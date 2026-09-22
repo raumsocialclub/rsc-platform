@@ -46,6 +46,7 @@ function pathsFor(id: string): string[] {
   if (page === "pricing") return ["/pricing"];
   if (page === "benefits") return ["/benefits"];
   if (page === "legal") return [`/${id.split(".")[1]}`];
+  if (page === "settings") return ["/", "/pricing", "/benefits", "/programs", "/my", "/login"];
   return [];
 }
 
@@ -70,9 +71,9 @@ export async function PUT(req: Request, ctx: Ctx) {
     return NextResponse.json({ ok: false, message: "저장하지 못했습니다." }, { status: 500 });
   }
   await supabase.from("site_content_history").insert({ content_id: id, data, saved_by: me.id });
-  await logAdmin(me.id, "site.save", id, { label: def.label });
+  await logAdmin(me.id, def.page === "settings" ? "settings.save" : "site.save", id, { label: def.label });
   for (const p of pathsFor(id)) revalidatePath(p);
-  if (def.page === "global") revalidatePath("/", "layout");
+  if (def.page === "global" || def.page === "settings") revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }
 

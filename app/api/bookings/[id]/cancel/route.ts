@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentMember } from "@/lib/auth/session";
 import { cancelBooking } from "@/lib/bookings/cancel";
-import { refundQuote } from "@/lib/bookings/refund";
+import { getRefundRules, refundQuote } from "@/lib/bookings/refund";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -22,7 +22,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
   if (b.status === "confirmed") {
     const { data: s } = await supabase.from("sessions").select("starts_at").eq("id", b.session_id).maybeSingle();
     if (!s) return NextResponse.json({ ok: false, message: "회차 정보를 찾을 수 없습니다." }, { status: 404 });
-    const quote = refundQuote(s.starts_at, b.amount);
+    const quote = refundQuote(s.starts_at, b.amount, await getRefundRules());
     if (!quote.allowed) return NextResponse.json({ ok: false, message: `취소할 수 없습니다. ${quote.label}.` }, { status: 409 });
     refundAmount = quote.amount;
   } else if (b.status !== "pending") {

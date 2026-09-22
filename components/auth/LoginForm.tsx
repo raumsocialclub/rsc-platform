@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import type { SocialProviderId } from "@/lib/auth/providers";
 import { describeAuthError } from "@/lib/auth/errors";
 import { SocialButtons } from "./SocialButtons";
@@ -25,10 +24,11 @@ export function LoginForm({ enabled, next, initialError = null }: Props) {
     if (!email.trim() || !pw) return setError("이메일과 비밀번호를 입력해 주세요.");
     setBusy(true);
     try {
-      const supabase = createClient();
-      const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password: pw });
-      if (err) {
-        setError(describeAuthError(err.message, "login"));
+      // 서버 라우트를 거쳐 로그인(연속 실패 잠금 적용). 세션 쿠키는 서버가 심는다.
+      const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim().toLowerCase(), password: pw }) });
+      const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+      if (!j?.ok) {
+        setError(j?.message ?? "로그인하지 못했습니다. 잠시 후 다시 시도해 주세요.");
         return;
       }
       router.push(next);

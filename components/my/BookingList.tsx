@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CancelBookingButton } from "./CancelBookingButton";
-import { refundQuote, REFUND_POLICY_TEXT } from "@/lib/bookings/refund";
+import { refundPolicyText, refundQuote, type RefundRules } from "@/lib/bookings/refund";
 import { BOOKING_STATUS_KO, type BookingDetail } from "@/lib/bookings/types";
 import { fmtDay, fmtTime, won } from "@/lib/programs/format";
 
@@ -13,7 +13,7 @@ const BADGE: Record<BookingDetail["status"], { background: string; color: string
 };
 
 /** deploy/member.html MY 뷰: 예약 카드 목록 + 다가오는/지난 탭 (ToDo M6) */
-export function BookingList({ bookings, tab, name, now }: { bookings: BookingDetail[]; tab: "upcoming" | "past"; name: string; now: number }) {
+export function BookingList({ bookings, tab, name, now, rules }: { bookings: BookingDetail[]; tab: "upcoming" | "past"; name: string; now: number; rules: RefundRules }) {
   const isPast = (b: BookingDetail) => new Date(b.session.starts_at).getTime() < now || b.status === "cancelled" || b.status === "expired" || b.status === "attended";
   const rows = bookings.filter((b) => (tab === "past" ? isPast(b) : !isPast(b)));
 
@@ -39,7 +39,7 @@ export function BookingList({ bookings, tab, name, now }: { bookings: BookingDet
       ) : (
         <div className="grid gap-[14px]">
           {rows.map((b) => {
-            const q = b.status === "confirmed" ? refundQuote(b.session.starts_at, b.amount) : null;
+            const q = b.status === "confirmed" ? refundQuote(b.session.starts_at, b.amount, rules) : null;
             const pendingAlive = b.status === "pending" && new Date(b.expires_at).getTime() > now;
             return (
               <div key={b.id} className="bg-white border border-[rgba(33,30,25,.12)] px-[20px] py-[20px] md:px-[26px] md:py-[22px] flex items-center justify-between gap-[16px] flex-wrap">
@@ -61,7 +61,7 @@ export function BookingList({ bookings, tab, name, now }: { bookings: BookingDet
           })}
         </div>
       )}
-      <div className="mt-[20px] text-[12px] text-[rgba(33,30,25,.45)]">환불 규정: {REFUND_POLICY_TEXT}</div>
+      <div className="mt-[20px] text-[12px] text-[rgba(33,30,25,.45)]">환불 규정: {refundPolicyText(rules)}</div>
     </>
   );
 }

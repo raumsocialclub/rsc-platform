@@ -55,6 +55,14 @@ NEXT_PUBLIC_SITE_URL=https://raumsocialclub2026.vercel.app
 - 토스 개발자센터 → 웹훅 URL `https://<domain>/api/payments/webhook` 등록 (`TOSS_WEBHOOK_SECRET` 을 넣었다면 `?key=<값>` 붙임). 이벤트: PAYMENT_STATUS_CHANGED.
 - 결제 키: 지금은 토스 문서 공용 테스트 키. 가맹점 키 발급 후 Vercel 환경변수 `NEXT_PUBLIC_TOSS_CLIENT_KEY`(test_gck_/live_gck_)·`TOSS_SECRET_KEY`(test_gsk_/live_gsk_) 값만 바꾸고 재배포.
 
+## 4-1. Vercel 방화벽 (국가 차단 · 요청 제한)
+- Vercel 대시보드 → 프로젝트 `rsc-platform` → **Firewall** → Configure → **+ New Rule**
+  - 국가 차단: Condition = Country, 값 선택 → Action = **Deny** → Save → **Publish**
+  - 요청 제한: Condition = Request Path (예: starts with `/api`) → Action = **Rate Limit** → 허용 횟수 → Save → Publish
+  - IP 차단: Condition = IP Address → Action = Deny (어드민 일반 설정의 차단 IP 와 동일 효과)
+  - 트래픽 폭주 시 상단 **Attack Challenge Mode** 를 잠시 켠다
+- 어드민 `/admin/settings` 에서 되는 것: 점검 모드, 보안 헤더, 관리자 허용 IP, 로그인 잠금, 차단 IP·국가, 캐시, 알림, 환불 정책
+
 ## 5. 개발 순서 (권장 마일스톤)
 1. **W1–2** 브랜드 페이지 5종 이식(메인·상담·가격·혜택) + 상담 저장 API + 어드민 상담 목록 → 현 배포본 교체.
 2. **W3–4** Auth(이메일·카카오·구글) + 초대코드 + 프로그램 목록/상세(DB) + 어드민 프로그램 CRUD/이미지 업로드.

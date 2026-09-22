@@ -6,7 +6,7 @@ import { bookingTarget } from "@/lib/programs/queries";
 import { categoryLabel, memberPrice, type ProgramWithSessions } from "@/lib/programs/types";
 
 /** deploy/member.html DETAIL 뷰: 좌 본문(460px 이미지·설명·PROGRAM FLOW·NOTICE) + 우 sticky 예약 카드 */
-export function ProgramDetail({ p }: { p: ProgramWithSessions }) {
+export function ProgramDetail({ p, refundText = "프로그램 3일 전까지 100% 환불, 이후 환불 불가" }: { p: ProgramWithSessions; refundText?: string }) {
   const sch = scheduleText(p.kind, p.sessions);
   const { session, remaining } = bookingTarget(p);
   const price = memberPrice(p);
@@ -55,7 +55,7 @@ export function ProgramDetail({ p }: { p: ProgramWithSessions }) {
 
           <div className="mt-[36px] text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[16px]">NOTICE</div>
           <ul className="m-0 pl-[18px] text-[13.5px] leading-[1.8] text-[rgba(33,30,25,.65)] list-disc">
-            <li>프로그램 3일 전까지 100% 환불, 이후 환불 불가</li>
+            <li>{refundText}</li>
             <li>정원 마감 시 대기 신청으로 전환됩니다</li>
             <li>드레스코드 및 상세 안내는 결제 후 문자로 발송됩니다</li>
           </ul>

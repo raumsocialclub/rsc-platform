@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { CheckoutClient } from "@/components/checkout/CheckoutClient";
 import { getCurrentMember } from "@/lib/auth/session";
 import { getMyBooking } from "@/lib/bookings/queries";
-import { REFUND_POLICY_TEXT } from "@/lib/bookings/refund";
+import { getRefundRules, refundPolicyText } from "@/lib/bookings/refund";
 import { fmtDay, fmtTime } from "@/lib/programs/format";
 
 export const metadata: Metadata = { title: "결제 · RSC" };
@@ -42,7 +42,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ booki
       successUrl={`${site}/checkout/success`}
       failUrl={`${site}/checkout/fail?bookingId=${b.id}`}
       backHref={backHref}
-      refundPolicy={REFUND_POLICY_TEXT}
+      refundPolicy={refundPolicyText(await getRefundRules())}
     />
   );
 }

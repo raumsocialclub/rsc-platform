@@ -5,6 +5,8 @@
  * 텍스트 줄바꿈 규칙: 값 안의 "\n" 은 줄바꿈. breaks="soft" 필드는 데스크톱에서만 줄바꿈(모바일은 이어짐),
  * breaks="hard" 필드는 항상 줄바꿈. (프로토타입의 <br class="lb"> / <br> 구분)
  */
+import { SETTINGS_DOCS } from "@/lib/settings/schema";
+
 export type FieldType = "text" | "textarea" | "image" | "link" | "number" | "boolean" | "color" | "select";
 export type Field = {
   key: string;
@@ -17,7 +19,7 @@ export type Field = {
 export type ListDef = { key: string; label: string; itemLabel: string; fields: Field[]; min?: number; max?: number };
 export type DocDef = {
   id: string;
-  page: "global" | "home" | "pricing" | "benefits" | "legal";
+  page: "global" | "home" | "pricing" | "benefits" | "legal" | "settings";
   label: string;
   description?: string;
   fields: Field[];
@@ -390,6 +392,7 @@ export const DOCS: DocDef[] = [
   })),
 ];
 
+DOCS.push(...SETTINGS_DOCS);
 export const DOC_BY_ID = new Map(DOCS.map((d) => [d.id, d]));
 export const PAGES: { key: DocDef["page"]; label: string; preview: string }[] = [
   { key: "global", label: "브랜드 · 테마", preview: "/" },

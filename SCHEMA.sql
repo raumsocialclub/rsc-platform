@@ -463,3 +463,13 @@ create policy "site public read" on storage.objects for select using (bucket_id 
 create policy "site admin insert" on storage.objects for insert with check (bucket_id = 'site' and public.is_admin());
 create policy "site admin update" on storage.objects for update using (bucket_id = 'site' and public.is_admin());
 create policy "site admin delete" on storage.objects for delete using (bucket_id = 'site' and public.is_admin());
+
+-- ---------- M10: 일반 설정 — 로그인 연속 실패 잠금 (서버 service role 전용, 정책 없음)
+create table login_attempts (
+  key text primary key,                       -- email:… 또는 ip:…
+  fails int not null default 0,
+  locked_until timestamptz,
+  updated_at timestamptz not null default now()
+);
+alter table login_attempts enable row level security;
+-- 일반 설정 값은 site_content 의 'settings.*' 문서에 저장 (lib/settings/schema.ts)

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramDetail } from "@/components/programs/ProgramDetail";
 import { getProgram } from "@/lib/programs/queries";
+import { getRefundRules, refundPolicyText } from "@/lib/bookings/refund";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -14,5 +15,5 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const p = await getProgram(id);
   if (!p || !p.is_published) notFound();
-  return <ProgramDetail p={p} />;
+  return <ProgramDetail p={p} refundText={refundPolicyText(await getRefundRules())} />;
 }

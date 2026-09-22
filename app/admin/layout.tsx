@@ -24,6 +24,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/coupons", label: "쿠폰 · 초대권" },
     { href: "/admin/stats", label: "통계 · 리포트" },
     { href: "/admin/site", label: "사이트 관리" },
+    { href: "/admin/settings", label: "일반 설정" },
   ];
 
   return (

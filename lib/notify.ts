@@ -5,11 +5,14 @@
  */
 export type NotifyResult = { sent: boolean; reason?: string; id?: string };
 
-const FROM = process.env.NOTIFY_FROM_EMAIL ?? "RAUM SOCIAL CLUB <onboarding@resend.dev>";
+import { getSettings } from "@/lib/settings/get";
 
 async function sendEmail(to: string, subject: string, html: string): Promise<NotifyResult> {
   const key = process.env.RESEND_API_KEY;
   if (!key) return { sent: false, reason: "NOT_CONFIGURED" };
+  const st = await getSettings().catch(() => null);
+  if (st && !st.emailEnabled) return { sent: false, reason: "DISABLED" };
+  const FROM = process.env.NOTIFY_FROM_EMAIL ?? (st ? `${st.fromName} <${st.fromEmail}>` : "RAUM SOCIAL CLUB <onboarding@resend.dev>");
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

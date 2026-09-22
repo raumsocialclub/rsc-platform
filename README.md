@@ -54,6 +54,10 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 **M9(어드민 고도화)**: `/admin/site` 에서 메인·가격·혜택·약관의 문구·사진·색상·연락처를 코드 수정 없이 바꿉니다(저장 즉시 반영, 이력 복원 가능). 기본값은 `lib/cms/schema.ts` 에 있어 DB 가 비어 있어도 기존 화면이 그대로 나옵니다.
 `/admin/stats` 는 기간별 매출·예약·회원·상담·접속(페이지뷰/방문자/유입/기기)·전환 퍼널·관리자 활동을 보여주고 항목별 또는 전체 CSV 로 내려받습니다. 접속 수집은 `/api/track` 비콘(서버에 `SUPABASE_SERVICE_ROLE_KEY` 필요).
 
+**M10(일반 설정)**: `/admin/settings` — 점검 모드, 보안 헤더, 관리자 허용 IP, 로그인 연속 실패 잠금, 차단 IP·국가, 공개 페이지 CDN 캐시 시간·캐시 비우기, 이메일 발송 켜기/발신자, 환불 정책(일수·환불률).
+저장 즉시 적용(요청 앞단 `proxy.ts` 가 30초 캐시로 읽음). HTTPS 는 Vercel 자동. 국가 차단·요청 제한(Rate Limit)·공격 대응은 Vercel 대시보드 → Firewall 에서(안내는 일반 설정 화면 하단).
+서버 함수 리전은 `vercel.json` 으로 서울(icn1)에 고정해 Supabase(서울)와의 왕복 지연을 줄였습니다.
+
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
 ## Overview
