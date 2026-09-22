@@ -51,4 +51,23 @@
   section[id] {
     scroll-margin-top: 76px;
   }
+
+  /* 접근성: 키보드 포커스 링 (마우스 클릭에는 표시하지 않음). Design.md 브라운 강조색. */
+  :focus-visible {
+    outline: 2px solid #9c6b3e;
+    outline-offset: 2px;
+  }
+
+  /* 모션 축소 설정 존중 */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
 }

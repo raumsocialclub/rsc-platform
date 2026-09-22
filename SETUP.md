@@ -6,7 +6,7 @@
 - [ ] 카카오 개발자 앱 등록 (카카오 로그인 · REST API 키 · Redirect URI = Supabase callback URL)
 - [ ] 구글 클라우드 OAuth 클라이언트 (동일 Redirect URI)
 - [ ] 네이버 로그인 앱 등록 (2차 — Supabase 기본 미지원, 커스텀 구현 필요)
-- [ ] 이용약관 · 개인정보처리방침 · 환불규정 페이지 (토스 심사 시 URL 요구)
+- [x] 이용약관 · 개인정보처리방침 · 환불규정 페이지 (토스 심사 시 URL 요구) — `/terms` `/privacy` `/refund` 자리 문구, 실제 문구로 교체 필요
 - [ ] 알림톡: 카카오 채널 비즈니스 인증 + 솔라피(Solapi) 가입, 템플릿 심사(예약 확정·초대코드·리마인더 3종). 심사 전엔 이메일(Resend)로 대체.
 
 ## 1. Supabase
@@ -51,7 +51,7 @@ NEXT_PUBLIC_SITE_URL=https://raumsocialclub2026.vercel.app
 
 ## 4. Vercel 배포
 - 새 GitHub 저장소(Next.js) 생성 → Vercel에서 Import → 기존 프로젝트의 도메인 `raumsocialclub2026.vercel.app`을 **기존 정적 프로젝트에서 제거 후 새 프로젝트에 추가** (Settings → Domains). 커스텀 도메인 연결 시 DNS CNAME `cname.vercel-dns.com`.
-- Supabase Auth → URL Configuration → Site URL / Redirect URLs에 배포 주소 + `/auth/callback` 등록.
+- Supabase Auth → URL Configuration → Site URL `https://rsc-platform.vercel.app`, Redirect URLs 에 `https://rsc-platform.vercel.app/auth/callback` (도메인 이전 후 `https://raumsocialclub2026.vercel.app/auth/callback` 추가). 소셜 로그인 붙일 때 필요.
 - 토스 개발자센터 → 웹훅 URL `https://<domain>/api/payments/webhook` 등록 (`TOSS_WEBHOOK_SECRET` 을 넣었다면 `?key=<값>` 붙임). 이벤트: PAYMENT_STATUS_CHANGED.
 - 결제 키: 지금은 토스 문서 공용 테스트 키. 가맹점 키 발급 후 Vercel 환경변수 `NEXT_PUBLIC_TOSS_CLIENT_KEY`(test_gck_/live_gck_)·`TOSS_SECRET_KEY`(test_gsk_/live_gsk_) 값만 바꾸고 재배포.
 

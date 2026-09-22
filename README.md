@@ -48,6 +48,9 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 **M7(어드민 예약·결제 / 회원 DB / 대시보드)**: `/admin/orders` 에서 예약을 고르면 결제 정보(토스 paymentKey·영수증)와 환불 버튼이 나옵니다. 관리자 환불은 정책과 무관하게 금액을 지정하며 토스 취소 API 를 호출합니다.
 `/admin/members` 는 검색·상태 필터 + 회원 상세(예약 이력, 메모, 활동/휴면/탈퇴). `/admin` 대시보드는 이번 달/지난 달/올해 실제 결제·예약 데이터를 집계합니다(한국 시간 기준). "엑셀 다운로드"는 CSV 파일입니다.
 
+**M8(마무리)**: `/terms` `/privacy` `/refund` 는 자리 문구입니다(`lib/legal/content.ts` 한 파일만 바꾸면 됩니다). 404·오류·로딩 화면과 키보드 포커스 링을 추가했습니다.
+라이브 전환 체크리스트는 SETUP.md 4 참고(토스 라이브 키, 웹훅 URL, Supabase Redirect URL, 도메인 이전).
+
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
 ## Overview

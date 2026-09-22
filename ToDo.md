@@ -70,10 +70,10 @@
 - 완료 조건: 실제 데이터로 KPI 숫자 일치
 
 ## M8. 마무리 & 라이브 전환
-- [ ] 이용약관·개인정보처리방침·환불규정 페이지(`/terms`, `/privacy`, `/refund`) — 문구는 사용자 제공
-- [ ] 에러·로딩·빈 상태 화면 전수 점검(Design.md 규칙)
-- [ ] 접근성(포커스 링, 대비), Lighthouse 모바일 90+
-- [ ] 토스 라이브 키 교체, 웹훅 URL 등록, Supabase Redirect URL 등록
+- [x] 이용약관·개인정보처리방침·환불규정 페이지(`/terms`, `/privacy`, `/refund`) — 자리 문구(`lib/legal/content.ts`), 실제 문구는 사용자 제공 후 교체
+- [x] 에러·로딩·빈 상태 화면 전수 점검(Design.md 규칙) — `app/not-found`, `app/error`, `app/global-error`, 회원·어드민 `loading`
+- [x] 접근성(포커스 링, 대비), Lighthouse 모바일 90+ — 로컬 측정 `/` 96/95/100/100, `/pricing` 94/96, `/login` 98/96, `/terms` 97/91 (대비 경고는 Design.md 고정색 overline)
+- [ ] 토스 라이브 키 교체, 웹훅 URL 등록, Supabase Redirect URL 등록 — 사용자 작업 (SETUP.md 4)
 - [ ] Vercel 도메인 `raumsocialclub2026.vercel.app` 새 프로젝트로 이전
 - [ ] `main` 병합 → 배포
 

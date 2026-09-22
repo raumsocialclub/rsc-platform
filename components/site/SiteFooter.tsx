@@ -47,7 +47,12 @@ export function SiteFooter() {
             <Image src="/images/logo-emblem.png" alt="RAUM SOCIAL CLUB" width={529} height={638} className="h-[26px] w-auto" style={{ filter: INK_FILTER }} />
             <Image src="/images/logo-text-footer.png" alt="" width={2612} height={332} className="h-[11px] w-auto opacity-80" style={{ filter: INK_FILTER }} />
           </Link>
-          <div className="text-[12px] text-[rgba(33,30,25,.4)]">© 2026 RAUM SOCIAL CLUB</div>
+          <div className="flex items-center gap-[16px] flex-wrap text-[12px] text-[rgba(33,30,25,.55)]">
+            <Link href="/terms">이용약관</Link>
+            <Link href="/privacy" className="font-semibold">개인정보처리방침</Link>
+            <Link href="/refund">환불규정</Link>
+            <span className="text-[rgba(33,30,25,.4)]">© 2026 RAUM SOCIAL CLUB</span>
+          </div>
         </div>
       </div>
     </footer>
