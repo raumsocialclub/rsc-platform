@@ -28,6 +28,8 @@ export async function GET() {
       supabaseAnonKey: !!anon,
       supabaseServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
       authProviders: process.env.NEXT_PUBLIC_AUTH_PROVIDERS ?? "",
+      naverClientId: !!process.env.NAVER_CLIENT_ID,
+      naverClientSecret: !!process.env.NAVER_CLIENT_SECRET,
       tossClientKey: !!process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY,
       tossSecretKey: !!process.env.TOSS_SECRET_KEY,
       tossTestKeys: (process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY ?? "").startsWith("test_"),

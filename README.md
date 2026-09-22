@@ -30,7 +30,7 @@ npm run dev
 
 **M3(가입·로그인)부터**: 가입은 초대코드가 있어야 합니다. 검수용 코드 `RSC-TEST-2026` 이 DB에 들어 있습니다(1회용).
 새 코드는 SQL Editor에서 `insert into invite_codes(code, issued_to_name) values ('RSC-XXXX-XXXX','이름');` 로 넣거나 M4 어드민에서 발급합니다.
-소셜 로그인(카카오·구글)은 Supabase Authentication → Providers 에 키를 넣은 뒤 `.env.local` 의 `NEXT_PUBLIC_AUTH_PROVIDERS=kakao,google` 로 켭니다.
+소셜 로그인은 카카오(Supabase Authentication → Providers 에 키 등록)와 네이버(`NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET`, 직접 연동)입니다. 준비되면 `NEXT_PUBLIC_AUTH_PROVIDERS=kakao,naver` 로 켭니다. 네이버 가입자는 이메일 제공 동의가 필요하며, 첫 로그인 뒤 `/join` 에서 초대코드를 연결합니다.
 Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" 은 꺼 두어야 가입 즉시 로그인됩니다.
 
 **M4(어드민)**: `/admin` 은 `members.role = 'admin'` 인 계정만 들어갑니다. 첫 관리자는 SQL Editor에서

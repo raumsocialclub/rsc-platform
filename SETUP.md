@@ -13,7 +13,7 @@
 > 2026-09-22 완료: 프로젝트 `rsc-platform`(ref `vfjpouuwvwgiqpwttyup`, Seoul) 생성, `SCHEMA.sql` 전체 실행됨.
 > 대시보드: https://supabase.com/dashboard/project/vfjpouuwvwgiqpwttyup
 1. 새 프로젝트(Seoul 리전) → SQL Editor에 `SCHEMA.sql` 실행.
-2. Authentication → Providers: Email, Kakao, Google 활성화(각 client id/secret 입력).
+2. Authentication → Providers: Email, Kakao 활성화(카카오 개발자 콘솔 REST API 키/시크릿, Redirect URI 는 Supabase 가 보여주는 `https://<ref>.supabase.co/auth/v1/callback`). 네이버는 Supabase 밖에서 직접 연동: 네이버 개발자센터 앱의 Client ID/Secret 을 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET` 에 넣고 Callback URL 로 `https://<도메인>/auth/naver/callback` 등록, 제공 정보에 이메일·이름·휴대전화 포함. 둘 다 준비되면 `NEXT_PUBLIC_AUTH_PROVIDERS=kakao,naver`.
 3. Storage → 버킷 `programs`(public) — SCHEMA.sql 끝의 M5 블록이 버킷과 정책을 함께 만듭니다(적용 완료). `site` 버킷은 필요 시 추가.
 4. Database → Extensions → `pg_cron` 활성화 → `select cron.schedule('expire-bookings','*/5 * * * *',$$select expire_pending_bookings()$$);`
 5. 첫 관리자: 가입 후 SQL `update members set role='admin' where email='...';`
