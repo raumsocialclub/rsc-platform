@@ -20,7 +20,13 @@ npm run dev
 ```
 
 외부 서비스 키(Supabase·토스 등)는 `.env.local`에 채웁니다. 목록과 받는 방법은 `SETUP.md` 참고.
-골격(M0) 단계에서는 키가 비어 있어도 화면이 뜹니다.
+브랜드 페이지(M1)까지는 키가 비어 있어도 화면이 뜹니다.
+
+**M2(상담 신청 저장)부터**: `.env.local`에 아래 두 값이 있어야 설문 제출이 저장됩니다.
+1. https://supabase.com/dashboard/project/vfjpouuwvwgiqpwttyup/settings/api 접속
+2. `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`, `anon public` 키 → `NEXT_PUBLIC_SUPABASE_ANON_KEY` 에 붙여넣기
+3. 개발 서버를 껐다가 다시 켜기 (`Ctrl + C` 후 `npm run dev`)
+저장된 신청은 같은 대시보드의 Table Editor → `inquiries` 에서 볼 수 있습니다.
 
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 

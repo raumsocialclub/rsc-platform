@@ -25,10 +25,10 @@
 - 완료 조건: 현재 배포 사이트와 동일하게 보임. Vercel 프리뷰 URL 공유.
 
 ## M2. Supabase 연결 + 상담 신청 저장
-- [ ] `SCHEMA.sql` 실행(사용자가 Supabase에서 실행 — 방법 안내)
-- [ ] `lib/supabase/{client,server,admin}.ts`
-- [ ] `POST /api/inquiries` (zod 검증) → `inquiries` insert
-- [ ] `/fit-check` 완료 시 저장 + 결과 화면
+- [x] `SCHEMA.sql` 실행(사용자가 Supabase에서 실행 — 방법 안내)
+- [x] `lib/supabase/{client,server,admin}.ts`
+- [x] `POST /api/inquiries` (zod 검증) → `inquiries` insert
+- [x] `/fit-check` 완료 시 저장 + 결과 화면
 - 완료 조건: 설문 제출 → Supabase Table Editor `inquiries`에 행 생김
 
 ## M3. 인증 + 초대코드 + 가입

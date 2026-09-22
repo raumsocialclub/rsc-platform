@@ -17,9 +17,22 @@ export type FitCheckSubmission = {
 };
 
 type Props = {
-  /** 제출 처리. M1에서는 미지정(화면만). M2에서 API 호출을 연결한다. */
+  /** 제출 처리. 기본값은 POST /api/inquiries 호출. 테스트나 다른 저장 방식이 필요할 때 바꿔 끼운다. */
   onSubmit?: (data: FitCheckSubmission) => Promise<void>;
 };
+
+/** 기본 제출: 서버 Route Handler 에 저장한다. (FLOWS.md 1-1) */
+async function submitToApi(data: FitCheckSubmission) {
+  const res = await fetch("/api/inquiries", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+  if (!res.ok || !json?.ok) {
+    throw new Error(json?.message ?? "신청을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+  }
+}
 
 const OVERLINE = "text-[11px] tracking-[.34em] text-[rgba(33,30,25,.5)]";
 const BACK_BTN = "border-0 bg-transparent cursor-pointer text-[13px] tracking-[.14em] text-[rgba(33,30,25,.5)] px-0 py-[8px]";
@@ -62,10 +75,9 @@ export function FitCheck({ onSubmit }: Props) {
   const submit = async () => {
     if (!canSubmit || submitting) return;
     setError(null);
-    if (!onSubmit) { setView("done"); return; }
     setSubmitting(true);
     try {
-      await onSubmit({
+      await (onSubmit ?? submitToApi)({
         name: name.trim(),
         phone: phone.trim(),
         route,

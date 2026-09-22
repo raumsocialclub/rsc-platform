@@ -34,11 +34,11 @@ export function SiteFooter() {
           <div>
             <div className="text-[10.5px] tracking-[.28em] text-brownHover mb-[16px]">MENU</div>
             <nav className="flex flex-col gap-[8px] text-[15px] text-[rgba(33,30,25,.72)]">
-              <a href="#about">소개</a>
-              <a href="#why">포지셔닝</a>
-              <a href="#social">RSC SOCIAL</a>
-              <a href="#solo">RAUM SOLO</a>
-              <a href="#membership">멤버십</a>
+              <Link href="/#about">소개</Link>
+              <Link href="/#why">포지셔닝</Link>
+              <Link href="/#social">RSC SOCIAL</Link>
+              <Link href="/#solo">RAUM SOLO</Link>
+              <Link href="/#membership">멤버십</Link>
             </nav>
           </div>
         </div>

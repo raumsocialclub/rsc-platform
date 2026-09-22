@@ -26,7 +26,7 @@ export function SiteHeader() {
         />
         <div className="flex items-center gap-[20px] ml-auto">
           <nav className="hidden md:flex items-center gap-[34px] text-[13.5px] font-semibold tracking-[.02em] text-brown">
-            <a href="#about">서비스 소개</a>
+            <Link href="/#about">서비스 소개</Link>
             <Link href="/programs">프로그램 예약</Link>
           </nav>
           <Link href="/login" className="hidden md:flex items-center text-[13px] font-semibold text-brown whitespace-nowrap">
@@ -72,7 +72,7 @@ export function SiteHeader() {
             </button>
           </div>
           <nav className="flex flex-col gap-[32px] text-[22px] font-semibold text-ink">
-            <a href="#about" onClick={close}>서비스 소개</a>
+            <Link href="/#about" onClick={close}>서비스 소개</Link>
             <Link href="/programs">프로그램 예약</Link>
             <Link href="/login" className="text-brown">로그인</Link>
           </nav>

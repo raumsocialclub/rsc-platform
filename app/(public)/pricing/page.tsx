@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SubHeader } from "@/components/site/SubHeader";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { UpButton } from "@/components/site/UpButton";
 
 export const metadata: Metadata = { title: "RSC 멤버십 가격 안내" };
 
@@ -36,8 +38,8 @@ function Scroll({ children, className = "" }: { children: React.ReactNode; class
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <SubHeader link={{ label: "홈으로", href: "/" }} textSrc="/images/logo-text-pricing.png" />
+    <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">
+      <SiteHeader />
 
       <main className="flex-1 px-[18px] pt-[40px] pb-[96px] md:px-[40px] md:pt-[72px] md:pb-[140px]">
         <div className="w-full max-w-[1100px] mx-auto">
@@ -238,6 +240,8 @@ export default function PricingPage() {
           </section>
         </div>
       </main>
+      <SiteFooter />
+      <UpButton />
     </div>
   );
 }

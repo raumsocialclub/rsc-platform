@@ -230,3 +230,14 @@ begin
 end $$;
 create trigger on_auth_user_created after insert on auth.users
   for each row execute function handle_new_user();
+
+-- ---------- security hardening (Supabase security advisor 권고, 2026-09-22)
+alter view session_availability set (security_invoker = true);
+alter function reserve_seat(uuid, uuid, int) set search_path = public;
+alter function expire_pending_bookings() set search_path = public;
+alter function is_admin() set search_path = public;
+alter function handle_new_user() set search_path = public;
+-- SECURITY DEFINER 함수는 서버(service role)·트리거에서만 호출한다.
+revoke execute on function reserve_seat(uuid, uuid, int) from anon, authenticated, public;
+revoke execute on function handle_new_user() from anon, authenticated, public;
+revoke execute on function expire_pending_bookings() from anon, authenticated, public;

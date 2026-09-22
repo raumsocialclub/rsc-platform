@@ -10,6 +10,8 @@
 - [ ] 알림톡: 카카오 채널 비즈니스 인증 + 솔라피(Solapi) 가입, 템플릿 심사(예약 확정·초대코드·리마인더 3종). 심사 전엔 이메일(Resend)로 대체.
 
 ## 1. Supabase
+> 2026-09-22 완료: 프로젝트 `rsc-platform`(ref `vfjpouuwvwgiqpwttyup`, Seoul) 생성, `SCHEMA.sql` 전체 실행됨.
+> 대시보드: https://supabase.com/dashboard/project/vfjpouuwvwgiqpwttyup
 1. 새 프로젝트(Seoul 리전) → SQL Editor에 `SCHEMA.sql` 실행.
 2. Authentication → Providers: Email, Kakao, Google 활성화(각 client id/secret 입력).
 3. Storage → 버킷 `programs`(public), `site`(public).
