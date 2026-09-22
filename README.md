@@ -1,5 +1,29 @@
 # Handoff: RAUM Social Club (RSC) — 실서비스 플랫폼
 
+## 로컬에서 실행하기 (내 PC에서 화면 띄우기)
+
+준비물: [Node.js](https://nodejs.org) LTS(20 이상) 한 번만 설치.
+
+**가장 쉬운 방법 — 스크립트 한 번 실행**
+- mac: 터미널을 열고 이 폴더로 이동한 뒤 `bash scripts/setup.sh`
+- Windows: PowerShell을 열고 이 폴더로 이동한 뒤 `.\scripts\setup.ps1`
+  (실행 정책 오류가 나면 `powershell -ExecutionPolicy Bypass -File .\scripts\setup.ps1`)
+
+스크립트가 Node.js 확인 → 패키지 설치 → `.env.local` 생성 → 개발 서버 실행까지 해줍니다.
+끝나면 브라우저에서 <http://localhost:3000> 을 열면 됩니다. 종료는 그 창에서 `Ctrl + C`.
+
+**직접 입력하는 방법**
+```
+npm i
+cp .env.example .env.local     # Windows: copy .env.example .env.local
+npm run dev
+```
+
+외부 서비스 키(Supabase·토스 등)는 `.env.local`에 채웁니다. 목록과 받는 방법은 `SETUP.md` 참고.
+골격(M0) 단계에서는 키가 비어 있어도 화면이 뜹니다.
+
+기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
+
 ## Overview
 라움소셜클럽(RSC)의 실서비스 구축 핸드오프. 브랜드 사이트 + 회원 가입/로그인 + 프로그램 예약·결제 + 관리자(어드민)까지 포함.
 
