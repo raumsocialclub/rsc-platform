@@ -1,0 +1,232 @@
+-- RSC Supabase schema. Run in SQL editor in order.
+create extension if not exists "pgcrypto";
+
+-- ---------- enums
+create type member_status as enum ('active','paused','withdrawn');
+create type member_role as enum ('member','admin');
+create type program_kind as enum ('single','season');
+create type booking_status as enum ('pending','confirmed','cancelled','expired','attended');
+create type payment_status as enum ('ready','paid','cancelled','partial_cancelled','failed');
+create type inquiry_status as enum ('pending','contacted','invited','closed');
+
+-- ---------- members (1:1 with auth.users)
+create table members (
+  id uuid primary key references auth.users(id) on delete cascade,
+  name text not null,
+  phone text,
+  email text,
+  role member_role not null default 'member',
+  status member_status not null default 'active',
+  invite_code_id uuid,
+  memo text,
+  created_at timestamptz not null default now()
+);
+
+-- ---------- membership plans (pricing page reads from here)
+create table membership_plans (
+  id text primary key,                       -- 'preview','access','signature'
+  name text not null,
+  price int not null,                        -- KRW, VAT incl.
+  founding_price int,
+  period_months int,                          -- null = one-off
+  basic_events int, premium_events int, invites int,
+  meeting_room int, seminar_room int, connection_included int,
+  description text,
+  sort int default 0
+);
+insert into membership_plans values
+ ('preview','RSC PREVIEW',165000,null,null,1,0,0,0,0,0,'가입 전 1회 경험',1),
+ ('access','RSC ACCESS',3300000,2400000,12,8,0,8,2,2,1,'검증된 싱글 커뮤니티',2),
+ ('signature','RSC SIGNATURE',8800000,7200000,12,18,4,12,4,4,3,'커뮤니티 + 관계 프로그램 + 컨시어지',3);
+
+create table memberships (
+  id uuid primary key default gen_random_uuid(),
+  member_id uuid not null references members(id) on delete cascade,
+  plan_id text not null references membership_plans(id),
+  starts_at date not null,
+  ends_at date,
+  is_founding boolean default false,
+  paid_amount int not null,
+  payment_id uuid,
+  status text not null default 'active',     -- active | expired | held | cancelled
+  created_at timestamptz default now()
+);
+
+-- ---------- programs & sessions
+create table programs (
+  id uuid primary key default gen_random_uuid(),
+  kind program_kind not null default 'single',
+  name text not null,
+  subtitle text,
+  category text,                              -- WELLNESS | WINE | SOCIAL | CULTURE | SOLO
+  place text,
+  short_desc text,
+  description text,
+  image_url text,
+  flow jsonb default '[]',                    -- [{"t":"10:00","d":"체크인"}]
+  capacity int not null default 20,
+  price int not null,
+  member_price int,
+  is_published boolean default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table sessions (                       -- one row per date (season = 6 rows)
+  id uuid primary key default gen_random_uuid(),
+  program_id uuid not null references programs(id) on delete cascade,
+  starts_at timestamptz not null,
+  ends_at timestamptz,
+  capacity int not null,
+  seq int default 1,                          -- season week number
+  status text default 'open'                  -- open | closed | cancelled
+);
+create index on sessions(program_id, starts_at);
+
+-- ---------- bookings & payments
+create table bookings (
+  id uuid primary key default gen_random_uuid(),
+  order_id text unique not null,              -- 'RSC-20260918-XXXX' (sent to Toss as orderId)
+  member_id uuid not null references members(id),
+  program_id uuid not null references programs(id),
+  session_id uuid not null references sessions(id),
+  qty int not null default 1,
+  unit_price int not null,
+  amount int not null,
+  status booking_status not null default 'pending',
+  expires_at timestamptz not null default now() + interval '15 minutes',
+  cancelled_at timestamptz,
+  created_at timestamptz default now()
+);
+create index on bookings(member_id, status);
+create index on bookings(session_id, status);
+
+create table payments (
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid references bookings(id),
+  membership_id uuid references memberships(id),
+  member_id uuid not null references members(id),
+  provider text not null default 'toss',
+  payment_key text unique,                    -- Toss paymentKey
+  order_id text not null,
+  method text,                                -- 카드 | 카카오페이 | 네이버페이 | 토스페이 | 계좌이체
+  amount int not null,
+  status payment_status not null default 'ready',
+  receipt_url text,
+  raw jsonb,                                  -- Toss confirm response
+  approved_at timestamptz,
+  cancelled_at timestamptz,
+  created_at timestamptz default now()
+);
+
+-- ---------- inquiries (Fit Check) & invites
+create table inquiries (
+  id uuid primary key default gen_random_uuid(),
+  name text, phone text, email text,
+  answers jsonb not null,
+  result_type text,
+  status inquiry_status not null default 'pending',
+  memo text,
+  created_at timestamptz default now()
+);
+
+create table invite_codes (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,                  -- RSC-XXXX-XXXX
+  inquiry_id uuid references inquiries(id),
+  issued_to_name text, issued_to_phone text,
+  expires_at timestamptz default now() + interval '30 days',
+  used_by uuid references members(id),
+  used_at timestamptz,
+  created_by uuid references members(id),
+  created_at timestamptz default now()
+);
+
+create table guest_passes (                    -- 지인 초대권 (연 8/12매)
+  id uuid primary key default gen_random_uuid(),
+  member_id uuid not null references members(id),
+  membership_id uuid references memberships(id),
+  booking_id uuid references bookings(id),
+  guest_name text,
+  used_at timestamptz default now()
+);
+
+-- ---------- seat reservation (atomic)
+create or replace function reserve_seat(p_session uuid, p_member uuid, p_qty int)
+returns bookings language plpgsql security definer as $$
+declare s sessions; p programs; taken int; b bookings; oid text;
+begin
+  select * into s from sessions where id = p_session for update;
+  if s is null or s.status <> 'open' then raise exception 'SESSION_CLOSED'; end if;
+  select * into p from programs where id = s.program_id;
+  select coalesce(sum(qty),0) into taken from bookings
+    where session_id = p_session and status in ('pending','confirmed','attended')
+      and (status <> 'pending' or expires_at > now());
+  if taken + p_qty > s.capacity then raise exception 'SOLD_OUT'; end if;
+  oid := 'RSC-' || to_char(now(),'YYYYMMDD') || '-' || upper(substr(gen_random_uuid()::text,1,6));
+  insert into bookings(order_id, member_id, program_id, session_id, qty, unit_price, amount)
+    values (oid, p_member, p.id, p_session, p_qty, coalesce(p.member_price, p.price), coalesce(p.member_price, p.price) * p_qty)
+    returning * into b;
+  return b;
+end $$;
+
+-- remaining seats view
+create view session_availability as
+select s.id as session_id, s.program_id, s.starts_at, s.capacity,
+  s.capacity - coalesce((select sum(qty) from bookings b where b.session_id = s.id
+     and b.status in ('confirmed','attended') or (b.session_id = s.id and b.status='pending' and b.expires_at > now())),0) as remaining
+from sessions s;
+
+-- expire abandoned pending bookings (schedule with pg_cron every 5 min)
+create or replace function expire_pending_bookings() returns void language sql as $$
+  update bookings set status='expired' where status='pending' and expires_at < now();
+$$;
+
+-- ---------- RLS
+alter table members enable row level security;
+alter table bookings enable row level security;
+alter table payments enable row level security;
+alter table memberships enable row level security;
+alter table programs enable row level security;
+alter table sessions enable row level security;
+alter table inquiries enable row level security;
+alter table invite_codes enable row level security;
+alter table guest_passes enable row level security;
+alter table membership_plans enable row level security;
+
+create or replace function is_admin() returns boolean language sql stable as $$
+  select exists(select 1 from members where id = auth.uid() and role = 'admin');
+$$;
+
+create policy "self read" on members for select using (id = auth.uid() or is_admin());
+create policy "self update" on members for update using (id = auth.uid() or is_admin());
+create policy "admin all members" on members for all using (is_admin());
+
+create policy "published programs" on programs for select using (is_published or is_admin());
+create policy "admin programs" on programs for all using (is_admin());
+create policy "sessions read" on sessions for select using (true);
+create policy "admin sessions" on sessions for all using (is_admin());
+create policy "plans read" on membership_plans for select using (true);
+create policy "admin plans" on membership_plans for all using (is_admin());
+
+create policy "own bookings" on bookings for select using (member_id = auth.uid() or is_admin());
+create policy "admin bookings" on bookings for all using (is_admin());
+create policy "own payments" on payments for select using (member_id = auth.uid() or is_admin());
+create policy "own memberships" on memberships for select using (member_id = auth.uid() or is_admin());
+create policy "own passes" on guest_passes for select using (member_id = auth.uid() or is_admin());
+
+create policy "anyone can submit inquiry" on inquiries for insert with check (true);
+create policy "admin inquiries" on inquiries for all using (is_admin());
+create policy "admin invites" on invite_codes for all using (is_admin());
+-- invite code validation & booking/payment writes go through server Route Handlers using the service role key.
+
+-- ---------- auth trigger: create members row on signup
+create or replace function handle_new_user() returns trigger language plpgsql security definer as $$
+begin
+  insert into members(id, name, email, phone)
+  values (new.id, coalesce(new.raw_user_meta_data->>'name', ''), new.email, new.raw_user_meta_data->>'phone')
+  on conflict (id) do nothing;
+  return new;
+end $$;
+create trigger on_auth_user_created after insert on auth.users
+  for each row execute function handle_new_user();

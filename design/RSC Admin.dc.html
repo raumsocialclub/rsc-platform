@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSC Admin — 라움소셜클럽 관리자</title>
+<style>
+  @font-face { font-family:'SamsungOne'; src:url('assets/fonts/SamsungOne-400.ttf') format('truetype'); font-weight:400; }
+  @font-face { font-family:'SamsungOne'; src:url('assets/fonts/SamsungOne-500.ttf') format('truetype'); font-weight:500; }
+  @font-face { font-family:'SamsungOne'; src:url('assets/fonts/SamsungOne-600.ttf') format('truetype'); font-weight:600; }
+  @font-face { font-family:'SamsungOne'; src:url('assets/fonts/SamsungOne-700.ttf') format('truetype'); font-weight:700; }
+  body { margin:0; background:#f2eee5; color:#211e19; font-family:'SamsungOne', Arial, sans-serif; font-weight:500; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  a { color:inherit; text-decoration:none; }
+  a:hover { color:#5a3d24; }
+  input, select, button, textarea { font-family:inherit; }
+  input::placeholder, textarea::placeholder { color:rgba(33,30,25,.35); }
+  table { border-collapse:collapse; width:100%; }
+  th { text-align:left; font-size:11.5px; letter-spacing:.08em; color:rgba(33,30,25,.5); font-weight:600; padding:12px 14px; border-bottom:1px solid rgba(33,30,25,.12); white-space:nowrap }
+  td { font-size:13.5px; padding:14px; border-bottom:1px solid rgba(33,30,25,.08); vertical-align:middle; white-space:nowrap }
+  tr:hover td { background:#faf7f1 }
+  [data-scroll] { overflow-x:auto; -webkit-overflow-scrolling:touch }
+  main input, main select, main textarea { min-width:0; width:100%; }
+  @media (max-width: 1200px) {
+    [data-cols="2"] { grid-template-columns:1fr !important }
+    [data-cols="4"] { grid-template-columns:1fr 1fr !important }
+  }
+  @media (max-width: 900px) {
+    [data-shell] { grid-template-columns:1fr !important }
+    [data-side] { position:static !important; height:auto !important; flex-direction:row !important; overflow-x:auto !important; padding:12px !important }
+    [data-side] nav { flex-direction:row !important; gap:4px !important }
+    main { padding:24px 18px !important }
+  }
+</style>
+</helmet>
+
+<div data-shell style="min-height:100vh;display:grid;grid-template-columns:240px minmax(0,1fr);background:#f2eee5">
+
+  <aside data-side style="position:sticky;top:0;height:100vh;background:#211e19;color:#f7f3ec;display:flex;flex-direction:column;padding:28px 20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:36px;padding:0 6px">
+      <img src="assets/logo-emblem.png" style="height:28px;width:auto">
+      <div><div style="font-size:12px;letter-spacing:.2em">RSC ADMIN</div><div style="font-size:10.5px;color:rgba(247,243,236,.5);margin-top:2px">라움소셜클럽 관리자</div></div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:4px;flex:1">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="7">
+        <button onClick="{{ n.go }}" style="display:flex;align-items:center;justify-content:space-between;border:none;cursor:pointer;text-align:left;padding:12px 14px;border-radius:6px;font-size:13.5px;font-weight:600;background:{{ n.bg }};color:{{ n.fg }};white-space:nowrap">{{ n.label }}<sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;background:#e2b478;color:#211e19;padding:2px 7px;border-radius:999px">{{ n.badge }}</span></sc-if></button>
+      </sc-for>
+    </nav>
+    <div style="border-top:1px solid rgba(247,243,236,.12);padding-top:18px;font-size:12.5px;color:rgba(247,243,236,.6);display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;border-radius:50%;background:#e2b478;color:#211e19;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">M</div>
+      <div><div style="color:#f7f3ec;font-weight:600">매니저</div><div>manager@theraum.co.kr</div></div>
+    </div>
+  </aside>
+
+  <main style="padding:40px 44px 100px;min-width:0">
+
+    <!-- DASHBOARD -->
+    <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:32px">
+        <div><div style="font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:10px">DASHBOARD</div><h1 style="font-weight:500;font-size:30px;margin:0">2026년 9월</h1></div>
+        <div style="display:flex;gap:8px"><button style="border:1px solid rgba(33,30,25,.2);background:#fff;padding:9px 16px;font-size:12.5px;cursor:pointer">이번 달</button><button style="border:1px solid rgba(33,30,25,.2);background:none;padding:9px 16px;font-size:12.5px;cursor:pointer">지난 달</button><button style="border:1px solid rgba(33,30,25,.2);background:none;padding:9px 16px;font-size:12.5px;cursor:pointer">올해</button></div>
+      </div>
+      <div data-cols="4" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:28px">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:22px 24px">
+            <div style="font-size:11.5px;letter-spacing:.08em;color:rgba(33,30,25,.5);margin-bottom:12px">{{ k.label }}</div>
+            <div style="font-size:clamp(18px,1.6vw,26px);font-weight:600;letter-spacing:-.01em;white-space:nowrap">{{ k.value }}</div>
+            <div style="font-size:12px;margin-top:8px;color:{{ k.deltaColor }}">{{ k.delta }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-bottom:28px">
+        <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:24px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:20px"><b style="font-size:14px">일별 매출</b><span style="font-size:12px;color:rgba(33,30,25,.5)">단위: 만원</span></div>
+          <div style="display:flex;align-items:flex-end;gap:6px;height:160px">
+            <sc-for list="{{ bars }}" as="b" hint-placeholder-count="14">
+              <div title="{{ b.tip }}" style="flex:1;background:{{ b.color }};height:{{ b.h }}"></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(33,30,25,.45);margin-top:8px"><span>9.1</span><span>9.7</span><span>9.14</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:24px">
+          <b style="font-size:14px;display:block;margin-bottom:18px">프로그램별 매출</b>
+          <div style="display:grid;gap:14px">
+            <sc-for list="{{ progShares }}" as="p" hint-placeholder-count="4">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>{{ p.name }}</span><b>{{ p.value }}</b></div>
+                <div style="height:6px;background:rgba(33,30,25,.08)"><div style="height:100%;background:#5a3d24;width:{{ p.w }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:24px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px"><b style="font-size:14px">최근 예약</b><button onClick="{{ goOrders }}" style="border:none;background:none;cursor:pointer;font-size:12.5px;color:#5a3d24;font-weight:600">전체 보기 →</button></div>
+        <div data-scroll><table><thead><tr><th>예약번호</th><th>회원</th><th>프로그램</th><th>인원</th><th>결제</th><th>금액</th><th>상태</th></tr></thead><tbody>
+          <sc-for list="{{ recentOrders }}" as="o" hint-placeholder-count="5">
+            <tr><td style="font-size:12.5px;color:rgba(33,30,25,.6)">{{ o.no }}</td><td><b>{{ o.member }}</b></td><td>{{ o.program }}</td><td>{{ o.qty }}</td><td>{{ o.pay }}</td><td><b>{{ o.amount }}</b></td><td><span style="font-size:11.5px;padding:4px 10px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.status }}</span></td></tr>
+          </sc-for>
+        </tbody></table></div>
+      </div>
+    </sc-if>
+
+    <!-- MEMBERS -->
+    <sc-if value="{{ isMembers }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px">
+        <div><div style="font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:10px">MEMBERS</div><h1 style="font-weight:500;font-size:30px;margin:0">회원 관리 <span style="font-size:16px;color:rgba(33,30,25,.5)">{{ memberCount }}명</span></h1></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input placeholder="이름 · 연락처 · 이메일 검색" style="padding:10px 14px;font-size:13px;border:1px solid rgba(33,30,25,.2);background:#fff;outline:none;min-width:240px">
+          <select onChange="{{ setMemberFilter }}" style="padding:10px 14px;font-size:13px;border:1px solid rgba(33,30,25,.2);background:#fff"><option value="all">전체 상태</option><option value="active">활동</option><option value="pending">승인 대기</option><option value="paused">휴면</option></select>
+          <button style="border:none;background:#5a3d24;color:#f2eee5;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer">초대코드 발급</button>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(33,30,25,.1)"><div data-scroll><table><thead><tr><th>회원</th><th>연락처</th><th>가입</th><th>가입 경로</th><th>참여</th><th>누적 결제</th><th>초대코드</th><th>상태</th><th></th></tr></thead><tbody>
+        <sc-for list="{{ visibleMembers }}" as="m" hint-placeholder-count="8">
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:50%;background:#e7e0d3;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">{{ m.initial }}</div><div><b>{{ m.name }}</b><div style="font-size:11.5px;color:rgba(33,30,25,.5)">{{ m.email }}</div></div></div></td>
+            <td>{{ m.phone }}</td><td style="color:rgba(33,30,25,.6)">{{ m.joined }}</td><td>{{ m.via }}</td><td>{{ m.visits }}회</td><td><b>{{ m.spent }}</b></td><td style="font-size:12px;color:rgba(33,30,25,.6)">{{ m.code }}</td>
+            <td><span style="font-size:11.5px;padding:4px 10px;background:{{ m.bg }};color:{{ m.fg }}">{{ m.status }}</span></td>
+            <td><sc-if value="{{ m.pending }}" hint-placeholder-val="{{ false }}"><button onClick="{{ m.approve }}" style="border:1px solid #5a3d24;background:none;color:#5a3d24;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">승인</button></sc-if></td>
+          </tr>
+        </sc-for>
+      </tbody></table></div></div>
+    </sc-if>
+
+    <!-- PROGRAMS -->
+    <sc-if value="{{ isPrograms }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px">
+        <div><div style="font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:10px">PROGRAMS</div><h1 style="font-weight:500;font-size:30px;margin:0">프로그램 관리</h1></div>
+        <div style="display:flex;gap:8px"><button onClick="{{ newSeason }}" style="border:1px solid #5a3d24;background:none;color:#5a3d24;padding:11px 18px;font-size:13px;font-weight:600;cursor:pointer">+ RAUM SOLO 시즌</button><button onClick="{{ newProgram }}" style="border:none;background:#5a3d24;color:#f2eee5;padding:11px 20px;font-size:13px;font-weight:600;cursor:pointer">+ 새 프로그램 등록</button></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:16px">
+        <sc-for list="{{ progTabs }}" as="t" hint-placeholder-count="3">
+          <button onClick="{{ t.go }}" style="border:1px solid rgba(33,30,25,.2);background:{{ t.bg }};color:{{ t.fg }};padding:8px 16px;border-radius:999px;cursor:pointer;font-size:12.5px;font-weight:600">{{ t.label }}</button>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(33,30,25,.1)"><div data-scroll><table><thead><tr><th>프로그램</th><th>유형</th><th>카테고리</th><th>일정</th><th>장소</th><th>판매가</th><th>예약/정원</th><th>상태</th><th></th></tr></thead><tbody>
+        <sc-for list="{{ programRows }}" as="p" hint-placeholder-count="6">
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:12px"><img src="{{ p.img }}" style="width:52px;height:38px;object-fit:cover"><b>{{ p.name }}</b></div></td>
+            <td style="font-size:12.5px;color:rgba(33,30,25,.65)">{{ p.typeLabel }}</td>
+            <td><span style="font-size:11px;letter-spacing:.1em;padding:3px 8px;background:rgba(33,30,25,.06)">{{ p.cat }}</span></td>
+            <td>{{ p.date }} {{ p.time }}</td><td style="color:rgba(33,30,25,.65)">{{ p.place }}</td><td><b>{{ p.priceText }}</b></td>
+            <td><div style="display:flex;align-items:center;gap:8px"><span>{{ p.booked }}/{{ p.cap }}</span><div style="width:60px;height:5px;background:rgba(33,30,25,.08)"><div style="height:100%;background:#5a3d24;width:{{ p.fillW }}"></div></div></div></td>
+            <td><span style="font-size:11.5px;padding:4px 10px;background:{{ p.bg }};color:{{ p.fg }}">{{ p.status }}</span></td>
+            <td><button onClick="{{ p.edit }}" style="border:1px solid rgba(33,30,25,.2);background:none;padding:6px 12px;font-size:12px;cursor:pointer">편집</button></td>
+          </tr>
+        </sc-for>
+      </tbody></table></div></div>
+    </sc-if>
+
+    <!-- PROGRAM EDIT -->
+    <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ goPrograms }}" style="border:none;background:none;cursor:pointer;font-size:13px;color:rgba(33,30,25,.55);padding:0;margin-bottom:20px">← 프로그램 목록</button>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px">
+        <h1 style="font-weight:500;font-size:30px;margin:0">{{ editTitle }}</h1>
+        <div style="display:flex;gap:8px"><button onClick="{{ goPrograms }}" style="border:1px solid rgba(33,30,25,.2);background:none;padding:11px 20px;font-size:13px;cursor:pointer">임시 저장</button><button onClick="{{ saveProgram }}" style="border:none;background:#5a3d24;color:#f2eee5;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer">게시</button></div>
+      </div>
+      <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:start">
+        <div style="display:grid;gap:20px">
+          <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:26px;display:grid;gap:16px">
+            <div style="font-size:12px;letter-spacing:.2em;color:rgba(33,30,25,.5)">기본 정보</div>
+            <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">프로그램 이름<input value="{{ edit.name }}" onChange="{{ setEditName }}" placeholder="예: RSC WINE CLASS" style="padding:13px 14px;font-size:14px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19" style-focus="border-color:#5a3d24"></label>
+            <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">서브타이틀<input value="{{ edit.sub }}" placeholder="예: Taste Table" style="padding:13px 14px;font-size:14px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19" style-focus="border-color:#5a3d24"></label>
+            <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+              <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">카테고리<select style="padding:13px 14px;font-size:14px;border:1px solid rgba(33,30,25,.2);background:#fff;color:#211e19"><option>WELLNESS</option><option>WINE</option><option>SOCIAL</option><option>CULTURE</option></select></label>
+              <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">장소<input value="{{ edit.place }}" placeholder="라움 체임버홀" style="padding:13px 14px;font-size:14px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19" style-focus="border-color:#5a3d24"></label>
+            </div>
+            <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">한 줄 소개 (목록 카드)<input value="{{ edit.short }}" placeholder="소믈리에가 안내하는 와인 5종 테이스팅과 취향별 테이블 대화." style="padding:13px 14px;font-size:14px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19" style-focus="border-color:#5a3d24"></label>
+            <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">상세 설명<textarea rows="5" value="{{ edit.desc }}" placeholder="프로그램 상세페이지에 노출되는 설명" style="padding:13px 14px;font-size:14px;border:1px solid rgba(33,30,25,.2);outline:none;resize:vertical;color:#211e19;line-height:1.6" style-focus="border-color:#5a3d24"></textarea></label>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:26px;display:grid;gap:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;letter-spacing:.2em;color:rgba(33,30,25,.5)">{{ flowLabel }}</div><button style="border:1px solid rgba(33,30,25,.2);background:none;padding:6px 12px;font-size:12px;cursor:pointer">+ 항목</button></div>
+            <sc-for list="{{ edit.flow }}" as="f" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:100px 1fr 32px;gap:10px;align-items:center">
+                <input value="{{ f.t }}" style="padding:11px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19">
+                <input value="{{ f.d }}" style="padding:11px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19">
+                <button style="border:none;background:none;cursor:pointer;color:rgba(33,30,25,.4);font-size:16px">✕</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;gap:20px">
+          <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:26px;display:grid;gap:16px">
+            <div style="font-size:12px;letter-spacing:.2em;color:rgba(33,30,25,.5)">일정 · 정원 · 가격</div>
+            <sc-if value="{{ isSeason }}" hint-placeholder-val="{{ false }}">
+              <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">시즌 시작<input type="date" value="2026-10-04" style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></label>
+                <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">시즌 종료<input type="date" value="2026-11-08" style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></label>
+              </div>
+              <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">요일<select style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);background:#fff;color:#211e19"><option>매주 토</option><option>매주 일</option><option>매주 금</option></select></label>
+                <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">모집 마감<input type="date" value="2026-09-27" style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></label>
+              </div>
+              <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">성비 정원 (남 / 여)<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px"><input type="number" value="12" style="padding:12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"><input type="number" value="12" style="padding:12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></div></label>
+            </sc-if>
+            <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ true }}">
+              <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">날짜<input type="date" value="2026-09-26" style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></label>
+                <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">시작 시간<input type="time" value="19:30" style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></label>
+              </div>
+            </sc-if>
+            <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+              <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">정원<input type="number" value="{{ edit.cap }}" style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></label>
+              <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">1인 최대 예약<input type="number" value="2" style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19"></label>
+            </div>
+            <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">판매가 (원)<input type="number" value="{{ edit.price }}" onChange="{{ setEditPrice }}" style="padding:13px 14px;font-size:16px;font-weight:600;border:1px solid rgba(33,30,25,.2);outline:none;color:#211e19" style-focus="border-color:#5a3d24"></label>
+            <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">환불 정책<select style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);background:#fff;color:#211e19"><option>3일 전 100% / 이후 불가</option><option>7일 전 100% / 3일 전 50%</option><option>환불 불가</option></select></label>
+            <label style="display:grid;gap:6px;font-size:12.5px;color:rgba(33,30,25,.6)">예약 오픈<select style="padding:12px 12px;font-size:13.5px;border:1px solid rgba(33,30,25,.2);background:#fff;color:#211e19"><option>즉시 공개</option><option>예약 공개 (날짜 지정)</option><option>비공개 (초대 링크만)</option></select></label>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:26px">
+            <div style="font-size:12px;letter-spacing:.2em;color:rgba(33,30,25,.5);margin-bottom:14px">대표 사진</div>
+            <div style="position:relative;height:180px;background:#e7e0d3;overflow:hidden;margin-bottom:10px"><img src="{{ edit.img }}" style="width:100%;height:100%;object-fit:cover"></div>
+            <button style="width:100%;border:1px dashed rgba(33,30,25,.3);background:none;padding:12px;font-size:12.5px;cursor:pointer;color:rgba(33,30,25,.6)">사진 업로드 · 권장 1600×1000</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ORDERS -->
+    <sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px">
+        <div><div style="font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:10px">ORDERS</div><h1 style="font-weight:500;font-size:30px;margin:0">예약 · 결제 내역</h1></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select style="padding:10px 14px;font-size:13px;border:1px solid rgba(33,30,25,.2);background:#fff"><option>전체 프로그램</option><option>RSC WINE CLASS</option><option>RSC SOCIAL NIGHT</option></select>
+          <select style="padding:10px 14px;font-size:13px;border:1px solid rgba(33,30,25,.2);background:#fff"><option>전체 상태</option><option>결제 완료</option><option>환불</option><option>취소</option></select>
+          <button style="border:1px solid rgba(33,30,25,.2);background:none;padding:10px 16px;font-size:12.5px;cursor:pointer">엑셀 다운로드</button>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(33,30,25,.1)"><div data-scroll><table><thead><tr><th>예약번호</th><th>일시</th><th>회원</th><th>프로그램</th><th>인원</th><th>결제수단</th><th>금액</th><th>쿠폰</th><th>상태</th><th></th></tr></thead><tbody>
+        <sc-for list="{{ allOrders }}" as="o" hint-placeholder-count="8">
+          <tr><td style="font-size:12.5px;color:rgba(33,30,25,.6)">{{ o.no }}</td><td style="color:rgba(33,30,25,.6)">{{ o.at }}</td><td><b>{{ o.member }}</b></td><td>{{ o.program }}</td><td>{{ o.qty }}</td><td>{{ o.pay }}</td><td><b>{{ o.amount }}</b></td><td style="font-size:12px;color:rgba(33,30,25,.6)">{{ o.coupon }}</td><td><span style="font-size:11.5px;padding:4px 10px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.status }}</span></td><td><button style="border:1px solid rgba(33,30,25,.2);background:none;padding:6px 12px;font-size:12px;cursor:pointer">상세</button></td></tr>
+        </sc-for>
+      </tbody></table></div></div>
+    </sc-if>
+
+    <!-- FIT CHECK -->
+    <sc-if value="{{ isFit }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px">
+        <div><div style="font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:10px">FIT CHECK</div><h1 style="font-weight:500;font-size:30px;margin:0">상담 신청 <span style="font-size:16px;color:rgba(33,30,25,.5)">대기 {{ fitPending }}건</span></h1></div>
+      </div>
+      <div data-cols="2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:20px;align-items:start">
+        <div style="background:#fff;border:1px solid rgba(33,30,25,.1)"><div data-scroll><table><thead><tr><th>신청일</th><th>이름</th><th>연락처</th><th>성향 결과</th><th>적합도</th><th>상태</th></tr></thead><tbody>
+          <sc-for list="{{ fitRows }}" as="f" hint-placeholder-count="6">
+            <tr onClick="{{ f.open }}" style="cursor:pointer"><td style="color:rgba(33,30,25,.6)">{{ f.at }}</td><td><b>{{ f.name }}</b></td><td>{{ f.phone }}</td><td>{{ f.type }}</td><td><b style="color:#5a3d24">{{ f.score }}</b></td><td><span style="font-size:11.5px;padding:4px 10px;background:{{ f.bg }};color:{{ f.fg }}">{{ f.status }}</span></td></tr>
+          </sc-for>
+        </tbody></table></div></div>
+        <div style="background:#fff;border:1px solid rgba(33,30,25,.1);padding:26px">
+          <div style="font-size:12px;letter-spacing:.2em;color:rgba(33,30,25,.5);margin-bottom:16px">신청 상세</div>
+          <div style="font-size:20px;font-weight:600;margin-bottom:4px">{{ fitCur.name }}</div>
+          <div style="font-size:13px;color:rgba(33,30,25,.55);margin-bottom:20px">{{ fitCur.phone }} · {{ fitCur.at }}</div>
+          <div style="background:#f7f3ec;padding:16px;margin-bottom:20px"><div style="font-size:11px;letter-spacing:.2em;color:#9c6b3e;margin-bottom:6px">성향 결과</div><b style="font-size:15px">{{ fitCur.type }}</b><div style="font-size:12.5px;color:rgba(33,30,25,.6);margin-top:6px;line-height:1.6">{{ fitCur.summary }}</div></div>
+          <div style="display:grid;gap:10px;font-size:13px;margin-bottom:24px">
+            <sc-for list="{{ fitCur.answers }}" as="a" hint-placeholder-count="5">
+              <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(33,30,25,.08);padding-bottom:8px"><span style="color:rgba(33,30,25,.55)">{{ a.q }}</span><b style="text-align:right">{{ a.a }}</b></div>
+            </sc-for>
+          </div>
+          <textarea rows="3" placeholder="상담 메모" style="width:100%;padding:12px;font-size:13px;border:1px solid rgba(33,30,25,.2);outline:none;resize:vertical;margin-bottom:12px"></textarea>
+          <div style="display:flex;gap:8px"><button style="flex:1;border:none;background:#5a3d24;color:#f2eee5;padding:12px;font-size:13px;font-weight:600;cursor:pointer">초대코드 발급</button><button style="border:1px solid rgba(33,30,25,.2);background:none;padding:12px 16px;font-size:13px;cursor:pointer">보류</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- COUPONS -->
+    <sc-if value="{{ isCoupons }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px">
+        <div><div style="font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:10px">COUPONS &amp; INVITES</div><h1 style="font-weight:500;font-size:30px;margin:0">쿠폰 · 초대권</h1></div>
+        <button style="border:none;background:#5a3d24;color:#f2eee5;padding:11px 20px;font-size:13px;font-weight:600;cursor:pointer">+ 쿠폰 만들기</button>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(33,30,25,.1)"><div data-scroll><table><thead><tr><th>코드</th><th>이름</th><th>유형</th><th>혜택</th><th>대상</th><th>사용/발급</th><th>유효기간</th><th>상태</th></tr></thead><tbody>
+        <sc-for list="{{ coupons }}" as="c" hint-placeholder-count="5">
+          <tr><td><b style="letter-spacing:.06em">{{ c.code }}</b></td><td>{{ c.name }}</td><td>{{ c.type }}</td><td><b>{{ c.benefit }}</b></td><td style="color:rgba(33,30,25,.65)">{{ c.target }}</td><td>{{ c.used }}/{{ c.issued }}</td><td style="color:rgba(33,30,25,.65)">{{ c.until }}</td><td><span style="font-size:11.5px;padding:4px 10px;background:{{ c.bg }};color:{{ c.fg }}">{{ c.status }}</span></td></tr>
+        </sc-for>
+      </tbody></table></div></div>
+    </sc-if>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'dash', memberFilter: 'all', fitIdx: 0, edit: null, approved: [], progTab: 'all' };
+  ok = { bg: 'rgba(46,107,62,.12)', fg: '#2e6b3e' };
+  warn = { bg: 'rgba(226,180,120,.25)', fg: '#7a5420' };
+  mute = { bg: 'rgba(33,30,25,.07)', fg: 'rgba(33,30,25,.6)' };
+  bad = { bg: 'rgba(163,64,44,.12)', fg: '#a3402c' };
+  brand = { bg: '#5a3d24', fg: '#f2eee5' };
+  programs = [
+    { id:1, name:'RSC WELLNESS EVENT', sub:'RSC × XON Training', cat:'WELLNESS', date:'9.20 (토)', time:'10:00', place:'라움 그라스가든', cap:20, booked:14, price:59000, img:'assets/run-brunch.jpg', short:'XON 트레이너와 함께하는 그룹 트레이닝, 이어지는 브런치 소셜.', desc:'XON Training 코치와 함께 라움 정원에서 진행되는 하이브리드 그룹 트레이닝입니다.', flow:[{t:'10:00',d:'체크인 · 웰컴 드링크'},{t:'10:20',d:'XON 그룹 트레이닝 (60분)'},{t:'11:30',d:'브런치 & 커피 소셜'},{t:'13:00',d:'마무리'}], status:'판매중' },
+    { id:2, name:'RSC WINE CLASS', sub:'Taste Table', cat:'WINE', date:'9.26 (금)', time:'19:30', place:'라움 프라이빗 다이닝', cap:16, booked:13, price:79000, img:'assets/taste-table.jpg', short:'소믈리에가 안내하는 와인 5종 테이스팅과 취향별 테이블 대화.', desc:'소믈리에가 큐레이션한 와인 5종을 테이스팅하며 각자의 취향을 발견하는 클래스입니다.', flow:[{t:'19:30',d:'체크인 · 웰컴 와인'},{t:'19:50',d:'와인 5종 테이스팅 클래스'},{t:'21:00',d:'취향별 테이블 소셜'},{t:'22:00',d:'마무리'}], status:'판매중' },
+    { id:3, name:'RSC SOCIAL NIGHT', sub:'Monthly Flagship', cat:'SOCIAL', date:'10.11 (토)', time:'18:00', place:'라움 체임버홀', cap:40, booked:40, price:140000, img:'assets/social-night.jpg', short:'매월 한 번, 공연·다이닝·와인이 어우러지는 RSC 대표 소셜.', desc:'매월 한 번 열리는 RSC 대표 프로그램입니다.', flow:[{t:'18:00',d:'체크인 · 리셉션'},{t:'18:30',d:'라이브 공연'},{t:'19:30',d:'코스 다이닝 & 와인 페어링'},{t:'21:30',d:'자유 소셜 · 애프터'}], status:'마감' },
+    { id:4, name:'SUNDAY RESET', sub:'Social Wellness', cat:'WELLNESS', date:'10.5 (일)', time:'09:00', place:'라움 그라스가든', cap:18, booked:7, price:45000, img:'assets/sunday-reset.jpg', short:'요가·명상·브런치로 시작하는 일요일 아침.', desc:'', flow:[{t:'09:00',d:'체크인'},{t:'09:20',d:'요가 & 명상 (70분)'}], status:'판매중' },
+    { id:5, name:'RAUM ART WALK', sub:'Art / Culture', cat:'CULTURE', date:'10.18 (토)', time:'15:00', place:'라움 아트센터', cap:20, booked:11, price:65000, img:'assets/art-walk.jpg', short:'전시 관람 → 큐레이터 토크 → 와인으로 이어지는 오후.', desc:'', flow:[{t:'15:00',d:'체크인'}], status:'판매중' },
+    { id:6, name:'ONE QUESTION SALON', sub:'Talk & Insight', cat:'CULTURE', date:'10.23 (목)', time:'19:30', place:'라움 라운지', cap:12, booked:0, price:39000, img:'assets/talk-insight.jpg', short:'하나의 질문으로 4~6명이 깊게 이야기하는 소규모 살롱.', desc:'', flow:[], status:'예약 공개 예정' },
+    { id:7, kind:'season', name:'RAUM SOLO · 가을 시즌', sub:'6-Week Season Program', cat:'RAUM SOLO', date:'10.4 ~ 11.8', time:'매주 토', place:'라움 전관', cap:24, booked:18, price:890000, img:'assets/raum-solo.jpg', short:'선별된 솔로 회원이 6주 동안 6개 경험을 함께하는 시즌형 프로그램.', desc:'6주간 매주 토요일, 6개의 서로 다른 경험을 같은 멤버와 함께합니다.', flow:[{t:'1주',d:'웰컴 디너'},{t:'2주',d:'와인 클래스'},{t:'3주',d:'그룹 트레이닝 & 브런치'},{t:'4주',d:'아트 워크'},{t:'5주',d:'선데이 리셋'},{t:'6주',d:'파이널 소셜 나이트'}], status:'모집중' },
+  ];
+  members = [
+    { id:1, name:'김서연', email:'seoyeon@gmail.com', phone:'010-2345-6789', joined:'2026.08.02', via:'카카오', visits:4, spent:312000, code:'RSC-2026-A1F3', status:'active' },
+    { id:2, name:'이준호', email:'junho.lee@naver.com', phone:'010-8765-4321', joined:'2026.08.05', via:'네이버', visits:3, spent:278000, code:'RSC-2026-B7K2', status:'active' },
+    { id:3, name:'박지민', email:'jimin.p@gmail.com', phone:'010-1122-3344', joined:'2026.09.01', via:'이메일', visits:0, spent:0, code:'RSC-2026-C9Q8', status:'pending' },
+    { id:4, name:'최다은', email:'daeun@daum.net', phone:'010-5566-7788', joined:'2026.07.18', via:'카카오', visits:6, spent:494000, code:'RSC-2026-D2M5', status:'active' },
+    { id:5, name:'정우진', email:'woojin.j@gmail.com', phone:'010-9988-7766', joined:'2026.06.30', via:'카카오', visits:1, spent:59000, code:'RSC-2026-E4P1', status:'paused' },
+    { id:6, name:'한소희', email:'sohee.han@gmail.com', phone:'010-3344-5566', joined:'2026.09.03', via:'네이버', visits:0, spent:0, code:'RSC-2026-F6R7', status:'pending' },
+    { id:7, name:'윤재현', email:'jaehyun@naver.com', phone:'010-7788-9900', joined:'2026.08.21', via:'이메일', visits:2, spent:158000, code:'RSC-2026-G8T3', status:'active' },
+    { id:8, name:'오하늘', email:'haneul.oh@gmail.com', phone:'010-2233-4455', joined:'2026.08.28', via:'카카오', visits:1, spent:79000, code:'RSC-2026-H1V9', status:'active' },
+  ];
+  orders = [
+    { no:'RSC-260907-031', at:'9.7 14:22', member:'김서연', program:'RSC WINE CLASS', qty:1, pay:'카카오페이', amount:79000, coupon:'—', status:'결제 완료' },
+    { no:'RSC-260907-030', at:'9.7 11:05', member:'이준호', program:'RSC WELLNESS EVENT', qty:2, pay:'네이버페이', amount:118000, coupon:'—', status:'결제 완료' },
+    { no:'RSC-260906-029', at:'9.6 21:48', member:'최다은', program:'RSC SOCIAL NIGHT', qty:1, pay:'신용카드', amount:140000, coupon:'—', status:'결제 완료' },
+    { no:'RSC-260906-028', at:'9.6 18:30', member:'윤재현', program:'RSC WINE CLASS', qty:1, pay:'토스페이', amount:71100, coupon:'WELCOME10', status:'결제 완료' },
+    { no:'RSC-260905-027', at:'9.5 10:12', member:'오하늘', program:'RAUM ART WALK', qty:1, pay:'초대권', amount:0, coupon:'INVITE', status:'초대권 사용' },
+    { no:'RSC-260904-026', at:'9.4 16:40', member:'정우진', program:'SUNDAY RESET', qty:1, pay:'카카오페이', amount:45000, coupon:'—', status:'환불' },
+    { no:'RSC-260904-025', at:'9.4 09:20', member:'김서연', program:'RSC SOCIAL NIGHT', qty:2, pay:'계좌이체', amount:280000, coupon:'—', status:'입금 대기' },
+    { no:'RSC-260903-024', at:'9.3 20:15', member:'최다은', program:'RSC WELLNESS EVENT', qty:1, pay:'카카오페이', amount:59000, coupon:'—', status:'결제 완료' },
+  ];
+  fits = [
+    { name:'박지민', phone:'010-1122-3344', at:'9.6', type:'취향 탐색형 · Culture Seeker', score:'92%', status:'대기', summary:'전시·와인·대화 중심 프로그램 선호. 반복 만남과 소규모 모임에 높은 적합도.', answers:[{q:'현재 상태',a:'솔로'},{q:'주말 선호',a:'전시 · 갤러리'},{q:'모임 규모',a:'4~6명 소규모'},{q:'관계 태도',a:'천천히 알아가기'},{q:'끌리는 사람',a:'대화가 편한 사람'}] },
+    { name:'한소희', phone:'010-3344-5566', at:'9.5', type:'무브먼트형 · Active Social', score:'88%', status:'대기', summary:'운동·웰니스 중심. 에너지 높은 그룹 활동 선호.', answers:[{q:'현재 상태',a:'솔로'},{q:'주말 선호',a:'러닝 · 운동'},{q:'모임 규모',a:'10명 이상'},{q:'관계 태도',a:'자연스럽게'},{q:'끌리는 사람',a:'끌리는 인상과 분위기'}] },
+    { name:'강민재', phone:'010-6677-8899', at:'9.4', type:'다이닝형 · Taste Table', score:'81%', status:'대기', summary:'와인·미식 중심 프로그램에 적합.', answers:[{q:'현재 상태',a:'솔로'},{q:'주말 선호',a:'다이닝 · 와인'},{q:'모임 규모',a:'6~10명'},{q:'관계 태도',a:'천천히 알아가기'},{q:'끌리는 사람',a:'취향이 맞는 사람'}] },
+    { name:'서지우', phone:'010-4455-6677', at:'9.2', type:'취향 탐색형 · Culture Seeker', score:'76%', status:'초대 완료', summary:'', answers:[] },
+    { name:'임태양', phone:'010-8899-0011', at:'9.1', type:'소셜형 · Night Owl', score:'64%', status:'보류', summary:'', answers:[] },
+    { name:'문예린', phone:'010-1010-2020', at:'8.30', type:'무브먼트형 · Active Social', score:'90%', status:'초대 완료', summary:'', answers:[] },
+  ];
+  couponsData = [
+    { code:'WELCOME10', name:'신규 회원 10%', type:'할인율', benefit:'10%', target:'가입 후 첫 결제', used:23, issued:100, until:'2026.12.31', status:'활성' },
+    { code:'INVITE', name:'지인 초대권', type:'무료 1인', benefit:'1인 무료', target:'회원당 연 8매', used:41, issued:320, until:'2026.12.31', status:'활성' },
+    { code:'SEP-WINE20', name:'9월 와인클래스 20%', type:'할인율', benefit:'20%', target:'RSC WINE CLASS', used:6, issued:30, until:'2026.09.26', status:'활성' },
+    { code:'SOLO-SEASON', name:'RAUM SOLO 시즌 3만원', type:'정액', benefit:'30,000원', target:'RAUM SOLO 시즌권', used:12, issued:12, until:'2026.08.31', status:'소진' },
+    { code:'AUG-RESET', name:'8월 선데이리셋 5천원', type:'정액', benefit:'5,000원', target:'SUNDAY RESET', used:9, issued:40, until:'2026.08.31', status:'만료' },
+  ];
+  won(n) { return n.toLocaleString('ko-KR') + '원'; }
+  statusStyle(s) {
+    if (['결제 완료','활성','판매중','모집중','active'].includes(s)) return this.ok;
+    if (['입금 대기','대기','pending','예약 공개 예정'].includes(s)) return this.warn;
+    if (['환불','만료','bad'].includes(s)) return this.bad;
+    if (['초대 완료','초대권 사용'].includes(s)) return this.brand;
+    return this.mute;
+  }
+  renderVals() {
+    const s = this.state;
+    const nav = [['dash','대시보드'],['members','회원 DB'],['programs','프로그램'],['orders','예약 · 결제'],['fit','상담 신청'],['coupons','쿠폰 · 초대권']];
+    const memberLabel = { active:'활동', pending:'승인 대기', paused:'휴면' };
+    const fitPending = this.fits.filter(f => f.status === '대기').length;
+    const members = this.members.map(m => ({ ...m, status: s.approved.includes(m.id) ? 'active' : m.status }));
+    const visibleMembers = members.filter(m => s.memberFilter === 'all' || m.status === s.memberFilter).map(m => ({
+      ...m, initial: m.name[0], spent: this.won(m.spent), pending: m.status === 'pending',
+      status: memberLabel[m.status], ...this.statusStyle(m.status),
+      approve: () => this.setState({ approved: [...s.approved, m.id] })
+    }));
+    const monthly = [42, 58, 0, 71, 118, 140, 96, 0, 45, 130, 79, 59, 210, 140];
+    const max = Math.max(...monthly);
+    const fitCur = this.fits[s.fitIdx];
+    const edit = s.edit || {};
+    return {
+      isDash: s.view === 'dash', isMembers: s.view === 'members', isPrograms: s.view === 'programs', isEdit: s.view === 'edit',
+      isOrders: s.view === 'orders', isFit: s.view === 'fit', isCoupons: s.view === 'coupons',
+      navItems: nav.map(([k, label]) => ({ label, go: () => this.setState({ view: k }), bg: s.view === k || (k === 'programs' && s.view === 'edit') ? 'rgba(247,243,236,.1)' : 'transparent', fg: s.view === k ? '#f7f3ec' : 'rgba(247,243,236,.65)', badge: k === 'fit' && fitPending ? String(fitPending) : (k === 'members' ? String(members.filter(m => m.status === 'pending').length || '') : '') })),
+      goOrders: () => this.setState({ view: 'orders' }), goPrograms: () => this.setState({ view: 'programs' }),
+      kpis: [
+        { label: '이번 달 매출', value: '11,880,000원', delta: '▲ 18% vs 8월', deltaColor: '#2e6b3e' },
+        { label: '예약 건수', value: '128건', delta: '▲ 22건', deltaColor: '#2e6b3e' },
+        { label: '활동 회원', value: String(members.filter(m => m.status === 'active').length) + '명', delta: '신규 ' + members.filter(m => m.joined.startsWith('2026.09')).length + '명 · 대기 ' + members.filter(m => m.status === 'pending').length + '명', deltaColor: 'rgba(33,30,25,.55)' },
+        { label: '평균 참여율', value: '86%', delta: '▼ 2%p', deltaColor: '#a3402c' },
+      ],
+      bars: monthly.map((v, i) => ({ h: Math.max(3, Math.round(v / max * 100)) + '%', color: i === 12 ? '#5a3d24' : '#c9b79a', tip: '9.' + (i + 1) + ' · ' + v + '만원' })),
+      progShares: [
+        { name: 'RSC SOCIAL NIGHT', value: '560만', w: '100%' }, { name: 'RSC WINE CLASS', value: '248만', w: '44%' },
+        { name: 'RSC WELLNESS EVENT', value: '212만', w: '38%' }, { name: 'RAUM ART WALK', value: '98만', w: '18%' },
+      ],
+      recentOrders: this.orders.slice(0, 5).map(o => ({ ...o, amount: this.won(o.amount), ...this.statusStyle(o.status) })),
+      allOrders: this.orders.map(o => ({ ...o, amount: this.won(o.amount), ...this.statusStyle(o.status) })),
+      memberCount: members.length, visibleMembers,
+      setMemberFilter: e => this.setState({ memberFilter: e.target.value }),
+      programRows: this.programs.filter(p => s.progTab === 'all' || (s.progTab === 'season' ? p.kind === 'season' : p.kind !== 'season')).map(p => ({ ...p, priceText: this.won(p.price), fillW: Math.round(p.booked / p.cap * 100) + '%', ...this.statusStyle(p.status), typeLabel: p.kind === 'season' ? '시즌권' : '단일 회차', edit: () => this.setState({ view: 'edit', edit: { ...p } }) })),
+      progTabs: [['all','전체'],['single','단일 프로그램'],['season','RAUM SOLO 시즌']].map(([k,label]) => ({ label, go: () => this.setState({ progTab: k }), bg: (s.progTab||'all') === k ? '#5a3d24' : 'transparent', fg: (s.progTab||'all') === k ? '#f2eee5' : '#5a3d24' })),
+      newProgram: () => this.setState({ view: 'edit', edit: { name: '', sub: '', place: '', short: '', desc: '', cap: 20, price: 0, img: 'assets/hero.jpg', flow: [{ t: '', d: '' }] } }),
+      newSeason: () => this.setState({ view: 'edit', edit: { kind: 'season', name: '', sub: '6-Week Season Program', place: '라움 전관', short: '', desc: '', cap: 24, price: 0, img: 'assets/raum-solo.jpg', flow: [{ t: '1주', d: '' },{ t: '2주', d: '' },{ t: '3주', d: '' },{ t: '4주', d: '' },{ t: '5주', d: '' },{ t: '6주', d: '' }] } }),
+      isSeason: edit.kind === 'season', isSingle: edit.kind !== 'season',
+      editTitle: edit.id ? (edit.kind === 'season' ? '시즌 프로그램 편집' : '프로그램 편집') : (edit.kind === 'season' ? '새 RAUM SOLO 시즌 등록' : '새 프로그램 등록'),
+      flowLabel: edit.kind === 'season' ? '주차별 일정 (6주)' : '타임라인 (PROGRAM FLOW)',
+      edit,
+      setEditName: e => this.setState({ edit: { ...edit, name: e.target.value } }),
+      setEditPrice: e => this.setState({ edit: { ...edit, price: Number(e.target.value) } }),
+      saveProgram: () => this.setState({ view: 'programs' }),
+      fitPending, fitCur,
+      fitRows: this.fits.map((f, i) => ({ ...f, ...this.statusStyle(f.status), open: () => this.setState({ fitIdx: i }) })),
+      coupons: this.couponsData.map(c => ({ ...c, ...this.statusStyle(c.status) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

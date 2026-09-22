@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSC 상담 신청 — 라움소셜클럽</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-300.ttf') format('truetype'); font-weight:300; }
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-400.ttf') format('truetype'); font-weight:400; }
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-500.ttf') format('truetype'); font-weight:500; }
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-600.ttf') format('truetype'); font-weight:600; }
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-700.ttf') format('truetype'); font-weight:700; }
+  body { margin:0; background:#f2eee5; color:#211e19; font-family:'SamsungOne', Arial, sans-serif; font-weight:500; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  a { color:inherit; text-decoration:none; }
+  a:hover { color:#5a3d24; }
+  ::selection { background:#5a3d24; color:#f2eee5; }
+  input, select, button { font-family:inherit; }
+  input::placeholder { color:rgba(33,30,25,.35); }
+  @media (max-width: 760px) {
+    header { padding:16px 20px !important }
+    main { padding:24px 20px 64px !important }
+  }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#f2eee5">
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 40px">
+    <a href="index.html" style="display:flex;align-items:center;gap:14px">
+      <img src="logo-emblem.png" style="height:39px;width:auto;filter:invert(1) brightness(0.15)">
+      <img src="logo-mtwj25gn-hxfi.png" style="height:23px;width:auto;filter:invert(1) brightness(0.15);opacity:.85" alt="logo">
+    </a>
+    <a href="index.html" style="font-size:12.5px;letter-spacing:.04em;color:rgba(33,30,25,.5)">닫기 ✕</a>
+  </header>
+
+  <main style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 40px 96px">
+    <div style="width:100%;max-width:1000px;margin:0 auto">
+
+      <sc-if value="{{ isIntro }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:32px 0">
+          <div style="font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:40px">A PRIVATE COMMUNITY FOR REMARKABLE SINGLES</div>
+          <h1 style="font-family:'SamsungOne', Arial, sans-serif;font-weight:500;font-size:clamp(32px,4.2vw,58px);line-height:1.36;margin:0 0 34px;text-wrap:pretty">아름다운 공간에서,<br>서로의 특별함을 발견하는 곳</h1>
+          <p style="margin:0 0 30px;font-size:16.5px;line-height:1.9;color:rgba(33,30,25,.7);max-width:600px;text-wrap:pretty">몇 가지 질문에 답하시면, <br>회원님의 라이프스타일에 맞는 RSC 프로그램과 커뮤니티 적합성을 안내드립니다.</p>
+          <p style="margin:0 0 52px;font-size:15.5px;line-height:1.9;color:rgba(33,30,25,.55);max-width:560px;text-wrap:pretty">RSC는 소개팅 서비스가 아닙니다. <br>취향과 태도가 맞는 사람을 반복적으로 만날 수 있는 커뮤니티인지, 먼저 확인해 보세요.</p>
+          <button onClick="{{ start }}" style="border:none;cursor:pointer;padding:18px 44px;background:#5a3d24;color:#f2eee5;font-size:14px;letter-spacing:.06em" style-hover="background:#5a3d24">시작하기</button>
+          <div style="margin-top:34px;font-size:13px;color:rgba(33,30,25,.45)">약 2분 · 가입 상담은 커뮤니티 적합성 확인 후 진행됩니다</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isQuestion }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:34px">
+            <div style="font-size:11px;letter-spacing:.34em;color:rgba(33,30,25,.5)">{{ q.label }}</div>
+            <div style="font-size:12px;letter-spacing:.18em;color:rgba(33,30,25,.4)">{{ stepLabel }}</div>
+          </div>
+          <h2 style="font-family:'SamsungOne', Arial, sans-serif;font-weight:500;font-size:clamp(27px,3.4vw,46px);line-height:1.36;margin:0 0 20px;text-wrap:pretty">{{ q.title }}</h2>
+          <p style="margin:0 0 46px;font-size:14.5px;line-height:1.8;color:rgba(33,30,25,.5);max-width:660px;text-wrap:pretty">{{ q.sub }}</p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:14px">
+            <sc-for list="{{ options }}" as="opt" hint-placeholder-count="4">
+              <button onClick="{{ opt.pick }}" style="{{ opt.cardStyle }}">
+                <div style="font-size:15.5px;font-weight:500;margin-bottom:8px">{{ opt.t }}</div>
+                <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.55)">{{ opt.d }}</div>
+              </button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ showInsight }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:52px;border-left:2px solid #5a3d24;padding:4px 0 4px 26px">
+              <div style="font-family:'SamsungOne', Arial, sans-serif;font-size:clamp(20px,2.2vw,27px);line-height:1.5;margin-bottom:14px;text-wrap:pretty">{{ insightTitle }}</div>
+              <div style="font-size:14.5px;line-height:1.85;color:rgba(33,30,25,.62);max-width:780px;text-wrap:pretty">{{ insightBody }}</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ blocked }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:52px;padding:28px 26px;border:1px solid rgba(33,30,25,.18)">
+              <div style="font-size:15px;font-weight:500;margin-bottom:10px">RSC는 현재 솔로인 분들을 위한 커뮤니티입니다</div>
+              <div style="font-size:14px;line-height:1.75;color:rgba(33,30,25,.6);text-wrap:pretty">지금은 가입 대상이 아니지만, 라움의 공연·전시·다이닝은 누구나 즐기실 수 있습니다.</div>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:60px;padding-top:26px;border-top:1px solid rgba(33,30,25,.14)">
+            <button onClick="{{ back }}" style="border:none;background:none;cursor:pointer;font-size:13px;letter-spacing:.14em;color:rgba(33,30,25,.5);padding:8px 0">이 전</button>
+            <sc-if value="{{ showInsight }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ next }}" style="border:none;cursor:pointer;padding:16px 42px;background:#5a3d24;color:#f2eee5;font-size:13.5px;letter-spacing:.06em" style-hover="background:#5a3d24">다음</button>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-size:11px;letter-spacing:.34em;color:rgba(33,30,25,.5);margin-bottom:34px">YOUR RSC PROFILE</div>
+          <h2 style="font-family:'SamsungOne', Arial, sans-serif;font-weight:500;font-size:clamp(28px,3.6vw,48px);line-height:1.34;margin:0 0 44px;text-wrap:pretty">회원님께 어울리는<br>RSC의 시작입니다</h2>
+
+          <div style="border:1px solid rgba(33,30,25,.18);padding:48px 44px;margin-bottom:52px">
+            <div style="font-family:'SamsungOne', Arial, sans-serif;font-size:clamp(23px,2.9vw,35px);letter-spacing:.1em;margin-bottom:18px">{{ profileEn }}</div>
+            <div style="font-size:15px;font-weight:500;color:#5a3d24;margin-bottom:22px">{{ profileKo }}</div>
+            <div style="font-size:15.5px;line-height:1.9;color:rgba(33,30,25,.68);max-width:720px;text-wrap:pretty">{{ profileBody }}</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:22px;margin-bottom:60px">
+            <sc-for list="{{ axes }}" as="ax" hint-placeholder-count="3">
+              <div>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+                  <span style="font-size:11.5px;letter-spacing:.24em;color:rgba(33,30,25,.55)">{{ ax.label }}</span>
+                  <span style="font-size:12px;letter-spacing:.14em;color:rgba(33,30,25,.5)">{{ ax.pct }}</span>
+                </div>
+                <div style="height:1px;background:rgba(33,30,25,.16);position:relative">
+                  <div style="{{ ax.barStyle }}"></div>
+                </div>
+                <div style="margin-top:10px;font-size:13px;line-height:1.7;color:rgba(33,30,25,.5);text-wrap:pretty">{{ ax.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="font-size:15px;font-weight:500;margin-bottom:24px">추천하는 첫 프로그램</div>
+          <div style="border-left:2px solid #5a3d24;padding:16px 0 16px 26px;margin-bottom:56px">
+            <div style="font-family:'SamsungOne', Arial, sans-serif;font-size:20px;margin-bottom:10px">{{ recProgram }}</div>
+            <div style="font-size:14.5px;line-height:1.8;color:rgba(33,30,25,.62);text-wrap:pretty">{{ recBody }}</div>
+          </div>
+
+          <div style="font-size:15px;font-weight:500;margin-bottom:20px">먼저 안내드리고 싶은 것</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:rgba(33,30,25,.14);border:1px solid rgba(33,30,25,.14);margin-bottom:52px">
+            <sc-for list="{{ picksSummary }}" as="p" hint-placeholder-count="3">
+              <div style="background:#f2eee5;padding:26px 24px">
+                <div style="font-size:10.5px;letter-spacing:.26em;color:#5a3d24;margin-bottom:14px">{{ p.label }}</div>
+                <div style="font-size:14.5px;line-height:1.75;color:rgba(33,30,25,.74);text-wrap:pretty">{{ p.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <p style="margin:0 0 48px;font-size:14px;line-height:1.85;color:rgba(33,30,25,.5);max-width:780px;text-wrap:pretty">RSC 멤버십은 프로필과 취향, 라이프스타일 확인을 거쳐 승인됩니다. 가입 상담에서 커뮤니티 적합성을 함께 확인해 드립니다.</p>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:26px;border-top:1px solid rgba(33,30,25,.14)">
+            <button onClick="{{ back }}" style="border:none;background:none;cursor:pointer;font-size:13px;letter-spacing:.14em;color:rgba(33,30,25,.5);padding:8px 0">이 전</button>
+            <button onClick="{{ next }}" style="border:none;cursor:pointer;padding:16px 42px;background:#5a3d24;color:#f2eee5;font-size:13.5px;letter-spacing:.06em" style-hover="background:#5a3d24">가입 상담 신청</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-size:11px;letter-spacing:.34em;color:rgba(33,30,25,.5);margin-bottom:34px">MEMBERSHIP REVIEW</div>
+          <h2 style="font-family:'SamsungOne', Arial, sans-serif;font-weight:500;font-size:clamp(28px,3.4vw,44px);line-height:1.36;margin:0 0 26px;text-wrap:pretty">가입 상담 담당자가<br>직접 연락드립니다</h2>
+          <p style="margin:0 0 56px;font-size:15.5px;line-height:1.85;color:rgba(33,30,25,.62);max-width:680px;text-wrap:pretty">남겨주신 프로필을 바탕으로 커뮤니티 적합성을 확인하고, 어울리는 프로그램과 멤버십을 안내드립니다.</p>
+
+          <div style="display:flex;flex-direction:column;gap:44px;max-width:760px">
+            <div>
+              <div style="font-size:13.5px;font-weight:500;margin-bottom:16px">성함 <span style="color:#5a3d24;font-weight:500">*</span></div>
+              <input value="{{ name }}" onChange="{{ onName }}" placeholder="성함을 입력해 주세요" style="width:100%;border:none;border-bottom:1px solid rgba(33,30,25,.28);background:none;padding:12px 0;font-size:16px;color:#211e19;outline:none">
+            </div>
+            <div>
+              <div style="font-size:13.5px;font-weight:500;margin-bottom:16px">연락처 <span style="color:#5a3d24;font-weight:500">*</span></div>
+              <input value="{{ phone }}" onChange="{{ onPhone }}" placeholder="연락처를 입력해 주세요" style="width:100%;border:none;border-bottom:1px solid rgba(33,30,25,.28);background:none;padding:12px 0;font-size:16px;color:#211e19;outline:none">
+            </div>
+            <div>
+              <div style="font-size:13.5px;font-weight:500;margin-bottom:16px">라움과의 인연 <span style="color:rgba(33,30,25,.4);font-weight:500">선택</span></div>
+              <select value="{{ route }}" onChange="{{ onRoute }}" style="width:100%;border:none;border-bottom:1px solid rgba(33,30,25,.28);background:none;padding:12px 0;font-size:16px;color:#211e19;outline:none">
+                <option value="">선택해 주세요</option>
+                <option value="회원 추천">기존 회원의 추천</option>
+                <option value="공연·전시 참석">라움의 공연·전시 참석</option>
+                <option value="인스타그램">인스타그램</option>
+                <option value="지인 소개">지인 소개</option>
+                <option value="처음 알게 됨">오늘 처음 알게 됐습니다</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:13.5px;font-weight:500;margin-bottom:16px">통화 희망 시간 <span style="color:rgba(33,30,25,.4);font-weight:500">선택</span></div>
+              <div style="display:flex;flex-wrap:wrap;gap:12px">
+                <sc-for list="{{ slots }}" as="slot" hint-placeholder-count="4">
+                  <button onClick="{{ slot.pick }}" style="{{ slot.style }}">{{ slot.t }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <label style="display:flex;align-items:flex-start;gap:14px;cursor:pointer">
+              <input type="checkbox" checked="{{ agreed }}" onChange="{{ onAgree }}" style="width:17px;height:17px;margin-top:2px;accent-color:#5a3d24;cursor:pointer">
+              <span style="font-size:14px;line-height:1.7;color:rgba(33,30,25,.68);text-wrap:pretty">개인정보 수집 및 이용에 동의합니다. 가입 상담 목적으로만 사용되며, 요청하시면 즉시 파기합니다.</span>
+            </label>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:64px;padding-top:26px;border-top:1px solid rgba(33,30,25,.14)">
+            <button onClick="{{ back }}" style="border:none;background:none;cursor:pointer;font-size:13px;letter-spacing:.14em;color:rgba(33,30,25,.5);padding:8px 0">이 전</button>
+            <button onClick="{{ submit }}" style="{{ submitStyle }}">상담 신청하기</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:60px 0">
+          <div style="font-size:11px;letter-spacing:.34em;color:#5a3d24;margin-bottom:36px">THANK YOU</div>
+          <h2 style="font-family:'SamsungOne', Arial, sans-serif;font-weight:500;font-size:clamp(30px,3.6vw,48px);line-height:1.36;margin:0 0 28px;text-wrap:pretty">신청이 접수되었습니다</h2>
+          <p style="margin:0 0 52px;font-size:16px;line-height:1.9;color:rgba(33,30,25,.66);max-width:560px;text-wrap:pretty">영업일 기준 2일 이내에 가입 상담 담당자가 연락드립니다. 그 사이 궁금한 점이 있으시면 언제든 문의해 주세요.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="index.html" style="display:inline-flex;align-items:center;padding:16px 34px;background:#5a3d24;color:#f2eee5;font-size:13.5px" style-hover="background:#5a3d24;color:#f2eee5">홈으로 돌아가기</a>
+            <a href="mailto:support@theraum.co.kr" style="display:inline-flex;align-items:center;padding:16px 34px;border:1px solid rgba(33,30,25,.3);font-size:13.5px" style-hover="border-color:#5a3d24;color:#5a3d24">support@theraum.co.kr</a>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const QUESTIONS = [
+  {
+    key: "single", label: "SCREENING", summary: "현재 상태", noInsight: true,
+    title: "현재 싱글이신가요?",
+    sub: "RSC는 현재 싱글인 분들을 위한 라이프스타일 커뮤니티입니다.",
+    options: [
+      { t: "네, 싱글입니다", d: "새로운 관계에 열려 있습니다", s: {},
+        insight: { title: "잘 찾아오셨습니다.", body: "RSC는 현재 싱글인 분들이 반복적으로 만나며 관계를 만들어가는 커뮤니티입니다." } },
+      { t: "아니오", d: "", s: {}, block: true }
+    ]
+  },
+  {
+    key: "stage", label: "LIFE STAGE", summary: "삶의 단계",
+    title: "지금 삶의 단계를 가장 잘 나타내는 것은 무엇인가요?",
+    sub: "RSC의 기준은 나이보다 라이프 스테이지입니다.",
+    options: [
+      { t: "일과 삶이 자리를 잡았습니다", d: "이제는 관계와 경험에 시간을 쓰고 싶습니다", s: { li: 2, re: 1 },
+        insight: { title: "지금이 딱 맞는 때입니다.", body: "일과 삶이 자리 잡았지만 새로운 사람을 만날 기회가 부족한 싱글. RSC의 핵심 회원이 바로 이 지점에 있습니다." } },
+      { t: "커리어에 몰입하는 시기입니다", d: "그래도 좋은 사람과의 시간은 놓치고 싶지 않습니다", s: { li: 3 },
+        insight: { title: "일상에 여백을 만드는 방법.", body: "바쁜 시기에도 짧고 밀도 있게 좋은 경험을 쌓을 수 있도록, RSC SOCIAL은 주 단위로 열립니다." } },
+      { t: "삶의 방향을 다시 그리는 중입니다", d: "새로운 사람들과 새로운 챕터를 시작하고 싶습니다", s: { re: 3 },
+        insight: { title: "새로운 챕터는 새로운 사람들과 함께 옵니다.", body: "라움은 억지로 연결하지 않지만, 반복해서 만날 기회는 촘촘하게 설계합니다." } },
+      { t: "이미 좋은 삶을 살고 있습니다", d: "그 삶을 나눌 사람이 있으면 더 좋겠습니다", s: { li: 1, re: 2 },
+        insight: { title: "이미 멋진 삶에, 나눌 사람을 더합니다.", body: "RSC는 부족함을 채우는 곳이 아니라, 이미 좋은 삶에 좋은 사람을 더하는 곳입니다." } }
+    ]
+  },
+  {
+    key: "category", label: "RSC SOCIAL", summary: "먼저 함께하고 싶은 프로그램",
+    title: "RSC SOCIAL 중, 가장 먼저 함께하고 싶은 프로그램은 무엇인가요?",
+    sub: "연애를 앞세우지 않는 취향 기반 프로그램입니다. 좋아하는 것을 함께 경험하다 보면 자연스럽게 사람을 알게 됩니다.",
+    options: [
+      { t: "RAUM ART WALK", d: "전시 → 큐레이터 토크 → 자유 소셜", s: { li: 2, pe: 1 }, day: "전시를 함께 걷고, 큐레이터의 이야기를 들은 뒤 와인 한 잔으로 대화를 이어갑니다.",
+        insight: { title: "예술과 취향이 자연스럽게 연결되는 시간.", body: "전시를 감상하고 큐레이터 토크를 들은 뒤, 와인과 함께 자유 소셜로 이어집니다." } },
+      { t: "SUNDAY RESET", d: "요가·바레·명상 → 브런치 → 커뮤니티 테이블", s: { li: 3 }, day: "일요일 아침, 요가와 러닝으로 몸을 깨우고 브런치 테이블에서 한 주를 나눕니다.",
+        insight: { title: "일요일을 리셋하는 회복의 시간.", body: "요가, 바레, 명상 이후 브런치와 커뮤니티 테이블로 이어지는 주간 프로그램입니다." } },
+      { t: "TASTE TABLE", d: "와인·위스키 테이스팅 → 취향별 테이블", s: { pe: 2, li: 1 }, day: "테이스팅 후 취향이 비슷한 테이블에 앉아 자유롭게 이야기합니다.",
+        insight: { title: "한 잔의 취향이 만드는 자연스러운 대화.", body: "와인 또는 위스키 테이스팅 후, 취향별 테이블에서 Free Social로 이어집니다." } },
+      { t: "ONE QUESTION SALON", d: "4~6명이 나누는 소규모 살롱", s: { pe: 3 }, day: "하나의 질문을 두고 몇 명의 회원들과 깊은 대화를 나눕니다.",
+        insight: { title: "하나의 질문이 만드는 깊은 대화.", body: "커리어, 여행, 삶의 방식, 관계, 가치관. 4~6명의 회원이 서로의 생각을 나누는 소규모 살롱입니다." } },
+      { t: "RAUM AFTER HOURS", d: "공연 → 뮤직 → 애프터 소셜", s: { pe: 2, re: 1 }, day: "공연을 함께 보고, 칵테일과 함께 애프터 소셜로 밤이 이어집니다.",
+        insight: { title: "공연이 끝나도 저녁은 이어집니다.", body: "공연 관람 후 음악을 즐기면서 애프터 소셜로 자연스럽게 대화가 길어지는 밤입니다." } },
+      { t: "RUN & BRUNCH", d: "러닝·트레이닝 → 브런치 → 소셜", s: { li: 2, pe: 1 }, day: "함께 달리고, 땀이 식기 전 브런치 테이블에서 대화를 이어갑니다.",
+        insight: { title: "함께 움직인 사람은 빨리 편해집니다.", body: "러닝과 트레이닝 후 브런치를 나누며 자연스러운 소셜 타임을 갖습니다." } }
+    ]
+  },
+  {
+    key: "people", label: "PEOPLE", summary: "함께하고 싶은 사람",
+    title: "어떤 사람과 시간을 쌓아가고 싶으신가요?",
+    sub: "라움이 한 번 확인한 사람들과 시작하는 관계입니다.",
+    options: [
+      { t: "취향이 닮은 사람", d: "같은 것을 좋아하는 사람", s: { li: 3 },
+        insight: { title: "취향이 먼저, 소개는 그다음입니다.", body: "같은 전시를 보고 같은 잔을 든 사람들 사이에는 소개가 따로 필요하지 않습니다." } },
+      { t: "대화가 깊어지는 사람", d: "가벼운 이야기 너머를 나누는 사람", s: { pe: 3 },
+        insight: { title: "취향을 보고, 대화하는 방식을 봅니다.", body: "여러 프로그램에서 반복적으로 만나며 서로의 결을 알아가는 것이 RSC의 방식입니다." } },
+      { t: "삶에 대한 태도가 좋은 사람", d: "자신의 삶을 주도적으로 사는 사람", s: { li: 1, re: 2 },
+        insight: { title: "조건이 아니라 태도로 확인합니다.", body: "가입과 멤버십이 첫 번째 기준이며, 실제 활동과 태도가 두 번째 기준이 됩니다." } },
+      { t: "다시 만나고 싶은 사람", d: "반복해서 마주치고 싶어지는 사람", s: { re: 3 },
+        insight: { title: "한 번의 만남보다, 반복되는 좋은 시간.", body: "멋진 관계는 한 번의 만남이 아니라 좋은 시간이 반복될 때 시작됩니다." } },
+      { t: "끌리는 인상과 분위기의 사람", d: "외모에 자연스럽게 끌리는 사람", s: { pe: 2, li: 1 },
+        insight: { title: "끌림은 관계가 시작되는 가장 솔직한 이유입니다.", body: "라움은 외모와 분위기에서 시작되는 호감 역시 중요한 취향으로 존중합니다." } }
+    ]
+  },
+  {
+    key: "openness", label: "OPENNESS", summary: "관계를 대하는 태도",
+    title: "새로운 관계를 대하는 회원님의 태도는 어떤가요?",
+    sub: "RSC는 매칭이 아니라 커뮤니티입니다. 결과보다 과정에 열려 있는 분과 잘 맞습니다.",
+    options: [
+      { t: "천천히, 여러 번 만나며 알아가고 싶다", d: "", s: { re: 3 },
+        insight: { title: "RSC와 가장 잘 맞는 태도입니다.", body: "한 번의 소개팅으로 상대를 판단하지 않습니다. 반복되는 프로그램 안에서 자연스럽게 관계가 깊어집니다." } },
+      { t: "일단 좋은 사람들 속에 있어보고 싶다", d: "", s: { li: 3 },
+        insight: { title: "먼저 커뮤니티에, 그다음 관계가 옵니다.", body: "매칭은 목적이 아니라 잘 설계된 커뮤니티 안에서 자연스럽게 발생하는 결과입니다." } },
+      { t: "결이 맞으면 적극적으로 다가가는 편이다", d: "", s: { pe: 3 },
+        insight: { title: "적극적인 태도도 환영합니다.", body: "다만 RSC는 공개적인 경쟁이나 선택 구조 없이, 자연스러운 만남을 우선합니다." } }
+    ]
+  },
+  {
+    key: "value", label: "VALUE", summary: "가장 기대하는 것",
+    title: "RSC에서 가장 기대하는 것은 무엇인가요?",
+    sub: "회원이 구매하는 것은 매칭 횟수가 아니라, 1년 동안 이어지는 경험과 관계의 가능성입니다.",
+    options: [
+      { t: "더 매력적인 싱글 라이프", d: "혼자서는 쉽게 경험하지 않았던 순간들", s: { li: 3 },
+        insight: { title: "BETTER LIFE.", body: "전시, 공연, 와인, 운동, 다이닝. 가입하는 순간부터 삶 자체가 더 풍성해집니다." } },
+      { t: "검증된 사람들과의 연결", d: "불특정 다수가 아닌 사람들", s: { pe: 3 },
+        insight: { title: "BETTER PEOPLE.", body: "라움이라는 브랜드와 멤버십을 선택하고, 실제로 활동하는 사람들을 만납니다." } },
+      { t: "자연스럽게 깊어지는 관계", d: "반복되는 시간이 만드는 관계", s: { re: 3 },
+        insight: { title: "BETTER RELATIONSHIP.", body: "RAUM SOLO처럼, 여러 경험을 함께하며 서로를 알아갈 충분한 시간이 주어집니다." } }
+    ]
+  }
+];
+
+const AXES = [
+  { k: "li", label: "BETTER LIFE", note: "혼자서는 쉽게 경험하지 않았던 순간을 채우는 데서 만족을 얻는 유형입니다." },
+  { k: "pe", label: "BETTER PEOPLE", note: "검증된 사람들과의 새로운 연결에서 만족을 얻는 유형입니다." },
+  { k: "re", label: "BETTER RELATIONSHIP", note: "반복되는 만남 속에서 자연스럽게 깊어지는 관계를 기대하는 유형입니다." }
+];
+
+const PROFILES = {
+  li_pe: { en: "THE EXPLORER", ko: "경험으로 시작하는 회원", body: "새로운 프로그램을 먼저 경험해보는 것을 선호하는 분입니다. RSC SOCIAL을 폭넓게 누리다 보면, 자연스럽게 반복해서 마주치는 얼굴이 생길 것입니다." },
+  li_re: { en: "THE SETTLER", ko: "삶에 사람을 더하는 회원", body: "이미 자신의 삶에 만족하지만, 그 삶을 나눌 사람을 찾는 분입니다. 반복적인 프로그램 참여가 자연스러운 관계로 이어질 가능성이 높은 유형입니다." },
+  pe_li: { en: "THE CONNECTOR", ko: "사람이 먼저인 회원", body: "무엇을 하는지보다 누구와 하는지가 중요한 분입니다. ONE QUESTION SALON처럼 소규모로 깊이 만나는 프로그램이 잘 맞습니다." },
+  pe_re: { en: "THE COMPANION", ko: "관계에 마음이 열린 회원", body: "검증된 사람들 사이에서 편안함을 느끾니다. RAUM SOCIAL NIGHT와 같은 프로그램에서 새로운 관계의 시작을 기대할 수 있는 유형입니다." },
+  re_li: { en: "THE SEEKER", ko: "다음 챕터를 찾는 회원", body: "삶의 방향을 새롭게 그리는 시기에 있는 분입니다. RSC SOCIAL로 시작해 RAUM SOLO까지, 자연스러운 여정이 준비되어 있습니다." },
+  re_pe: { en: "THE READY ONE", ko: "관계에 가장 준비된 회원", body: "천천히, 반복해서 알아가는 방식을 가장 편안하게 느끼는 분입니다. RAUM SOLO의 6주 여정이 회원님에게 가장 잘 맞는 다음 단계입니다." }
+};
+
+const REC = {
+  category: {
+    "RAUM ART WALK": "전시와 와인이 있는 저녁부터 시작해 보세요. 큐레이터 토크가 끝나면 자연스럽게 대화가 이어집니다.",
+    "SUNDAY RESET": "일요일 아침의 요가와 브런치로 가볍게 시작해 보세요. 매주 같은 얼굴을 마주치게 됩니다.",
+    "TASTE TABLE": "테이스팅 후 취향별 테이블에 앉는 것부터 시작해 보세요. 취향이 대화를 대신 열어줍니다.",
+    "ONE QUESTION SALON": "소규모 살롱에서 깊은 대화로 시작해 보세요. 4~6명이라 서로를 빨리 알게 됩니다.",
+    "RAUM AFTER HOURS": "공연이 있는 밤부터 시작해 보세요. 애프터 소셜에서 대화가 자연스럽게 길어집니다.",
+    "RUN & BRUNCH": "함께 달리는 것부터 시작해 보세요. 땀을 흘린 사람들 사이엔 어색함이 빨리 사라집니다."
+  }
+};
+
+const SLOTS = ["오전 10–12시", "오후 2–4시", "오후 4–6시", "저녁 6–8시"];
+
+class Component extends DCLogic {
+  state = { view: "intro", i: 0, picks: {}, name: "", phone: "", route: "", slot: "", agreed: false };
+
+  card(active) {
+    return "cursor:pointer;text-align:left;padding:26px 24px;background:" + (active ? "#e5ddce" : "transparent") +
+      ";border:1px solid " + (active ? "#5a3d24" : "rgba(33,30,25,.18)") + ";color:#211e19;transition:all .2s ease";
+  }
+  chip(active) {
+    return "cursor:pointer;padding:15px 26px;font-size:14.5px;background:" + (active ? "#e5ddce" : "transparent") +
+      ";border:1px solid " + (active ? "#5a3d24" : "rgba(33,30,25,.22)") + ";color:#211e19;transition:all .2s ease";
+  }
+
+  picked(q) { const n = this.state.picks[q.key]; return n == null ? null : q.options[n]; }
+
+  renderVals() {
+    const st = this.state;
+    const q = QUESTIONS[st.i];
+    const idx = st.picks[q.key];
+    const isQ = st.view === "q";
+    const opt = idx != null ? q.options[idx] : null;
+    const ins = opt ? opt.insight : null;
+    const isBlocked = !!(opt && opt.block);
+
+    const totals = { li: 0, pe: 0, re: 0 };
+    QUESTIONS.forEach(qq => {
+      const o = this.picked(qq);
+      if (!o) return;
+      Object.keys(o.s || {}).forEach(k => { totals[k] += o.s[k]; });
+    });
+    const order = ["li", "pe", "re"].sort((a, b) => totals[b] - totals[a]);
+    const prof = PROFILES[order[0] + "_" + order[1]] || PROFILES.li_pe;
+    const max = Math.max(totals.li, totals.pe, totals.re, 1);
+
+    const catOpt = this.picked(QUESTIONS.find(x => x.key === "category"));
+    const recProgram = catOpt ? catOpt.t : "RAUM ART WALK";
+    const recBody = REC.category[recProgram] || "";
+
+    const picksSummary = ["stage", "people", "value"]
+      .map(k => { const qq = QUESTIONS.find(x => x.key === k); const o = this.picked(qq);
+        return o ? { label: qq.summary, value: o.t + (o.d ? " — " + o.d : "") } : null; })
+      .filter(Boolean);
+
+    const canSubmit = st.name.trim() && st.phone.trim() && st.agreed;
+
+    return {
+      isIntro: st.view === "intro",
+      isQuestion: isQ,
+      isResult: st.view === "result",
+      isForm: st.view === "form",
+      isDone: st.view === "done",
+      q,
+      stepLabel: (st.i + 1) + " / " + QUESTIONS.length,
+      options: q.options.map((o, n) => ({
+        t: o.t, d: o.d || "",
+        cardStyle: this.card(idx === n),
+        pick: () => this.setState(s => ({ picks: Object.assign({}, s.picks, { [q.key]: n }) }))
+      })),
+      showInsight: isQ && idx != null && !isBlocked,
+      blocked: isQ && isBlocked,
+      insightTitle: ins ? ins.title : "",
+      insightBody: ins ? ins.body : "",
+      start: () => this.setState({ view: "q", i: 0 }),
+      next: () => {
+        if (st.view === "result") return this.setState({ view: "form" });
+        if (st.i < QUESTIONS.length - 1) return this.setState({ i: st.i + 1 });
+        this.setState({ view: "result" });
+      },
+      back: () => {
+        if (st.view === "form") return this.setState({ view: "result" });
+        if (st.view === "result") return this.setState({ view: "q", i: QUESTIONS.length - 1 });
+        if (st.i === 0) return this.setState({ view: "intro" });
+        this.setState({ i: st.i - 1 });
+      },
+      profileEn: prof.en, profileKo: prof.ko, profileBody: prof.body,
+      recProgram, recBody,
+      picksSummary,
+      axes: AXES.map(a => {
+        const pct = Math.round((totals[a.k] / max) * 100);
+        return { label: a.label, pct: pct + "%", note: a.note,
+          barStyle: "position:absolute;left:0;top:0;height:1px;background:#5a3d24;width:" + Math.max(pct, 4) + "%" };
+      }),
+      name: st.name, phone: st.phone, route: st.route, agreed: st.agreed,
+      onName: e => this.setState({ name: e.target.value }),
+      onPhone: e => this.setState({ phone: e.target.value }),
+      onRoute: e => this.setState({ route: e.target.value }),
+      onAgree: e => this.setState({ agreed: e.target.checked }),
+      slots: SLOTS.map(t => ({ t, style: this.chip(st.slot === t), pick: () => this.setState({ slot: st.slot === t ? "" : t }) })),
+      submitStyle: "border:none;padding:16px 42px;font-size:13.5px;letter-spacing:.06em;background:" +
+        (canSubmit ? "#211e19" : "rgba(33,30,25,.25)") + ";color:#f2eee5;cursor:" + (canSubmit ? "pointer" : "not-allowed"),
+      submit: () => { if (canSubmit) this.setState({ view: "done" }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

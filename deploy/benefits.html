@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회원 혜택 안내 — 라움소셜클럽</title>
+<style>
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-400.ttf') format('truetype'); font-weight:400; }
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-500.ttf') format('truetype'); font-weight:500; }
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-600.ttf') format('truetype'); font-weight:600; }
+  @font-face { font-family:'SamsungOne'; src:url('fonts/SamsungOne-700.ttf') format('truetype'); font-weight:700; }
+  body { margin:0; background:#f2eee5; color:#211e19; font-family:'SamsungOne', Arial, sans-serif; font-weight:500; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  a { color:inherit; text-decoration:none; }
+  a:hover { color:#5a3d24; }
+  @media (max-width: 760px) {
+    header { padding:14px 18px !important }
+    main { padding:40px 18px 96px !important }
+    [data-row] { grid-template-columns:1fr !important; gap:10px !important; padding:20px 18px !important }
+    [data-row] [data-right] { text-align:left !important }
+    h1 { font-size:30px !important }
+  }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 40px;background:rgba(242,238,229,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(33,30,25,.1)">
+    <a href="index.html" style="display:flex;align-items:center;gap:12px">
+      <img src="logo-emblem.png" style="height:32px;width:auto;filter:invert(1) brightness(0.15)">
+      <img src="logo-mtwj2m03-g2ra.png" style="height:15px;width:auto;filter:invert(1) brightness(0.15);opacity:.85" alt="logo">
+    </a>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="pricing.html" style="font-size:13px;font-weight:600;color:#5a3d24;padding:8px 12px">가격 안내</a>
+      <a href="fit-check.html" style="display:inline-flex;align-items:center;padding:10px 20px;border-radius:999px;background:#5a3d24;color:#f2eee5;font-size:12.5px;font-weight:600" style-hover="background:#9c6b3e">RSC 상담 신청하기</a>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:72px 40px 140px">
+    <div style="width:100%;max-width:960px;margin:0 auto">
+
+      <section style="text-align:center;margin-bottom:56px">
+        <div style="font-size:11px;letter-spacing:.3em;color:#9c6b3e;margin-bottom:22px">RSC MEMBER BENEFITS</div>
+        <h1 style="font-weight:600;font-size:clamp(30px,4vw,48px);line-height:1.28;margin:0 0 20px;text-wrap:pretty">정회원 혜택 안내</h1>
+        <p style="margin:0 auto;font-size:16px;line-height:1.75;color:rgba(33,30,25,.68);max-width:520px;text-wrap:pretty">“아름다운 공간에서, 서로의 특별함을 발편하는 곳”<br>라움이 검증한 멤버가 모이는, 싱글 라이프스타일 커뮤니티</p>
+      </section>
+
+      <section style="border:1px solid rgba(33,30,25,.14);margin-bottom:64px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 28px;background:#211e19;color:#f7f3ec">
+          <span style="font-size:12px;letter-spacing:.2em;font-weight:600">회원 혜택 구성</span>
+          <span style="font-size:11px;letter-spacing:.14em;color:rgba(247,243,236,.65)">8 BENEFITS · 3 CATEGORIES</span>
+        </div>
+
+        <div style="padding:12px 28px;background:#e9e3d6;font-size:12.5px;font-weight:600;color:#5a3d24;letter-spacing:.06em">이벤트 · 커뮤니티</div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;border-bottom:1px solid rgba(33,30,25,.1);background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">01</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">카테고리 행사 우선참여</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">무료 · 우선권</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· ART WALK, TASTE TABLE 등 6개 카테고리 행사 참가비 무료<br>· 비회원보다 먼저 예약 가능</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">회당 평균<br><b style="color:#211e19;font-size:15px">160,000원</b> 상당 절감</div>
+        </div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;border-bottom:1px solid rgba(33,30,25,.1);background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">02</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">지인 초대권</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">연 8회</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· 분기당 2매, 연 8매 제공<br>· 초대받은 지인도 참가비 없이 동행</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">연 8매<br>분기당 2매 제공</div>
+        </div>
+
+        <div style="padding:12px 28px;background:#e9e3d6;font-size:12.5px;font-weight:600;color:#5a3d24;letter-spacing:.06em">스페이스</div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;border-bottom:1px solid rgba(33,30,25,.1);background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">03</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">전용 미팅룸 · 세미나룸</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">회원 전용 예약</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· 프라이빗 미팅룸 2개, 세미나룸 2개<br>· 사용한 시간만큼만 별도 결제</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">미팅룸 5만원/h<br>세미나룸 10만원/h</div>
+        </div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;border-bottom:1px solid rgba(33,30,25,.1);background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">04</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">RSC 라운지</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">무료 제공</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· 행사 전후, 미팅 사이 자유롭게 이용<br>· 물 · 티 · 커피 무료 제공</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">상시<br>무료 이용</div>
+        </div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;border-bottom:1px solid rgba(33,30,25,.1);background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">05</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">평일 무료주차</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">평일 1일 1회</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· 평일 1일 1회, 3시간까지 주차료 무료</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">1일 최대<br><b style="color:#211e19;font-size:15px">54,000원</b> 상당 절감</div>
+        </div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;border-bottom:1px solid rgba(33,30,25,.1);background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">06</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">라움 아트센터 대관</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">회원 우선</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· 브리제홀, 마제스틱볼룸 등 7개 공간 협의<br>· 개인 행사부터 소셜 파티까지 폭넓게 활용</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">대관료<br>별도 문의</div>
+        </div>
+
+        <div style="padding:12px 28px;background:#e9e3d6;font-size:12.5px;font-weight:600;color:#5a3d24;letter-spacing:.06em">파트너 혜택</div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;border-bottom:1px solid rgba(33,30,25,.1);background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">07</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">브런치카페 할인</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">할인 제공</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· 지하 1층 브런치 베이커리 카페</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">회원 할인가<br>적용</div>
+        </div>
+        <div data-row="" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,.8fr);gap:24px;padding:24px 28px;background:#f7f3ec;align-items:start">
+          <div><div style="font-size:11px;color:rgba(33,30,25,.45);margin-bottom:6px">08</div><div style="font-size:16px;font-weight:600;margin-bottom:10px">라움 제휴 브랜드 이용</div><span style="display:inline-block;font-size:11px;padding:4px 10px;border:1px solid rgba(33,30,25,.25);border-radius:999px;color:rgba(33,30,25,.65)">등록 할인</span></div>
+          <div style="font-size:13.5px;line-height:1.7;color:rgba(33,30,25,.75)">· 호텔, 병원, 웰니스센터 등 제휴 브랜드 혜택 이용</div>
+          <div data-right="" style="text-align:right;font-size:13px;line-height:1.6;color:rgba(33,30,25,.6)">이용 시<br>할인 제공</div>
+        </div>
+      </section>
+
+      <section style="background:#211e19;color:#f7f3ec;padding:56px 48px;text-align:center">
+        <div style="font-size:11px;letter-spacing:.3em;color:#e2b478;margin-bottom:18px">RAUM SOCIAL CLUB</div>
+        <h2 style="font-weight:600;font-size:clamp(22px,2.6vw,32px);line-height:1.3;margin:0 0 32px">멤버십 가격과 혜택을 함께 확인해보세요</h2>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="pricing.html" style="display:inline-flex;align-items:center;padding:16px 32px;border-radius:999px;background:#e2b478;color:#211e19;font-size:14px;font-weight:700" style-hover="background:#f0c98e">멤버십 가격 안내</a>
+          <a href="fit-check.html" style="display:inline-flex;align-items:center;padding:16px 32px;border-radius:999px;border:1px solid rgba(247,243,236,.35);color:#f7f3ec;font-size:14px" style-hover="border-color:#e2b478;color:#e2b478">RSC 상담 신청하기</a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+</body>
+</html>
