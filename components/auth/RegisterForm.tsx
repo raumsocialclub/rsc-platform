@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { normalizePhone } from "@/lib/phone";
+import { describeAuthError, describeInviteReason } from "@/lib/auth/errors";
 import type { SocialProviderId } from "@/lib/auth/providers";
 import { SocialButtons } from "./SocialButtons";
 import { INPUT, SUBMIT, OVERLINE, ERROR, DIVIDER } from "./ui";
@@ -38,6 +39,15 @@ export function RegisterForm({ code, enabled }: Props) {
 
     setBusy(true);
     try {
+      // 1) 초대코드를 서버에서 다시 확인해 구체적인 이유(사용됨/만료/없음)를 먼저 알려준다.
+      const vr = await fetch("/api/invites/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
+      const vj = (await vr.json().catch(() => null)) as { valid?: boolean; reason?: string } | null;
+      if (!vj?.valid) {
+        setError(describeInviteReason(vj?.reason));
+        return;
+      }
+
+      // 2) Supabase 가입. DB 트리거가 초대코드를 검증·사용 처리하고 members 행을 만든다.
       const supabase = createClient();
       const { data, error: err } = await supabase.auth.signUp({
         email: em,
@@ -45,22 +55,18 @@ export function RegisterForm({ code, enabled }: Props) {
         options: { data: { name: n, phone: p, invite_code: code, marketing_opt_in: news } },
       });
       if (err) {
-        const msg = err.message.toLowerCase();
-        if (msg.includes("already registered") || msg.includes("already been registered")) setError("이미 가입된 이메일입니다. 로그인해 주세요.");
-        else if (msg.includes("database error")) setError("초대코드가 유효하지 않거나 이미 사용되었습니다. 상담 담당자에게 확인해주세요.");
-        else if (msg.includes("password")) setError("비밀번호는 8자 이상이어야 합니다.");
-        else setError("가입을 완료하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+        setError(describeAuthError(err.message, "signup"));
         return;
       }
       if (!data.session) {
         // Supabase 의 "Confirm email" 설정이 켜져 있으면 세션이 없다. 운영자가 설정을 꺼야 한다.
-        setError("가입은 접수되었지만 이메일 인증 설정이 켜져 있어 바로 로그인되지 않습니다. 운영자에게 문의해 주세요.");
+        setError("가입은 접수되었지만 이메일 인증 설정이 켜져 있어 바로 로그인되지 않습니다. 운영자가 Supabase에서 'Confirm email'을 끈 뒤 로그인해 주세요.");
         return;
       }
       router.push("/programs");
       router.refresh();
-    } catch {
-      setError("가입을 완료하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } catch (e) {
+      setError(describeAuthError(e instanceof Error ? e.message : String(e), "signup"));
     } finally {
       setBusy(false);
     }

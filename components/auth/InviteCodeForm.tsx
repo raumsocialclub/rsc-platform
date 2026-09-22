@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SUBMIT, OVERLINE, ERROR } from "./ui";
+import { describeInviteReason } from "@/lib/auth/errors";
 
 type Props = {
   /** "verify": 가입 전 검증 → /join/register?code= 로 이동. "consume": 로그인한(소셜) 회원이 코드 연결 → /programs */
@@ -34,7 +35,7 @@ export function InviteCodeForm({ mode, initialError = null }: Props) {
           router.push(`/join/register?code=${encodeURIComponent(c)}`);
           return;
         }
-        setError(json?.reason === "SERVER" ? "확인 중 오류가 났습니다. 잠시 후 다시 시도해 주세요." : INVALID_MSG);
+        setError(describeInviteReason(json?.reason));
       } else {
         const res = await fetch("/api/invites/consume", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: c }) });
         const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;

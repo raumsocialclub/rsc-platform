@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { SocialProviderId } from "@/lib/auth/providers";
+import { describeAuthError } from "@/lib/auth/errors";
 import { SocialButtons } from "./SocialButtons";
 import { INPUT, SUBMIT, OVERLINE, ERROR, DIVIDER } from "./ui";
 
@@ -27,14 +28,13 @@ export function LoginForm({ enabled, next, initialError = null }: Props) {
       const supabase = createClient();
       const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password: pw });
       if (err) {
-        const msg = err.message.toLowerCase();
-        setError(msg.includes("email not confirmed") ? "이메일 인증이 완료되지 않은 계정입니다. 운영자에게 문의해 주세요." : "이메일 또는 비밀번호가 올바르지 않습니다.");
+        setError(describeAuthError(err.message, "login"));
         return;
       }
       router.push(next);
       router.refresh();
-    } catch {
-      setError("로그인하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } catch (e) {
+      setError(describeAuthError(e instanceof Error ? e.message : String(e), "login"));
     } finally {
       setBusy(false);
     }
