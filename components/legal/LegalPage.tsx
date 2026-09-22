@@ -15,7 +15,7 @@ const NAV = [
  * 약관류 공통 레이아웃 (Design.md 규칙: 크림 배경, 좌측 정렬 본문, 상단 라벨 + 제목).
  * 본문은 lib/legal/*.ts 의 자리 문구 — 실제 문구는 사용자 제공 후 교체한다.
  */
-export function LegalPage({ overline, title, updated, sections, current }: { overline: string; title: string; updated: string; sections: LegalSection[]; current: string }) {
+export function LegalPage({ overline, title, updated, sections, current, placeholder = true }: { overline: string; title: string; updated: string; sections: LegalSection[]; current: string; placeholder?: boolean }) {
   return (
     <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">
       <Header />
@@ -34,9 +34,11 @@ export function LegalPage({ overline, title, updated, sections, current }: { ove
               );
             })}
           </nav>
-          <div className="bg-[rgba(226,180,120,.18)] border border-[rgba(226,180,120,.6)] px-[18px] py-[14px] text-[13px] leading-[1.7] text-[#7a5420] mb-[36px]">
-            아래 내용은 <b>자리 문구</b>입니다. 법무 검토를 거친 실제 문구로 교체해야 하며, 토스페이먼츠 심사 전에 반드시 확정해 주세요.
-          </div>
+          {placeholder && (
+            <div className="bg-[rgba(226,180,120,.18)] border border-[rgba(226,180,120,.6)] px-[18px] py-[14px] text-[13px] leading-[1.7] text-[#7a5420] mb-[36px]">
+              아래 내용은 <b>자리 문구</b>입니다. 법무 검토를 거친 실제 문구로 교체해야 하며, 토스페이먼츠 심사 전에 반드시 확정해 주세요.
+            </div>
+          )}
           <article className="grid gap-[32px]">
             {sections.map((s, i) => (
               <section key={i} id={`s${i + 1}`}>

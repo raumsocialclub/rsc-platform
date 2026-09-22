@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin/guard";
 import { createClient } from "@/lib/supabase/server";
+import { logAdmin } from "@/lib/admin/log";
 
 /** PATCH /api/admin/members/[id] { memo?, status? } — 회원 메모·상태 변경 (관리자 RLS) */
 const Body = z.object({ memo: z.string().max(2000).optional(), status: z.enum(["active", "paused", "withdrawn"]).optional() });
@@ -16,5 +17,6 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   const supabase = await createClient();
   const { error } = await supabase.from("members").update(parsed.data).eq("id", id);
   if (error) return NextResponse.json({ ok: false, message: "저장하지 못했습니다." }, { status: 500 });
+  await logAdmin(me.id, "member.update", id, { status: parsed.data.status ?? null, memo: parsed.data.memo != null });
   return NextResponse.json({ ok: true });
 }

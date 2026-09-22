@@ -8,13 +8,15 @@ import { Logo } from "./Logo";
 const INK_FILTER = "invert(1) brightness(0.15)";
 
 export type HeaderUser = { name: string; initial: string };
+export type HeaderBrand = { ctaLabel: string; ctaHref: string; logoEmblem: string; logoText: string };
+const DEFAULT_BRAND: HeaderBrand = { ctaLabel: "RSC 상담 신청", ctaHref: "/fit-check", logoEmblem: "/images/logo-emblem.png", logoText: "/images/logo-text-nav.png" };
 
 /**
  * 공통 GNB. 데스크톱: fixed 상단 바 + 메뉴 텍스트. 모바일: 햄버거 → 전체화면 오버레이.
  * deploy/index.html <header> 재현. 로그인 상태(user)면 "프로그램 · 내 예약 · 이니셜 아바타"로 바뀐다.
  * user 는 서버 컴포넌트 <Header /> 가 넣어 준다.
  */
-export function SiteHeader({ user = null }: { user?: HeaderUser | null }) {
+export function SiteHeader({ user = null, brand = DEFAULT_BRAND }: { user?: HeaderUser | null; brand?: HeaderBrand }) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
   const loggedIn = !!user;
@@ -26,7 +28,8 @@ export function SiteHeader({ user = null }: { user?: HeaderUser | null }) {
           href="/"
           emblemClass="h-[28px] md:h-[39px]"
           textClass="h-[16px] md:h-[18px]"
-          textSrc="/images/logo-text-nav.png"
+          textSrc={brand.logoText}
+          emblemSrc={brand.logoEmblem}
         />
         <div className="flex items-center gap-[20px] ml-auto">
           {loggedIn ? (
@@ -59,11 +62,11 @@ export function SiteHeader({ user = null }: { user?: HeaderUser | null }) {
                 로그인
               </Link>
               <Link
-                href="/fit-check"
+                href={brand.ctaHref}
                 className="inline-flex items-center gap-[6px] md:gap-[9px] px-[14px] py-[9px] md:px-[20px] md:py-[11px] border border-brown rounded-pill text-[11.5px] md:text-[12.5px] whitespace-nowrap bg-brown text-cream font-semibold hover:bg-brownHover hover:border-brownHover hover:text-cream"
               >
-                <span className="md:hidden">상담 신청</span>
-                <span className="hidden md:inline">RSC 상담 신청</span>
+                <span className="md:hidden">{brand.ctaLabel.replace(/^RSC\s+/, "")}</span>
+                <span className="hidden md:inline">{brand.ctaLabel}</span>
                 <span className="opacity-70">→</span>
               </Link>
             </>
@@ -83,12 +86,13 @@ export function SiteHeader({ user = null }: { user?: HeaderUser | null }) {
         <div className="fixed inset-0 z-[90] bg-cream flex flex-col px-[28px] py-[24px]">
           <div className="flex items-center justify-between mb-[56px]">
             <Image
-              src="/images/logo-emblem.png"
+              src={brand.logoEmblem}
               alt="RAUM SOCIAL CLUB"
               width={529}
               height={638}
               className="h-[30px] w-auto"
               style={{ filter: INK_FILTER }}
+              unoptimized={brand.logoEmblem.startsWith("http")}
             />
             <button
               type="button"
@@ -123,11 +127,11 @@ export function SiteHeader({ user = null }: { user?: HeaderUser | null }) {
             </div>
           ) : (
             <Link
-              href="/fit-check"
+              href={brand.ctaHref}
               onClick={close}
               className="mt-auto inline-flex items-center justify-center px-[28px] py-[16px] rounded-pill bg-brown text-cream text-[15px] font-semibold hover:text-cream"
             >
-              RSC 상담 신청
+              {brand.ctaLabel}
             </Link>
           )}
         </div>

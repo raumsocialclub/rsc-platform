@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin/guard";
 import { ProgramInputSchema, firstIssue } from "@/lib/programs/schema";
 import { saveProgram } from "@/lib/programs/admin";
 import { createClient } from "@/lib/supabase/server";
+import { logAdmin } from "@/lib/admin/log";
 
 /** POST /api/admin/programs — 새 프로그램 + 회차 생성 */
 export async function POST(req: Request) {
@@ -17,5 +18,6 @@ export async function POST(req: Request) {
     console.error("[admin/programs POST]", result.error);
     return NextResponse.json({ ok: false, message: "저장하지 못했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });
   }
+  await logAdmin(me.id, "program.create", result.id, { name: parsed.data.name, published: parsed.data.is_published });
   return NextResponse.json({ ok: true, id: result.id });
 }

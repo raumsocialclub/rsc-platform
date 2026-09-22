@@ -384,3 +384,82 @@ begin
 end $$;
 revoke all on function book_session(uuid) from public, anon;
 grant execute on function book_session(uuid) to authenticated;
+
+-- ---------- M9: 사이트 콘텐츠 관리(CMS) + 접속 통계 + 관리자 활동 로그
+create table site_content (
+  id text primary key,                        -- 'home.hero' 등 (lib/cms/schema.ts)
+  page text not null,                         -- global | home | pricing | benefits | legal
+  data jsonb not null default '{}',
+  updated_at timestamptz default now(),
+  updated_by uuid references members(id)
+);
+create table site_content_history (
+  id bigserial primary key,
+  content_id text not null,
+  data jsonb not null,
+  saved_at timestamptz default now(),
+  saved_by uuid references members(id)
+);
+create index on site_content_history(content_id, saved_at desc);
+create table page_views (
+  id bigserial primary key,
+  ts timestamptz not null default now(),
+  path text not null,
+  referrer text, ref_host text,
+  utm_source text, utm_medium text, utm_campaign text,
+  visitor_id text, member_id uuid,
+  device text, country text
+);
+create index on page_views(ts);
+create index on page_views(path, ts);
+create table admin_logs (
+  id bigserial primary key,
+  ts timestamptz not null default now(),
+  admin_id uuid references members(id),
+  action text not null,
+  target text,
+  detail jsonb
+);
+create index on admin_logs(ts desc);
+alter table site_content enable row level security;
+alter table site_content_history enable row level security;
+alter table page_views enable row level security;
+alter table admin_logs enable row level security;
+create policy "site content public read" on site_content for select using (true);
+create policy "site content admin write" on site_content for all using (is_admin());
+create policy "site history admin" on site_content_history for all using (is_admin());
+create policy "page views admin read" on page_views for select using (is_admin());   -- insert 는 서버(service role)
+create policy "admin logs admin" on admin_logs for all using (is_admin());
+
+create or replace function stats_page_views(p_from timestamptz, p_to timestamptz)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare r jsonb;
+begin
+  if not is_admin() then raise exception 'FORBIDDEN'; end if;
+  select jsonb_build_object(
+    'daily', (select coalesce(jsonb_agg(jsonb_build_object('day', d, 'pv', pv, 'uv', uv) order by d), '[]') from (
+        select to_char(ts at time zone 'Asia/Seoul', 'YYYY-MM-DD') d, count(*) pv, count(distinct visitor_id) uv
+        from page_views where ts >= p_from and ts < p_to group by 1) x),
+    'paths', (select coalesce(jsonb_agg(jsonb_build_object('path', path, 'pv', pv, 'uv', uv) order by pv desc), '[]') from (
+        select path, count(*) pv, count(distinct visitor_id) uv from page_views where ts >= p_from and ts < p_to group by 1 order by 2 desc limit 15) x),
+    'referrers', (select coalesce(jsonb_agg(jsonb_build_object('host', host, 'pv', pv) order by pv desc), '[]') from (
+        select coalesce(nullif(ref_host, ''), '(직접 접속)') host, count(*) pv from page_views where ts >= p_from and ts < p_to group by 1 order by 2 desc limit 10) x),
+    'devices', (select coalesce(jsonb_agg(jsonb_build_object('device', device, 'pv', pv)), '[]') from (
+        select coalesce(device, 'unknown') device, count(*) pv from page_views where ts >= p_from and ts < p_to group by 1) x),
+    'countries', (select coalesce(jsonb_agg(jsonb_build_object('country', country, 'pv', pv) order by pv desc), '[]') from (
+        select coalesce(country, '??') country, count(*) pv from page_views where ts >= p_from and ts < p_to group by 1 order by 2 desc limit 8) x),
+    'totals', (select jsonb_build_object('pv', count(*), 'uv', count(distinct visitor_id), 'members', count(distinct member_id)) from page_views where ts >= p_from and ts < p_to)
+  ) into r;
+  return r;
+end $$;
+revoke all on function stats_page_views(timestamptz, timestamptz) from public, anon;
+grant execute on function stats_page_views(timestamptz, timestamptz) to authenticated;
+
+-- 사이트 이미지 버킷 (로고·섹션 사진)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('site', 'site', true, 10485760, array['image/jpeg','image/png','image/webp','image/svg+xml'])
+on conflict (id) do update set public = true;
+create policy "site public read" on storage.objects for select using (bucket_id = 'site');
+create policy "site admin insert" on storage.objects for insert with check (bucket_id = 'site' and public.is_admin());
+create policy "site admin update" on storage.objects for update using (bucket_id = 'site' and public.is_admin());
+create policy "site admin delete" on storage.objects for delete using (bucket_id = 'site' and public.is_admin());

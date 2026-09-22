@@ -11,21 +11,24 @@ type Props = {
   textClass: string;
   /** 텍스트 로고 파일 (public/images/ 아래) */
   textSrc?: string;
+  /** 엠블럼 파일 (CMS 로고 교체용) */
+  emblemSrc?: string;
   className?: string;
 };
 
 /** 엠블럼 + 텍스트 로고. 원본은 흰색이라 invert 필터로 잉크색을 만든다. */
-export function Logo({ href = "/", emblemClass, textClass, textSrc = "/images/logo-text.png", className = "gap-[14px]" }: Props) {
+export function Logo({ href = "/", emblemClass, textClass, textSrc = "/images/logo-text.png", emblemSrc = "/images/logo-emblem.png", className = "gap-[14px]" }: Props) {
   return (
     <Link href={href} className={`flex items-center ${className}`}>
       <Image
-        src="/images/logo-emblem.png"
+        src={emblemSrc}
         alt="RAUM SOCIAL CLUB"
         width={529}
         height={638}
         priority
         className={`w-auto ${emblemClass}`}
         style={{ filter: INK_FILTER }}
+        unoptimized={emblemSrc.startsWith("http")}
       />
       <Image
         src={textSrc}
@@ -35,6 +38,7 @@ export function Logo({ href = "/", emblemClass, textClass, textSrc = "/images/lo
         priority
         className={`w-auto opacity-85 ${textClass}`}
         style={{ filter: INK_FILTER }}
+        unoptimized={textSrc.startsWith("http")}
       />
     </Link>
   );

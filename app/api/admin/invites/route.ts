@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin/guard";
 import { createClient } from "@/lib/supabase/server";
 import { sendInviteCode } from "@/lib/notify";
 import { normalizePhone } from "@/lib/phone";
+import { logAdmin } from "@/lib/admin/log";
 
 /**
  * POST /api/admin/invites { inquiryId?, name?, phone?, email? }
@@ -34,6 +35,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, message: "초대코드를 발급하지 못했습니다." }, { status: 500 });
   }
   const code = data as { code: string; expires_at: string | null };
+  await logAdmin(me.id, "invite.issue", code.code, { inquiryId: inquiryId ?? null, name: name ?? null });
   const notify = await sendInviteCode({ to: email || null, name, code: code.code, expiresAt: code.expires_at?.slice(0, 10) });
   return NextResponse.json({ ok: true, code: code.code, expiresAt: code.expires_at, notify });
 }

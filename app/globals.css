@@ -1,6 +1,18 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
+/* Design.md 토큰 기본값. 어드민 "색상 테마" 저장값이 layout 에서 :root 에 덮어쓴다. */
+:root {
+  --c-cream: #f7f3ec;
+  --c-ink: #211e19;
+  --c-brown: #5a3d24;
+  --c-brownHover: #9c6b3e;
+  --c-gold: #e2b478;
+  --c-goldHover: #f0c98e;
+  --c-sand: #efe9de;
+  --c-sandDeep: #e9e3d6;
+}
+
 /* Design.md 기본 규칙 — 크림 종이 위 짙은 브라운 잉크 */
 @layer base {
   html {
@@ -11,8 +23,8 @@
 
   body {
     margin: 0;
-    background: #f7f3ec;
-    color: #211e19;
+    background: var(--c-cream);
+    color: var(--c-ink);
     font-family: var(--font-samsung), Arial, sans-serif;
     font-weight: 500;
     -webkit-font-smoothing: antialiased;
@@ -28,12 +40,12 @@
   }
 
   a:hover {
-    color: #9c6b3e;
+    color: var(--c-brownHover);
   }
 
   ::selection {
-    background: #9c6b3e;
-    color: #f7f3ec;
+    background: var(--c-brownHover);
+    color: var(--c-cream);
   }
 
   input,
@@ -54,7 +66,7 @@
 
   /* 접근성: 키보드 포커스 링 (마우스 클릭에는 표시하지 않음). Design.md 브라운 강조색. */
   :focus-visible {
-    outline: 2px solid #9c6b3e;
+    outline: 2px solid var(--c-brownHover);
     outline-offset: 2px;
   }
 

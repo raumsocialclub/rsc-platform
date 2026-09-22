@@ -28,8 +28,16 @@ export function SocialButtons({ mode, inviteCode, enabled, next }: Props) {
     if (inviteCode) setInviteCookie(inviteCode);
 
     if (id === "naver") {
-      // 네이버는 서버 라우트가 state 를 만들고 네이버 인증 페이지로 보낸다.
-      window.location.href = `/auth/naver/start?next=${encodeURIComponent(target)}`;
+      // 네이버는 서버가 state 쿠키를 만들고 인증 URL 을 돌려준다 → 외부 페이지로 이동
+      try {
+        const res = await fetch("/auth/naver/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ next: target }) });
+        const j = (await res.json().catch(() => null)) as { ok?: boolean; url?: string; message?: string } | null;
+        if (!j?.ok || !j.url) throw new Error(j?.message ?? "네이버 로그인을 시작하지 못했습니다.");
+        window.location.assign(j.url);
+      } catch (e) {
+        setNotice(e instanceof Error ? e.message : "네이버 로그인을 시작하지 못했습니다.");
+        setBusy(null);
+      }
       return;
     }
     const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(target)}`;

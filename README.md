@@ -51,6 +51,9 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 **M8(마무리)**: `/terms` `/privacy` `/refund` 는 자리 문구입니다(`lib/legal/content.ts` 한 파일만 바꾸면 됩니다). 404·오류·로딩 화면과 키보드 포커스 링을 추가했습니다.
 라이브 전환 체크리스트는 SETUP.md 4 참고(토스 라이브 키, 웹훅 URL, Supabase Redirect URL, 도메인 이전).
 
+**M9(어드민 고도화)**: `/admin/site` 에서 메인·가격·혜택·약관의 문구·사진·색상·연락처를 코드 수정 없이 바꿉니다(저장 즉시 반영, 이력 복원 가능). 기본값은 `lib/cms/schema.ts` 에 있어 DB 가 비어 있어도 기존 화면이 그대로 나옵니다.
+`/admin/stats` 는 기간별 매출·예약·회원·상담·접속(페이지뷰/방문자/유입/기기)·전환 퍼널·관리자 활동을 보여주고 항목별 또는 전체 CSV 로 내려받습니다. 접속 수집은 `/api/track` 비콘(서버에 `SUPABASE_SERVICE_ROLE_KEY` 필요).
+
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
 ## Overview

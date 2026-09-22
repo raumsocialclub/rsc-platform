@@ -14,13 +14,13 @@ const config: Config = {
     },
     extend: {
       colors: {
-        cream: "#f7f3ec",
-        card: "#f7f3ec",
-        ink: "#211e19",
-        brown: "#5a3d24",
-        brownHover: "#9c6b3e",
-        gold: "#e2b478",
-        goldHover: "#f0c98e",
+        cream: "var(--c-cream)",
+        card: "var(--c-cream)",
+        ink: "var(--c-ink)",
+        brown: "var(--c-brown)",
+        brownHover: "var(--c-brownHover)",
+        gold: "var(--c-gold)",
+        goldHover: "var(--c-goldHover)",
         success: "#2e6b3e",
         successBg: "rgba(46,107,62,.12)",
         warn: "#7a5420",
@@ -35,7 +35,7 @@ const config: Config = {
         "line-24": "rgba(33,30,25,.24)",
         "line-30": "rgba(33,30,25,.3)",
         // 다크 섹션 위
-        paper: "#f7f3ec",
+        paper: "var(--c-cream)",
         "paper-60": "rgba(247,243,236,.6)",
         "paper-85": "rgba(247,243,236,.85)",
         "paper-line": "rgba(247,243,236,.15)",
@@ -46,8 +46,8 @@ const config: Config = {
         // 스켈레톤
         skeleton: "#e9e3d7",
         // 교차 섹션·강조 배경 (배포본 값)
-        sand: "#efe9de",
-        sandDeep: "#e9e3d6",
+        sand: "var(--c-sand)",
+        sandDeep: "var(--c-sandDeep)",
         sandActive: "#e5ddce",
         sandHover: "#efe8db",
       },

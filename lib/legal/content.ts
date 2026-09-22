@@ -1,5 +1,10 @@
 import type { LegalSection } from "@/components/legal/LegalPage";
 
+/** CMS(site_content) 조항 형식: body 는 줄바꿈으로 항을 나눈 한 문자열 */
+export type CmsSection = { title: string; body: string };
+export const toCms = (list: LegalSection[]): CmsSection[] => list.map((x) => ({ title: x.title, body: x.body.join("\n") }));
+export const fromCms = (list: CmsSection[]): LegalSection[] => list.map((x) => ({ title: x.title, body: String(x.body ?? "").split("\n").map((l) => l.trim()).filter(Boolean) }));
+
 /**
  * 약관 자리 문구 (사용자 결정: "자리 문구로 먼저"). 실제 문구를 받으면 이 파일만 교체한다.
  * 환불 규정의 숫자는 lib/bookings/refund.ts 의 REFUND_RULES 와 맞춘다.
@@ -39,3 +44,5 @@ export const REFUND: LegalSection[] = [
   { title: "결제 후 미확정 예약", body: ["결제 시작 후 15분 이내에 결제가 완료되지 않은 예약은 자동으로 취소되며 별도의 청구가 발생하지 않습니다."] },
   { title: "기타", body: ["이 규정에서 정하지 않은 사항은 전자상거래 등에서의 소비자 보호에 관한 법률 및 소비자분쟁해결기준에 따릅니다."] },
 ];
+
+export const LEGAL_DEFAULT_SECTIONS: Record<"terms" | "privacy" | "refund", CmsSection[]> = { terms: toCms(TERMS), privacy: toCms(PRIVACY), refund: toCms(REFUND) };

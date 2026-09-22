@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin/guard";
 import { ProgramInputSchema, firstIssue } from "@/lib/programs/schema";
 import { saveProgram } from "@/lib/programs/admin";
 import { createClient } from "@/lib/supabase/server";
+import { logAdmin } from "@/lib/admin/log";
 
 type Ctx = { params: Promise<{ id: string }> };
 const Id = z.string().uuid();
@@ -23,6 +24,7 @@ export async function PUT(req: Request, ctx: Ctx) {
     console.error("[admin/programs PUT]", result.error);
     return NextResponse.json({ ok: false, message: "저장하지 못했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });
   }
+  await logAdmin(me.id, "program.update", id, { name: parsed.data.name, published: parsed.data.is_published });
   return NextResponse.json({ ok: true, id });
 }
 
@@ -36,6 +38,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
   const supabase = await createClient();
   const { error } = await supabase.from("programs").update({ is_published: parsed.data.is_published }).eq("id", id);
   if (error) return NextResponse.json({ ok: false, message: "변경하지 못했습니다." }, { status: 500 });
+  await logAdmin(me.id, "program.publish", id, { published: parsed.data.is_published });
   return NextResponse.json({ ok: true });
 }
 
@@ -50,5 +53,6 @@ export async function DELETE(_req: Request, ctx: Ctx) {
   if (count) return NextResponse.json({ ok: false, message: "예약이 있는 프로그램은 삭제할 수 없습니다. 비공개로 전환해 주세요." }, { status: 409 });
   const { error } = await supabase.from("programs").delete().eq("id", id);
   if (error) return NextResponse.json({ ok: false, message: "삭제하지 못했습니다." }, { status: 500 });
+  await logAdmin(me.id, "program.delete", id);
   return NextResponse.json({ ok: true });
 }
