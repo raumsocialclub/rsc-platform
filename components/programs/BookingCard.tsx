@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BookButton } from "./BookButton";
 
 type Props = {
   sessionId: string | null;
@@ -12,13 +12,12 @@ type Props = {
 
 /**
  * 예약 카드. 데스크톱은 sticky(top 120px), 모바일은 본문 아래 + 하단 고정바(가격 · 결제 버튼).
- * 결제 버튼은 /checkout?session= 로 이동 (M6 에서 예약 생성 + 토스 결제위젯 연결).
+ * 결제 버튼 → POST /api/bookings (pending 예약) → /checkout/[bookingId] 토스 결제위젯. (FLOWS.md 2)
  */
 export function BookingCard({ sessionId, date, place, capacity, remaining, priceText, seasonWeeks }: Props) {
   const soldOut = remaining <= 0 || !sessionId;
-  const href = sessionId ? `/checkout?session=${sessionId}` : "#";
   const cta = soldOut ? "마감되었습니다" : `${priceText} 결제하기`;
-  const btnBase = "w-full border-0 px-[18px] py-[18px] text-[14px] tracking-[.06em] font-semibold text-center block";
+  const btnBase = "w-full border-0 px-[18px] py-[18px] text-[14px] tracking-[.06em] font-semibold text-center block rounded-none";
   const btnClass = soldOut
     ? `${btnBase} bg-[rgba(33,30,25,.15)] text-[rgba(33,30,25,.5)] cursor-not-allowed`
     : `${btnBase} bg-brown text-cream hover:bg-brownHover hover:text-cream cursor-pointer`;
@@ -37,7 +36,7 @@ export function BookingCard({ sessionId, date, place, capacity, remaining, price
           <span className="text-[14px]">인원</span>
           <b className="text-[14px]">회원 본인 1명</b>
         </div>
-        {soldOut ? <div className={btnClass}>{cta}</div> : <Link href={href} className={btnClass}>{cta}</Link>}
+        {soldOut || !sessionId ? <div className={btnClass}>{cta}</div> : <BookButton sessionId={sessionId} label={cta} className={btnClass} />}
         <div className="mt-[14px] text-[12px] text-[rgba(33,30,25,.45)] text-center">프로그램은 회원 본인만 예약할 수 있습니다</div>
       </div>
 
@@ -50,7 +49,7 @@ export function BookingCard({ sessionId, date, place, capacity, remaining, price
         {soldOut ? (
           <div className="ml-auto bg-[rgba(33,30,25,.15)] text-[rgba(33,30,25,.5)] px-[22px] py-[14px] text-[13.5px] font-semibold whitespace-nowrap">마감</div>
         ) : (
-          <Link href={href} className="ml-auto bg-brown text-cream hover:text-cream px-[22px] py-[14px] text-[13.5px] font-semibold whitespace-nowrap">결제하기</Link>
+          <div className="ml-auto"><BookButton sessionId={sessionId!} label="결제하기" busyLabel="잠시만요…" className="bg-brown text-cream hover:bg-brownHover px-[22px] py-[14px] text-[13.5px] font-semibold whitespace-nowrap border-0 cursor-pointer rounded-none" /></div>
         )}
       </div>
     </>

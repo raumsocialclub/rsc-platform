@@ -28,6 +28,10 @@ export async function GET() {
       supabaseAnonKey: !!anon,
       supabaseServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
       authProviders: process.env.NEXT_PUBLIC_AUTH_PROVIDERS ?? "",
+      tossClientKey: !!process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY,
+      tossSecretKey: !!process.env.TOSS_SECRET_KEY,
+      tossTestKeys: (process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY ?? "").startsWith("test_"),
+      resendApiKey: !!process.env.RESEND_API_KEY,
     },
     auth,
     // 가입 즉시 활성이 되려면 auth.mailerAutoconfirm 이 true 여야 한다 (Supabase "Confirm email" 꺼짐).

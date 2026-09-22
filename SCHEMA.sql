@@ -351,3 +351,34 @@ grant select on session_availability to anon, authenticated;
 create or replace function set_updated_at() returns trigger language plpgsql set search_path = public as $$
 begin new.updated_at = now(); return new; end $$;
 create trigger programs_updated_at before update on programs for each row execute function set_updated_at();
+
+-- ---------- M6: pg_cron — 15분 미결제 예약 만료 (Dashboard → Database → Extensions → pg_cron 켠 뒤 실행)
+create extension if not exists pg_cron with schema pg_catalog;
+grant usage on schema cron to postgres;
+select cron.schedule('expire-bookings', '*/5 * * * *', $$select public.expire_pending_bookings()$$);
+
+-- ---------- M6: 로그인 회원 본인 예약 (reserve_seat 래퍼, member_id = auth.uid())
+-- 같은 회차에 이미 유효한 예약(확정 또는 미만료 pending)이 있으면 그 예약을 돌려준다(중복 홀드 방지).
+create or replace function book_session(p_session uuid)
+returns bookings language plpgsql security definer set search_path = public as $$
+declare m members; b bookings; p programs; s sessions;
+begin
+  select * into m from members where id = auth.uid();
+  if m is null then raise exception 'NOT_MEMBER'; end if;
+  if m.status <> 'active' then raise exception 'MEMBER_INACTIVE'; end if;
+  if m.invite_code_id is null then raise exception 'NOT_INVITED'; end if;
+  select * into s from sessions where id = p_session;
+  if s is null then raise exception 'SESSION_NOT_FOUND'; end if;
+  select * into p from programs where id = s.program_id;
+  if p is null or not coalesce(p.is_published, false) then raise exception 'PROGRAM_UNPUBLISHED'; end if;
+  if s.starts_at < now() then raise exception 'SESSION_PAST'; end if;
+  select * into b from bookings
+    where member_id = m.id and session_id = p_session
+      and (status in ('confirmed','attended') or (status = 'pending' and expires_at > now()))
+    order by created_at desc limit 1;
+  if b is not null then return b; end if;
+  b := reserve_seat(p_session, m.id, 1);
+  return b;
+end $$;
+revoke all on function book_session(uuid) from public, anon;
+grant execute on function book_session(uuid) to authenticated;

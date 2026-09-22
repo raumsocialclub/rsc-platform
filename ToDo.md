@@ -53,14 +53,14 @@
 - 완료 조건: 어드민에서 등록·공개한 프로그램이 회원 목록에 보이고 비공개는 안 보임
 
 ## M6. 예약 + 토스 결제 + 내 예약
-- [ ] `POST /api/bookings` → `rpc('reserve_seat')` (pending, 15분)
-- [ ] `/checkout/[bookingId]` 토스 결제위젯 (테스트 키)
-- [ ] `/checkout/success` → `POST /api/payments/confirm` (금액 검증 → 토스 confirm → payments/bookings 갱신)
-- [ ] `/checkout/fail`
-- [ ] `POST /api/payments/webhook`
-- [ ] pg_cron `expire_pending_bookings` 5분
-- [ ] `/my` 다가오는/지난 예약, 취소 → `POST /api/bookings/[id]/cancel` → 토스 cancel
-- [ ] 예약 확정 이메일
+- [x] `POST /api/bookings` → `rpc('reserve_seat')` (pending, 15분)
+- [x] `/checkout/[bookingId]` 토스 결제위젯 (테스트 키)
+- [x] `/checkout/success` → `POST /api/payments/confirm` (금액 검증 → 토스 confirm → payments/bookings 갱신)
+- [x] `/checkout/fail`
+- [x] `POST /api/payments/webhook`
+- [x] pg_cron `expire_pending_bookings` 5분
+- [x] `/my` 다가오는/지난 예약, 취소 → `POST /api/bookings/[id]/cancel` → 토스 cancel
+- [x] 예약 확정 이메일
 - 완료 조건: 테스트 카드로 결제 → 예약 확정 → 내 예약에 표시 → 취소 → 토스 대시보드에서 취소 확인. 두 브라우저로 마지막 1석 동시 결제 시 한 명만 성공.
 
 ## M7. 어드민 예약·결제 + 회원 DB + 대시보드

@@ -40,6 +40,11 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 **M5(프로그램)**: 어드민 → 프로그램 → "+ 새 프로그램 등록"(단일) 또는 "+ RAUM SOLO 시즌"(6주). 사진은 Supabase Storage 버킷 `programs`(public, SETUP.md 3)에 올라갑니다.
 "게시"를 누르면 회원 `/programs` 목록·상세에 바로 보이고, "임시 저장"(비공개)은 관리자만 봅니다. 잔여석은 DB 함수 `session_remaining` 으로 계산합니다.
 
+**M6(예약·결제)**: 프로그램 상세 "결제하기" → 예약(15분 홀드) → `/checkout/[id]` 토스 결제위젯 → 승인 → `/my`. 토스 키는 `.env.local`/Vercel 의
+`NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY` 로 읽습니다(지금은 토스 문서의 공용 테스트 키 → 가맹점 키로 교체만 하면 됨). 테스트 결제는 실제 청구가 없습니다.
+서버 승인·환불·웹훅은 `SUPABASE_SERVICE_ROLE_KEY` 가 있어야 동작합니다(로컬은 `.env.local` 에도 필요). 환불 정책은 `lib/bookings/refund.ts`(3일 전까지 100%).
+토스 웹훅은 개발자센터에서 `https://<도메인>/api/payments/webhook` 을 등록합니다(선택, confirm 누락 보강).
+
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
 ## Overview

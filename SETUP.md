@@ -52,7 +52,8 @@ NEXT_PUBLIC_SITE_URL=https://raumsocialclub2026.vercel.app
 ## 4. Vercel 배포
 - 새 GitHub 저장소(Next.js) 생성 → Vercel에서 Import → 기존 프로젝트의 도메인 `raumsocialclub2026.vercel.app`을 **기존 정적 프로젝트에서 제거 후 새 프로젝트에 추가** (Settings → Domains). 커스텀 도메인 연결 시 DNS CNAME `cname.vercel-dns.com`.
 - Supabase Auth → URL Configuration → Site URL / Redirect URLs에 배포 주소 + `/auth/callback` 등록.
-- 토스 개발자센터 → 웹훅 URL `https://<domain>/api/payments/webhook` 등록.
+- 토스 개발자센터 → 웹훅 URL `https://<domain>/api/payments/webhook` 등록 (`TOSS_WEBHOOK_SECRET` 을 넣었다면 `?key=<값>` 붙임). 이벤트: PAYMENT_STATUS_CHANGED.
+- 결제 키: 지금은 토스 문서 공용 테스트 키. 가맹점 키 발급 후 Vercel 환경변수 `NEXT_PUBLIC_TOSS_CLIENT_KEY`(test_gck_/live_gck_)·`TOSS_SECRET_KEY`(test_gsk_/live_gsk_) 값만 바꾸고 재배포.
 
 ## 5. 개발 순서 (권장 마일스톤)
 1. **W1–2** 브랜드 페이지 5종 이식(메인·상담·가격·혜택) + 상담 저장 API + 어드민 상담 목록 → 현 배포본 교체.
