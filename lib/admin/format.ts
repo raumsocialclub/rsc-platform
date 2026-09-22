@@ -44,3 +44,14 @@ export function inquiryBadge(status: string) {
   if (status === "contacted") return badgeStyle("ok");
   return badgeStyle("mute");
 }
+
+/** 예약 상태 배지 (M7) */
+export function orderBadge(status: "pending" | "confirmed" | "cancelled" | "expired" | "attended"): { background: string; color: string } {
+  const map = { confirmed: "ok", attended: "mute", pending: "warn", cancelled: "bad", expired: "mute" } as const;
+  return badgeStyle(map[status]);
+}
+
+/** 회원 상태 배지 (M7) */
+export function memberBadge(status: "active" | "paused" | "withdrawn"): { background: string; color: string } {
+  return badgeStyle(status === "active" ? "ok" : status === "paused" ? "warn" : "bad");
+}

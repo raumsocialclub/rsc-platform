@@ -3,50 +3,8 @@ import { CARD, TH, TD, Badge, EmptyRow, PageTitle } from "./ui";
 import { InquiryDetail, type InquiryRow } from "./InquiryDetail";
 import { IssueInviteForm } from "./IssueInviteForm";
 import { CopyButton } from "./CopyButton";
-import { INQUIRY_STATUS, badgeStyle, fmtDate, fmtShortDate, inquiryBadge, won } from "@/lib/admin/format";
+import { INQUIRY_STATUS, badgeStyle, fmtDate, fmtShortDate, inquiryBadge } from "@/lib/admin/format";
 import { PROFILES } from "@/lib/fit-check/questions";
-
-/* ---------- 대시보드 ---------- */
-export type DashboardData = {
-  monthLabel: string;
-  kpis: { revenue: number; bookings: number; activeMembers: number; newMembers: number; pendingInquiries: number };
-};
-
-export function DashboardView({ data }: { data: DashboardData }) {
-  const k = data.kpis;
-  const cards = [
-    { label: "이번 달 매출", value: won(k.revenue), delta: "결제 연동 후 집계 (M6)", color: "rgba(33,30,25,.55)" },
-    { label: "예약 건수", value: `${k.bookings}건`, delta: "결제 연동 후 집계 (M6)", color: "rgba(33,30,25,.55)" },
-    { label: "활동 회원", value: `${k.activeMembers}명`, delta: `신규 ${k.newMembers}명`, color: "rgba(33,30,25,.55)" },
-    { label: "상담 대기", value: `${k.pendingInquiries}건`, delta: k.pendingInquiries ? "확인이 필요합니다" : "대기 없음", color: k.pendingInquiries ? "#7a5420" : "rgba(33,30,25,.55)" },
-  ];
-  return (
-    <>
-      <PageTitle overline="DASHBOARD" title={data.monthLabel} />
-      <div className="grid grid-cols-2 min-[1201px]:grid-cols-4 gap-[16px] mb-[28px]">
-        {cards.map((c) => (
-          <div key={c.label} className={`${CARD} px-[24px] py-[22px]`}>
-            <div className="text-[11.5px] tracking-[.08em] text-[rgba(33,30,25,.5)] mb-[12px]">{c.label}</div>
-            <div className="text-[clamp(18px,1.6vw,26px)] font-semibold tracking-[-.01em] whitespace-nowrap">{c.value}</div>
-            <div className="text-[12px] mt-[8px]" style={{ color: c.color }}>{c.delta}</div>
-          </div>
-        ))}
-      </div>
-      <div className={`${CARD} p-[24px]`}>
-        <div className="flex justify-between mb-[14px]">
-          <b className="text-[14px]">최근 예약</b>
-          <Link href="/admin/orders" className="text-[12.5px] text-brown font-semibold">전체 보기 →</Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="border-collapse w-full">
-            <thead><tr>{["예약번호", "회원", "프로그램", "인원", "결제", "금액", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
-            <tbody><EmptyRow colSpan={7}>예약·결제는 M6에서 연동됩니다.</EmptyRow></tbody>
-          </table>
-        </div>
-      </div>
-    </>
-  );
-}
 
 /* ---------- 상담 신청 ---------- */
 export function InquiriesView({ rows, selected }: { rows: InquiryRow[]; selected: InquiryRow | null }) {

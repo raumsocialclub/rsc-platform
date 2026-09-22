@@ -19,6 +19,7 @@ create table members (
   status member_status not null default 'active',
   invite_code_id uuid,
   memo text,
+  provider text not null default 'email',    -- 가입 경로: email | kakao | google (M7)
   created_at timestamptz not null default now()
 );
 
@@ -238,13 +239,14 @@ begin
     if v.id is null then raise exception 'INVITE_REQUIRED'; end if;
     if v.used_by is not null or (v.expires_at is not null and v.expires_at < now()) then raise exception 'INVITE_INVALID'; end if;
   end if;
-  insert into members(id, name, email, phone, invite_code_id)
+  insert into members(id, name, email, phone, invite_code_id, provider)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'full_name', ''),
     new.email,
     new.raw_user_meta_data->>'phone',
-    case when v.id is not null and v.used_by is null then v.id else null end
+    case when v.id is not null and v.used_by is null then v.id else null end,
+    v_provider
   )
   on conflict (id) do nothing;
   if v.id is not null and v.used_by is null then
