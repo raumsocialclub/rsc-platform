@@ -46,10 +46,10 @@
 - 완료 조건: 상담 신청 → 어드민에서 코드 발급 → 이메일 수신 → 그 코드로 가입
 
 ## M5. 프로그램 CRUD (어드민) + 회원 목록/상세
-- [ ] `/admin/programs` 탭(전체/단일/시즌) 테이블
-- [ ] `/admin/programs/new`, `/admin/programs/[id]` 폼: 종류·이름·서브·카테고리·장소·소개·설명·이미지 업로드(Storage)·정원·판매가·회원가·일정(단일 1 / 시즌 6)·타임라인·공개
-- [ ] `/programs` 카드 그리드 + 카테고리 필터, 잔여석(`session_availability`)
-- [ ] `/programs/[id]` 상세 + sticky 예약 카드(모바일 하단 고정바)
+- [x] `/admin/programs` 탭(전체/단일/시즌) 테이블
+- [x] `/admin/programs/new`, `/admin/programs/[id]` 폼: 종류·이름·서브·카테고리·장소·소개·설명·이미지 업로드(Storage)·정원·판매가·회원가·일정(단일 1 / 시즌 6)·타임라인·공개
+- [x] `/programs` 카드 그리드 + 카테고리 필터, 잔여석(`session_availability`)
+- [x] `/programs/[id]` 상세 + sticky 예약 카드(모바일 하단 고정바)
 - 완료 조건: 어드민에서 등록·공개한 프로그램이 회원 목록에 보이고 비공개는 안 보임
 
 ## M6. 예약 + 토스 결제 + 내 예약

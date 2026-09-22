@@ -320,3 +320,34 @@ alter function handle_new_user() set search_path = public;
 revoke execute on function reserve_seat(uuid, uuid, int) from anon, authenticated, public;
 revoke execute on function handle_new_user() from anon, authenticated, public;
 revoke execute on function expire_pending_bookings() from anon, authenticated, public;
+
+-- ---------- M5: Storage 버킷 (프로그램 이미지, 공개 읽기 · 관리자 쓰기)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('programs', 'programs', true, 10485760, array['image/jpeg','image/png','image/webp'])
+on conflict (id) do update set public = true;
+create policy "programs public read" on storage.objects for select using (bucket_id = 'programs');
+create policy "programs admin insert" on storage.objects for insert with check (bucket_id = 'programs' and public.is_admin());
+create policy "programs admin update" on storage.objects for update using (bucket_id = 'programs' and public.is_admin());
+create policy "programs admin delete" on storage.objects for delete using (bucket_id = 'programs' and public.is_admin());
+
+-- ---------- M5: 잔여석 함수 (회원은 bookings RLS 때문에 남의 예약을 못 보므로 SECURITY DEFINER 로 계산)
+create or replace function session_remaining(p_session uuid)
+returns int language sql stable security definer set search_path = public as $$
+  select s.capacity - coalesce((
+    select sum(b.qty)::int from bookings b
+    where b.session_id = s.id
+      and (b.status in ('confirmed','attended') or (b.status = 'pending' and b.expires_at > now()))
+  ), 0)
+  from sessions s where s.id = p_session;
+$$;
+grant execute on function session_remaining(uuid) to anon, authenticated;
+drop view if exists session_availability;
+create view session_availability with (security_invoker = true) as
+select s.id as session_id, s.program_id, s.starts_at, s.capacity, session_remaining(s.id) as remaining
+from sessions s;
+grant select on session_availability to anon, authenticated;
+
+-- programs.updated_at 자동 갱신
+create or replace function set_updated_at() returns trigger language plpgsql set search_path = public as $$
+begin new.updated_at = now(); return new; end $$;
+create trigger programs_updated_at before update on programs for each row execute function set_updated_at();

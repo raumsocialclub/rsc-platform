@@ -14,7 +14,7 @@
 > 대시보드: https://supabase.com/dashboard/project/vfjpouuwvwgiqpwttyup
 1. 새 프로젝트(Seoul 리전) → SQL Editor에 `SCHEMA.sql` 실행.
 2. Authentication → Providers: Email, Kakao, Google 활성화(각 client id/secret 입력).
-3. Storage → 버킷 `programs`(public), `site`(public).
+3. Storage → 버킷 `programs`(public) — SCHEMA.sql 끝의 M5 블록이 버킷과 정책을 함께 만듭니다(적용 완료). `site` 버킷은 필요 시 추가.
 4. Database → Extensions → `pg_cron` 활성화 → `select cron.schedule('expire-bookings','*/5 * * * *',$$select expire_pending_bookings()$$);`
 5. 첫 관리자: 가입 후 SQL `update members set role='admin' where email='...';`
 

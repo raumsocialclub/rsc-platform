@@ -37,6 +37,9 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 `update members set role='admin' where email='본인이메일';` 로 지정합니다. 상담 신청 → "초대코드 발급"으로 코드를 만들고 복사해 전달합니다.
 이메일 자동 발송은 Vercel 환경변수 `RESEND_API_KEY`(+ 선택 `NOTIFY_FROM_EMAIL`)를 넣으면 켜집니다.
 
+**M5(프로그램)**: 어드민 → 프로그램 → "+ 새 프로그램 등록"(단일) 또는 "+ RAUM SOLO 시즌"(6주). 사진은 Supabase Storage 버킷 `programs`(public, SETUP.md 3)에 올라갑니다.
+"게시"를 누르면 회원 `/programs` 목록·상세에 바로 보이고, "임시 저장"(비공개)은 관리자만 봅니다. 잔여석은 DB 함수 `session_remaining` 으로 계산합니다.
+
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
 ## Overview
