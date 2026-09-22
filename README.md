@@ -33,6 +33,10 @@ npm run dev
 소셜 로그인(카카오·구글)은 Supabase Authentication → Providers 에 키를 넣은 뒤 `.env.local` 의 `NEXT_PUBLIC_AUTH_PROVIDERS=kakao,google` 로 켭니다.
 Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" 은 꺼 두어야 가입 즉시 로그인됩니다.
 
+**M4(어드민)**: `/admin` 은 `members.role = 'admin'` 인 계정만 들어갑니다. 첫 관리자는 SQL Editor에서
+`update members set role='admin' where email='본인이메일';` 로 지정합니다. 상담 신청 → "초대코드 발급"으로 코드를 만들고 복사해 전달합니다.
+이메일 자동 발송은 Vercel 환경변수 `RESEND_API_KEY`(+ 선택 `NOTIFY_FROM_EMAIL`)를 넣으면 켜집니다.
+
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
 ## Overview

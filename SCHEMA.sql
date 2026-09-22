@@ -194,9 +194,12 @@ alter table invite_codes enable row level security;
 alter table guest_passes enable row level security;
 alter table membership_plans enable row level security;
 
-create or replace function is_admin() returns boolean language sql stable as $$
+-- SECURITY DEFINER: members RLS 정책 안에서 members 를 다시 읽을 때 무한 재귀를 막는다.
+create or replace function is_admin() returns boolean
+language sql stable security definer set search_path = public as $$
   select exists(select 1 from members where id = auth.uid() and role = 'admin');
 $$;
+grant execute on function is_admin() to anon, authenticated;
 
 create policy "self read" on members for select using (id = auth.uid() or is_admin());
 create policy "self update" on members for update using (id = auth.uid() or is_admin());
@@ -281,6 +284,31 @@ begin
 end $$;
 revoke all on function consume_invite_code(text) from public, anon;
 grant execute on function consume_invite_code(text) to authenticated;
+
+-- ---------- invite code issue (M4, 어드민 전용, 30일 만료)
+create or replace function issue_invite_code(p_inquiry uuid default null, p_name text default null, p_phone text default null)
+returns invite_codes language plpgsql security definer set search_path = public as $$
+declare v invite_codes; v_code text; alphabet text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; i int;
+begin
+  if not is_admin() then raise exception 'FORBIDDEN'; end if;
+  loop
+    v_code := 'RSC-';
+    for i in 1..8 loop
+      v_code := v_code || substr(alphabet, 1 + floor(random() * length(alphabet))::int, 1);
+      if i = 4 then v_code := v_code || '-'; end if;
+    end loop;
+    exit when not exists (select 1 from invite_codes where code = v_code);
+  end loop;
+  insert into invite_codes(code, inquiry_id, issued_to_name, issued_to_phone, expires_at, created_by)
+  values (v_code, p_inquiry, p_name, p_phone, now() + interval '30 days', auth.uid())
+  returning * into v;
+  if p_inquiry is not null then
+    update inquiries set status = 'invited' where id = p_inquiry;
+  end if;
+  return v;
+end $$;
+revoke all on function issue_invite_code(uuid, text, text) from public, anon;
+grant execute on function issue_invite_code(uuid, text, text) to authenticated;
 
 -- ---------- security hardening (Supabase security advisor 권고, 2026-09-22)
 alter view session_availability set (security_invoker = true);
