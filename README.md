@@ -46,7 +46,7 @@ npm run dev
 
 ## Design Tokens
 Colors
-- 배경 크림 `#f2eee5` / 카드 크림 `#f7f3ec` / 흰 카드 `#ffffff`
+- 배경 크림 `#f7f3ec` / 카드 크림 `#f7f3ec`(배경과 동일, 1px 테두리로만 구분) / 흰 카드 `#ffffff`
 - 잉크(본문) `#211e19` / 다크 섹션 배경 `#211e19` (그 위 텍스트 `#f7f3ec`)
 - 포인트 짙은 브라운 `#5a3d24` (버튼·GNB 메뉴·제목 라벨) / hover 브라운 `#9c6b3e`
 - 골드(다크 배경 위 라벨·강조) `#e2b478`, hover `#f0c98e`
@@ -65,7 +65,7 @@ Typography
 
 Layout
 - 콘텐츠 max-width 1100px, 데스크톱 좌우 padding 40px, 모바일 18px
-- 버튼: pill (`border-radius:999px`), padding 15px 28px, 13.5~14px; 주 버튼 bg `#5a3d24` text `#f2eee5`; 보조 버튼 1px border `rgba(33,30,25,.3)`
+- 버튼: pill (`border-radius:999px`), padding 15px 28px, 13.5~14px; 주 버튼 bg `#5a3d24` text `#f7f3ec`; 보조 버튼 1px border `rgba(33,30,25,.3)`
 - 카드: 1px border `rgba(33,30,25,.14)`, radius 0 (각진 카드), 그림자 없음
 - GNB: sticky, `rgba(242,238,229,.9)` + `backdrop-filter: blur(14px)`, 하단 1px 선
 - 반응형 breakpoint 760px: 그리드 1열, 헤더 padding 14px 18px

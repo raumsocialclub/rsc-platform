@@ -32,7 +32,7 @@ app/
 lib/supabase/{client,server,admin}.ts   lib/toss.ts   lib/notify.ts
 middleware.ts
 ```
-디자인 재현: `design/` HTML을 열고 Tailwind로 이식. 폰트는 `next/font/local`로 SamsungOne 4종 로드. 색상은 `tailwind.config` theme.extend.colors에 README 토큰 등록(cream `#f2eee5`, card `#f7f3ec`, ink `#211e19`, brown `#5a3d24`, brownHover `#9c6b3e`, gold `#e2b478`).
+디자인 재현: `design/` HTML을 열고 Tailwind로 이식. 폰트는 `next/font/local`로 SamsungOne 4종 로드. 색상은 `tailwind.config` theme.extend.colors에 README 토큰 등록(cream `#f7f3ec`, card `#f7f3ec`, ink `#211e19`, brown `#5a3d24`, brownHover `#9c6b3e`, gold `#e2b478`).
 
 ## 3. 환경변수 (Vercel Project Settings → Environment Variables)
 ```

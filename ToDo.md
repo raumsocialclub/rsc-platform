@@ -15,13 +15,13 @@
 - 완료 조건: `localhost:3000`에 크림 배경 + "RAUM SOCIAL CLUB" 텍스트가 SamsungOne으로 보임
 
 ## M1. 브랜드 페이지 5종 (정적, 현 배포본 대체)
-- [ ] 공통 GNB(데스크톱/모바일 오버레이) + 푸터 + UP 플로팅 버튼
-- [ ] `/` — `design/RAUM Social Club.dc.html` 재현 (deploy/index.html 렌더 참고)
-- [ ] `/pricing` — `design/RSC Pricing.dc.html`
-- [ ] `/benefits` — `design/RSC Benefits.dc.html`
-- [ ] `/fit-check` — `design/RSC Fit Check.dc.html` 설문 UI(아직 저장은 안 함, 다음 모듈)
-- [ ] 이미지 `public/images/`로 이동, `next/image` 사용
-- [ ] 375px·768px·1440px 에서 잘림·겹침 없음
+- [x] 공통 GNB(데스크톱/모바일 오버레이) + 푸터 + UP 플로팅 버튼
+- [x] `/` — `design/RAUM Social Club.dc.html` 재현 (deploy/index.html 렌더 참고)
+- [x] `/pricing` — `design/RSC Pricing.dc.html`
+- [x] `/benefits` — `design/RSC Benefits.dc.html`
+- [x] `/fit-check` — `design/RSC Fit Check.dc.html` 설문 UI(아직 저장은 안 함, 다음 모듈)
+- [x] 이미지 `public/images/`로 이동, `next/image` 사용
+- [x] 375px·768px·1440px 에서 잘림·겹침 없음
 - 완료 조건: 현재 배포 사이트와 동일하게 보임. Vercel 프리뷰 URL 공유.
 
 ## M2. Supabase 연결 + 상담 신청 저장

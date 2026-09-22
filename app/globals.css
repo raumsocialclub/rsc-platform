@@ -2,25 +2,53 @@
 @config "../tailwind.config.ts";
 
 /* Design.md 기본 규칙 — 크림 종이 위 짙은 브라운 잉크 */
-html {
-  scroll-behavior: smooth;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* 프로토타입은 브라우저 기본 행간(normal)을 쓴다. Tailwind preflight의 1.5를 되돌린다. */
+    line-height: normal;
+  }
 
-body {
-  margin: 0;
-  background: #f2eee5;
-  color: #211e19;
-  font-family: var(--font-samsung), Arial, sans-serif;
-  font-weight: 500;
-  -webkit-font-smoothing: antialiased;
-}
+  body {
+    margin: 0;
+    background: #f7f3ec;
+    color: #211e19;
+    font-family: var(--font-samsung), Arial, sans-serif;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease,
+      background 0.25s ease;
+  }
 
-::selection {
-  background: #9c6b3e;
-  color: #f7f3ec;
+  a:hover {
+    color: #9c6b3e;
+  }
+
+  ::selection {
+    background: #9c6b3e;
+    color: #f7f3ec;
+  }
+
+  input,
+  select,
+  button,
+  textarea {
+    font-family: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(33, 30, 25, 0.35);
+  }
+
+  section[id] {
+    scroll-margin-top: 76px;
+  }
 }

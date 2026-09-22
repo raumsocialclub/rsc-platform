@@ -9,11 +9,12 @@ const config: Config = {
   theme: {
     // breakpoint는 하나(760px)만 사용한다.
     screens: {
-      md: "760px",
+      // 프로토타입은 max-width:760px 를 모바일로 본다. 761px 이상이 데스크톱.
+      md: "761px",
     },
     extend: {
       colors: {
-        cream: "#f2eee5",
+        cream: "#f7f3ec",
         card: "#f7f3ec",
         ink: "#211e19",
         brown: "#5a3d24",
@@ -44,6 +45,11 @@ const config: Config = {
         toss: "#0064FF",
         // 스켈레톤
         skeleton: "#e9e3d7",
+        // 교차 섹션·강조 배경 (배포본 값)
+        sand: "#efe9de",
+        sandDeep: "#e9e3d6",
+        sandActive: "#e5ddce",
+        sandHover: "#efe8db",
       },
       fontFamily: {
         sans: ["var(--font-samsung)", "Arial", "sans-serif"],
