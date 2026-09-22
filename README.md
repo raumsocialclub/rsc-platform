@@ -28,6 +28,11 @@ npm run dev
 3. 개발 서버를 껐다가 다시 켜기 (`Ctrl + C` 후 `npm run dev`)
 저장된 신청은 같은 대시보드의 Table Editor → `inquiries` 에서 볼 수 있습니다.
 
+**M3(가입·로그인)부터**: 가입은 초대코드가 있어야 합니다. 검수용 코드 `RSC-TEST-2026` 이 DB에 들어 있습니다(1회용).
+새 코드는 SQL Editor에서 `insert into invite_codes(code, issued_to_name) values ('RSC-XXXX-XXXX','이름');` 로 넣거나 M4 어드민에서 발급합니다.
+소셜 로그인(카카오·구글)은 Supabase Authentication → Providers 에 키를 넣은 뒤 `.env.local` 의 `NEXT_PUBLIC_AUTH_PROVIDERS=kakao,google` 로 켭니다.
+Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" 은 꺼 두어야 가입 즉시 로그인됩니다.
+
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
 ## Overview

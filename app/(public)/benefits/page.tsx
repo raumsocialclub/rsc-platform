@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { UpButton } from "@/components/site/UpButton";
 
@@ -41,7 +41,7 @@ export default function BenefitsPage() {
   const total = GROUPS.reduce((n, g) => n + g.rows.length, 0);
   return (
     <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">
-      <SiteHeader />
+      <Header />
 
       <main className="flex-1 px-[18px] pt-[40px] pb-[96px] md:px-[40px] md:pt-[72px] md:pb-[140px]">
         <div className="w-full max-w-[960px] mx-auto">

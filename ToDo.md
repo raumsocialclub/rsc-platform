@@ -32,11 +32,11 @@
 - 완료 조건: 설문 제출 → Supabase Table Editor `inquiries`에 행 생김
 
 ## M3. 인증 + 초대코드 + 가입
-- [ ] Supabase Auth: 이메일/비밀번호, 카카오, 구글 (콜백 `/auth/callback`)
-- [ ] `/join` 초대코드 입력 → `POST /api/invites/verify`
-- [ ] `/join/register?code=` 가입 폼 + 소셜 가입 → 트리거로 `members` 생성 → 코드 used 처리
-- [ ] `/login`, 로그아웃, GNB 로그인 상태 표시(이니셜 아바타)
-- [ ] `middleware.ts` 보호 라우트
+- [x] Supabase Auth: 이메일/비밀번호, 카카오, 구글 (콜백 `/auth/callback`)
+- [x] `/join` 초대코드 입력 → `POST /api/invites/verify`
+- [x] `/join/register?code=` 가입 폼 + 소셜 가입 → 트리거로 `members` 생성 → 코드 used 처리
+- [x] `/login`, 로그아웃, GNB 로그인 상태 표시(이니셜 아바타)
+- [x] `middleware.ts` 보호 라우트
 - 완료 조건: 어드민이 SQL로 넣은 초대코드로 가입 → `/programs` 접근 가능, 코드 없이 `/join/register` 진입 불가
 
 ## M4. 어드민 골격 + 상담 목록 + 초대코드 발급

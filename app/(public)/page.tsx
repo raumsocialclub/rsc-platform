@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { UpButton } from "@/components/site/UpButton";
 import { ImageBlock } from "@/components/site/ImageBlock";
@@ -48,7 +48,7 @@ const VALUES = [
 export default function HomePage() {
   return (
     <>
-      <SiteHeader />
+      <Header />
 
       {/* HERO */}
       <section id="top" className="relative h-screen min-h-[640px] md:min-h-[660px] w-full">

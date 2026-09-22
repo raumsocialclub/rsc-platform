@@ -221,15 +221,66 @@ create policy "admin invites" on invite_codes for all using (is_admin());
 -- invite code validation & booking/payment writes go through server Route Handlers using the service role key.
 
 -- ---------- auth trigger: create members row on signup
-create or replace function handle_new_user() returns trigger language plpgsql security definer as $$
+-- 이메일 가입은 메타데이터의 invite_code 가 유효해야만 계정이 만들어진다 (초대제 원칙을 DB에서 강제).
+-- 소셜 가입은 코드 없이 계정이 만들어지고, members.invite_code_id 가 비어 있으면 앱에서 코드 입력을 요구한다.
+create or replace function handle_new_user() returns trigger language plpgsql security definer set search_path = public as $$
+declare v_code text; v invite_codes; v_provider text;
 begin
-  insert into members(id, name, email, phone)
-  values (new.id, coalesce(new.raw_user_meta_data->>'name', ''), new.email, new.raw_user_meta_data->>'phone')
+  v_provider := coalesce(new.raw_app_meta_data->>'provider', 'email');
+  v_code := upper(trim(coalesce(new.raw_user_meta_data->>'invite_code', '')));
+  if v_code <> '' then
+    select * into v from invite_codes where code = v_code for update;
+  end if;
+  if v_provider = 'email' then
+    if v.id is null then raise exception 'INVITE_REQUIRED'; end if;
+    if v.used_by is not null or (v.expires_at is not null and v.expires_at < now()) then raise exception 'INVITE_INVALID'; end if;
+  end if;
+  insert into members(id, name, email, phone, invite_code_id)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'full_name', ''),
+    new.email,
+    new.raw_user_meta_data->>'phone',
+    case when v.id is not null and v.used_by is null then v.id else null end
+  )
   on conflict (id) do nothing;
+  if v.id is not null and v.used_by is null then
+    update invite_codes set used_by = new.id, used_at = now() where id = v.id;
+  end if;
   return new;
 end $$;
 create trigger on_auth_user_created after insert on auth.users
   for each row execute function handle_new_user();
+
+-- ---------- invite code RPCs (M3)
+-- 가입 전 검증: 로그인 없이 호출. 코드 존재·미사용·미만료 여부만 알려준다.
+create or replace function verify_invite_code(p_code text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare v invite_codes;
+begin
+  select * into v from invite_codes where code = upper(trim(p_code));
+  if v.id is null then return jsonb_build_object('valid', false, 'reason', 'NOT_FOUND'); end if;
+  if v.used_by is not null then return jsonb_build_object('valid', false, 'reason', 'USED'); end if;
+  if v.expires_at is not null and v.expires_at < now() then return jsonb_build_object('valid', false, 'reason', 'EXPIRED'); end if;
+  return jsonb_build_object('valid', true, 'code', v.code, 'name', v.issued_to_name);
+end $$;
+revoke all on function verify_invite_code(text) from public;
+grant execute on function verify_invite_code(text) to anon, authenticated;
+
+-- 로그인한 사용자가 코드를 사용 처리한다 (소셜 가입 후 코드 입력). 원자적.
+create or replace function consume_invite_code(p_code text)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare v invite_codes; uid uuid := auth.uid();
+begin
+  if uid is null then raise exception 'NOT_AUTHENTICATED'; end if;
+  select * into v from invite_codes where code = upper(trim(p_code)) for update;
+  if v.id is null or v.used_by is not null or (v.expires_at is not null and v.expires_at < now()) then return false; end if;
+  update invite_codes set used_by = uid, used_at = now() where id = v.id;
+  update members set invite_code_id = v.id where id = uid;
+  return true;
+end $$;
+revoke all on function consume_invite_code(text) from public, anon;
+grant execute on function consume_invite_code(text) to authenticated;
 
 -- ---------- security hardening (Supabase security advisor 권고, 2026-09-22)
 alter view session_availability set (security_invoker = true);
