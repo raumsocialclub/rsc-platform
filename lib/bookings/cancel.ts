@@ -1,6 +1,7 @@
 // 서버 전용. 예약 취소 + 토스 환불 (회원 /my 취소, 어드민 환불 공용). FLOWS.md 3
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cancelPayment, describeTossError, type TossPayment } from "@/lib/toss/client";
+import { opsAlert } from "@/lib/alert";
 import type { Booking } from "./types";
 
 export type CancelResult = { ok: true; refunded: number; bookingStatus: "cancelled" } | { ok: false; status: number; message: string };
@@ -53,6 +54,7 @@ export async function cancelBooking(params: { bookingId: string; refundAmount: n
       const res = await cancelPayment(pay.payment_key, { cancelReason: params.reason, ...(full ? {} : { cancelAmount: amount }) }, `cancel-${booking.id}-${amount}`);
       if (!res.ok && res.error.code !== "ALREADY_CANCELED_PAYMENT") {
         console.error("[bookings/cancel]", res.error);
+        await opsAlert("refund.failed", { bookingId: booking.id, orderId: booking.order_id, amount, tossCode: res.error.code, tossMessage: res.error.message, reason: params.reason });
         return { ok: false, status: 502, message: describeTossError(res.error.code, "환불 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.") };
       }
       refunded = amount;

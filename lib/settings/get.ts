@@ -6,7 +6,7 @@ export type Settings = {
   securityHeaders: boolean; adminAllowedIps: string; loginMaxFails: number; loginLockMinutes: number;
   blockedIps: string; blockedCountries: string; blockMessage: string;
   cacheSeconds: number;
-  emailEnabled: boolean; fromName: string; fromEmail: string;
+  emailEnabled: boolean; fromName: string; fromEmail: string; alertEmail: string;
   refundDays: number; refundRate: number; lateRefundRate: number;
 };
 

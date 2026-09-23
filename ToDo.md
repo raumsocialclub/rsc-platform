@@ -105,5 +105,14 @@
 - [x] 부관리자 제한: 일반 설정·SEO 설정은 읽기 전용(저장 API 403), 회원 목록 CSV(통계 리포트·회원 DB 버튼) 주관리자만, 관리자 관리 메뉴 숨김. 환불은 가능하되 사유 필수 + 활동 로그(처리자·금액·사유)
 - [x] `members.last_login_at`(이메일·소셜 로그인 시 기록), 관리자 로그인 후 기본 목적지 `/admin`, `admin_logs` 에 admin.invite / admin.invite.revoke / admin.role / admin.status / admin.accept
 
+## M13. 오픈 준비 — 모니터링 · 자동 테스트 · 배포 게이트 · 스테이징 · 점검 루틴 (사용자 요청)
+- [x] Sentry(`@sentry/nextjs`): 서버·엣지·브라우저 설정, `instrumentation.ts` onRequestError, error/global-error 캡처, `withSentryConfig`. DSN 없으면 비활성. `lib/alert.ts` opsAlert → 결제 승인 실패·웹훅 실패·환불 실패를 Sentry + 운영 알림 메일(일반 설정 → 알림 → 운영 알림 받는 이메일)
+- [x] 자동 테스트 Vitest 47개: 가입(초대코드 검증·사용·관리자 초대 토큰), 예약(book_session 오류 코드·성공), 결제(금액 검증·만료·중복 승인·토스 실패 알림·웹훅 재조회·취소 동기화), 환불(전액·부분·정책 일수·회원 취소 API·관리자 사유 필수·로그). `npm test`, `npm run check`
+- [x] GitHub Actions `CI`(모든 push/PR: lint·typecheck·test·build) + `Deploy production`(main: 테스트 통과 → Vercel Deploy Hook). `vercel.json` main 자동배포 끔
+- [x] 스테이징: `staging` 브랜치 → Vercel Preview(`rsc-platform-git-staging-…`), Preview 환경변수 `NEXT_PUBLIC_SITE_URL`·`NEXT_PUBLIC_APP_ENV=staging` 분리, 화면 상단 STAGING 띠
+- [x] `MAINTENANCE.md` 월 1회 점검 루틴 + 보고 양식, SETUP 4-4~4-8(Vercel Pro·Supabase Pro 전환 단계, Deploy Hook·GitHub Secret·main 보호, Sentry 가입·DSN, 스테이징)
+- [ ] 사용자: Vercel Pro·Supabase Pro 결제, Sentry 가입 후 DSN 을 Vercel 환경변수에, Deploy Hook → GitHub Secret, main 보호 규칙 (SETUP 4-4~4-6)
+- [ ] 스테이징 DB: Supabase 프로젝트 한도(무료 2개) 때문에 보류 → Pro 전환 또는 옛 프로젝트 정리 후 "스테이징 DB 만들어라"
+
 ## 2차 (별도 지시 후)
 - 멤버십 결제/분납(빌링키), 네이버 로그인, 지인 초대권 사용, 알림톡(솔라피) 전환, 사이트 이미지 CMS, 리마인더 자동 발송

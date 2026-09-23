@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendBookingConfirmed } from "@/lib/notify";
 import { fmtFull } from "@/lib/programs/format";
 import { confirmPayment, describeTossError, getPayment, methodLabel, type TossPayment } from "@/lib/toss/client";
+import { opsAlert } from "@/lib/alert";
 import type { Booking } from "./types";
 
 export type ConfirmResult =
@@ -33,6 +34,7 @@ export async function confirmBookingPayment(params: { paymentKey: string; orderI
       if (again.ok && again.data.status === "DONE") return finalize(booking, again.data);
     }
     console.error("[payments/confirm]", res.error);
+    await opsAlert("payment.confirm_failed", { orderId: params.orderId, bookingId: booking.id, amount: params.amount, tossCode: res.error.code, tossMessage: res.error.message });
     return { ok: false, code: res.error.code, message: describeTossError(res.error.code, res.error.message), bookingId: booking.id };
   }
   return finalize(booking, res.data);
@@ -41,7 +43,10 @@ export async function confirmBookingPayment(params: { paymentKey: string; orderI
 /** 토스에서 DONE 인 결제를 payments/bookings 에 반영 (confirm 응답·웹훅 공용) */
 export async function finalize(booking: Booking, p: TossPayment): Promise<ConfirmResult> {
   const admin = createAdminClient();
-  if (p.totalAmount !== booking.amount) return { ok: false, code: "AMOUNT_MISMATCH", message: "결제 금액이 예약 금액과 다릅니다.", bookingId: booking.id };
+  if (p.totalAmount !== booking.amount) {
+    await opsAlert("payment.confirm_failed", { orderId: booking.order_id, bookingId: booking.id, expected: booking.amount, paid: p.totalAmount, stage: "amount" });
+    return { ok: false, code: "AMOUNT_MISMATCH", message: "결제 금액이 예약 금액과 다릅니다.", bookingId: booking.id };
+  }
 
   const { error: pe } = await admin.from("payments").upsert(
     {
@@ -61,6 +66,7 @@ export async function finalize(booking: Booking, p: TossPayment): Promise<Confir
   );
   if (pe) {
     console.error("[payments/finalize] payments upsert", pe);
+    await opsAlert("payment.confirm_failed", { orderId: booking.order_id, bookingId: booking.id, paymentKey: p.paymentKey, amount: p.totalAmount, stage: "db", message: pe.message });
     return { ok: false, code: "DB", message: "결제는 승인되었지만 기록 저장에 실패했습니다. 고객센터로 문의해 주세요.", bookingId: booking.id };
   }
   const { error: be } = await admin.from("bookings").update({ status: "confirmed" }).eq("id", booking.id).eq("status", "pending");

@@ -3,6 +3,7 @@ import { finalize } from "@/lib/bookings/confirm";
 import type { Booking } from "@/lib/bookings/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPayment } from "@/lib/toss/client";
+import { opsAlert } from "@/lib/alert";
 
 /**
  * POST /api/payments/webhook — 토스 PAYMENT_STATUS_CHANGED (FLOWS.md 2-6, confirm 누락 보강)
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
 
   if (p.status === "DONE" && booking.status === "pending") {
     const r = await finalize(booking, p);
+    if (!r.ok) await opsAlert("payment.webhook_failed", { orderId: p.orderId, bookingId: booking.id, code: r.code, message: r.message });
     return NextResponse.json({ ok: r.ok, code: r.ok ? "CONFIRMED" : r.code });
   }
   if ((p.status === "CANCELED" || p.status === "PARTIAL_CANCELED") && booking.status === "confirmed") {

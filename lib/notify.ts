@@ -64,3 +64,17 @@ export async function sendAdminInvite(params: { to: string; name?: string | null
     </div>`;
   return sendEmail(params.to, "[RSC] 관리자 초대", html);
 }
+
+/** 운영 알림 메일 (M13, lib/alert.ts 가 호출). 일반 설정 → 알림 → 운영 알림 받는 이메일 */
+export async function sendOpsAlert(params: { to: string; title: string; kind: string; detail: Record<string, unknown>; level: "error" | "warning" }): Promise<NotifyResult> {
+  const rows = Object.entries(params.detail).map(([k, v]) => `<tr><td style="padding:4px 10px 4px 0;color:#5a3d24;white-space:nowrap">${k}</td><td style="padding:4px 0">${String(typeof v === "object" ? JSON.stringify(v) : v ?? "")}</td></tr>`).join("");
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rsc-platform.vercel.app";
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#211e19;line-height:1.7">
+      <p style="font-size:12px;letter-spacing:.2em;color:#a3402c">${params.level === "error" ? "ERROR" : "WARNING"} · ${params.kind}</p>
+      <p style="font-size:18px;font-weight:600;margin:0 0 12px">${params.title}</p>
+      <table style="font-size:13px;border-collapse:collapse">${rows}</table>
+      <p style="font-size:12px;color:#5a3d24;margin-top:16px">${new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })} · <a href="${site}/admin/orders">어드민 예약·결제</a></p>
+    </div>`;
+  return sendEmail(params.to, `[RSC 운영 알림] ${params.title}`, html);
+}

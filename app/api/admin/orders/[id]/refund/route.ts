@@ -7,7 +7,7 @@ import { logAdmin } from "@/lib/admin/log";
 /**
  * POST /api/admin/orders/[id]/refund { amount, reason } — 관리자 환불(취소). 정책과 무관하게 금액 지정(0 = 환불 없이 취소). 사유 필수, 활동 로그에 기록 (M12).
  */
-const Body = z.object({ amount: z.number().int().min(0).max(100_000_000), reason: z.string().trim().min(2, "환불 사유를 입력해 주세요.").max(200) });
+const Body = z.object({ amount: z.number().int().min(0).max(100_000_000), reason: z.string({ error: "환불 사유를 입력해 주세요." }).trim().min(2, "환불 사유를 입력해 주세요.").max(200) });
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const me = await requireAdmin();

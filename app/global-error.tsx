@@ -1,7 +1,13 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
+
 /** 루트 레이아웃 자체가 실패했을 때의 최후 경계. 폰트·CSS 없이도 읽히도록 인라인 스타일. */
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
   return (
     <html lang="ko">
       <body style={{ margin: 0, background: "#f7f3ec", color: "#211e19", fontFamily: "Arial, sans-serif", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>

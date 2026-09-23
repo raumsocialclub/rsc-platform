@@ -34,6 +34,8 @@ export async function GET() {
       tossSecretKey: !!process.env.TOSS_SECRET_KEY,
       tossTestKeys: (process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY ?? "").startsWith("test_"),
       resendApiKey: !!process.env.RESEND_API_KEY,
+      sentryDsn: !!(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN),
+      vercelEnv: process.env.VERCEL_ENV ?? "local",
     },
     auth,
     // 가입 즉시 활성이 되려면 auth.mailerAutoconfirm 이 true 여야 한다 (Supabase "Confirm email" 꺼짐).

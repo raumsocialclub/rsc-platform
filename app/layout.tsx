@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { samsungOne } from "@/lib/fonts";
 import { PageTracker } from "@/components/site/PageTracker";
+import { EnvBanner } from "@/components/site/EnvBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getBrand, getTheme } from "@/lib/cms/get";
 import { getSeo, robotsFor, siteUrl, absUrl } from "@/lib/seo/get";
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <style dangerouslySetInnerHTML={{ __html: css }} />
       </head>
       <body className="min-h-full flex flex-col bg-cream text-ink font-sans font-medium">
+        <EnvBanner />
         {children}
         <JsonLd data={org} />
         <PageTracker />

@@ -60,6 +60,10 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
 
+## 테스트 · 배포 · 운영 (M13)
+- `npm test` 자동 테스트(가입·예약·결제·환불, 외부 서비스 없이 실행), `npm run check` 린트+타입+테스트. GitHub Actions `CI` 가 모든 push 에서 같은 검사를 돌리고, `main` 은 테스트 통과 시에만 Vercel Deploy Hook 으로 운영 배포된다(SETUP.md 4-5)
+- 오류 알림 Sentry(`NEXT_PUBLIC_SENTRY_DSN`) + 결제·환불 실패 운영 알림 메일(`lib/alert.ts`, 어드민 일반 설정 → 알림). 스테이징 `staging` 브랜치 → Preview 배포(STAGING 띠). 월 1회 점검은 `MAINTENANCE.md`
+
 ## Overview
 라움소셜클럽(RSC)의 실서비스 구축 핸드오프. 브랜드 사이트 + 회원 가입/로그인 + 프로그램 예약·결제 + 관리자(어드민)까지 포함.
 
