@@ -68,7 +68,7 @@ describe("관리자 초대 토큰", () => {
     expect(hash).not.toBe(token);
     expect(hashInviteToken(token)).toBe(hash);
     expect(isTokenShape("short")).toBe(false);
-    expect(inviteLink(token)).toBe(`https://test.example/admin-invite/${token}`);
+    expect(inviteLink(token)).toBe(`${process.env.NEXT_PUBLIC_SITE_URL}/admin-invite/${token}`);
   });
   it("초대 상태 판정", async () => {
     const { inviteState } = await import("@/lib/admins/types");
