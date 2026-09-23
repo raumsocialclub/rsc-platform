@@ -7,75 +7,112 @@
 ---
 
 ## M0. 프로젝트 골격 + 로컬 실행
-- [ ] `npx create-next-app@latest . --ts --tailwind --app --src-dir=false`
-- [ ] 의존성: `@supabase/supabase-js @supabase/ssr @tosspayments/payment-widget-sdk zod`
-- [ ] `Design.md` 토큰을 `tailwind.config.ts`에 등록, SamsungOne `next/font/local` 4종 로드, `app/layout.tsx`에 body 기본(bg cream, text ink, weight 500)
-- [ ] `.env.example` 작성(SETUP.md 목록), `README.md`에 로컬 실행법: `npm i && npm run dev`
-- [ ] `scripts/setup.sh`(mac) / `setup.ps1`(win): node 확인 → npm i → .env 복사 → dev 서버 실행
+- [x] `npx create-next-app@latest . --ts --tailwind --app --src-dir=false`
+- [x] 의존성: `@supabase/supabase-js @supabase/ssr @tosspayments/payment-widget-sdk zod`
+- [x] `Design.md` 토큰을 `tailwind.config.ts`에 등록, SamsungOne `next/font/local` 4종 로드, `app/layout.tsx`에 body 기본(bg cream, text ink, weight 500)
+- [x] `.env.example` 작성(SETUP.md 목록), `README.md`에 로컬 실행법: `npm i && npm run dev`
+- [x] `scripts/setup.sh`(mac) / `setup.ps1`(win): node 확인 → npm i → .env 복사 → dev 서버 실행
 - 완료 조건: `localhost:3000`에 크림 배경 + "RAUM SOCIAL CLUB" 텍스트가 SamsungOne으로 보임
 
 ## M1. 브랜드 페이지 5종 (정적, 현 배포본 대체)
-- [ ] 공통 GNB(데스크톱/모바일 오버레이) + 푸터 + UP 플로팅 버튼
-- [ ] `/` — `design/RAUM Social Club.dc.html` 재현 (deploy/index.html 렌더 참고)
-- [ ] `/pricing` — `design/RSC Pricing.dc.html`
-- [ ] `/benefits` — `design/RSC Benefits.dc.html`
-- [ ] `/fit-check` — `design/RSC Fit Check.dc.html` 설문 UI(아직 저장은 안 함, 다음 모듈)
-- [ ] 이미지 `public/images/`로 이동, `next/image` 사용
-- [ ] 375px·768px·1440px 에서 잘림·겹침 없음
+- [x] 공통 GNB(데스크톱/모바일 오버레이) + 푸터 + UP 플로팅 버튼
+- [x] `/` — `design/RAUM Social Club.dc.html` 재현 (deploy/index.html 렌더 참고)
+- [x] `/pricing` — `design/RSC Pricing.dc.html`
+- [x] `/benefits` — `design/RSC Benefits.dc.html`
+- [x] `/fit-check` — `design/RSC Fit Check.dc.html` 설문 UI(아직 저장은 안 함, 다음 모듈)
+- [x] 이미지 `public/images/`로 이동, `next/image` 사용
+- [x] 375px·768px·1440px 에서 잘림·겹침 없음
 - 완료 조건: 현재 배포 사이트와 동일하게 보임. Vercel 프리뷰 URL 공유.
 
 ## M2. Supabase 연결 + 상담 신청 저장
-- [ ] `SCHEMA.sql` 실행(사용자가 Supabase에서 실행 — 방법 안내)
-- [ ] `lib/supabase/{client,server,admin}.ts`
-- [ ] `POST /api/inquiries` (zod 검증) → `inquiries` insert
-- [ ] `/fit-check` 완료 시 저장 + 결과 화면
+- [x] `SCHEMA.sql` 실행(사용자가 Supabase에서 실행 — 방법 안내)
+- [x] `lib/supabase/{client,server,admin}.ts`
+- [x] `POST /api/inquiries` (zod 검증) → `inquiries` insert
+- [x] `/fit-check` 완료 시 저장 + 결과 화면
 - 완료 조건: 설문 제출 → Supabase Table Editor `inquiries`에 행 생김
 
 ## M3. 인증 + 초대코드 + 가입
-- [ ] Supabase Auth: 이메일/비밀번호, 카카오, 구글 (콜백 `/auth/callback`)
-- [ ] `/join` 초대코드 입력 → `POST /api/invites/verify`
-- [ ] `/join/register?code=` 가입 폼 + 소셜 가입 → 트리거로 `members` 생성 → 코드 used 처리
-- [ ] `/login`, 로그아웃, GNB 로그인 상태 표시(이니셜 아바타)
-- [ ] `middleware.ts` 보호 라우트
+- [x] Supabase Auth: 이메일/비밀번호, 카카오, 구글 (콜백 `/auth/callback`)
+- [x] `/join` 초대코드 입력 → `POST /api/invites/verify`
+- [x] `/join/register?code=` 가입 폼 + 소셜 가입 → 트리거로 `members` 생성 → 코드 used 처리
+- [x] `/login`, 로그아웃, GNB 로그인 상태 표시(이니셜 아바타)
+- [x] `middleware.ts` 보호 라우트
 - 완료 조건: 어드민이 SQL로 넣은 초대코드로 가입 → `/programs` 접근 가능, 코드 없이 `/join/register` 진입 불가
 
 ## M4. 어드민 골격 + 상담 목록 + 초대코드 발급
-- [ ] `/admin` 레이아웃(사이드바, role 검사)
-- [ ] `/admin/inquiries` 목록/상세, 메모, 상태 변경, "초대코드 발급"(코드 생성 + 이메일 발송 — Resend)
-- [ ] `/admin/coupons` 초대코드 목록
+- [x] `/admin` 레이아웃(사이드바, role 검사)
+- [x] `/admin/inquiries` 목록/상세, 메모, 상태 변경, "초대코드 발급"(코드 생성 + 화면 표시·복사. 이메일 발송은 lib/notify.ts 구조만, RESEND_API_KEY 등록 시 자동 발송)
+- [x] `/admin/coupons` 초대코드 목록
 - 완료 조건: 상담 신청 → 어드민에서 코드 발급 → 이메일 수신 → 그 코드로 가입
 
 ## M5. 프로그램 CRUD (어드민) + 회원 목록/상세
-- [ ] `/admin/programs` 탭(전체/단일/시즌) 테이블
-- [ ] `/admin/programs/new`, `/admin/programs/[id]` 폼: 종류·이름·서브·카테고리·장소·소개·설명·이미지 업로드(Storage)·정원·판매가·회원가·일정(단일 1 / 시즌 6)·타임라인·공개
-- [ ] `/programs` 카드 그리드 + 카테고리 필터, 잔여석(`session_availability`)
-- [ ] `/programs/[id]` 상세 + sticky 예약 카드(모바일 하단 고정바)
+- [x] `/admin/programs` 탭(전체/단일/시즌) 테이블
+- [x] `/admin/programs/new`, `/admin/programs/[id]` 폼: 종류·이름·서브·카테고리·장소·소개·설명·이미지 업로드(Storage)·정원·판매가·회원가·일정(단일 1 / 시즌 6)·타임라인·공개
+- [x] `/programs` 카드 그리드 + 카테고리 필터, 잔여석(`session_availability`)
+- [x] `/programs/[id]` 상세 + sticky 예약 카드(모바일 하단 고정바)
 - 완료 조건: 어드민에서 등록·공개한 프로그램이 회원 목록에 보이고 비공개는 안 보임
 
 ## M6. 예약 + 토스 결제 + 내 예약
-- [ ] `POST /api/bookings` → `rpc('reserve_seat')` (pending, 15분)
-- [ ] `/checkout/[bookingId]` 토스 결제위젯 (테스트 키)
-- [ ] `/checkout/success` → `POST /api/payments/confirm` (금액 검증 → 토스 confirm → payments/bookings 갱신)
-- [ ] `/checkout/fail`
-- [ ] `POST /api/payments/webhook`
-- [ ] pg_cron `expire_pending_bookings` 5분
-- [ ] `/my` 다가오는/지난 예약, 취소 → `POST /api/bookings/[id]/cancel` → 토스 cancel
-- [ ] 예약 확정 이메일
+- [x] `POST /api/bookings` → `rpc('reserve_seat')` (pending, 15분)
+- [x] `/checkout/[bookingId]` 토스 결제위젯 (테스트 키)
+- [x] `/checkout/success` → `POST /api/payments/confirm` (금액 검증 → 토스 confirm → payments/bookings 갱신)
+- [x] `/checkout/fail`
+- [x] `POST /api/payments/webhook`
+- [x] pg_cron `expire_pending_bookings` 5분
+- [x] `/my` 다가오는/지난 예약, 취소 → `POST /api/bookings/[id]/cancel` → 토스 cancel
+- [x] 예약 확정 이메일
 - 완료 조건: 테스트 카드로 결제 → 예약 확정 → 내 예약에 표시 → 취소 → 토스 대시보드에서 취소 확인. 두 브라우저로 마지막 1석 동시 결제 시 한 명만 성공.
 
 ## M7. 어드민 예약·결제 + 회원 DB + 대시보드
-- [ ] `/admin/orders` 필터·테이블·상세(영수증, 환불 버튼)
-- [ ] `/admin/members` 검색·필터·상세 드로어(예약/결제 이력, 메모, 상태)
-- [ ] `/admin` 대시보드 KPI(이번 달 매출, 신규 회원, 예약 수, 상담 대기), 최근 예약, 마감 임박
+- [x] `/admin/orders` 필터·테이블·상세(영수증, 환불 버튼)
+- [x] `/admin/members` 검색·필터·상세 드로어(예약/결제 이력, 메모, 상태)
+- [x] `/admin` 대시보드 KPI(이번 달 매출, 신규 회원, 예약 수, 상담 대기), 최근 예약, 마감 임박
 - 완료 조건: 실제 데이터로 KPI 숫자 일치
 
 ## M8. 마무리 & 라이브 전환
-- [ ] 이용약관·개인정보처리방침·환불규정 페이지(`/terms`, `/privacy`, `/refund`) — 문구는 사용자 제공
-- [ ] 에러·로딩·빈 상태 화면 전수 점검(Design.md 규칙)
-- [ ] 접근성(포커스 링, 대비), Lighthouse 모바일 90+
-- [ ] 토스 라이브 키 교체, 웹훅 URL 등록, Supabase Redirect URL 등록
-- [ ] Vercel 도메인 `raumsocialclub2026.vercel.app` 새 프로젝트로 이전
+- [x] 이용약관·개인정보처리방침·환불규정 페이지(`/terms`, `/privacy`, `/refund`) — 자리 문구(`lib/legal/content.ts`), 실제 문구는 사용자 제공 후 교체
+- [x] 에러·로딩·빈 상태 화면 전수 점검(Design.md 규칙) — `app/not-found`, `app/error`, `app/global-error`, 회원·어드민 `loading`
+- [x] 접근성(포커스 링, 대비), Lighthouse 모바일 90+ — 로컬 측정 `/` 96/95/100/100, `/pricing` 94/96, `/login` 98/96, `/terms` 97/91 (대비 경고는 Design.md 고정색 overline)
+- [ ] 토스 라이브 키 교체, 웹훅 URL 등록, Supabase Redirect URL 등록 — 사용자 작업 (SETUP.md 4)
+- [x] ~~Vercel 도메인 `raumsocialclub2026.vercel.app` 새 프로젝트로 이전~~ → 이전하지 않음(다른 Vercel 팀 소유). `rsc-platform.vercel.app` 사용, 이후 실도메인 `www.raumsocialclub.co.kr` 연결 예정(사용자 결정 2026-09-23)
 - [ ] `main` 병합 → 배포
+
+## M9. 어드민 고도화 — 사이트 관리(CMS) · 통계 · 리포트 (사용자 요청)
+- [x] 사이트 콘텐츠 관리: `site_content` + `lib/cms/schema.ts`(문서·필드 정의, 기본값 = 기존 문구) → `/admin/site` 편집기(문구·사진 업로드·색상·연락처·섹션 표시/순서, 저장 즉시 게시, 이력·기본값 복원)
+- [x] 홈·가격·혜택·약관·GNB·푸터가 CMS 데이터로 렌더 (기본값 상태에서 기존 화면과 섹션 위치·높이 동일)
+- [x] 색상 테마: tailwind 토큰 → CSS 변수, 어드민에서 변경 시 전체 반영
+- [x] 접속 통계: `page_views` 비콘(`/api/track`), 일별 PV/UV·페이지·유입·기기·국가 (`stats_page_views`)
+- [x] `/admin/stats`: 기간(7/30/90일·이번 달·지난 달·올해·직접 지정) 매출(일별·프로그램·결제수단)·예약·회원·상담·접속·전환 퍼널·관리자 활동 로그, 항목별/전체 CSV
+- [x] 관리자 활동 로그 `admin_logs` (사이트 저장, 환불, 회원 수정, 프로그램 등록/공개, 초대코드 발급)
+- [ ] 페이지 빌더(섹션 자유 추가·레이아웃 편집)는 범위 밖 — 필요 시 별도 지시
+
+## M10. 어드민 일반 설정 (사용자 요청)
+- [x] `/admin/settings`: 사이트 상태(점검 모드·허용 IP) · 보안(보안 헤더·관리자 허용 IP·로그인 연속 실패 잠금) · 접근 차단(IP·국가) · 페이지 캐시(CDN 시간·비우기) · 알림(이메일 켜기·발신자) · 결제/환불(일수·환불률)
+- [x] `proxy.ts` 가 요청 앞단에서 차단·점검·관리자 IP·보안 헤더·캐시 헤더 적용(설정 30초 캐시), `/api/auth/login` 잠금, 환불 정책·알림 설정 연동
+- [x] Vercel 함수 리전 서울(icn1). 국가 차단·요청 제한·공격 대응은 Vercel Firewall 안내(SETUP.md 4-1, 일반 설정 화면 하단)
+
+## M11. SEO · GEO + 소식 게시판 (사용자 요청)
+- [x] `/admin/seo`: 검색 노출 스위치(기본 꺼짐 → 오픈 때 켬) · 브랜드명 · 기본 설명 · 키워드 · 대표 이미지(OG, 기본 메인 히어로) · 구글/네이버 소유 확인 코드 칸 · AI 크롤러 허용(기본 켜짐) · llms.txt 본문 · 조직 정보(구조화 데이터) · 페이지별 제목/설명/이미지/검색 제외
+- [x] `app/robots.ts` `app/sitemap.ts` `app/llms.txt` 자동 생성, 전 페이지 title/description/OG/canonical/robots 메타(`lib/seo/get.ts`), 어드민·회원·로그인 화면 noindex, Organization·WebSite·FAQPage·NewsArticle·Breadcrumb JSON-LD
+- [x] 메인 08 FAQ 섹션(`home.faq`, 10문항 초안 — 사이트 관리에서 수정) 
+- [x] 소식 게시판: `posts` 테이블(RLS) · `/admin/posts` 목록/새 글/편집(사진 업로드·발행·임시 저장·주소 자동) · 공개 `/news` `/news/[slug]`(마크다운 본문) · GNB·푸터 링크 · 사이트맵·llms.txt 자동 포함
+- [ ] 실도메인 연결 후 구글 서치콘솔·네이버 서치어드바이저 등록 → 소유 확인 코드 입력 → 사이트맵 제출 (SETUP.md 4-2) — 사용자 작업
+
+## M12. 관리자 권한 3단계 + 부관리자 초대 (사용자 요청)
+- [x] 역할 owner(주관리자: nse101@kakao.com) > admin(부관리자) > member. `is_admin()` 은 활동 상태의 admin·owner, `is_owner()` 추가. 정지(paused) 즉시 어드민 차단
+- [x] `/admin/admins`(주관리자 전용): 부관리자 초대(이름·이메일 → 48시간·1회용 링크, 화면 표시+복사, 이메일 키 있으면 발송), 관리자 목록(역할·상태·마지막 로그인), 정지/해제, 권한 해제, 초대 이력·취소, 권한표
+- [x] `/admin-invite/[token]`: 이름·비밀번호 → 계정 생성(트리거가 `app_metadata.admin_invite` 로 초대코드 없이 role=admin 생성) → 바로 로그인. 이미 가입된 이메일이면 권한만 부여
+- [x] 부관리자 제한: 일반 설정·SEO 설정은 읽기 전용(저장 API 403), 회원 목록 CSV(통계 리포트·회원 DB 버튼) 주관리자만, 관리자 관리 메뉴 숨김. 환불은 가능하되 사유 필수 + 활동 로그(처리자·금액·사유)
+- [x] `members.last_login_at`(이메일·소셜 로그인 시 기록), 관리자 로그인 후 기본 목적지 `/admin`, `admin_logs` 에 admin.invite / admin.invite.revoke / admin.role / admin.status / admin.accept
+
+## M13. 오픈 준비 — 모니터링 · 자동 테스트 · 배포 게이트 · 스테이징 · 점검 루틴 (사용자 요청)
+- [x] Sentry(`@sentry/nextjs`): 서버·엣지·브라우저 설정, `instrumentation.ts` onRequestError, error/global-error 캡처, `withSentryConfig`. DSN 없으면 비활성. `lib/alert.ts` opsAlert → 결제 승인 실패·웹훅 실패·환불 실패를 Sentry + 운영 알림 메일(일반 설정 → 알림 → 운영 알림 받는 이메일, 기본 theraumai@gmail.com)
+- [x] 자동 테스트 Vitest 47개: 가입(초대코드 검증·사용·관리자 초대 토큰), 예약(book_session 오류 코드·성공), 결제(금액 검증·만료·중복 승인·토스 실패 알림·웹훅 재조회·취소 동기화), 환불(전액·부분·정책 일수·회원 취소 API·관리자 사유 필수·로그). `npm test`, `npm run check`
+- [x] GitHub Actions `CI`(모든 push/PR: lint·typecheck·test·build) + `Deploy production`(main: 테스트 통과 → Vercel Deploy Hook). `vercel.json` main 자동배포 끔
+- [x] 스테이징: `staging` 브랜치 → Vercel Preview(`rsc-platform-git-staging-…`), Preview 환경변수 `NEXT_PUBLIC_SITE_URL`·`NEXT_PUBLIC_APP_ENV=staging` 분리, 화면 상단 STAGING 띠
+- [x] `MAINTENANCE.md` 월 1회 점검 루틴 + 보고 양식, SETUP 4-4~4-8(Vercel Pro·Supabase Pro 전환 단계, Deploy Hook·GitHub Secret·main 보호, Sentry 가입·DSN, 스테이징)
+- [ ] 사용자: Vercel Pro·Supabase Pro 결제, Sentry 가입 후 DSN 을 Vercel 환경변수에, Deploy Hook → GitHub Secret, main 보호 규칙 (SETUP 4-4~4-6)
+- [ ] 스테이징 DB: Supabase 프로젝트 한도(무료 2개) 때문에 보류 → Pro 전환 또는 옛 프로젝트 정리 후 "스테이징 DB 만들어라"
 
 ## 2차 (별도 지시 후)
 - 멤버십 결제/분납(빌링키), 네이버 로그인, 지인 초대권 사용, 알림톡(솔라피) 전환, 사이트 이미지 CMS, 리마인더 자동 발송

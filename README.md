@@ -1,10 +1,74 @@
 # Handoff: RAUM Social Club (RSC) — 실서비스 플랫폼
 
+## 로컬에서 실행하기 (내 PC에서 화면 띄우기)
+
+준비물: [Node.js](https://nodejs.org) LTS(20 이상) 한 번만 설치.
+
+**가장 쉬운 방법 — 스크립트 한 번 실행**
+- mac: 터미널을 열고 이 폴더로 이동한 뒤 `bash scripts/setup.sh`
+- Windows: PowerShell을 열고 이 폴더로 이동한 뒤 `.\scripts\setup.ps1`
+  (실행 정책 오류가 나면 `powershell -ExecutionPolicy Bypass -File .\scripts\setup.ps1`)
+
+스크립트가 Node.js 확인 → 패키지 설치 → `.env.local` 생성 → 개발 서버 실행까지 해줍니다.
+끝나면 브라우저에서 <http://localhost:3000> 을 열면 됩니다. 종료는 그 창에서 `Ctrl + C`.
+
+**직접 입력하는 방법**
+```
+npm i
+cp .env.example .env.local     # Windows: copy .env.example .env.local
+npm run dev
+```
+
+외부 서비스 키(Supabase·토스 등)는 `.env.local`에 채웁니다. 목록과 받는 방법은 `SETUP.md` 참고.
+브랜드 페이지(M1)까지는 키가 비어 있어도 화면이 뜹니다.
+
+**M2(상담 신청 저장)부터**: `.env.local`에 아래 두 값이 있어야 설문 제출이 저장됩니다.
+1. https://supabase.com/dashboard/project/vfjpouuwvwgiqpwttyup/settings/api 접속
+2. `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`, `anon public` 키 → `NEXT_PUBLIC_SUPABASE_ANON_KEY` 에 붙여넣기
+3. 개발 서버를 껐다가 다시 켜기 (`Ctrl + C` 후 `npm run dev`)
+저장된 신청은 같은 대시보드의 Table Editor → `inquiries` 에서 볼 수 있습니다.
+
+**M3(가입·로그인)부터**: 가입은 초대코드가 있어야 합니다. 검수용 코드 `RSC-TEST-2026` 이 DB에 들어 있습니다(1회용).
+새 코드는 SQL Editor에서 `insert into invite_codes(code, issued_to_name) values ('RSC-XXXX-XXXX','이름');` 로 넣거나 M4 어드민에서 발급합니다.
+소셜 로그인은 카카오(Supabase Authentication → Providers 에 키 등록)와 네이버(`NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET`, 직접 연동)입니다. 준비되면 `NEXT_PUBLIC_AUTH_PROVIDERS=kakao,naver` 로 켭니다. 네이버 가입자는 이메일 제공 동의가 필요하며, 첫 로그인 뒤 `/join` 에서 초대코드를 연결합니다.
+Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" 은 꺼 두어야 가입 즉시 로그인됩니다.
+
+**M4(어드민)**: `/admin` 은 `members.role = 'admin'` 인 계정만 들어갑니다. 첫 관리자는 SQL Editor에서
+`update members set role='admin' where email='본인이메일';` 로 지정합니다. 상담 신청 → "초대코드 발급"으로 코드를 만들고 복사해 전달합니다.
+이메일 자동 발송은 Vercel 환경변수 `RESEND_API_KEY`(+ 선택 `NOTIFY_FROM_EMAIL`)를 넣으면 켜집니다.
+
+**M5(프로그램)**: 어드민 → 프로그램 → "+ 새 프로그램 등록"(단일) 또는 "+ RAUM SOLO 시즌"(6주). 사진은 Supabase Storage 버킷 `programs`(public, SETUP.md 3)에 올라갑니다.
+"게시"를 누르면 회원 `/programs` 목록·상세에 바로 보이고, "임시 저장"(비공개)은 관리자만 봅니다. 잔여석은 DB 함수 `session_remaining` 으로 계산합니다.
+
+**M6(예약·결제)**: 프로그램 상세 "결제하기" → 예약(15분 홀드) → `/checkout/[id]` 토스 결제위젯 → 승인 → `/my`. 토스 키는 `.env.local`/Vercel 의
+`NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY` 로 읽습니다(지금은 토스 문서의 공용 테스트 키 → 가맹점 키로 교체만 하면 됨). 테스트 결제는 실제 청구가 없습니다.
+서버 승인·환불·웹훅은 `SUPABASE_SERVICE_ROLE_KEY` 가 있어야 동작합니다(로컬은 `.env.local` 에도 필요). 환불 정책은 `lib/bookings/refund.ts`(3일 전까지 100%).
+토스 웹훅은 개발자센터에서 `https://<도메인>/api/payments/webhook` 을 등록합니다(선택, confirm 누락 보강).
+
+**M7(어드민 예약·결제 / 회원 DB / 대시보드)**: `/admin/orders` 에서 예약을 고르면 결제 정보(토스 paymentKey·영수증)와 환불 버튼이 나옵니다. 관리자 환불은 정책과 무관하게 금액을 지정하며 토스 취소 API 를 호출합니다.
+`/admin/members` 는 검색·상태 필터 + 회원 상세(예약 이력, 메모, 활동/휴면/탈퇴). `/admin` 대시보드는 이번 달/지난 달/올해 실제 결제·예약 데이터를 집계합니다(한국 시간 기준). "엑셀 다운로드"는 CSV 파일입니다.
+
+**M8(마무리)**: `/terms` `/privacy` `/refund` 는 자리 문구입니다(`lib/legal/content.ts` 한 파일만 바꾸면 됩니다). 404·오류·로딩 화면과 키보드 포커스 링을 추가했습니다.
+라이브 전환 체크리스트는 SETUP.md 4 참고(토스 라이브 키, 웹훅 URL, Supabase Redirect URL, 도메인 이전).
+
+**M9(어드민 고도화)**: `/admin/site` 에서 메인·가격·혜택·약관의 문구·사진·색상·연락처를 코드 수정 없이 바꿉니다(저장 즉시 반영, 이력 복원 가능). 기본값은 `lib/cms/schema.ts` 에 있어 DB 가 비어 있어도 기존 화면이 그대로 나옵니다.
+`/admin/stats` 는 기간별 매출·예약·회원·상담·접속(페이지뷰/방문자/유입/기기)·전환 퍼널·관리자 활동을 보여주고 항목별 또는 전체 CSV 로 내려받습니다. 접속 수집은 `/api/track` 비콘(서버에 `SUPABASE_SERVICE_ROLE_KEY` 필요).
+
+**M10(일반 설정)**: `/admin/settings` — 점검 모드, 보안 헤더, 관리자 허용 IP, 로그인 연속 실패 잠금, 차단 IP·국가, 공개 페이지 CDN 캐시 시간·캐시 비우기, 이메일 발송 켜기/발신자, 환불 정책(일수·환불률).
+저장 즉시 적용(요청 앞단 `proxy.ts` 가 30초 캐시로 읽음). HTTPS 는 Vercel 자동. 국가 차단·요청 제한(Rate Limit)·공격 대응은 Vercel 대시보드 → Firewall 에서(안내는 일반 설정 화면 하단).
+서버 함수 리전은 `vercel.json` 으로 서울(icn1)에 고정해 Supabase(서울)와의 왕복 지연을 줄였습니다.
+
+기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
+
+## 테스트 · 배포 · 운영 (M13)
+- `npm test` 자동 테스트(가입·예약·결제·환불, 외부 서비스 없이 실행), `npm run check` 린트+타입+테스트. GitHub Actions `CI` 가 모든 push 에서 같은 검사를 돌리고, `main` 은 테스트 통과 시에만 Vercel Deploy Hook 으로 운영 배포된다(SETUP.md 4-5)
+- 오류 알림 Sentry(`NEXT_PUBLIC_SENTRY_DSN`) + 결제·환불 실패 운영 알림 메일(`lib/alert.ts`, 어드민 일반 설정 → 알림). 스테이징 `staging` 브랜치 → Preview 배포(STAGING 띠). 월 1회 점검은 `MAINTENANCE.md`
+
 ## Overview
 라움소셜클럽(RSC)의 실서비스 구축 핸드오프. 브랜드 사이트 + 회원 가입/로그인 + 프로그램 예약·결제 + 관리자(어드민)까지 포함.
 
 **타깃 스택 (확정)**
-- Frontend: **Next.js 14+ (App Router, TypeScript)**, Tailwind 권장 — Vercel 배포 (기존 주소 `raumsocialclub2026.vercel.app` 유지)
+- Frontend: **Next.js 14+ (App Router, TypeScript)**, Tailwind 권장 — Vercel 배포 (`rsc-platform.vercel.app`, 이후 실도메인 연결 예정)
 - DB / Auth / Storage: **Supabase** (Postgres + Auth + Storage + RLS)
 - 결제: **토스페이먼츠** 결제위젯 (카드·카카오페이·네이버페이·토스페이·계좌이체)
 - 알림: 카카오 알림톡(솔라피) 또는 Resend 이메일
@@ -22,7 +86,7 @@
 
 ## Design Tokens
 Colors
-- 배경 크림 `#f2eee5` / 카드 크림 `#f7f3ec` / 흰 카드 `#ffffff`
+- 배경 크림 `#f7f3ec` / 카드 크림 `#f7f3ec`(배경과 동일, 1px 테두리로만 구분) / 흰 카드 `#ffffff`
 - 잉크(본문) `#211e19` / 다크 섹션 배경 `#211e19` (그 위 텍스트 `#f7f3ec`)
 - 포인트 짙은 브라운 `#5a3d24` (버튼·GNB 메뉴·제목 라벨) / hover 브라운 `#9c6b3e`
 - 골드(다크 배경 위 라벨·강조) `#e2b478`, hover `#f0c98e`
@@ -41,7 +105,7 @@ Typography
 
 Layout
 - 콘텐츠 max-width 1100px, 데스크톱 좌우 padding 40px, 모바일 18px
-- 버튼: pill (`border-radius:999px`), padding 15px 28px, 13.5~14px; 주 버튼 bg `#5a3d24` text `#f2eee5`; 보조 버튼 1px border `rgba(33,30,25,.3)`
+- 버튼: pill (`border-radius:999px`), padding 15px 28px, 13.5~14px; 주 버튼 bg `#5a3d24` text `#f7f3ec`; 보조 버튼 1px border `rgba(33,30,25,.3)`
 - 카드: 1px border `rgba(33,30,25,.14)`, radius 0 (각진 카드), 그림자 없음
 - GNB: sticky, `rgba(242,238,229,.9)` + `backdrop-filter: blur(14px)`, 하단 1px 선
 - 반응형 breakpoint 760px: 그리드 1열, 헤더 padding 14px 18px
@@ -70,6 +134,10 @@ Layout
 ### D. 혜택 안내 — `design/RSC Benefits.dc.html` (`/benefits`)
 정적 페이지. 혜택 목록(카테고리 행사 우선 참여, 지인 초대권 연 8매, 전용 미팅룸·세미나룸 예약, RSC 라운지 이용, 평일 무료주차, 라움 아트센터 대관 우선, 제휴 시설 할인). CTA 2개 유지.
 
+### D-2. 소식 — `/news`, `/news/[slug]` (M11)
+목록: 카드 그리드(대표 사진 3:2 · 분류 · 날짜 · 제목 · 요약), 12건 페이지 이동. 상세: 760px 본문(간단 마크다운), 대표 사진, 요약, 하단 목록/상담 CTA. NewsArticle·Breadcrumb JSON-LD, OG 이미지는 대표 사진.
+메인 08 FAQ 섹션(`home.faq`)은 `<details>` 아코디언 + FAQPage JSON-LD.
+
 ### E. 회원 영역 — `design/RSC Member.dc.html` (`/join`, `/login`, `/programs`, `/programs/[id]`, `/checkout/[bookingId]`, `/my`)
 프로토타입 상단의 검은 "화면 미리보기" 바는 **개발 시 제거** (프로토타입 전용 스위처).
 
@@ -84,7 +152,8 @@ Layout
 8. **내 예약** `/my` — 다가오는 예약 / 지난 예약 탭, 카드 목록(상태 배지: 확정·취소·완료), 취소 버튼(정책에 따른 환불).
 
 ### F. 어드민 — `design/RSC Admin.dc.html` (`/admin/*`, role=admin만)
-좌측 다크 사이드바(`#211e19`) 메뉴: 대시보드 · 회원 DB · 프로그램 · 예약·결제 · 상담 신청 · 쿠폰·초대권. 선택 항목 bg `rgba(247,243,236,.1)`.
+좌측 다크 사이드바(`#211e19`) 메뉴: 대시보드 · 회원 DB · 프로그램 · 예약·결제 · 상담 신청 · 쿠폰·초대권 · 통계·리포트 · 소식 게시판 · 사이트 관리 · SEO 설정 · 일반 설정 · 관리자 관리(주관리자만). 선택 항목 bg `rgba(247,243,236,.1)`.
+**권한(M12)**: `members.role` owner(주관리자) > admin(부관리자) > member. 부관리자는 일반 설정·SEO 설정 읽기 전용, 회원 목록 CSV 불가, 관리자 관리 불가. 환불은 가능(사유 필수·활동 로그). 정지(status=paused)된 관리자는 즉시 차단.
 1. **대시보드** `/admin` — KPI 4개(이번 달 매출, 신규 회원, 예약 건수, 상담 대기), 최근 예약 테이블, 마감 임박 프로그램.
 2. **회원 DB** `/admin/members` — 검색 + 상태 필터(활동/승인 대기/휴면), 테이블(이름·연락처·멤버십 플랜·가입일·최근 참여·상태), 행 클릭 → 상세 드로어(예약 이력, 결제 이력, 메모, 상태 변경).
 3. **프로그램** `/admin/programs` — 탭(전체 / 단일 프로그램 / RAUM SOLO 시즌), 테이블(이미지·이름·일시·장소·정원/예약(채움 바)·가격·공개상태), "새 프로그램 등록" / "새 RAUM SOLO 시즌 등록" 버튼.
@@ -92,6 +161,10 @@ Layout
 5. **예약·결제** `/admin/orders` — 필터(기간·상태·프로그램), 테이블(주문번호·회원·프로그램·수량·금액·결제수단·상태·결제일), 행 클릭 → 상세(토스 paymentKey, 영수증 URL, 환불 버튼 → 토스 취소 API 호출).
 6. **상담 신청** `/admin/inquiries` — 좌 목록(이름·일시·결과 유형·상태 대기/완료), 우 상세(답변 전체, 메모, 초대코드 발급 버튼 → `invite_codes` 생성 + 알림톡/이메일 발송, 상태 완료 처리).
 7. **쿠폰·초대권** `/admin/coupons` — 초대코드 목록(코드·발급 대상·발급일·사용 여부·만료), 지인 초대권 잔여 현황(회원별 연 8/12매).
+8. **소식 게시판** `/admin/posts` — 목록(대표 사진·제목·분류·발행일·상태), 새 글/편집(제목·요약·본문(간단 마크다운, 본문 사진 삽입)·분류·주소(슬러그 자동)·발행일·대표 사진·발행/임시 저장/삭제). 공개 `/news`, `/news/[slug]`. (M11)
+9. **SEO 설정** `/admin/seo` — 검색 노출 on/off(기본 off), 브랜드명·기본 설명·키워드·대표 이미지(OG), 구글/네이버 소유 확인 코드, AI 크롤러 허용·llms.txt, 조직 정보(JSON-LD), 페이지별 제목·설명·이미지·검색 제외. `robots.txt` `sitemap.xml` `llms.txt` 자동 생성. (M11)
+
+10. **관리자 관리** `/admin/admins` (주관리자 전용, M12) — 부관리자 초대(이름·이메일 → 48시간·1회용 링크 표시/복사, 이메일 자동 발송), 관리자 목록(역할·상태·마지막 로그인·정지/해제·권한 해제), 초대 이력·취소, 권한표. 초대 수락 화면 `/admin-invite/[token]`(이름·비밀번호 → 관리자 계정 → 바로 `/admin`; 기존 회원이면 권한만 부여).
 
 ## Interactions & Behavior
 - 버튼 hover: 주 버튼 bg `#5a3d24 → #9c6b3e`; 보조 버튼 border/text `→ #9c6b3e`. transition 150ms ease.

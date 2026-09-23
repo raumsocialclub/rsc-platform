@@ -27,7 +27,7 @@
 - 관계 프로그램: CONNECTION ESSENTIAL 550,000 / SELECT 1,100,000 / BESPOKE 2,200,000(실제 대면 1회 단위), RAUM MERRY 33,000,000원부터(별도 상담)
 
 ## 기술 결정 (확정)
-- Frontend: Next.js(App Router, TypeScript, Tailwind) → Vercel 배포, 기존 주소 `raumsocialclub2026.vercel.app` 유지
+- Frontend: Next.js(App Router, TypeScript, Tailwind) → Vercel 배포, 주소 `rsc-platform.vercel.app` (기존 `raumsocialclub2026.vercel.app` 는 다른 Vercel 팀 소유라 이전하지 않기로 결정 2026-09-23. 이후 실도메인 `www.raumsocialclub.co.kr` 연결 예정)
 - DB·인증·파일: Supabase (Postgres, Auth — 이메일·카카오·구글, Storage)
 - 결제: 토스페이먼츠 결제위젯 + 서버 confirm + 웹훅
 - 알림: 카카오 알림톡(솔라피) — 심사 전까지는 이메일(Resend)
