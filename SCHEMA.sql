@@ -537,3 +537,11 @@ create index admin_invites_email_idx on admin_invites(email);
 alter table admin_invites enable row level security;
 create policy "admin invites owner" on admin_invites for all using (is_owner()) with check (is_owner());
 -- 주관리자 지정: update members set role = 'owner' where lower(email) = '<주관리자 이메일>';
+
+-- ---------- 개인정보처리방침 보유 기간과 일치: 로그인 보안 기록 30일, 접속 기록 1년 지나면 자동 삭제 (매일 03:17 UTC)
+create or replace function purge_expired_logs() returns void language sql security definer set search_path = public as $$
+  delete from login_attempts where updated_at < now() - interval '30 days';
+  delete from page_views where ts < now() - interval '1 year';
+$$;
+revoke all on function purge_expired_logs() from public, anon, authenticated;
+select cron.schedule('purge-expired-logs', '17 3 * * *', $$select public.purge_expired_logs()$$);
