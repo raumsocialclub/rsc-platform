@@ -106,7 +106,7 @@
 - [x] `members.last_login_at`(이메일·소셜 로그인 시 기록), 관리자 로그인 후 기본 목적지 `/admin`, `admin_logs` 에 admin.invite / admin.invite.revoke / admin.role / admin.status / admin.accept
 
 ## M13. 오픈 준비 — 모니터링 · 자동 테스트 · 배포 게이트 · 스테이징 · 점검 루틴 (사용자 요청)
-- [x] Sentry(`@sentry/nextjs`): 서버·엣지·브라우저 설정, `instrumentation.ts` onRequestError, error/global-error 캡처, `withSentryConfig`. DSN 없으면 비활성. `lib/alert.ts` opsAlert → 결제 승인 실패·웹훅 실패·환불 실패를 Sentry + 운영 알림 메일(일반 설정 → 알림 → 운영 알림 받는 이메일)
+- [x] Sentry(`@sentry/nextjs`): 서버·엣지·브라우저 설정, `instrumentation.ts` onRequestError, error/global-error 캡처, `withSentryConfig`. DSN 없으면 비활성. `lib/alert.ts` opsAlert → 결제 승인 실패·웹훅 실패·환불 실패를 Sentry + 운영 알림 메일(일반 설정 → 알림 → 운영 알림 받는 이메일, 기본 theraumai@gmail.com)
 - [x] 자동 테스트 Vitest 47개: 가입(초대코드 검증·사용·관리자 초대 토큰), 예약(book_session 오류 코드·성공), 결제(금액 검증·만료·중복 승인·토스 실패 알림·웹훅 재조회·취소 동기화), 환불(전액·부분·정책 일수·회원 취소 API·관리자 사유 필수·로그). `npm test`, `npm run check`
 - [x] GitHub Actions `CI`(모든 push/PR: lint·typecheck·test·build) + `Deploy production`(main: 테스트 통과 → Vercel Deploy Hook). `vercel.json` main 자동배포 끔
 - [x] 스테이징: `staging` 브랜치 → Vercel Preview(`rsc-platform-git-staging-…`), Preview 환경변수 `NEXT_PUBLIC_SITE_URL`·`NEXT_PUBLIC_APP_ENV=staging` 분리, 화면 상단 STAGING 띠

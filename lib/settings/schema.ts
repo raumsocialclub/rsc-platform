@@ -53,7 +53,7 @@ export const SETTINGS_DOCS: DocDef[] = [
     label: "알림",
     description: "이메일 발송은 RESEND_API_KEY 가 등록되어 있어야 실제로 나갑니다.",
     fields: [b("emailEnabled", "이메일 발송 켜기"), t("fromName", "발신 이름"), t("fromEmail", "발신 주소", "Resend 에서 인증한 도메인의 주소"), t("alertEmail", "운영 알림 받는 이메일", "결제 실패·환불 실패·서버 오류가 나면 이 주소로 메일이 갑니다 (RESEND_API_KEY 필요). Sentry 알림은 Sentry 계정 이메일로 따로 갑니다")],
-    defaults: { emailEnabled: true, fromName: "RAUM SOCIAL CLUB", fromEmail: "onboarding@resend.dev", alertEmail: "nse101@kakao.com" },
+    defaults: { emailEnabled: true, fromName: "RAUM SOCIAL CLUB", fromEmail: "onboarding@resend.dev", alertEmail: "theraumai@gmail.com" },
   },
   {
     id: "settings.payment",

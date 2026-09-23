@@ -104,7 +104,7 @@ VERCEL_DEPLOY_HOOK_PRODUCTION=     # Vercel 이 아니라 GitHub → Settings �
 3. 화면에 나오는 **DSN**(`https://…@…ingest.sentry.io/…`) 복사. 나중엔 Settings → Projects → rsc-platform → **Client Keys (DSN)** 에서 다시 볼 수 있다
 4. Vercel → rsc-platform → Settings → **Environment Variables** → Key `NEXT_PUBLIC_SENTRY_DSN`, Value 에 DSN, 환경 Production·Preview 체크 → Save → 다음 배포부터 적용(Claude 에게 "재배포해라")
 5. Sentry → **Alerts** → 기본 규칙 "Send a notification for new issues" 가 켜져 있는지, 받는 사람이 본인 이메일인지 확인. 결제 실패는 `ops.kind = payment.confirm_failed` 태그로 들어오므로, Alerts → Create Alert → "Issues" → 조건에 `tags[ops.kind]:payment.*` 를 넣으면 결제만 따로 알림을 받을 수 있다
-6. 이메일 백업 알림: RESEND_API_KEY 가 등록되면 어드민 → 일반 설정 → 알림 → **운영 알림 받는 이메일**(기본 nse101@kakao.com)로도 결제 실패·환불 실패 메일이 간다(Sentry 와 별개)
+6. 이메일 백업 알림: RESEND_API_KEY 가 등록되면 어드민 → 일반 설정 → 알림 → **운영 알림 받는 이메일**(기본 theraumai@gmail.com)로도 결제 실패·환불 실패 메일이 간다(Sentry 와 별개)
 7. 확인: `https://rsc-platform.vercel.app/api/health` 에서 `env.sentryDsn: true`
 
 ## 4-7. 스테이징(테스트 환경) (M13)
