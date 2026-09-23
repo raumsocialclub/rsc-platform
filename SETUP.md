@@ -46,12 +46,12 @@ TOSS_SECRET_KEY=                    # test_sk_... → live_sk_...
 TOSS_WEBHOOK_SECRET=
 SOLAPI_API_KEY= / SOLAPI_API_SECRET= / SOLAPI_SENDER= / KAKAO_PF_ID=
 RESEND_API_KEY=
-NEXT_PUBLIC_SITE_URL=https://raumsocialclub2026.vercel.app
+NEXT_PUBLIC_SITE_URL=https://rsc-platform.vercel.app
 ```
 
 ## 4. Vercel 배포
-- 새 GitHub 저장소(Next.js) 생성 → Vercel에서 Import → 기존 프로젝트의 도메인 `raumsocialclub2026.vercel.app`을 **기존 정적 프로젝트에서 제거 후 새 프로젝트에 추가** (Settings → Domains). 커스텀 도메인 연결 시 DNS CNAME `cname.vercel-dns.com`.
-- Supabase Auth → URL Configuration → Site URL `https://rsc-platform.vercel.app`, Redirect URLs 에 `https://rsc-platform.vercel.app/auth/callback` (도메인 이전 후 `https://raumsocialclub2026.vercel.app/auth/callback` 추가). 소셜 로그인 붙일 때 필요.
+- Vercel 프로젝트 `rsc-platform` → 주소 `https://rsc-platform.vercel.app`. 기존 `raumsocialclub2026.vercel.app` 는 다른 Vercel 팀 소유라 이전하지 않음. 실도메인(`www.raumsocialclub.co.kr`) 연결 시: Settings → Domains → Add → 안내되는 DNS 레코드(CNAME `cname.vercel-dns.com`) 등록 → `NEXT_PUBLIC_SITE_URL`·Supabase Redirect URL·소셜 로그인 Redirect URI·토스 웹훅 URL 을 새 주소로 변경.
+- Supabase Auth → URL Configuration → Site URL `https://rsc-platform.vercel.app`, Redirect URLs 에 `https://rsc-platform.vercel.app/auth/callback` (실도메인 연결 후 그 주소의 `/auth/callback` 추가). 소셜 로그인 붙일 때 필요.
 - 토스 개발자센터 → 웹훅 URL `https://<domain>/api/payments/webhook` 등록 (`TOSS_WEBHOOK_SECRET` 을 넣었다면 `?key=<값>` 붙임). 이벤트: PAYMENT_STATUS_CHANGED.
 - 결제 키: 지금은 토스 문서 공용 테스트 키. 가맹점 키 발급 후 Vercel 환경변수 `NEXT_PUBLIC_TOSS_CLIENT_KEY`(test_gck_/live_gck_)·`TOSS_SECRET_KEY`(test_gsk_/live_gsk_) 값만 바꾸고 재배포.
 

@@ -74,7 +74,7 @@
 - [x] 에러·로딩·빈 상태 화면 전수 점검(Design.md 규칙) — `app/not-found`, `app/error`, `app/global-error`, 회원·어드민 `loading`
 - [x] 접근성(포커스 링, 대비), Lighthouse 모바일 90+ — 로컬 측정 `/` 96/95/100/100, `/pricing` 94/96, `/login` 98/96, `/terms` 97/91 (대비 경고는 Design.md 고정색 overline)
 - [ ] 토스 라이브 키 교체, 웹훅 URL 등록, Supabase Redirect URL 등록 — 사용자 작업 (SETUP.md 4)
-- [ ] Vercel 도메인 `raumsocialclub2026.vercel.app` 새 프로젝트로 이전
+- [x] ~~Vercel 도메인 `raumsocialclub2026.vercel.app` 새 프로젝트로 이전~~ → 이전하지 않음(다른 Vercel 팀 소유). `rsc-platform.vercel.app` 사용, 이후 실도메인 `www.raumsocialclub.co.kr` 연결 예정(사용자 결정 2026-09-23)
 - [ ] `main` 병합 → 배포
 
 ## M9. 어드민 고도화 — 사이트 관리(CMS) · 통계 · 리포트 (사용자 요청)

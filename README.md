@@ -64,7 +64,7 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 라움소셜클럽(RSC)의 실서비스 구축 핸드오프. 브랜드 사이트 + 회원 가입/로그인 + 프로그램 예약·결제 + 관리자(어드민)까지 포함.
 
 **타깃 스택 (확정)**
-- Frontend: **Next.js 14+ (App Router, TypeScript)**, Tailwind 권장 — Vercel 배포 (기존 주소 `raumsocialclub2026.vercel.app` 유지)
+- Frontend: **Next.js 14+ (App Router, TypeScript)**, Tailwind 권장 — Vercel 배포 (`rsc-platform.vercel.app`, 이후 실도메인 연결 예정)
 - DB / Auth / Storage: **Supabase** (Postgres + Auth + Storage + RLS)
 - 결제: **토스페이먼츠** 결제위젯 (카드·카카오페이·네이버페이·토스페이·계좌이체)
 - 알림: 카카오 알림톡(솔라피) 또는 Resend 이메일
