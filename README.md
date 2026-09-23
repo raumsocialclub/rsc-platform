@@ -130,6 +130,10 @@ Layout
 ### D. 혜택 안내 — `design/RSC Benefits.dc.html` (`/benefits`)
 정적 페이지. 혜택 목록(카테고리 행사 우선 참여, 지인 초대권 연 8매, 전용 미팅룸·세미나룸 예약, RSC 라운지 이용, 평일 무료주차, 라움 아트센터 대관 우선, 제휴 시설 할인). CTA 2개 유지.
 
+### D-2. 소식 — `/news`, `/news/[slug]` (M11)
+목록: 카드 그리드(대표 사진 3:2 · 분류 · 날짜 · 제목 · 요약), 12건 페이지 이동. 상세: 760px 본문(간단 마크다운), 대표 사진, 요약, 하단 목록/상담 CTA. NewsArticle·Breadcrumb JSON-LD, OG 이미지는 대표 사진.
+메인 08 FAQ 섹션(`home.faq`)은 `<details>` 아코디언 + FAQPage JSON-LD.
+
 ### E. 회원 영역 — `design/RSC Member.dc.html` (`/join`, `/login`, `/programs`, `/programs/[id]`, `/checkout/[bookingId]`, `/my`)
 프로토타입 상단의 검은 "화면 미리보기" 바는 **개발 시 제거** (프로토타입 전용 스위처).
 
@@ -152,6 +156,8 @@ Layout
 5. **예약·결제** `/admin/orders` — 필터(기간·상태·프로그램), 테이블(주문번호·회원·프로그램·수량·금액·결제수단·상태·결제일), 행 클릭 → 상세(토스 paymentKey, 영수증 URL, 환불 버튼 → 토스 취소 API 호출).
 6. **상담 신청** `/admin/inquiries` — 좌 목록(이름·일시·결과 유형·상태 대기/완료), 우 상세(답변 전체, 메모, 초대코드 발급 버튼 → `invite_codes` 생성 + 알림톡/이메일 발송, 상태 완료 처리).
 7. **쿠폰·초대권** `/admin/coupons` — 초대코드 목록(코드·발급 대상·발급일·사용 여부·만료), 지인 초대권 잔여 현황(회원별 연 8/12매).
+8. **소식 게시판** `/admin/posts` — 목록(대표 사진·제목·분류·발행일·상태), 새 글/편집(제목·요약·본문(간단 마크다운, 본문 사진 삽입)·분류·주소(슬러그 자동)·발행일·대표 사진·발행/임시 저장/삭제). 공개 `/news`, `/news/[slug]`. (M11)
+9. **SEO 설정** `/admin/seo` — 검색 노출 on/off(기본 off), 브랜드명·기본 설명·키워드·대표 이미지(OG), 구글/네이버 소유 확인 코드, AI 크롤러 허용·llms.txt, 조직 정보(JSON-LD), 페이지별 제목·설명·이미지·검색 제외. `robots.txt` `sitemap.xml` `llms.txt` 자동 생성. (M11)
 
 ## Interactions & Behavior
 - 버튼 hover: 주 버튼 bg `#5a3d24 → #9c6b3e`; 보조 버튼 border/text `→ #9c6b3e`. transition 150ms ease.

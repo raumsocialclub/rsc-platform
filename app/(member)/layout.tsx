@@ -1,7 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { getCurrentMember } from "@/lib/auth/session";
+
+/** 회원 전용 화면은 검색에서 제외 (M11) */
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /**
  * 회원 전용 영역(/programs, /my). proxy.ts 가 비로그인은 /login 으로 보내고,

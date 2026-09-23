@@ -3,7 +3,7 @@ import { OrdersView } from "@/components/admin/OrdersView";
 import { getOrder, listOrders } from "@/lib/admin/queries";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "예약 · 결제 · RSC ADMIN" };
+export const metadata: Metadata = { title: "예약 · 결제" };
 
 export default async function AdminOrdersPage({ searchParams }: { searchParams: Promise<{ program?: string; status?: string; id?: string }> }) {
   const { program = "", status = "", id } = await searchParams;

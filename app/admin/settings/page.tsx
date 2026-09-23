@@ -8,7 +8,7 @@ import { SETTINGS_DOCS } from "@/lib/settings/schema";
 import { clientIp } from "@/lib/settings/ip";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "일반 설정 · RSC ADMIN" };
+export const metadata: Metadata = { title: "일반 설정" };
 
 const FIREWALL_GUIDE = [
   ["국가 차단 (Vercel)", "Vercel 대시보드 → 프로젝트 rsc-platform → Firewall → Configure → + New Rule → Condition 을 Country 로, 값에 국가를 고르고 Action = Deny → Save → 우상단 Publish. (이 화면의 '접근 차단 → 차단 국가' 로도 되지만 Vercel 방화벽이 더 앞단에서 막아 비용이 들지 않습니다.)"],

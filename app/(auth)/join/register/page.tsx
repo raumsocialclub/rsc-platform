@@ -6,7 +6,7 @@ import { enabledProviders } from "@/lib/auth/providers";
 import { getCurrentMember } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "회원가입 · RSC" };
+export const metadata: Metadata = { title: "회원가입" };
 
 /** /join/register?code= — 서버에서 코드를 다시 검증한다. 코드 없이/무효 코드로는 진입 불가. */
 export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ code?: string }> }) {

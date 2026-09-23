@@ -63,6 +63,13 @@ NEXT_PUBLIC_SITE_URL=https://rsc-platform.vercel.app
   - 트래픽 폭주 시 상단 **Attack Challenge Mode** 를 잠시 켠다
 - 어드민 `/admin/settings` 에서 되는 것: 점검 모드, 보안 헤더, 관리자 허용 IP, 로그인 잠금, 차단 IP·국가, 캐시, 알림, 환불 정책
 
+## 4-2. 검색엔진 등록 (SEO · GEO, 실도메인 연결 후)
+- 오픈 전에는 어드민 `/admin/seo` 의 **검색 노출 켜기** 가 꺼져 있어 robots.txt 가 검색엔진을 막고 모든 페이지에 noindex 가 붙는다. AI 크롤러(GPTBot·ClaudeBot·PerplexityBot·Google-Extended)는 기본 허용.
+- **구글 서치콘솔**: search.google.com/search-console → 속성 추가 → URL 접두어 `https://도메인` → 확인 방법 **HTML 태그** → `content="…"` 값만 복사 → 어드민 SEO 설정 → 검색엔진 소유 확인 → 구글 칸에 저장 → 서치콘솔 "확인" → 왼쪽 Sitemaps 에 `sitemap.xml` 제출
+- **네이버 서치어드바이저**: searchadvisor.naver.com → 웹마스터 도구 → 사이트 등록 `https://도메인` → **HTML 태그** → `content="…"` 값 복사 → 어드민 네이버 칸에 저장 → 소유확인 → 요청 → 사이트맵 제출 `https://도메인/sitemap.xml`, 검증 → robots.txt 검증
+- **오픈 때**: 어드민 SEO 설정 → 검색 노출 켜기 → 저장. 이후 서치콘솔·서치어드바이저에서 색인 요청.
+- 확인 주소: `/robots.txt` `/sitemap.xml` `/llms.txt`. 공유 미리보기 확인: 카카오톡 채팅창에 주소 붙여넣기(캐시가 남으면 developers.kakao.com/tool/debugger/sharing 에서 초기화)
+
 ## 5. 개발 순서 (권장 마일스톤)
 1. **W1–2** 브랜드 페이지 5종 이식(메인·상담·가격·혜택) + 상담 저장 API + 어드민 상담 목록 → 현 배포본 교체.
 2. **W3–4** Auth(이메일·카카오·구글) + 초대코드 + 프로그램 목록/상세(DB) + 어드민 프로그램 CRUD/이미지 업로드.

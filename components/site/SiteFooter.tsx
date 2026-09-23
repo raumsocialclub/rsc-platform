@@ -40,6 +40,8 @@ export async function SiteFooter() {
               <Link href="/#social">RSC SOCIAL</Link>
               <Link href="/#solo">RAUM SOLO</Link>
               <Link href="/#membership">멤버십</Link>
+              <Link href="/#faq">FAQ</Link>
+              <Link href="/news">소식</Link>
             </nav>
           </div>
         </div>

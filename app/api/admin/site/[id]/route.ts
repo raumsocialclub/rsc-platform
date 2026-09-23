@@ -47,6 +47,7 @@ function pathsFor(id: string): string[] {
   if (page === "benefits") return ["/benefits"];
   if (page === "legal") return [`/${id.split(".")[1]}`];
   if (page === "settings") return ["/", "/pricing", "/benefits", "/programs", "/my", "/login"];
+  if (page === "seo") return ["/", "/pricing", "/benefits", "/fit-check", "/news", "/terms", "/privacy", "/refund", "/robots.txt", "/sitemap.xml", "/llms.txt"];
   return [];
 }
 
@@ -71,9 +72,9 @@ export async function PUT(req: Request, ctx: Ctx) {
     return NextResponse.json({ ok: false, message: "저장하지 못했습니다." }, { status: 500 });
   }
   await supabase.from("site_content_history").insert({ content_id: id, data, saved_by: me.id });
-  await logAdmin(me.id, def.page === "settings" ? "settings.save" : "site.save", id, { label: def.label });
+  await logAdmin(me.id, def.page === "settings" ? "settings.save" : def.page === "seo" ? "seo.save" : "site.save", id, { label: def.label });
   for (const p of pathsFor(id)) revalidatePath(p);
-  if (def.page === "global" || def.page === "settings") revalidatePath("/", "layout");
+  if (def.page === "global" || def.page === "settings" || def.page === "seo") revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }
 
@@ -89,7 +90,7 @@ export async function DELETE(_req: Request, ctx: Ctx) {
   if (error) return NextResponse.json({ ok: false, message: "되돌리지 못했습니다." }, { status: 500 });
   await logAdmin(me.id, "site.reset", id, { label: def.label });
   for (const p of pathsFor(id)) revalidatePath(p);
-  if (def.page === "global") revalidatePath("/", "layout");
+  if (def.page === "global" || def.page === "seo") revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }
 

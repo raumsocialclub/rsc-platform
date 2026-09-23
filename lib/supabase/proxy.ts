@@ -8,7 +8,8 @@ import { clientIp, ipMatches, parseList } from "@/lib/settings/ip";
  * → (3) 보안 헤더·공개 페이지 CDN 캐시 헤더. (proxy.ts 에서 호출)
  */
 const PROTECTED = [/^\/programs(\/|$)/, /^\/my(\/|$)/, /^\/checkout(\/|$)/, /^\/admin(\/|$)/];
-const PUBLIC_CACHEABLE = new Set(["/", "/pricing", "/benefits", "/fit-check", "/terms", "/privacy", "/refund"]);
+const PUBLIC_CACHEABLE = new Set(["/", "/pricing", "/benefits", "/fit-check", "/terms", "/privacy", "/refund", "/news", "/robots.txt", "/sitemap.xml", "/llms.txt"]);
+const isPublicCacheable = (p: string) => PUBLIC_CACHEABLE.has(p) || p.startsWith("/news/");
 const MAINTENANCE_OPEN = [/^\/admin(\/|$)/, /^\/login(\/|$)/, /^\/auth(\/|$)/];
 
 export async function updateSession(request: NextRequest) {
@@ -71,7 +72,7 @@ export async function updateSession(request: NextRequest) {
   }
   const ttl = Number(settings.cacheSeconds) || 0;
   const hasAuthCookie = request.cookies.getAll().some((c) => c.name.startsWith("sb-"));
-  if (ttl > 0 && PUBLIC_CACHEABLE.has(pathname) && !hasSession && !hasAuthCookie && request.method === "GET") {
+  if (ttl > 0 && isPublicCacheable(pathname) && !hasSession && !hasAuthCookie && request.method === "GET") {
     response.headers.set("Cache-Control", `public, s-maxage=${ttl}, stale-while-revalidate=${ttl * 5}`);
     response.headers.set("Vary", "Cookie");
   }

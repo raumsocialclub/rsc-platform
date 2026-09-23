@@ -6,6 +6,7 @@
  * breaks="hard" 필드는 항상 줄바꿈. (프로토타입의 <br class="lb"> / <br> 구분)
  */
 import { SETTINGS_DOCS } from "@/lib/settings/schema";
+import { SEO_DOCS } from "@/lib/seo/schema";
 
 export type FieldType = "text" | "textarea" | "image" | "link" | "number" | "boolean" | "color" | "select";
 export type Field = {
@@ -19,7 +20,7 @@ export type Field = {
 export type ListDef = { key: string; label: string; itemLabel: string; fields: Field[]; min?: number; max?: number };
 export type DocDef = {
   id: string;
-  page: "global" | "home" | "pricing" | "benefits" | "legal" | "settings";
+  page: "global" | "home" | "pricing" | "benefits" | "legal" | "settings" | "seo";
   label: string;
   description?: string;
   fields: Field[];
@@ -237,6 +238,33 @@ export const DOCS: DocDef[] = [
     },
   },
 
+  {
+    id: "home.faq",
+    page: "home",
+    label: "08 자주 묻는 질문 (FAQ)",
+    description: "검색엔진·AI 검색이 '가입 조건·회비·환불' 같은 질문에 답할 때 인용하는 섹션입니다. 질문은 방문자가 실제로 검색할 문장으로 쓰는 것이 좋습니다.",
+    fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard"), ta("lead", "설명", "soft")],
+    lists: [{ key: "items", label: "질문", itemLabel: "질문", fields: [t("q", "질문"), ta("a", "답변", "hard")], min: 1, max: 20 }],
+    defaults: {
+      visible: true,
+      label: "08  /  FAQ",
+      title: "자주 묻는 질문",
+      lead: "가입 조건부터 환불, 오시는 길까지.\n더 궁금한 점은 상담 신청으로 남겨 주세요.",
+      items: [
+        { q: "라움소셜클럽은 어떤 곳인가요? 소개팅·매칭 서비스인가요?", a: "매칭 서비스가 아니라 커뮤니티입니다. 라움이 검증한 싱글 회원들이 라움아트센터의 공간에서 전시·와인·운동·다이닝 같은 프로그램을 함께 경험하며, 여러 프로그램에서 반복해서 만나는 동안 자연스럽게 관계가 깊어지는 구조입니다. 1:1 만남이나 결혼을 목적으로 하는 관계 프로그램(CONNECTION, RAUM MERRY)은 원하는 분만 별도로 선택합니다." },
+        { q: "가입 조건이 어떻게 되나요?", a: "만 19세 이상이고 법률상 배우자가 없는 싱글이면 상담을 신청할 수 있습니다. 상담과 적합성 확인을 거쳐 초대코드를 받은 분만 가입할 수 있으며, 가입 즉시 회원 자격이 활성화됩니다(별도 승인 대기 없음)." },
+        { q: "초대제라는 게 무슨 뜻인가요? 바로 가입할 수는 없나요?", a: "네, 상담 없이 바로 가입할 수는 없습니다. 사이트의 'RSC 상담 신청'에서 간단한 설문을 남기시면 운영팀이 연락드려 상담을 진행하고, 상담 후 초대코드를 보내드립니다. 그 코드로 가입 화면에 들어올 수 있습니다. 회원이 되시면 지인 초대권(ACCESS 연 8매, SIGNATURE 연 12매)으로 지인을 행사에 동반할 수도 있습니다." },
+        { q: "회비는 얼마인가요?", a: "RSC ACCESS 연 3,300,000원(월 환산 275,000원), RSC SIGNATURE 연 8,800,000원(월 환산 733,000원)이며 Founding Member 100명 한정으로 각각 2,400,000원 · 7,200,000원에 가입할 수 있습니다. 가입 전 행사 1회로 먼저 경험하는 RSC PREVIEW는 165,000원입니다. 모든 금액은 VAT 포함 총액이고 자동 갱신은 없으며, 분납은 ACCESS 최대 2회 · SIGNATURE 최대 3회까지 가능합니다." },
+        { q: "PREVIEW는 무엇이고, 가입하면 비용은 어떻게 되나요?", a: "PREVIEW는 가입을 결정하기 전에 RSC의 공간·회원·프로그램을 실제 행사 1회로 먼저 경험하는 상품입니다(생애 최초 1회, 165,000원). RSC Basic Event 1회, 호스트 온보딩과 공간 안내, 행사 후 멤버십 상담, 행사 당일 주차 3시간이 포함됩니다. 행사 후 7일 이내에 ACCESS 또는 SIGNATURE에 가입하시면 165,000원이 전액 차감됩니다." },
+        { q: "어떤 프로그램이 있나요?", a: "일상적으로 참여하는 6개 카테고리 행사 — RAUM ART WALK(전시), SUNDAY RESET(웰니스), TASTE TABLE(와인·위스키), ONE QUESTION SALON(토크), RAUM AFTER HOURS(공연·음악), RUN & BRUNCH(러닝) — 와 매월 열리는 RAUM SOCIAL NIGHT, 6주 동안 한 시즌을 함께 보내는 RAUM SOLO가 있습니다. 여기에 관계 프로그램 CONNECTION(ESSENTIAL · SELECT · BESPOKE)과 결혼 목적의 RAUM MERRY를 선택할 수 있습니다." },
+        { q: "취소·환불은 어떻게 되나요?", a: "프로그램 예약은 프로그램 시작 3일 전까지 내 예약에서 직접 취소하면 전액 환불되며, 이후에는 환불이 어렵습니다(정확한 기준은 예약 화면과 환불규정 페이지에 표시됩니다). 멤버십 환불은 상품별 산정 기준을 따르되, 관계 법령과 소비자분쟁해결기준 중 회원에게 유리한 기준을 우선 적용합니다. 상세 환불·노쇼·홀드 기준은 상담 시 안내드립니다." },
+        { q: "위치는 어디이고 주차는 가능한가요?", a: "서울특별시 강남구 언주로 564 라움아트센터(역삼동 680-1)입니다. 정회원은 평일 1일 1회, 3시간까지 무료로 주차할 수 있고 PREVIEW 참가자는 행사 당일 3시간 주차가 제공됩니다. 행사 전후에는 RSC 라운지를 자유롭게 이용하실 수 있습니다." },
+        { q: "상담은 어떻게 신청하나요?", a: "사이트 상단의 'RSC 상담 신청' 버튼을 눌러 1분 정도의 설문(Fit Check)을 남겨 주세요. 운영팀이 확인 후 전화 또는 이메일로 연락드립니다. 전화 02-538-3366, 이메일 support@theraum.co.kr, 인스타그램 @raum_socialclub 로도 문의하실 수 있습니다." },
+        { q: "멤버십을 잠시 쉬거나 다른 사람에게 넘길 수 있나요?", a: "계약기간 중 1회, 30~90일 범위에서 객관적 사유가 있을 때 홀드(일시 정지)할 수 있습니다. 멤버십의 양도와 재판매는 불가하며, ACCESS에서 SIGNATURE로의 전환은 60일 이내 전액 차감, 이후에는 잔여기간 비례 차감으로 계산됩니다." },
+      ],
+    },
+  },
+
   /* ---------- 가격 ---------- */
   {
     id: "pricing.hero",
@@ -392,7 +420,7 @@ export const DOCS: DocDef[] = [
   })),
 ];
 
-DOCS.push(...SETTINGS_DOCS);
+DOCS.push(...SETTINGS_DOCS, ...SEO_DOCS);
 export const DOC_BY_ID = new Map(DOCS.map((d) => [d.id, d]));
 export const PAGES: { key: DocDef["page"]; label: string; preview: string }[] = [
   { key: "global", label: "브랜드 · 테마", preview: "/" },

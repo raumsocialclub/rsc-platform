@@ -6,7 +6,7 @@ import { mergeDoc } from "@/lib/cms/get";
 import { DOCS, DOC_BY_ID, PAGES } from "@/lib/cms/schema";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "사이트 관리 · RSC ADMIN" };
+export const metadata: Metadata = { title: "사이트 관리" };
 
 /** 사이트 관리: 페이지 탭 → 문서 목록 → 편집기. 문구·사진·색상·연락처를 코드 수정 없이 바꾼다. (M9) */
 export default async function AdminSitePage({ searchParams }: { searchParams: Promise<{ page?: string; doc?: string }> }) {

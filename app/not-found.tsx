@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
-export const metadata: Metadata = { title: "페이지를 찾을 수 없습니다 · RSC" };
+export const metadata: Metadata = { title: "페이지를 찾을 수 없습니다", robots: { index: false, follow: false } };
 
 /** 404. Design.md 빈 상태 규칙: 크림 카드 + 한 줄 설명 + 브라운 버튼 */
 export default function NotFound() {

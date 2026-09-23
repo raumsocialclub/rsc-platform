@@ -4,7 +4,7 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { InviteCodeForm } from "@/components/auth/InviteCodeForm";
 import { getCurrentMember } from "@/lib/auth/session";
 
-export const metadata: Metadata = { title: "초대코드 입력 · RSC" };
+export const metadata: Metadata = { title: "초대코드 입력" };
 
 /**
  * /join — 초대코드 입력. (FLOWS.md 1-3)

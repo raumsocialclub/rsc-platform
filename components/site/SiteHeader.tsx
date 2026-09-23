@@ -37,6 +37,7 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND }: { user?: Head
               <nav className="hidden md:flex items-center gap-[34px] text-[13.5px] font-semibold tracking-[.02em] text-brown">
                 <Link href="/#about">서비스 소개</Link>
                 <Link href="/programs">프로그램</Link>
+                <Link href="/news">소식</Link>
                 <Link href="/my">내 예약</Link>
               </nav>
               <form action="/auth/signout" method="post" className="hidden md:block">
@@ -57,6 +58,7 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND }: { user?: Head
               <nav className="hidden md:flex items-center gap-[34px] text-[13.5px] font-semibold tracking-[.02em] text-brown">
                 <Link href="/#about">서비스 소개</Link>
                 <Link href="/programs">프로그램 예약</Link>
+                <Link href="/news">소식</Link>
               </nav>
               <Link href="/login" className="hidden md:flex items-center text-[13px] font-semibold text-brown whitespace-nowrap">
                 로그인
@@ -105,6 +107,7 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND }: { user?: Head
           </div>
           <nav className="flex flex-col gap-[32px] text-[22px] font-semibold text-ink">
             <Link href="/#about" onClick={close}>서비스 소개</Link>
+            <Link href="/news" onClick={close}>소식</Link>
             {loggedIn ? (
               <>
                 <Link href="/programs" onClick={close}>프로그램</Link>

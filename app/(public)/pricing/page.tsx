@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo/get";
 import Link from "next/link";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -6,7 +7,9 @@ import { UpButton } from "@/components/site/UpButton";
 import { Txt, lines } from "@/components/cms/Txt";
 import { getPageDocs, list, s } from "@/lib/cms/get";
 
-export const metadata: Metadata = { title: "RSC 멤버십 가격 안내" };
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("pricing");
+}
 
 /* deploy/pricing.html 재현. 모든 문구·표는 CMS(site_content pricing.*) */
 

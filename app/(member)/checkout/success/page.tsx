@@ -6,7 +6,7 @@ import { confirmBookingPayment } from "@/lib/bookings/confirm";
 import { listMyBookings } from "@/lib/bookings/queries";
 import { fmtDay, fmtTime, won } from "@/lib/programs/format";
 
-export const metadata: Metadata = { title: "예약 완료 · RSC" };
+export const metadata: Metadata = { title: "예약 완료" };
 
 type SP = { paymentKey?: string; orderId?: string; amount?: string; done?: string };
 

@@ -7,7 +7,7 @@ import { getRefundRules, refundPolicyText } from "@/lib/bookings/refund";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const p = await getProgram(id);
-  return { title: p ? `${p.name} · RSC` : "프로그램 · RSC" };
+  return { title: p ? p.name : "프로그램" };
 }
 
 /** 프로그램 상세. 비공개 프로그램은 RLS 로 회원에게 안 보이므로 404. */

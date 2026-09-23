@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo/get";
 import Link from "next/link";
 import { Logo } from "@/components/site/Logo";
 import { FitCheck } from "@/components/fit-check/FitCheck";
 
-export const metadata: Metadata = { title: "RSC 상담 신청" };
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("fitcheck");
+}
 
 /* deploy/fit-check.html 재현. 저장(POST /api/inquiries)은 M2에서 연결한다. */
 export default function FitCheckPage() {

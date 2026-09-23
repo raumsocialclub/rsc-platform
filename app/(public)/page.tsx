@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -5,6 +6,13 @@ import { UpButton } from "@/components/site/UpButton";
 import { ImageBlock } from "@/components/site/ImageBlock";
 import { Txt } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { pageMetadata } from "@/lib/seo/get";
+import { faqJsonLd } from "@/lib/seo/jsonld";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("home");
+}
 
 /* ---------- 공통 조각 (deploy/index.html 인라인 스타일을 그대로 옮김) ---------- */
 
@@ -35,7 +43,9 @@ function Cta({ href, className, children }: { href: string; className: string; c
 /** 메인 페이지. 모든 문구·사진은 CMS(site_content home.*) — 기본값은 lib/cms/schema.ts */
 export default async function HomePage() {
   const d = await getPageDocs("home");
-  const hero = d["home.hero"], about = d["home.about"], why = d["home.why"], promise = d["home.promise"], social = d["home.social"], solo = d["home.solo"], spaces = d["home.spaces"], mem = d["home.membership"];
+  const hero = d["home.hero"], about = d["home.about"], why = d["home.why"], promise = d["home.promise"], social = d["home.social"], solo = d["home.solo"], spaces = d["home.spaces"], mem = d["home.membership"], faq = d["home.faq"];
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a);
+  const showFaq = on(faq, "visible") && faqItems.length > 0;
   const promiseSize = (i: number) => (i === 1 ? "text-[22px]" : "text-[23px]");
 
   return (
@@ -232,6 +242,33 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
+        </section>
+      )}
+
+      {/* 08 FAQ (M11 — 검색·AI 검색 인용용, FAQPage 구조화 데이터 포함) */}
+      {showFaq && (
+        <section id="faq" className={`${SECTION} bg-sand`}>
+          <div className={INNER}>
+            <SectionLabel><Label v={s(faq, "label")} /></SectionLabel>
+            <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(240px,1fr)_minmax(0,2fr)] md:gap-[80px] items-start">
+              <div>
+                <h2 className={`${H2} md:leading-[1.28] mb-[20px]`}><Txt v={s(faq, "title")} breaks="hard" /></h2>
+                <p className={`${BODY_M} md:text-[15px] md:leading-[1.6] text-[rgba(33,30,25,.62)] max-w-[360px] text-pretty`}><Txt v={s(faq, "lead")} /></p>
+              </div>
+              <div className="border-t border-[rgba(33,30,25,.14)]">
+                {faqItems.map((it, i) => (
+                  <details key={i} className="group border-b border-[rgba(33,30,25,.14)]">
+                    <summary className="flex items-start justify-between gap-[20px] cursor-pointer list-none py-[22px] md:py-[26px] [&::-webkit-details-marker]:hidden">
+                      <span className="text-[16px] md:text-[18px] font-semibold leading-[1.45] text-pretty">{it.q}</span>
+                      <span aria-hidden className="flex-none text-[20px] leading-none text-brownHover mt-[2px] transition-transform group-open:rotate-45">+</span>
+                    </summary>
+                    <div className={`${BODY_M} md:text-[15px] md:leading-[1.8] text-[rgba(33,30,25,.72)] pb-[26px] md:pr-[40px] text-pretty`}><Txt v={it.a} breaks="hard" /></div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </div>
+          <JsonLd data={faqJsonLd(faqItems)} />
         </section>
       )}
 

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo/get";
 import { LegalPage } from "@/components/legal/LegalPage";
 import { getDoc, list, on, s } from "@/lib/cms/get";
 import { fromCms, type CmsSection } from "@/lib/legal/content";
 
-export const metadata: Metadata = { title: "개인정보처리방침 · RSC" };
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("privacy");
+}
 
 /** CMS(site_content legal.privacy). 기본값은 lib/legal/content.ts 자리 문구 */
 export default async function Page() {

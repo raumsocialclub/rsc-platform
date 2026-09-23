@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { describeTossError } from "@/lib/toss/errors";
 
-export const metadata: Metadata = { title: "결제 실패 · RSC" };
+export const metadata: Metadata = { title: "결제 실패" };
 
 /** 토스 failUrl (?code=&message=&orderId=&bookingId=). 예약은 pending 으로 남아 15분 뒤 자동 만료된다. */
 export default async function CheckoutFailPage({ searchParams }: { searchParams: Promise<{ code?: string; message?: string; bookingId?: string }> }) {

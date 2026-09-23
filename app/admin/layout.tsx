@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { getCurrentMember, initialOf } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: { default: "RSC ADMIN", template: "%s · RSC ADMIN" }, robots: { index: false, follow: false } };
 
 /**
  * 어드민 셸. proxy.ts 가 비로그인은 /login 으로 보내고, 여기서 members.role = 'admin' 을 검사한다. (FLOWS.md 6)
@@ -23,7 +26,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/inquiries", label: "상담 신청", badge: pendingInquiries ?? 0 },
     { href: "/admin/coupons", label: "쿠폰 · 초대권" },
     { href: "/admin/stats", label: "통계 · 리포트" },
+    { href: "/admin/posts", label: "소식 게시판" },
     { href: "/admin/site", label: "사이트 관리" },
+    { href: "/admin/seo", label: "SEO 설정" },
     { href: "/admin/settings", label: "일반 설정" },
   ];
 

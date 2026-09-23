@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CouponsView, type InviteRow } from "@/components/admin/views";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "쿠폰 · 초대권 · RSC ADMIN" };
+export const metadata: Metadata = { title: "쿠폰 · 초대권" };
 
 export default async function AdminCouponsPage() {
   const supabase = await createClient();

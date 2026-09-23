@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo/get";
 import Link from "next/link";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -6,7 +7,9 @@ import { UpButton } from "@/components/site/UpButton";
 import { Txt, lines } from "@/components/cms/Txt";
 import { getPageDocs, list, s } from "@/lib/cms/get";
 
-export const metadata: Metadata = { title: "RSC 정회원 혜택 안내" };
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("benefits");
+}
 
 /* deploy/benefits.html 재현. 혜택 목록은 CMS(site_content benefits.rows) */
 

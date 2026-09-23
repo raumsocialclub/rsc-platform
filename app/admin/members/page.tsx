@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { MembersView } from "@/components/admin/MembersView";
 import { filterMembers, listMembers, listOrders } from "@/lib/admin/queries";
 
-export const metadata: Metadata = { title: "회원 DB · RSC ADMIN" };
+export const metadata: Metadata = { title: "회원 DB" };
 
 export default async function AdminMembersPage({ searchParams }: { searchParams: Promise<{ q?: string; status?: string; id?: string }> }) {
   const { q = "", status = "", id } = await searchParams;

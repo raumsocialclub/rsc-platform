@@ -91,5 +91,12 @@
 - [x] `proxy.ts` 가 요청 앞단에서 차단·점검·관리자 IP·보안 헤더·캐시 헤더 적용(설정 30초 캐시), `/api/auth/login` 잠금, 환불 정책·알림 설정 연동
 - [x] Vercel 함수 리전 서울(icn1). 국가 차단·요청 제한·공격 대응은 Vercel Firewall 안내(SETUP.md 4-1, 일반 설정 화면 하단)
 
+## M11. SEO · GEO + 소식 게시판 (사용자 요청)
+- [x] `/admin/seo`: 검색 노출 스위치(기본 꺼짐 → 오픈 때 켬) · 브랜드명 · 기본 설명 · 키워드 · 대표 이미지(OG, 기본 메인 히어로) · 구글/네이버 소유 확인 코드 칸 · AI 크롤러 허용(기본 켜짐) · llms.txt 본문 · 조직 정보(구조화 데이터) · 페이지별 제목/설명/이미지/검색 제외
+- [x] `app/robots.ts` `app/sitemap.ts` `app/llms.txt` 자동 생성, 전 페이지 title/description/OG/canonical/robots 메타(`lib/seo/get.ts`), 어드민·회원·로그인 화면 noindex, Organization·WebSite·FAQPage·NewsArticle·Breadcrumb JSON-LD
+- [x] 메인 08 FAQ 섹션(`home.faq`, 10문항 초안 — 사이트 관리에서 수정) 
+- [x] 소식 게시판: `posts` 테이블(RLS) · `/admin/posts` 목록/새 글/편집(사진 업로드·발행·임시 저장·주소 자동) · 공개 `/news` `/news/[slug]`(마크다운 본문) · GNB·푸터 링크 · 사이트맵·llms.txt 자동 포함
+- [ ] 실도메인 연결 후 구글 서치콘솔·네이버 서치어드바이저 등록 → 소유 확인 코드 입력 → 사이트맵 제출 (SETUP.md 4-2) — 사용자 작업
+
 ## 2차 (별도 지시 후)
 - 멤버십 결제/분납(빌링키), 네이버 로그인, 지인 초대권 사용, 알림톡(솔라피) 전환, 사이트 이미지 CMS, 리마인더 자동 발송

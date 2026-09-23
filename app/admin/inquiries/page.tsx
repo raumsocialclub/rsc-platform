@@ -3,7 +3,7 @@ import { InquiriesView } from "@/components/admin/views";
 import type { InquiryRow } from "@/components/admin/InquiryDetail";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "상담 신청 · RSC ADMIN" };
+export const metadata: Metadata = { title: "상담 신청" };
 
 /** /admin/inquiries?id= — 좌 목록 / 우 상세. RLS "admin inquiries" 정책으로 조회. */
 export default async function AdminInquiriesPage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {

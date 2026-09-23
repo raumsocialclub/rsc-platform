@@ -7,7 +7,7 @@ import { getMyBooking } from "@/lib/bookings/queries";
 import { getRefundRules, refundPolicyText } from "@/lib/bookings/refund";
 import { fmtDay, fmtTime } from "@/lib/programs/format";
 
-export const metadata: Metadata = { title: "결제 · RSC" };
+export const metadata: Metadata = { title: "결제" };
 
 /** 결제 페이지 (FLOWS.md 2-2). pending 예약만 결제할 수 있고, 확정된 예약은 완료 화면으로 보낸다. */
 export default async function CheckoutPage({ params }: { params: Promise<{ bookingId: string }> }) {

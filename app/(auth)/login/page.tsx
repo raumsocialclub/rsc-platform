@@ -5,7 +5,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { enabledProviders } from "@/lib/auth/providers";
 import { getCurrentMember } from "@/lib/auth/session";
 
-export const metadata: Metadata = { title: "로그인 · RSC" };
+export const metadata: Metadata = { title: "로그인" };
 
 const LOGIN_ERRORS: Record<string, string> = {
   oauth: "소셜 로그인에 실패했습니다. 다시 시도해 주세요.",

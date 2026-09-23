@@ -473,3 +473,25 @@ create table login_attempts (
 );
 alter table login_attempts enable row level security;
 -- 일반 설정 값은 site_content 의 'settings.*' 문서에 저장 (lib/settings/schema.ts)
+
+-- ---------- M11: SEO · GEO + 소식 게시판
+-- SEO 설정 값은 site_content 의 'seo.*' 문서에 저장 (lib/seo/schema.ts). FAQ 는 'home.faq'
+create table posts (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,                  -- /news/<slug>
+  title text not null,
+  category text not null default '소식',      -- 소식 | 프로그램 | 행사 후기 | 공지
+  summary text,
+  body text not null default '',              -- 간단 마크다운 (components/Markdown.tsx)
+  cover_image text,
+  published boolean not null default false,
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  created_by uuid references members(id)
+);
+create index posts_published_idx on posts(published, published_at desc);
+create trigger posts_updated_at before update on posts for each row execute function set_updated_at();
+alter table posts enable row level security;
+create policy "posts public read" on posts for select using (published = true or is_admin());
+create policy "posts admin write" on posts for all using (is_admin()) with check (is_admin());
