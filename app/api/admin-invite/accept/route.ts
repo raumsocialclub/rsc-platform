@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
  * POST /api/admin-invite/accept { token, name, password } — 초대 링크로 관리자 계정 만들기 (로그인 불필요, M12).
  * - 토큰은 해시로 조회. 만료·사용·취소된 초대는 거부 (48시간 · 1회용)
  * - 같은 이메일의 회원이 이미 있으면 계정을 새로 만들지 않고 역할만 부관리자로 올린다 (기존 비밀번호로 로그인)
- * - 없으면 service role 로 계정을 만든다. app_metadata.admin_invite 를 보고 DB 트리거가 초대코드 없이 members 행(role=admin)을 만들고 초대를 사용 처리한다
+ * - 없으면 service role 로 계정을 만든다. user_metadata.admin_invite(+app_metadata) 를 보고 DB 트리거가 초대코드 없이 members 행(role=admin)을 만들고 초대를 사용 처리한다
  * - 성공하면 바로 로그인 세션을 심는다
  */
 const Body = z.object({
@@ -54,7 +54,9 @@ export async function POST(req: Request) {
     email,
     password,
     email_confirm: true,
-    user_metadata: { name },
+    // 초대 id 는 user_metadata 로 넘긴다: GoTrue 가 app_metadata 를 INSERT 뒤에 붙이는 경우가 있어 트리거가 못 읽는다.
+    // 트리거는 초대 이메일 == 계정 이메일 까지 확인하므로 남이 이 값을 흉내 내도 자기 이메일로는 관리자가 될 수 없다.
+    user_metadata: { name, admin_invite: inv.id },
     app_metadata: { admin_invite: inv.id },
   });
   if (created.error || !created.data.user) {

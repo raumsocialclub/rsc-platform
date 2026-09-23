@@ -238,11 +238,13 @@ create or replace function handle_new_user() returns trigger language plpgsql se
 declare v_code text; v invite_codes; v_provider text; v_inv admin_invites; v_inv_id uuid;
 begin
   v_provider := coalesce(new.raw_app_meta_data->>'provider', 'email');
-  -- M12: app_metadata.admin_invite(초대 id) 가 있으면 초대코드 없이 관리자 계정 (서버 service role 의 createUser 만 붙일 수 있다)
-  v_inv_id := nullif(new.raw_app_meta_data->>'admin_invite', '')::uuid;
+  -- M12: admin_invite(초대 id, user_metadata 또는 app_metadata) 가 있고 초대 이메일이 계정 이메일과 같으면 초대코드 없이 관리자 계정.
+  -- (GoTrue admin createUser 는 app_metadata 를 INSERT 뒤에 붙일 수 있어 user_metadata 로도 받는다)
+  v_inv_id := nullif(coalesce(new.raw_app_meta_data->>'admin_invite', new.raw_user_meta_data->>'admin_invite', ''), '')::uuid;
   if v_inv_id is not null then
     select * into v_inv from admin_invites where id = v_inv_id for update;
-    if v_inv.id is null or v_inv.used_at is not null or v_inv.revoked_at is not null or v_inv.expires_at < now() then
+    if v_inv.id is null or v_inv.used_at is not null or v_inv.revoked_at is not null or v_inv.expires_at < now()
+       or lower(v_inv.email) <> lower(coalesce(new.email, '')) then
       raise exception 'ADMIN_INVITE_INVALID';
     end if;
     insert into members(id, name, email, role, provider)
