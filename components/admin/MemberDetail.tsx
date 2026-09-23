@@ -38,7 +38,7 @@ export function MemberDetail({ member, orders }: { member: MemberRow; orders: Or
       <div className="flex items-center gap-[12px] mb-[18px]">
         <div className="w-[40px] h-[40px] rounded-full bg-[#e7e0d3] flex items-center justify-center text-[14px] font-semibold flex-none">{member.name?.[0] ?? "?"}</div>
         <div className="min-w-0">
-          <b className="text-[16px] block">{member.name || "이름 없음"}{member.role === "admin" && <span className="ml-[6px] text-[11px] text-brown tracking-[.1em]">ADMIN</span>}</b>
+          <b className="text-[16px] block">{member.name || "이름 없음"}{member.role !== "member" && <span className="ml-[6px] text-[11px] text-brown tracking-[.1em]">{member.role === "owner" ? "OWNER" : "ADMIN"}</span>}</b>
           <span className="text-[12px] text-[rgba(33,30,25,.55)] break-all">{member.email}</span>
         </div>
         <Badge style={memberBadge(member.status)}>{MEMBER_STATUS_KO[member.status]}</Badge>

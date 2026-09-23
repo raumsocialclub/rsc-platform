@@ -99,7 +99,7 @@ function FieldInput({ f, value, onChange }: { f: Field; value: unknown; onChange
 /**
  * 사이트 콘텐츠 편집기 (schema 기반). 저장하면 즉시 게시되고 이력에 남는다. 기본값 복원·이력 복원 지원.
  */
-export function SiteEditor({ def, initial, previewHref, updatedAt }: { def: DocDef; initial: Data; previewHref: string; updatedAt: string | null }) {
+export function SiteEditor({ def, initial, previewHref, updatedAt, readOnly = false }: { def: DocDef; initial: Data; previewHref: string; updatedAt: string | null; readOnly?: boolean }) {
   const router = useRouter();
   const [data, setData] = useState<Data>(initial);
   const [busy, setBusy] = useState<"save" | "reset" | "history" | null>(null);
@@ -151,7 +151,8 @@ export function SiteEditor({ def, initial, previewHref, updatedAt }: { def: DocD
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); void save(); }} className="grid gap-[20px]">
+    <form onSubmit={(e) => { e.preventDefault(); if (!readOnly) void save(); }} className="grid gap-[20px]">
+      <fieldset disabled={readOnly} className="contents min-w-0 border-0 p-0 m-0">
       <div className="flex items-end justify-between gap-[12px] flex-wrap">
         <div>
           <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[6px]">{def.id}</div>
@@ -162,8 +163,8 @@ export function SiteEditor({ def, initial, previewHref, updatedAt }: { def: DocD
         <div className="flex gap-[8px] items-center flex-wrap">
           <a href={previewHref} target="_blank" rel="noreferrer" className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[12.5px]`}>사이트에서 보기 ↗</a>
           <button type="button" onClick={loadHistory} disabled={!!busy} className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[12.5px]`}>이력</button>
-          {updatedAt && <button type="button" onClick={reset} disabled={!!busy} className="bg-transparent border-0 text-[12.5px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error px-[6px]">기본값으로</button>}
-          <button type="submit" disabled={!!busy || !dirty} className={BTN_PRIMARY}>{busy === "save" ? "저장 중…" : "저장 · 게시"}</button>
+          {updatedAt && !readOnly && <button type="button" onClick={reset} disabled={!!busy} className="bg-transparent border-0 text-[12.5px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error px-[6px]">기본값으로</button>}
+          {readOnly ? <span className="text-[12px] text-[rgba(33,30,25,.5)] px-[6px]">읽기 전용 · 주관리자만 저장</span> : <button type="submit" disabled={!!busy || !dirty} className={BTN_PRIMARY}>{busy === "save" ? "저장 중…" : "저장 · 게시"}</button>}
         </div>
       </div>
       {msg && <div className="text-[13px] text-brown">{msg}</div>}
@@ -222,8 +223,9 @@ export function SiteEditor({ def, initial, previewHref, updatedAt }: { def: DocD
         );
       })}
       <div className="flex justify-end">
-        <button type="submit" disabled={!!busy || !dirty} className={BTN_PRIMARY}>{busy === "save" ? "저장 중…" : "저장 · 게시"}</button>
+        {!readOnly && <button type="submit" disabled={!!busy || !dirty} className={BTN_PRIMARY}>{busy === "save" ? "저장 중…" : "저장 · 게시"}</button>}
       </div>
+      </fieldset>
     </form>
   );
 }

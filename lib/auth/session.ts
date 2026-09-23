@@ -4,7 +4,7 @@ export type CurrentMember = {
   id: string;
   email: string | null;
   name: string;
-  role: "member" | "admin";
+  role: "member" | "admin" | "owner";
   status: "active" | "paused" | "withdrawn";
   /** 초대코드가 연결되지 않은 소셜 가입자는 null → /join 에서 코드 입력 필요 */
   inviteCodeId: string | null;
@@ -33,6 +33,16 @@ export async function getCurrentMember(): Promise<CurrentMember | null> {
     inviteCodeId: m?.invite_code_id ?? null,
   };
 }
+
+/** 부관리자 이상 (활동 상태만) */
+export function isAdminRole(m: Pick<CurrentMember, "role" | "status"> | null | undefined): boolean {
+  return !!m && (m.role === "admin" || m.role === "owner") && m.status === "active";
+}
+/** 주관리자 */
+export function isOwnerRole(m: Pick<CurrentMember, "role" | "status"> | null | undefined): boolean {
+  return !!m && m.role === "owner" && m.status === "active";
+}
+export const ROLE_KO: Record<CurrentMember["role"], string> = { owner: "주관리자", admin: "부관리자", member: "회원" };
 
 /** GNB 아바타용 이니셜 (이름 첫 글자, 없으면 이메일 첫 글자, 없으면 R) */
 export function initialOf(m: { name: string; email: string | null }) {

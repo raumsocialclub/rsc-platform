@@ -6,6 +6,7 @@ import { mergeDoc } from "@/lib/cms/get";
 import { absUrl, getSeo, siteUrl } from "@/lib/seo/get";
 import { SEO_DOCS, PUBLIC_PAGES } from "@/lib/seo/schema";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentMember, isOwnerRole } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "SEO 설정" };
 
@@ -19,6 +20,7 @@ const CONSOLE_GUIDE = [
 /** SEO · GEO 설정 (M11): 상태 패널 + seo.* 문서 편집기 + 검색엔진 등록 안내 */
 export default async function AdminSeoPage() {
   const supabase = await createClient();
+  const readOnly = !isOwnerRole(await getCurrentMember());
   const [{ data: rows }, seo, { count: postCount }] = await Promise.all([
     supabase.from("site_content").select("id, data, updated_at").eq("page", "seo"),
     getSeo(),
@@ -46,6 +48,7 @@ export default async function AdminSeoPage() {
   return (
     <>
       <PageTitle overline="SEO · GEO" title="SEO 설정" />
+      {readOnly && <div className="mb-[20px] px-[16px] py-[12px] bg-[rgba(226,180,120,.25)] text-[13px] text-[#7a5420]">부관리자는 SEO 설정을 볼 수만 있습니다. 변경은 주관리자에게 요청해 주세요.</div>}
       <div className={`${CARD} p-[22px] mb-[20px]`}>
         <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[12px]">현재 상태</div>
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_260px] gap-[24px]">
@@ -74,7 +77,7 @@ export default async function AdminSeoPage() {
           const row = byId.get(def.id);
           return (
             <div key={def.id} id={def.id} className="border-t border-[rgba(33,30,25,.12)] pt-[20px]">
-              <SiteEditor key={`${def.id}-${row?.updated_at ?? "default"}`} def={def} initial={mergeDoc(def, (row?.data ?? null) as Record<string, unknown> | null)} previewHref="/" updatedAt={(row?.updated_at as string | undefined) ?? null} />
+              <SiteEditor key={`${def.id}-${row?.updated_at ?? "default"}`} def={def} initial={mergeDoc(def, (row?.data ?? null) as Record<string, unknown> | null)} previewHref="/" updatedAt={(row?.updated_at as string | undefined) ?? null} readOnly={readOnly} />
             </div>
           );
         })}
@@ -85,7 +88,7 @@ export default async function AdminSeoPage() {
             {pages.map((def) => {
               const row = byId.get(def.id);
               const p = PUBLIC_PAGES.find((x) => def.id === `seo.${x.key}`)!;
-              return <SiteEditor key={`${def.id}-${row?.updated_at ?? "default"}`} def={def} initial={mergeDoc(def, (row?.data ?? null) as Record<string, unknown> | null)} previewHref={p.path} updatedAt={(row?.updated_at as string | undefined) ?? null} />;
+              return <SiteEditor key={`${def.id}-${row?.updated_at ?? "default"}`} def={def} initial={mergeDoc(def, (row?.data ?? null) as Record<string, unknown> | null)} previewHref={p.path} updatedAt={(row?.updated_at as string | undefined) ?? null} readOnly={readOnly} />;
             })}
           </div>
         </div>

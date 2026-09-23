@@ -98,5 +98,12 @@
 - [x] 소식 게시판: `posts` 테이블(RLS) · `/admin/posts` 목록/새 글/편집(사진 업로드·발행·임시 저장·주소 자동) · 공개 `/news` `/news/[slug]`(마크다운 본문) · GNB·푸터 링크 · 사이트맵·llms.txt 자동 포함
 - [ ] 실도메인 연결 후 구글 서치콘솔·네이버 서치어드바이저 등록 → 소유 확인 코드 입력 → 사이트맵 제출 (SETUP.md 4-2) — 사용자 작업
 
+## M12. 관리자 권한 3단계 + 부관리자 초대 (사용자 요청)
+- [x] 역할 owner(주관리자: nse101@kakao.com) > admin(부관리자) > member. `is_admin()` 은 활동 상태의 admin·owner, `is_owner()` 추가. 정지(paused) 즉시 어드민 차단
+- [x] `/admin/admins`(주관리자 전용): 부관리자 초대(이름·이메일 → 48시간·1회용 링크, 화면 표시+복사, 이메일 키 있으면 발송), 관리자 목록(역할·상태·마지막 로그인), 정지/해제, 권한 해제, 초대 이력·취소, 권한표
+- [x] `/admin-invite/[token]`: 이름·비밀번호 → 계정 생성(트리거가 `app_metadata.admin_invite` 로 초대코드 없이 role=admin 생성) → 바로 로그인. 이미 가입된 이메일이면 권한만 부여
+- [x] 부관리자 제한: 일반 설정·SEO 설정은 읽기 전용(저장 API 403), 회원 목록 CSV(통계 리포트·회원 DB 버튼) 주관리자만, 관리자 관리 메뉴 숨김. 환불은 가능하되 사유 필수 + 활동 로그(처리자·금액·사유)
+- [x] `members.last_login_at`(이메일·소셜 로그인 시 기록), 관리자 로그인 후 기본 목적지 `/admin`, `admin_logs` 에 admin.invite / admin.invite.revoke / admin.role / admin.status / admin.accept
+
 ## 2차 (별도 지시 후)
 - 멤버십 결제/분납(빌링키), 네이버 로그인, 지인 초대권 사용, 알림톡(솔라피) 전환, 사이트 이미지 CMS, 리마인더 자동 발송

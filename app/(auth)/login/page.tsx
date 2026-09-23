@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { enabledProviders } from "@/lib/auth/providers";
-import { getCurrentMember } from "@/lib/auth/session";
+import { getCurrentMember, isAdminRole } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "로그인" };
 
@@ -19,7 +19,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next, error } = await searchParams;
   const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/programs";
   const me = await getCurrentMember();
-  if (me) redirect(me.inviteCodeId ? safeNext : "/join");
+  if (me) redirect(isAdminRole(me) ? (next ? safeNext : "/admin") : me.inviteCodeId ? safeNext : "/join");
 
   return (
     <AuthShell>

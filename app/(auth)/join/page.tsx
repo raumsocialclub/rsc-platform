@@ -15,6 +15,7 @@ export default async function JoinPage({ searchParams }: { searchParams: Promise
   const { error } = await searchParams;
   const me = await getCurrentMember();
   if (me?.inviteCodeId) redirect("/programs");
+  if (me && (me.role === "admin" || me.role === "owner")) redirect("/admin");
 
   return (
     <AuthShell>

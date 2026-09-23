@@ -86,6 +86,11 @@ export async function GET(request: Request) {
     console.error("[auth/naver] verifyOtp", otpErr);
     return fail("naver");
   }
+  {
+    // 마지막 로그인 시각 (M12)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await admin.from("members").update({ last_login_at: new Date().toISOString() }).eq("id", user.id);
+  }
 
   // 6) 초대코드 쿠키 → 사용 처리 (가입 화면에서 온 경우)
   const invite = cookieStore.get(INVITE_COOKIE)?.value;

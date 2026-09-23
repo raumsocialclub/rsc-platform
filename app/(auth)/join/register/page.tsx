@@ -16,6 +16,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
 
   const me = await getCurrentMember();
   if (me?.inviteCodeId) redirect("/programs");
+  if (me && (me.role === "admin" || me.role === "owner")) redirect("/admin");
   if (me) redirect("/join"); // 소셜 가입자는 코드 연결 화면으로
 
   const supabase = await createClient();

@@ -7,6 +7,7 @@ import { mergeDoc } from "@/lib/cms/get";
 import { SETTINGS_DOCS } from "@/lib/settings/schema";
 import { clientIp } from "@/lib/settings/ip";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentMember, isOwnerRole } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "일반 설정" };
 
@@ -20,6 +21,7 @@ const FIREWALL_GUIDE = [
 /** 일반 설정 (M10): 사이트 상태 · 보안 · 접근 차단 · 캐시 · 알림 · 결제/환불. 값은 site_content(settings.*) */
 export default async function AdminSettingsPage() {
   const supabase = await createClient();
+  const readOnly = !isOwnerRole(await getCurrentMember());
   const [{ data: rows }, h] = await Promise.all([supabase.from("site_content").select("id, data, updated_at").eq("page", "settings"), headers()]);
   const byId = new Map((rows ?? []).map((r) => [r.id as string, r]));
   const myIp = clientIp(h) || "(알 수 없음)";
@@ -35,6 +37,7 @@ export default async function AdminSettingsPage() {
   return (
     <>
       <PageTitle overline="SETTINGS" title="일반 설정" />
+      {readOnly && <div className="mb-[20px] px-[16px] py-[12px] bg-[rgba(226,180,120,.25)] text-[13px] text-[#7a5420]">부관리자는 일반 설정을 볼 수만 있습니다. 변경은 주관리자에게 요청해 주세요.</div>}
       <div className={`${CARD} p-[22px] mb-[20px]`}>
         <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[12px]">현재 상태</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[24px] gap-y-[8px] text-[13.5px]">
@@ -48,7 +51,7 @@ export default async function AdminSettingsPage() {
           const row = byId.get(def.id);
           return (
             <div key={def.id} id={def.id} className="border-t border-[rgba(33,30,25,.12)] pt-[20px]">
-              <SiteEditor key={`${def.id}-${row?.updated_at ?? "default"}`} def={def} initial={mergeDoc(def, (row?.data ?? null) as Record<string, unknown> | null)} previewHref="/" updatedAt={(row?.updated_at as string | undefined) ?? null} />
+              <SiteEditor key={`${def.id}-${row?.updated_at ?? "default"}`} def={def} initial={mergeDoc(def, (row?.data ?? null) as Record<string, unknown> | null)} previewHref="/" updatedAt={(row?.updated_at as string | undefined) ?? null} readOnly={readOnly} />
             </div>
           );
         })}

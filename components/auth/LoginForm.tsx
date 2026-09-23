@@ -26,12 +26,13 @@ export function LoginForm({ enabled, next, initialError = null }: Props) {
     try {
       // 서버 라우트를 거쳐 로그인(연속 실패 잠금 적용). 세션 쿠키는 서버가 심는다.
       const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim().toLowerCase(), password: pw }) });
-      const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+      const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string; role?: string } | null;
       if (!j?.ok) {
         setError(j?.message ?? "로그인하지 못했습니다. 잠시 후 다시 시도해 주세요.");
         return;
       }
-      router.push(next);
+      // 관리자는 기본 목적지가 어드민 (M12)
+      router.push((j.role === "admin" || j.role === "owner") && next === "/programs" ? "/admin" : next);
       router.refresh();
     } catch (e) {
       setError(describeAuthError(e instanceof Error ? e.message : String(e), "login"));

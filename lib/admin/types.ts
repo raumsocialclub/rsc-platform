@@ -36,7 +36,7 @@ export type MemberRow = {
   name: string;
   email: string | null;
   phone: string | null;
-  role: "member" | "admin";
+  role: "member" | "admin" | "owner";
   status: MemberStatus;
   provider: string;
   memo: string | null;

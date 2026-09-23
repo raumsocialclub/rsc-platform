@@ -70,6 +70,12 @@ NEXT_PUBLIC_SITE_URL=https://rsc-platform.vercel.app
 - **오픈 때**: 어드민 SEO 설정 → 검색 노출 켜기 → 저장. 이후 서치콘솔·서치어드바이저에서 색인 요청.
 - 확인 주소: `/robots.txt` `/sitemap.xml` `/llms.txt`. 공유 미리보기 확인: 카카오톡 채팅창에 주소 붙여넣기(캐시가 남으면 developers.kakao.com/tool/debugger/sharing 에서 초기화)
 
+## 4-3. 관리자 계정 (M12)
+- 주관리자(owner)는 DB 에서 한 번만 지정: Supabase SQL Editor → `update members set role = 'owner' where lower(email) = '<이메일>';` (현재 nse101@kakao.com)
+- 부관리자는 어드민 → **관리자 관리** 에서 초대한다(링크 48시간·1회용). `RESEND_API_KEY` 가 있으면 메일로 나가고, 없으면 화면의 링크를 복사해 전달한다.
+- 초대 수락(`/admin-invite/<token>`)은 서버의 `SUPABASE_SERVICE_ROLE_KEY` 가 있어야 동작한다(Vercel 에 등록됨). 로컬 `.env.local` 에 키가 없으면 로컬에서는 수락 화면이 "처리할 수 없습니다" 로 나온다.
+- 관리자 권한 잠김 복구: 주관리자가 정지되었거나 허용 IP 에 막힌 경우 Supabase SQL Editor 에서 `update members set status='active' where role='owner';`, 허용 IP 는 `delete from site_content where id='settings.security';`
+
 ## 5. 개발 순서 (권장 마일스톤)
 1. **W1–2** 브랜드 페이지 5종 이식(메인·상담·가격·혜택) + 상담 저장 API + 어드민 상담 목록 → 현 배포본 교체.
 2. **W3–4** Auth(이메일·카카오·구글) + 초대코드 + 프로그램 목록/상세(DB) + 어드민 프로그램 CRUD/이미지 업로드.

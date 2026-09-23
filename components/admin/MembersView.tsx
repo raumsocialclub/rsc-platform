@@ -5,10 +5,10 @@ import { CARD, TH, TD, Badge, EmptyRow, PageTitle } from "./ui";
 import { fmtDate, memberBadge, won } from "@/lib/admin/format";
 import { MEMBER_STATUS_KO, PROVIDER_KO, type MemberRow, type OrderRow } from "@/lib/admin/types";
 
-type Props = { rows: MemberRow[]; total: number; selected: MemberRow | null; selectedOrders: OrderRow[]; filter: { q: string; status: string } };
+type Props = { rows: MemberRow[]; total: number; selected: MemberRow | null; selectedOrders: OrderRow[]; filter: { q: string; status: string }; canExport?: boolean };
 
 /** design/RSC Admin.dc.html MEMBERS 뷰 + 상세 드로어 */
-export function MembersView({ rows, total, selected, selectedOrders, filter }: Props) {
+export function MembersView({ rows, total, selected, selectedOrders, filter, canExport = false }: Props) {
   const href = (id: string) => {
     const p = new URLSearchParams();
     if (filter.q) p.set("q", filter.q);
@@ -19,7 +19,10 @@ export function MembersView({ rows, total, selected, selectedOrders, filter }: P
   return (
     <>
       <PageTitle overline="MEMBERS" title="회원 관리" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">{total}명</span>}>
-        <MembersFilter filter={filter} />
+        <div className="flex items-center gap-[10px] flex-wrap">
+          <MembersFilter filter={filter} />
+          {canExport && <a href="/api/admin/stats/export?type=members&preset=all" className="border border-brown text-brown px-[14px] py-[9px] text-[12.5px] font-semibold whitespace-nowrap hover:text-brownHover hover:border-brownHover">회원 CSV ↓</a>}
+        </div>
       </PageTitle>
       <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-[20px] items-start">
         <div className={CARD}>
@@ -35,7 +38,7 @@ export function MembersView({ rows, total, selected, selectedOrders, filter }: P
                       <td className={TD}>
                         <Link href={href(m.id)} className="flex items-center gap-[10px]">
                           <div className="w-[30px] h-[30px] rounded-full bg-[#e7e0d3] flex items-center justify-center text-[12px] font-semibold flex-none">{m.name?.[0] ?? "?"}</div>
-                          <div><b>{m.name || "이름 없음"}</b>{m.role === "admin" && <span className="ml-[6px] text-[10px] text-brown tracking-[.1em]">ADMIN</span>}<div className="text-[11.5px] text-[rgba(33,30,25,.5)]">{m.email}</div></div>
+                          <div><b>{m.name || "이름 없음"}</b>{m.role !== "member" && <span className="ml-[6px] text-[10px] text-brown tracking-[.1em]">{m.role === "owner" ? "OWNER" : "ADMIN"}</span>}<div className="text-[11.5px] text-[rgba(33,30,25,.5)]">{m.email}</div></div>
                         </Link>
                       </td>
                       <td className={TD}>{m.phone ?? "—"}</td>

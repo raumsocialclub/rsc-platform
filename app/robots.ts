@@ -3,7 +3,7 @@ import { getSeo, siteUrl } from "@/lib/seo/get";
 import { AI_BOTS } from "@/lib/seo/schema";
 
 /** 회원·관리자·결제·API 영역은 항상 크롤링 제외 */
-const PRIVATE = ["/admin", "/my", "/checkout", "/api", "/auth", "/login", "/join", "/programs"];
+const PRIVATE = ["/admin", "/admin-invite", "/my", "/checkout", "/api", "/auth", "/login", "/join", "/programs"];
 
 /**
  * robots.txt — 어드민 "SEO 설정" 값으로 매번 생성한다(DB 를 읽으므로 동적).

@@ -10,7 +10,7 @@ import { clientIp, ipMatches, parseList } from "@/lib/settings/ip";
 const PROTECTED = [/^\/programs(\/|$)/, /^\/my(\/|$)/, /^\/checkout(\/|$)/, /^\/admin(\/|$)/];
 const PUBLIC_CACHEABLE = new Set(["/", "/pricing", "/benefits", "/fit-check", "/terms", "/privacy", "/refund", "/news", "/robots.txt", "/sitemap.xml", "/llms.txt"]);
 const isPublicCacheable = (p: string) => PUBLIC_CACHEABLE.has(p) || p.startsWith("/news/");
-const MAINTENANCE_OPEN = [/^\/admin(\/|$)/, /^\/login(\/|$)/, /^\/auth(\/|$)/];
+const MAINTENANCE_OPEN = [/^\/admin(\/|$)/, /^\/admin-invite(\/|$)/, /^\/login(\/|$)/, /^\/auth(\/|$)/];
 
 export async function updateSession(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

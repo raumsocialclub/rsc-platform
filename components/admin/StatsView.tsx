@@ -8,7 +8,7 @@ import { MEMBER_STATUS_KO, PROVIDER_KO } from "@/lib/admin/types";
 
 const PRESETS = [{ k: "7d", l: "7일" }, { k: "30d", l: "30일" }, { k: "90d", l: "90일" }, { k: "month", l: "이번 달" }, { k: "last", l: "지난 달" }, { k: "year", l: "올해" }];
 const INQ: Record<string, string> = { pending: "대기", contacted: "상담 진행", invited: "초대 완료", closed: "보류" };
-const ACTION: Record<string, string> = { "site.save": "사이트 저장", "site.reset": "사이트 기본값", "order.refund": "환불/취소", "member.update": "회원 수정", "program.create": "프로그램 등록", "program.update": "프로그램 수정", "program.publish": "프로그램 공개 변경", "program.delete": "프로그램 삭제", "invite.issue": "초대코드 발급" };
+const ACTION: Record<string, string> = { "site.save": "사이트 저장", "site.reset": "사이트 기본값", "order.refund": "환불/취소", "member.update": "회원 수정", "program.create": "프로그램 등록", "program.update": "프로그램 수정", "program.publish": "프로그램 공개 변경", "program.delete": "프로그램 삭제", "invite.issue": "초대코드 발급", "settings.save": "일반 설정 저장", "seo.save": "SEO 설정 저장", "cache.purge": "캐시 비우기", "post.create": "소식 등록", "post.update": "소식 수정", "post.publish": "소식 발행 변경", "post.delete": "소식 삭제", "admin.invite": "관리자 초대", "admin.invite.revoke": "관리자 초대 취소", "admin.role": "관리자 권한 변경", "admin.status": "관리자 정지/해제" };
 
 function Csv({ type, range }: { type: string; range: Stats["range"] }) {
   return <a href={`/api/admin/stats/export?type=${type}&from=${range.from}&to=${range.to}`} className="text-[12px] text-brown font-semibold whitespace-nowrap">CSV ↓</a>;
@@ -48,7 +48,7 @@ function Table({ head, rows, empty }: { head: string[]; rows: React.ReactNode[][
 const shortDay = (d: string) => d.slice(5).replace("-", ".");
 
 /** 통계 · 리포트 (M9): 매출 · 예약 · 회원 · 접속 · 전환 · 관리자 활동, 항목별 CSV */
-export function StatsView({ s, preset }: { s: Stats; preset: string }) {
+export function StatsView({ s, preset, owner = true }: { s: Stats; preset: string; owner?: boolean }) {
   const r = s.range;
   const tr = s.traffic;
   const kpi = [
@@ -96,8 +96,8 @@ export function StatsView({ s, preset }: { s: Stats; preset: string }) {
       </div>
 
       <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-[16px] mb-[16px]">
-        <Card title="일별 신규 회원" csv="members" range={r}><Bars data={s.members.daily.map((d) => ({ label: shortDay(d.day), value: d.count }))} color="#9c6b3e" fmt={(v) => `${v}명`} /></Card>
-        <Card title="회원 현황" csv="members" range={r}>
+        <Card title="일별 신규 회원" csv={owner ? "members" : undefined} range={r}><Bars data={s.members.daily.map((d) => ({ label: shortDay(d.day), value: d.count }))} color="#9c6b3e" fmt={(v) => `${v}명`} /></Card>
+        <Card title="회원 현황" csv={owner ? "members" : undefined} range={r}>
           <Table head={["구분", "수"]} rows={[["전체", s.members.totals.total], ...(["active", "paused", "withdrawn"] as const).map((k) => [MEMBER_STATUS_KO[k], s.members.totals[k]]), ...s.members.byProvider.map((p) => [`기간 내 가입 · ${PROVIDER_KO[p.provider] ?? p.provider}`, p.count])]} empty="없음" />
         </Card>
       </div>
@@ -123,7 +123,7 @@ export function StatsView({ s, preset }: { s: Stats; preset: string }) {
       )}
 
       <Card title="관리자 활동 로그 (최근 50)" csv="logs" range={r}>
-        <Table head={["일시", "관리자", "작업", "대상"]} rows={s.logs.map((l) => [fmtFull(l.ts), l.admin, ACTION[l.action] ?? l.action, <span key="t" className="text-[12px] text-[rgba(33,30,25,.6)]">{l.target ?? ""}{l.detail && "label" in l.detail ? ` · ${String(l.detail.label)}` : ""}{l.detail && "refunded" in l.detail ? ` · ${won(Number(l.detail.refunded))}` : ""}</span>])} empty="아직 활동 기록이 없습니다." />
+        <Table head={["일시", "관리자", "작업", "대상"]} rows={s.logs.map((l) => [fmtFull(l.ts), l.admin, ACTION[l.action] ?? l.action, <span key="t" className="text-[12px] text-[rgba(33,30,25,.6)]">{l.target ?? ""}{l.detail && "label" in l.detail ? ` · ${String(l.detail.label)}` : ""}{l.detail && "refunded" in l.detail ? ` · ${won(Number(l.detail.refunded))}` : ""}{l.detail && "reason" in l.detail && l.detail.reason ? ` · 사유: ${String(l.detail.reason)}` : ""}{l.detail && "email" in l.detail && l.detail.email ? ` · ${String(l.detail.email)}` : ""}</span>])} empty="아직 활동 기록이 없습니다." />
       </Card>
     </>
   );

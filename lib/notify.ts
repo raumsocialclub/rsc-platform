@@ -52,3 +52,15 @@ export async function sendBookingConfirmed(params: { to?: string | null; name?: 
     </div>`;
   return sendEmail(params.to, "[RSC] 예약이 확정되었습니다", html);
 }
+
+/** 부관리자 초대 링크 (M12). 48시간 · 1회용 */
+export async function sendAdminInvite(params: { to: string; name?: string | null; link: string; invitedBy?: string | null; expiresAt: string }): Promise<NotifyResult> {
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#211e19;line-height:1.7">
+      <p>${params.name || "안녕하세요"}님, RAUM SOCIAL CLUB 관리자(부관리자)로 초대되었습니다.${params.invitedBy ? ` (초대: ${params.invitedBy})` : ""}</p>
+      <p>아래 링크에서 비밀번호를 정하면 바로 관리자 화면에 들어갈 수 있습니다.</p>
+      <p><a href="${params.link}" style="display:inline-block;padding:12px 20px;background:#5a3d24;color:#f7f3ec;text-decoration:none;font-weight:600">관리자 계정 만들기</a></p>
+      <p style="font-size:12px;color:#5a3d24">${params.link}<br>유효기간: ${params.expiresAt} 까지 · 한 번만 사용할 수 있습니다.</p>
+    </div>`;
+  return sendEmail(params.to, "[RSC] 관리자 초대", html);
+}

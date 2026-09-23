@@ -16,7 +16,7 @@ export function OrderDetail({ order }: { order: OrderRow }) {
   const refundable = order.status === "confirmed" || order.status === "attended" || order.status === "pending";
   const balance = pay?.balance ?? 0;
   const [amount, setAmount] = useState(String(balance));
-  const [reason, setReason] = useState("관리자 환불");
+  const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -26,12 +26,16 @@ export function OrderDetail({ order }: { order: OrderRow }) {
       setMsg(`환불 금액은 0 ~ ${won(balance)} 사이여야 합니다.`);
       return;
     }
+    if (reason.trim().length < 2) {
+      setMsg("사유를 입력해 주세요. (활동 로그와 토스 취소 사유에 기록됩니다)");
+      return;
+    }
     const what = n > 0 ? `${won(n)} 환불하고 예약을 취소할까요?` : "환불 없이 예약만 취소할까요?";
     if (!confirm(`${order.order_id}\n${what}`)) return;
     setBusy(true);
     setMsg(null);
     try {
-      const res = await fetch(`/api/admin/orders/${order.id}/refund`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: n, reason }) });
+      const res = await fetch(`/api/admin/orders/${order.id}/refund`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: n, reason: reason.trim() }) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string; refunded?: number } | null;
       if (!j?.ok) throw new Error(j?.message ?? "처리하지 못했습니다.");
       setMsg(j.refunded ? `${won(j.refunded)} 환불 완료` : "예약을 취소했습니다.");
@@ -87,11 +91,11 @@ export function OrderDetail({ order }: { order: OrderRow }) {
               <button type="button" onClick={() => setAmount(String(balance))} className={`${BTN_SECONDARY} px-[12px] py-[8px] text-[12px]`}>전액</button>
             </div>
           )}
-          {pay && balance > 0 && <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="사유 (토스 취소 사유로 기록)" className={`${FIELD} mb-[8px]`} />}
+          <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="사유 (필수 · 활동 로그와 토스 취소 사유에 기록)" className={`${FIELD} mb-[8px]`} required />
           <button type="button" onClick={refund} disabled={busy} className="w-full border border-[rgba(163,64,44,.5)] bg-transparent text-error px-[14px] py-[10px] text-[13px] font-semibold cursor-pointer hover:bg-[rgba(163,64,44,.06)] disabled:opacity-50">
             {busy ? "처리 중…" : pay && balance > 0 ? (Number(amount) > 0 ? `${won(Number(amount) || 0)} 환불하고 취소` : "환불 없이 취소") : "예약 취소"}
           </button>
-          <div className="mt-[8px] text-[11.5px] text-[rgba(33,30,25,.45)]">관리자 환불은 환불 정책과 무관하게 금액을 지정합니다. 토스 취소 API 가 호출되며 되돌릴 수 없습니다.</div>
+          <div className="mt-[8px] text-[11.5px] text-[rgba(33,30,25,.45)]">관리자 환불은 환불 정책과 무관하게 금액을 지정합니다. 사유는 필수이며 처리자·금액과 함께 활동 로그에 남습니다. 토스 취소 API 가 호출되며 되돌릴 수 없습니다.</div>
         </div>
       )}
       {msg && <div className="mt-[12px] text-[12.5px] text-brown">{msg}</div>}

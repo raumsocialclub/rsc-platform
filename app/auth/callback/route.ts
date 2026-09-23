@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { INVITE_COOKIE } from "@/lib/auth/providers";
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 
 /**
  * 소셜 로그인 콜백. code → 세션 교환 후, 가입 화면에서 남긴 초대코드 쿠키가 있으면 사용 처리한다. (FLOWS.md 1-5)
@@ -20,6 +21,12 @@ export async function GET(request: Request) {
   if (error) {
     console.error("[auth/callback]", error);
     return NextResponse.redirect(`${origin}/login?error=oauth`);
+  }
+
+  // 마지막 로그인 시각 (M12)
+  if (hasServiceRoleKey()) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await createAdminClient().from("members").update({ last_login_at: new Date().toISOString() }).eq("id", user.id);
   }
 
   const cookieStore = await cookies();

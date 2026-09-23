@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/admin/guard";
+import { OWNER_ONLY_MESSAGE, requireAdmin } from "@/lib/admin/guard";
+import { isOwnerRole } from "@/lib/auth/session";
 import { logAdmin } from "@/lib/admin/log";
 import { DOC_BY_ID } from "@/lib/cms/schema";
 import { createClient } from "@/lib/supabase/server";
@@ -58,6 +59,7 @@ export async function PUT(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
   const def = DOC_BY_ID.get(id);
   if (!def) return NextResponse.json({ ok: false, message: "알 수 없는 문서입니다." }, { status: 404 });
+  if ((def.page === "settings" || def.page === "seo") && !isOwnerRole(me)) return NextResponse.json({ ok: false, message: OWNER_ONLY_MESSAGE }, { status: 403 });
   const text = await req.text();
   if (text.length > MAX_BYTES) return NextResponse.json({ ok: false, message: "내용이 너무 큽니다." }, { status: 413 });
   const parsed = z.object({ data: z.record(z.string(), z.unknown()) }).safeParse(JSON.parse(text || "{}"));
@@ -85,6 +87,7 @@ export async function DELETE(_req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
   const def = DOC_BY_ID.get(id);
   if (!def) return NextResponse.json({ ok: false, message: "알 수 없는 문서입니다." }, { status: 404 });
+  if ((def.page === "settings" || def.page === "seo") && !isOwnerRole(me)) return NextResponse.json({ ok: false, message: OWNER_ONLY_MESSAGE }, { status: 403 });
   const supabase = await createClient();
   const { error } = await supabase.from("site_content").delete().eq("id", id);
   if (error) return NextResponse.json({ ok: false, message: "되돌리지 못했습니다." }, { status: 500 });

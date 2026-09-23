@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin/guard";
+import { isOwnerRole } from "@/lib/auth/session";
 import { listMembers, listOrders } from "@/lib/admin/queries";
 import { fullStats, parseRange } from "@/lib/admin/statsFull";
 import { BOOKING_STATUS_KO } from "@/lib/bookings/types";
@@ -20,7 +21,10 @@ export async function GET(req: Request) {
   const range = parseRange({ from: sp.get("from") ?? undefined, to: sp.get("to") ?? undefined, preset: sp.get("preset") ?? undefined });
   const st = await fullStats(range);
   const sections: { name: string; head: string[]; rows: unknown[][] }[] = [];
-  const want = (k: string) => type === "all" || type === k;
+  const owner = isOwnerRole(me);
+  // 회원 목록 CSV 는 주관리자만 (M12). 전체 리포트에서도 부관리자는 회원 항목이 빠진다
+  if (type === "members" && !owner) return new Response("주관리자만 내려받을 수 있습니다.", { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } });
+  const want = (k: string) => (type === "all" || type === k) && (k !== "members" || owner);
 
   if (want("revenue-daily")) sections.push({ name: "일별 매출", head: ["날짜", "결제액", "환불액", "순매출", "결제 건수"], rows: st.revenue.daily.map((d) => [d.day, d.paid, d.refunded, d.net, d.count]) });
   if (want("revenue-program")) sections.push({ name: "프로그램별 매출", head: ["프로그램", "순매출", "결제 건수"], rows: st.revenue.byProgram.map((p) => [p.name, p.net, p.count]) });

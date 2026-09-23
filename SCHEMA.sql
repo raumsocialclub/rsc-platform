@@ -3,7 +3,7 @@ create extension if not exists "pgcrypto";
 
 -- ---------- enums
 create type member_status as enum ('active','paused','withdrawn');
-create type member_role as enum ('member','admin');
+create type member_role as enum ('member','admin','owner');   -- owner: 주관리자 (M12)
 create type program_kind as enum ('single','season');
 create type booking_status as enum ('pending','confirmed','cancelled','expired','attended');
 create type payment_status as enum ('ready','paid','cancelled','partial_cancelled','failed');
@@ -20,6 +20,7 @@ create table members (
   invite_code_id uuid,
   memo text,
   provider text not null default 'email',    -- 가입 경로: email | kakao | google (M7)
+  last_login_at timestamptz,                  -- M12
   created_at timestamptz not null default now()
 );
 
@@ -196,11 +197,17 @@ alter table guest_passes enable row level security;
 alter table membership_plans enable row level security;
 
 -- SECURITY DEFINER: members RLS 정책 안에서 members 를 다시 읽을 때 무한 재귀를 막는다.
+-- is_admin: 부관리자·주관리자 모두. 정지(paused)·탈퇴 계정은 권한 없음 (M12)
 create or replace function is_admin() returns boolean
 language sql stable security definer set search_path = public as $$
-  select exists(select 1 from members where id = auth.uid() and role = 'admin');
+  select exists(select 1 from members where id = auth.uid() and role in ('admin','owner') and status = 'active');
 $$;
 grant execute on function is_admin() to anon, authenticated;
+create or replace function is_owner() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists(select 1 from members where id = auth.uid() and role = 'owner' and status = 'active');
+$$;
+grant execute on function is_owner() to anon, authenticated;
 
 create policy "self read" on members for select using (id = auth.uid() or is_admin());
 create policy "self update" on members for update using (id = auth.uid() or is_admin());
@@ -228,9 +235,22 @@ create policy "admin invites" on invite_codes for all using (is_admin());
 -- 이메일 가입은 메타데이터의 invite_code 가 유효해야만 계정이 만들어진다 (초대제 원칙을 DB에서 강제).
 -- 소셜 가입은 코드 없이 계정이 만들어지고, members.invite_code_id 가 비어 있으면 앱에서 코드 입력을 요구한다.
 create or replace function handle_new_user() returns trigger language plpgsql security definer set search_path = public as $$
-declare v_code text; v invite_codes; v_provider text;
+declare v_code text; v invite_codes; v_provider text; v_inv admin_invites; v_inv_id uuid;
 begin
   v_provider := coalesce(new.raw_app_meta_data->>'provider', 'email');
+  -- M12: app_metadata.admin_invite(초대 id) 가 있으면 초대코드 없이 관리자 계정 (서버 service role 의 createUser 만 붙일 수 있다)
+  v_inv_id := nullif(new.raw_app_meta_data->>'admin_invite', '')::uuid;
+  if v_inv_id is not null then
+    select * into v_inv from admin_invites where id = v_inv_id for update;
+    if v_inv.id is null or v_inv.used_at is not null or v_inv.revoked_at is not null or v_inv.expires_at < now() then
+      raise exception 'ADMIN_INVITE_INVALID';
+    end if;
+    insert into members(id, name, email, role, provider)
+    values (new.id, coalesce(nullif(new.raw_user_meta_data->>'name', ''), v_inv.name, ''), new.email, v_inv.role, v_provider)
+    on conflict (id) do nothing;
+    update admin_invites set used_at = now(), used_by = new.id where id = v_inv.id;
+    return new;
+  end if;
   v_code := upper(trim(coalesce(new.raw_user_meta_data->>'invite_code', '')));
   if v_code <> '' then
     select * into v from invite_codes where code = v_code for update;
@@ -495,3 +515,23 @@ create trigger posts_updated_at before update on posts for each row execute func
 alter table posts enable row level security;
 create policy "posts public read" on posts for select using (published = true or is_admin());
 create policy "posts admin write" on posts for all using (is_admin()) with check (is_admin());
+
+-- ---------- M12: 관리자 관리 — 주관리자(owner)가 부관리자(admin) 초대. 링크 토큰은 해시만 저장, 48시간, 1회용
+-- (members.role 에 'owner' 추가, members.last_login_at, is_admin/is_owner, handle_new_user 의 admin_invite 경로는 위에 반영)
+create table admin_invites (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  name text not null default '',
+  role member_role not null default 'admin',
+  token_hash text not null unique,
+  invited_by uuid references members(id),
+  expires_at timestamptz not null default now() + interval '48 hours',
+  used_at timestamptz,
+  used_by uuid,
+  revoked_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create index admin_invites_email_idx on admin_invites(email);
+alter table admin_invites enable row level security;
+create policy "admin invites owner" on admin_invites for all using (is_owner()) with check (is_owner());
+-- 주관리자 지정: update members set role = 'owner' where lower(email) = '<주관리자 이메일>';

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 export type AdminNavItem = { href: string; label: string; badge?: number };
 
-type Props = { items: AdminNavItem[]; user: { name: string; email: string; initial: string } };
+type Props = { items: AdminNavItem[]; user: { name: string; email: string; initial: string; roleLabel?: string } };
 
 /** design/RSC Admin.dc.html <aside> 재현. 900px 이하에서는 가로 스크롤 바로 바뀐다. */
 export function AdminSidebar({ items, user }: Props) {
@@ -41,7 +41,7 @@ export function AdminSidebar({ items, user }: Props) {
       <div className="hidden min-[901px]:flex border-t border-[rgba(247,243,236,.12)] pt-[18px] text-[12.5px] text-[rgba(247,243,236,.6)] items-center gap-[10px]">
         <div className="w-[30px] h-[30px] rounded-full bg-gold text-ink flex items-center justify-center font-bold text-[12px] flex-none">{user.initial}</div>
         <div className="min-w-0">
-          <div className="text-cream font-semibold truncate">{user.name || "관리자"}</div>
+          <div className="text-cream font-semibold truncate">{user.name || "관리자"}{user.roleLabel && <span className="ml-[6px] text-[10.5px] tracking-[.12em] text-gold">{user.roleLabel}</span>}</div>
           <div className="truncate">{user.email}</div>
         </div>
       </div>

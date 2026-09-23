@@ -47,5 +47,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, message: describeAuthError(error.message, "login") }, { status: 401 });
   }
   if (admin) await admin.from("login_attempts").delete().in("key", keys);
-  return NextResponse.json({ ok: true });
+  // 역할(관리자면 /admin 으로 보냄) + 마지막 로그인 시각 (M12)
+  const { data: { user } } = await supabase.auth.getUser();
+  let role = "member";
+  if (user) {
+    const { data: m } = await supabase.from("members").select("role").eq("id", user.id).maybeSingle();
+    role = (m?.role as string | undefined) ?? "member";
+    if (admin) await admin.from("members").update({ last_login_at: new Date().toISOString() }).eq("id", user.id);
+  }
+  return NextResponse.json({ ok: true, role });
 }
