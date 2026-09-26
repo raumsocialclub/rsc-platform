@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RSC Showreel</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+@font-face{font-family:"SamsungOne";src:url("../../deploy/fonts/SamsungOne-400.ttf");font-weight:400}
+@font-face{font-family:"SamsungOne";src:url("../../deploy/fonts/SamsungOne-500.ttf");font-weight:500}
+@font-face{font-family:"SamsungOne";src:url("../../deploy/fonts/SamsungOne-600.ttf");font-weight:600}
+:root{
+  --ink:#211e19;--cream:#f2eee5;--card:#f7f3ec;--gold:#e2b478;--brown:#5a3d24;--brownH:#9c6b3e;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --kr:"Noto Serif KR",serif;
+  --krs:"Noto Sans KR",sans-serif;
+  --sans:"SamsungOne",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0b0a08;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:var(--ink);transform-origin:0 0;color:var(--cream)}
+.F{position:absolute;left:0;top:0;width:1920px;height:1080px}
+.A{position:absolute}
+.ph{position:absolute;left:0;top:0;width:1920px;height:1080px;background-size:cover;background-position:center;
+    filter:saturate(.8) sepia(.14) contrast(1.05) brightness(.92)}
+.ch{display:inline-block;white-space:pre}
+.ovl{font-family:var(--sans);font-weight:500;font-size:13px;letter-spacing:.34em;text-transform:uppercase;white-space:nowrap}
+.ctr{left:0;width:1920px;text-align:center}
+.dim{position:absolute;inset:0;background:#120f0c}
+.word{position:absolute;left:0;width:1920px;top:0;height:1080px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.big{font-family:var(--serif);font-weight:300;font-size:250px;line-height:1;letter-spacing:.08em;white-space:nowrap;margin-right:-.08em}
+.sub{margin-top:34px;text-align:center;text-shadow:0 1px 18px rgba(0,0,0,.55)}
+.sub .p{font-family:var(--sans);font-weight:500;font-size:14px;letter-spacing:.4em;color:var(--gold)}
+.sub .k{font-family:var(--krs);font-weight:400;font-size:19px;letter-spacing:.06em;opacity:.78;margin-top:12px}
+.mask{overflow:hidden;display:inline-block;vertical-align:top}
+svg{overflow:visible}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ============ S7 · LOGO (bottom layer) ============ -->
+  <div id="s7" class="F" style="background:#1a1714">
+    <div id="s7glow" class="F" style="background:radial-gradient(ellipse 820px 560px at 960px 430px,rgba(226,180,120,.16),rgba(226,180,120,0) 70%)"></div>
+    <div id="s7grp" class="F" style="transform-origin:960px 520px">
+      <div id="emb" class="A" style="left:844px;top:260px;width:232px;height:280px;
+        background:linear-gradient(160deg,#f6dcaa 0%,#e2b478 45%,#b8864f 100%);
+        -webkit-mask-image:url(../../deploy/logo-emblem.png),linear-gradient(115deg,#000 45%,transparent 55%);
+        -webkit-mask-size:100% 100%,320% 100%;-webkit-mask-repeat:no-repeat;
+        -webkit-mask-composite:source-in;mask-composite:intersect"></div>
+      <div id="embSheen" class="A" style="left:844px;top:260px;width:232px;height:280px;mix-blend-mode:screen;
+        background:linear-gradient(115deg,transparent 42%,rgba(255,248,230,.95) 50%,transparent 58%);background-size:320% 100%;
+        -webkit-mask-image:url(../../deploy/logo-emblem.png);-webkit-mask-size:100% 100%"></div>
+      <div id="wm" class="A" style="left:530px;top:584px;width:860px;height:109.3px;background:var(--cream);
+        -webkit-mask-image:url(../../deploy/logo-mtwj03w6-n1ft.png);-webkit-mask-size:100% 100%"></div>
+      <div id="s7line" class="A" style="top:744px;height:1px;background:var(--gold)"></div>
+      <div id="s7kr" class="A ctr" style="top:772px;font-family:var(--kr);font-weight:300;font-size:25px;letter-spacing:.02em;color:var(--cream)">라움이 검증한 멤버가 모이는 싱글 라이프스타일 커뮤니티</div>
+    </div>
+    <div id="s7foot" class="A ctr ovl" style="top:968px;font-size:12px;letter-spacing:.46em;color:var(--gold)">Founding Members&nbsp;&nbsp;·&nbsp;&nbsp;2026</div>
+    <svg id="s7svg" class="F" viewBox="0 0 1920 1080" width="1920" height="1080">
+      <ellipse id="irisRing" cx="960" cy="400" rx="111" ry="135" fill="none" stroke="#e2b478" stroke-width="9"/>
+    </svg>
+  </div>
+
+  <!-- ============ S6 · BEGINNING ============ -->
+  <div id="s6" class="F">
+    <div id="s6ph" class="ph" style="background-image:url(../../deploy/social-night.jpg);filter:grayscale(1) sepia(.42) contrast(1.08) brightness(.82)"></div>
+    <div class="dim" style="opacity:.42"></div>
+    <div class="F" style="background:radial-gradient(ellipse at 50% 55%,rgba(18,15,12,0) 30%,rgba(18,15,12,.65) 100%)"></div>
+    <div id="s6leak" class="F" style="mix-blend-mode:screen"></div>
+    <div id="s6txt" class="F">
+      <div id="s6a" class="A ctr" style="top:338px;font-family:var(--kr);font-weight:300;font-size:98px;line-height:1.2;letter-spacing:-.01em">서로의 특별함을</div>
+      <div id="s6b" class="A ctr" style="top:470px;font-family:var(--kr);font-weight:300;font-size:98px;line-height:1.2;letter-spacing:-.01em">발견하는 곳.</div>
+      <div id="s6e" class="A ctr" style="top:648px;font-family:var(--serif);font-style:italic;font-weight:300;font-size:38px;letter-spacing:.01em;color:var(--cream)">where remarkable singles discover one another</div>
+    </div>
+  </div>
+
+  <!-- ============ S5 · RAUM SOLO (cloned into two halves) ============ -->
+  <div id="s5top" class="F"></div>
+  <div id="s5bot" class="F"></div>
+  <template id="s5tpl">
+    <div class="F solo">
+      <div class="ph s5ph" style="background-image:url(../../deploy/raum-solo.jpg)"></div>
+      <div class="dim" style="opacity:.6"></div>
+      <div class="F" style="background:radial-gradient(ellipse at 50% 48%,rgba(18,15,12,0) 35%,rgba(18,15,12,.6) 100%)"></div>
+      <div class="A s5num" style="left:1320px;top:250px;font-family:var(--serif);font-weight:300;font-size:640px;line-height:1;color:transparent;-webkit-text-stroke:1.2px rgba(226,180,120,.38)">01</div>
+      <div class="A ctr ovl s5ov" style="top:312px;color:var(--gold)">The Flagship Season&nbsp;&nbsp;—&nbsp;&nbsp;6 Weeks</div>
+      <div class="A ctr s5t" style="top:352px;font-family:var(--serif);font-weight:400;font-size:190px;line-height:1.1;letter-spacing:.14em;white-space:nowrap">RAUM SOLO</div>
+      <div class="A ctr s5k" style="top:590px;font-family:var(--kr);font-weight:300;font-size:32px;letter-spacing:.01em;opacity:.88">한 번의 소개팅이 아닌, 함께 보내는 한 시즌.</div>
+      <div class="A s5base" style="left:460px;top:770px;height:1px;background:rgba(242,238,229,.3)"></div>
+      <div class="A s5prog" style="left:460px;top:769.5px;height:2px;background:var(--gold)"></div>
+      <div class="s5dots"></div>
+      <div class="A s5names" style="left:0;top:812px;width:1920px;height:40px;overflow:hidden"></div>
+      <div class="A s5seam1" style="left:0;top:539px;height:1px;background:var(--gold)"></div>
+      <div class="A s5seam2" style="left:0;top:540px;height:1px;background:var(--gold)"></div>
+    </div>
+  </template>
+
+  <!-- ============ S4 · TRIPTYCH (cream) ============ -->
+  <div id="s4" class="F" style="background:var(--cream)">
+    <div id="s4L" class="F"><div class="A s4in" style="left:275px;top:170px;width:430px;height:600px;overflow:hidden">
+      <div class="ph s4p" style="left:-20px;top:-20px;width:470px;height:640px;background-image:url(../../deploy/taste-table.jpg)"></div></div></div>
+    <div id="s4R" class="F"><div class="A s4in" style="left:1215px;top:170px;width:430px;height:600px;overflow:hidden">
+      <div class="ph s4p" style="left:-20px;top:-20px;width:470px;height:640px;background-image:url(../../deploy/about.jpg);background-position:50% 40%"></div></div></div>
+    <div id="s4M" class="F">
+      <div id="s4Mp1" class="ph" style="background-image:url(../../deploy/talk-insight.jpg);background-position:50% 55%"></div>
+      <div id="s4Mp2" class="ph" style="background-image:url(../../deploy/raum-solo.jpg)"></div>
+      <div id="s4Mdim" class="dim" style="opacity:0"></div>
+    </div>
+    <svg id="s4svg" class="F" viewBox="0 0 1920 1080" width="1920" height="1080">
+      <path id="s4oL" fill="none" stroke="#9c6b3e" stroke-width="1" pathLength="1"/>
+      <path id="s4oM" fill="none" stroke="#9c6b3e" stroke-width="1" pathLength="1"/>
+      <path id="s4oR" fill="none" stroke="#9c6b3e" stroke-width="1" pathLength="1"/>
+      <g id="s4a1"><line id="s4a1l" x1="0" y1="470" x2="0" y2="470" stroke="#9c6b3e" stroke-width="1.2"/><path id="s4a1h" d="" fill="none" stroke="#9c6b3e" stroke-width="1.2"/></g>
+      <g id="s4a2"><line id="s4a2l" x1="0" y1="470" x2="0" y2="470" stroke="#9c6b3e" stroke-width="1.2"/><path id="s4a2h" d="" fill="none" stroke="#9c6b3e" stroke-width="1.2"/></g>
+    </svg>
+    <div id="s4lab" class="F" style="color:var(--ink)">
+      <div class="A s4l" style="left:290px;width:400px;top:796px;text-align:center"><div class="s4e" style="font-family:var(--serif);font-weight:500;font-size:34px;letter-spacing:.2em;margin-right:-.2em">EXPERIENCE</div><div style="font-family:var(--kr);font-weight:400;font-size:18px;color:var(--brown);margin-top:8px;letter-spacing:.3em">경험</div></div>
+      <div class="A s4l" style="left:760px;width:400px;top:796px;text-align:center"><div class="s4e" style="font-family:var(--serif);font-weight:500;font-size:34px;letter-spacing:.2em;margin-right:-.2em">PEOPLE</div><div style="font-family:var(--kr);font-weight:400;font-size:18px;color:var(--brown);margin-top:8px;letter-spacing:.3em">사람</div></div>
+      <div class="A s4l" style="left:1230px;width:400px;top:796px;text-align:center"><div class="s4e" style="font-family:var(--serif);font-weight:500;font-size:34px;letter-spacing:.2em;margin-right:-.2em">RELATIONSHIP</div><div style="font-family:var(--kr);font-weight:400;font-size:18px;color:var(--brown);margin-top:8px;letter-spacing:.3em">관계</div></div>
+      <div id="s4tag" class="A ctr" style="top:938px;font-family:var(--kr);font-weight:300;font-size:30px;letter-spacing:.02em">매칭이 아니라, <span style="color:var(--brownH)">커뮤니티</span>.</div>
+    </div>
+  </div>
+
+  <!-- ============ S1 + S2 · THE SPACE ============ -->
+  <div id="s12" class="F">
+    <div id="s1clip" class="F">
+      <div id="s1ph" class="ph" style="background-image:url(../../deploy/hall-majestic.jpg)"></div>
+      <div id="s1dark" class="dim" style="background:var(--ink)"></div>
+    </div>
+    <div id="s2grad" class="F" style="background:linear-gradient(90deg,rgba(18,15,12,.84) 0%,rgba(18,15,12,.42) 52%,rgba(18,15,12,.08) 100%),linear-gradient(0deg,rgba(18,15,12,.55),rgba(18,15,12,0) 45%)"></div>
+    <div id="s2leak" class="F" style="mix-blend-mode:screen"></div>
+    <svg id="s1svg" class="F" viewBox="0 0 1920 1080" width="1920" height="1080">
+      <path id="s1a" fill="none" stroke="#e2b478" stroke-width="1.6" pathLength="1"/>
+      <path id="s1b" fill="none" stroke="#e2b478" stroke-width="1.6" pathLength="1"/>
+    </svg>
+    <div id="s1top" class="A ctr ovl" style="top:238px;font-size:15px;color:var(--gold)">Raum Social Club</div>
+    <div id="s1bot" class="A ctr ovl" style="top:812px;font-size:13px;color:var(--cream)">A Private Community for Remarkable Singles</div>
+    <div id="s2txt" class="A" style="left:170px;top:396px">
+      <div class="ovl" style="color:var(--gold);height:16px"><span id="s2line" style="display:inline-block;height:1px;width:0;background:var(--gold);vertical-align:middle;margin-right:20px"></span><span id="s2ov">Welcome to Raum</span></div>
+      <div id="s2h" style="font-family:var(--kr);font-weight:300;font-size:112px;line-height:1.25;margin-top:30px;letter-spacing:-.015em;white-space:nowrap">아름다운 공간에서,</div>
+      <div id="s2e" style="font-family:var(--serif);font-style:italic;font-weight:300;font-size:44px;margin-top:10px;color:var(--cream)">in a beautiful space,</div>
+    </div>
+    <div id="s12dim" class="dim" style="opacity:0"></div>
+  </div>
+
+  <!-- ============ S3 · TASTE MONTAGE ============ -->
+  <div id="s3" class="F">
+    <!-- 0 ART : slide up -->
+    <div id="c0" class="F"><div class="ph" style="background-image:url(../../deploy/art-walk.jpg);background-position:50% 55%"></div><div class="dim" style="opacity:.38"></div></div>
+    <!-- 1 WINE : split -->
+    <div id="c1" class="F">
+      <div class="F c1h" style="clip-path:inset(0 0 540px 0)"><div class="ph" style="background-image:url(../../deploy/hero.jpg)"></div><div class="dim" style="opacity:.36"></div></div>
+      <div class="F c1h" style="clip-path:inset(540px 0 0 0)"><div class="ph" style="background-image:url(../../deploy/hero.jpg)"></div><div class="dim" style="opacity:.36"></div></div>
+    </div>
+    <!-- 2 WELLNESS : text mask -->
+    <div id="c2" class="F" style="background:#16130f">
+      <div id="c2full" class="F"><div class="ph" style="background-image:url(../../deploy/garden-grass.jpg)"></div><div class="dim" style="opacity:.3"></div></div>
+      <div id="c2word" class="word"><div class="big" style="font-weight:600;font-size:290px;letter-spacing:.04em;margin-right:-.04em;color:transparent;
+        background:url(../../deploy/garden-grass.jpg) center/1920px auto;-webkit-background-clip:text;background-clip:text;filter:saturate(.95) brightness(1.05)">WELLNESS</div></div>
+    </div>
+    <!-- 3 MUSIC : iris -->
+    <div id="c3" class="F"><div class="ph" style="background-image:url(../../deploy/after-hours.jpg);background-position:50% 60%"></div><div class="dim" style="opacity:.25"></div></div>
+    <!-- 4 DINING : blinds -->
+    <div id="c4" class="F"></div>
+    <!-- 5 TALK : zoom cut -->
+    <div id="c5" class="F"><div id="c5ph" class="ph" style="background-image:url(../../deploy/talk-insight.jpg);background-position:50% 55%"></div><div id="c5dim" class="dim" style="opacity:.36"></div></div>
+    <div id="scrim" class="F" style="background:radial-gradient(ellipse 1000px 460px at 50% 52%,rgba(18,15,12,.42),rgba(18,15,12,0) 72%)"></div>
+    <svg id="c3svg" class="F" viewBox="0 0 1920 1080" width="1920" height="1080"><circle id="c3ring" cx="960" cy="540" r="0" fill="none" stroke="#e2b478" stroke-width="1.5"/></svg>
+
+    <div id="w0" class="word"><div class="big w0t" style="color:transparent;-webkit-text-stroke:2px #f2eee5">ART</div><div class="sub"><div class="p">01 — Raum Art Walk</div><div class="k">아트 &amp; 컬처</div></div></div>
+    <div id="w1" class="word"><div class="big w1t">WINE</div><div class="sub"><div class="p">02 — Taste Table</div><div class="k">와인 &amp; 스피릿</div></div></div>
+    <div id="w2" class="word"><div class="big" style="visibility:hidden;font-size:290px">&nbsp;</div><div class="sub"><div class="p">03 — Sunday Reset</div><div class="k">소셜 웰니스</div></div></div>
+    <div id="w3" class="word"><div class="big w3t" style="font-style:italic;letter-spacing:.04em;text-transform:none">Music</div><div class="sub"><div class="p">04 — Raum After Hours</div><div class="k">뮤직 &amp; 퍼포먼스</div></div></div>
+    <div id="w4" class="word"><div class="big w4t">DINING</div><div class="sub"><div class="p">05 — Run &amp; Brunch</div><div class="k">다이닝 &amp; 무브먼트</div></div></div>
+    <div id="w5" class="word"><div class="big w5t">TALK</div><div class="sub"><div class="p">06 — One Question Salon</div><div class="k">토크 &amp; 인사이트</div></div></div>
+
+    <div id="s3bar" class="A" style="left:160px;top:1000px;width:1600px;height:1px;background:rgba(242,238,229,.25)">
+      <div id="s3fill" style="height:1px;background:var(--gold);width:0"></div>
+    </div>
+  </div>
+
+  <!-- ============ GLOBAL FX + HUD ============ -->
+  <canvas id="dust" class="F" width="1920" height="1080" style="pointer-events:none"></canvas>
+  <div id="flash" class="F" style="background:#fff6e6;opacity:0;mix-blend-mode:screen"></div>
+  <div id="hud" class="F" style="mix-blend-mode:difference;color:#f2eee5;pointer-events:none">
+    <svg class="F" viewBox="0 0 1920 1080" width="1920" height="1080" style="opacity:.55">
+      <path d="M48 76V48H76M1844 48H1872V76M1872 1004V1032H1844M76 1032H48V1004" fill="none" stroke="#f2eee5" stroke-width="1"/>
+    </svg>
+    <div class="A ovl" style="left:96px;top:44px;font-size:11px;opacity:.75">Raum Social Club&nbsp;&nbsp;/&nbsp;&nbsp;Showreel 2026</div>
+    <div id="tc" class="A ovl" style="right:96px;top:44px;font-size:11px;opacity:.75;letter-spacing:.24em;font-variant-numeric:tabular-nums">00:00:00</div>
+    <div class="A" style="left:96px;top:1022px;height:14px;width:400px;overflow:hidden"><div id="chap" style="position:relative"></div></div>
+    <div class="A ovl" style="right:96px;top:1022px;font-size:11px;opacity:.75">Seoul</div>
+  </div>
+  <canvas id="grain" class="F" width="960" height="540" style="pointer-events:none;mix-blend-mode:overlay;opacity:.11;image-rendering:auto"></canvas>
+  <div id="vig" class="F" style="pointer-events:none;background:radial-gradient(ellipse 75% 75% at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,.4) 100%)"></div>
+</div>
+
+<div id="play" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;cursor:pointer;
+  font:500 13px/1 SamsungOne,Arial;letter-spacing:.34em;color:#f2eee5;background:rgba(11,10,8,.55)">CLICK TO PLAY WITH SOUND</div>
+
+<script>
+/* ------------------------------------------------------------------ utils */
+const $ = s => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const E = {
+  lin: p => p,
+  outCubic: p => 1 - Math.pow(1 - p, 3),
+  inCubic: p => p * p * p,
+  inOutCubic: p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2,
+  outQuart: p => 1 - Math.pow(1 - p, 4),
+  inOutQuart: p => p < .5 ? 8 * p ** 4 : 1 - Math.pow(-2 * p + 2, 4) / 2,
+  outExpo: p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p),
+  inExpo: p => p <= 0 ? 0 : Math.pow(2, 10 * p - 10),
+  inOutExpo: p => p <= 0 ? 0 : p >= 1 ? 1 : p < .5 ? Math.pow(2, 20 * p - 10) / 2 : (2 - Math.pow(2, -20 * p + 10)) / 2,
+  outBack: p => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); },
+};
+const P = (t, a, b, e = E.lin) => e(clamp((t - a) / (b - a)));
+const show = (el, v) => { const d = v ? '' : 'none'; if (el.style.display !== d) el.style.display = d; };
+const bell = p => Math.sin(Math.PI * clamp(p));
+
+function split(el) {
+  const txt = el.textContent; el.textContent = '';
+  return [...txt].map(c => { const s = document.createElement('span'); s.className = 'ch'; s.textContent = c; el.appendChild(s); return s; });
+}
+function splitMasked(el) {
+  const txt = el.textContent; el.textContent = '';
+  return [...txt].map(c => { const m = document.createElement('span'); m.className = 'mask';
+    const s = document.createElement('span'); s.className = 'ch'; s.textContent = c; m.appendChild(s); el.appendChild(m); return s; });
+}
+// Arch (Roman window) shape: box centred on (cx, cy), width w, height h.
+function archPath(cx, cy, w, h) {
+  const r = w / 2, x0 = cx - r, x1 = cx + r, top = cy - h / 2, bot = cy + h / 2, ya = top + r;
+  return `M${x0} ${bot}L${x0} ${ya}A${r} ${r} 0 0 1 ${x1} ${ya}L${x1} ${bot}Z`;
+}
+// two open halves from the apex down to each foot (drawn with dashoffset)
+function archHalves(cx, cy, w, h) {
+  const r = w / 2, x0 = cx - r, x1 = cx + r, top = cy - h / 2, bot = cy + h / 2, ya = top + r;
+  return [`M${cx} ${top}A${r} ${r} 0 0 0 ${x0} ${ya}L${x0} ${bot}`, `M${cx} ${top}A${r} ${r} 0 0 1 ${x1} ${ya}L${x1} ${bot}`];
+}
+function archOpen(cx, cy, w, h) { // full outline without base
+  const r = w / 2, x0 = cx - r, x1 = cx + r, top = cy - h / 2, bot = cy + h / 2, ya = top + r;
+  return `M${x0} ${bot}L${x0} ${ya}A${r} ${r} 0 0 1 ${x1} ${ya}L${x1} ${bot}`;
+}
+const clip = (el, v) => { el.style.clipPath = v; };
+
+/* ------------------------------------------------------------------ timing (120 BPM, beat = .5s) */
+const BEATS = [4.0, 4.5, 5.0, 5.5, 6.0, 6.5];
+const WEEKS = ['Week 0 — Orientation', 'Week 1 — First Impression', 'Week 2 — Taste', 'Week 3 — Active',
+               'Week 4 — Conversation', 'Week 5 — Free Social', 'Week 6 — Solo Ball'];
+const TICK0 = 9.25, TICKD = 0.1875;
+const FLASHES = [[2.0, .22], [4.0, .1], [4.5, .08], [5.0, .06], [5.5, .1], [6.0, .08], [6.5, .14], [9.0, .16], [12.0, .2]];
+const CHAPTERS = [[0, '01 · Space'], [4.0, '02 · Taste'], [7.0, '03 · People'], [9.0, '04 · Season'], [10.5, '05 · Beginning']];
+
+/* ------------------------------------------------------------------ build */
+const s2chars = split($('#s2h'));
+const s6a = split($('#s6a')), s6b = split($('#s6b'));
+const s6chars = [...s6a, ...s6b];
+const w1chars = splitMasked($('#w1 .w1t'));
+const w4chars = split($('#w4 .w4t'));
+
+// blinds for DINING
+const BL = 8;
+const blinds = [];
+for (let j = 0; j < BL; j++) {
+  const d = document.createElement('div'); d.className = 'A';
+  Object.assign(d.style, { left: (j * 240) + 'px', top: '0px', width: '240px', height: '1080px', overflow: 'hidden' });
+  d.innerHTML = `<div class="ph" style="left:${-j * 240}px;background-image:url(../../deploy/run-brunch.jpg);background-position:50% 50%"></div><div class="dim" style="opacity:.34;left:0;width:240px"></div>`;
+  $('#c4').appendChild(d); blinds.push(d);
+}
+
+// RAUM SOLO: two clones
+function buildSolo(host) {
+  host.appendChild($('#s5tpl').content.cloneNode(true));
+  const r = host.querySelector('.solo');
+  const dots = r.querySelector('.s5dots'), names = r.querySelector('.s5names');
+  const D = [], N = [];
+  for (let i = 0; i < 7; i++) {
+    const x = 460 + i * (1000 / 6);
+    const d = document.createElement('div'); d.className = 'A';
+    Object.assign(d.style, { left: (x - 5) + 'px', top: '765px', width: '10px', height: '10px', borderRadius: '50%',
+      border: '1px solid rgba(242,238,229,.55)', background: 'transparent' });
+    const n = document.createElement('div'); n.className = 'A ovl';
+    Object.assign(n.style, { left: (x - 20) + 'px', width: '40px', top: '738px', textAlign: 'center', fontSize: '11px', letterSpacing: '.1em', opacity: '.55' });
+    n.textContent = String(i);
+    dots.appendChild(d); dots.appendChild(n); D.push(d);
+    const nm = document.createElement('div'); nm.className = 'A ovl ctr';
+    Object.assign(nm.style, { top: '8px', fontSize: '17px', fontWeight: '600', letterSpacing: '.36em', color: '#e2b478' });
+    nm.textContent = WEEKS[i]; names.appendChild(nm); N.push(nm);
+  }
+  return { r, ph: r.querySelector('.s5ph'), num: r.querySelector('.s5num'), ov: r.querySelector('.s5ov'), t: r.querySelector('.s5t'),
+    k: r.querySelector('.s5k'), base: r.querySelector('.s5base'), prog: r.querySelector('.s5prog'), D, N,
+    seam1: r.querySelector('.s5seam1'), seam2: r.querySelector('.s5seam2') };
+}
+const soloT = buildSolo($('#s5top')), soloB = buildSolo($('#s5bot'));
+
+// chapter labels (rolling)
+const chapEls = CHAPTERS.map(([_, s]) => { const d = document.createElement('div'); d.className = 'ovl';
+  Object.assign(d.style, { position: 'absolute', left: 0, top: 0, fontSize: '11px', opacity: '.75' }); d.textContent = s; $('#chap').appendChild(d); return d; });
+
+// dust particles (deterministic)
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const DUST = Array.from({ length: 70 }, () => ({ x: rnd() * 1920, y: rnd() * 1080, r: .6 + rnd() * 2.2, v: 8 + rnd() * 26,
+  a: .25 + rnd() * .75, f: .3 + rnd() * 1.2, ph: rnd() * 6.28, sway: 6 + rnd() * 22 }));
+const dctx = $('#dust').getContext('2d');
+
+// film grain: pre-baked tiles, cycled per frame
+const gctx = $('#grain').getContext('2d');
+const GRAIN = [];
+for (let k = 0; k < 12; k++) {
+  const img = gctx.createImageData(960, 540); const d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const v = (rnd() * 255) | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
+  GRAIN.push(img);
+}
+
+/* ------------------------------------------------------------------ scenes */
+function S12(t) {
+  const vis = t < 4.22; show($('#s12'), vis); if (!vis) return;
+  // arch window grows into full frame on the downbeat (2.0)
+  const g = P(t, 1.5, 2.0, E.inExpo);
+  const k = lerp(1, 10, g), aw = 300 * k, ah = 450 * k;
+  clip($('#s1clip'), t < 2.0 ? `path('${archPath(960, 540, aw, ah)}')` : 'none');
+  const [pa, pb] = archHalves(960, 540, aw, ah);
+  const d = P(t, .12, 1.25, E.inOutCubic);
+  for (const [id, pd] of [['#s1a', pa], ['#s1b', pb]]) {
+    const el = $(id); el.setAttribute('d', pd);
+    el.style.strokeDasharray = '1 1'; el.style.strokeDashoffset = String(1 - d);
+    el.style.opacity = String(1 - P(t, 1.62, 1.95));
+  }
+  const s = lerp(1.0, 1.24, P(t, 0, 4.1, E.inOutCubic));
+  $('#s1ph').style.transform = `scale(${s})`;
+  $('#s1dark').style.opacity = String(Math.max(1 - P(t, .45, 1.55, E.outCubic), 0) * .9 + (1 - P(t, 1.5, 2.0)) * .1);
+
+  const o1 = P(t, .35, 1.05, E.outCubic) * (1 - P(t, 1.3, 1.58, E.inCubic));
+  $('#s1top').style.opacity = String(o1);
+  $('#s1top').style.letterSpacing = lerp(.9, .5, P(t, .35, 1.4, E.outCubic)) + 'em';
+  $('#s1bot').style.opacity = String(.85 * P(t, .55, 1.2, E.outCubic) * (1 - P(t, 1.3, 1.58, E.inCubic)));
+  $('#s1bot').style.letterSpacing = lerp(.75, .36, P(t, .55, 1.5, E.outCubic)) + 'em';
+
+  // S2 — headline
+  $('#s2grad').style.opacity = String(P(t, 1.85, 2.4, E.outCubic));
+  const lp = P(t, 2.0, 3.9);
+  $('#s2leak').style.background = `radial-gradient(ellipse 900px 700px at ${lerp(-10, 115, lp)}% ${lerp(30, 60, lp)}%,rgba(236,190,120,.55),rgba(236,190,120,0) 70%)`;
+  $('#s2leak').style.opacity = String(.5 * bell(lp));
+  $('#s2line').style.width = (70 * P(t, 2.05, 2.6, E.outExpo)) + 'px';
+  $('#s2ov').style.opacity = String(P(t, 2.15, 2.6));
+  s2chars.forEach((c, i) => {
+    const p = P(t, 2.1 + i * .045, 2.1 + i * .045 + .75, E.outExpo);
+    c.style.opacity = String(p); c.style.transform = `translateY(${(1 - p) * 56}px)`; c.style.filter = `blur(${(1 - p) * 12}px)`;
+  });
+  const pe = P(t, 2.45, 3.1, E.outCubic);
+  $('#s2e').style.opacity = String(.78 * pe); $('#s2e').style.transform = `translateY(${(1 - pe) * 18}px)`;
+  const q = P(t, 3.6, 3.9, E.inCubic);
+  $('#s2txt').style.opacity = String(1 - q);
+  $('#s2txt').style.transform = `translateY(${-50 * q}px)`;
+  $('#s2txt').style.filter = `blur(${q * 8}px)`;
+  // pushed up by ART slide
+  const u = P(t, 3.9, 4.16, E.outExpo);
+  $('#s12').style.transform = `translateY(${-30 * u}%)`;
+  $('#s12dim').style.opacity = String(.7 * u);
+}
+
+function S3(t) {
+  const vis = t >= 3.9 && t < 6.84; show($('#s3'), vis); if (!vis) return;
+  const on = i => t >= BEATS[i] - .1 && t < (i < 5 ? BEATS[i + 1] + .3 : 99);
+  // 0 · ART slides up
+  show($('#c0'), on(0));
+  const u = P(t, 3.9, 4.16, E.outExpo);
+  $('#c0').style.transform = `translateY(${(1 - u) * 100}%)`;
+  $('#c0 .ph').style.transform = `scale(${lerp(1.18, 1.04, P(t, 3.92, 4.6, E.outCubic))})`;
+  // 1 · WINE split halves
+  show($('#c1'), on(1));
+  const sp = P(t, 4.4, 4.64, E.outExpo);
+  const hs = document.querySelectorAll('.c1h');
+  hs[0].style.transform = `translateX(${-(1 - sp) * 1920}px)`;
+  hs[1].style.transform = `translateX(${(1 - sp) * 1920}px)`;
+  hs.forEach(h => h.querySelector('.ph').style.transform = `scale(${lerp(1.12, 1.03, P(t, 4.4, 5.0, E.outCubic))})`);
+  // 2 · WELLNESS as a window of type
+  show($('#c2'), on(2) && t >= 5.0);
+  const wm = P(t, 5.0, 5.3, E.outExpo), wz = P(t, 5.26, 5.46, E.inExpo);
+  $('#c2word').style.transform = `scale(${lerp(1.22, 1, wm) * lerp(1, 5, wz)})`;
+  $('#c2word').style.opacity = String(1 - P(t, 5.36, 5.46));
+  $('#c2full').style.opacity = String(P(t, 5.3, 5.44, E.inCubic));
+  // 3 · MUSIC iris
+  show($('#c3'), on(3));
+  const ir = P(t, 5.42, 5.72, E.outExpo);
+  clip($('#c3'), `circle(${ir * 1150}px at 960px 540px)`);
+  $('#c3 .ph').style.transform = `scale(${lerp(1.2, 1.04, P(t, 5.42, 6.0, E.outCubic))})`;
+  const ring = $('#c3ring');
+  ring.setAttribute('r', String(ir * 1150 + 10));
+  ring.style.opacity = String(t >= 5.42 && t < 5.9 ? 1 - P(t, 5.46, 5.72) : 0);
+  // 4 · DINING blinds
+  show($('#c4'), on(4));
+  blinds.forEach((b, j) => {
+    const p = P(t, 5.9 + j * .022, 5.9 + j * .022 + .26, E.outQuart);
+    b.style.transform = `translateY(${-(1 - p) * 1080}px)`;
+    b.querySelector('.ph').style.transform = `scale(${lerp(1.1, 1.02, P(t, 5.9, 6.5, E.outCubic))})`;
+  });
+  // 5 · TALK zoom cut
+  show($('#c5'), t >= 6.5);
+  const zc = P(t, 6.5, 6.84, E.outExpo);
+  $('#c5ph').style.transform = `scale(${1 + .38 * (1 - zc)})`;
+  $('#c5ph').style.filter = `saturate(.8) sepia(.14) contrast(1.05) brightness(.92) blur(${16 * (1 - P(t, 6.5, 6.7, E.outCubic))}px)`;
+  $('#c5dim').style.opacity = String(.36 * (1 - P(t, 6.66, 6.84)));
+
+  // words
+  const cur = BEATS.reduce((a, b, i) => t >= b ? i : a, -1);
+  for (let i = 0; i < 6; i++) show($('#w' + i), i === cur);
+  const lt = t - BEATS[Math.max(cur, 0)];
+  const subIn = el => { const p = P(lt, .08, .3, E.outCubic); el.style.opacity = String(p); el.style.transform = `translateY(${(1 - p) * 14}px)`; };
+  if (cur >= 0) subIn($('#w' + cur + ' .sub'));
+  if (cur === 0) {
+    const w = $('#w0 .w0t');
+    w.style.transform = `scale(${lerp(1.14, 1, P(lt, 0, .45, E.outExpo))})`;
+    w.style.color = `rgba(242,238,229,${P(lt, .14, .32, E.outCubic)})`;
+    $('#w0').style.transform = `translateY(${(1 - u) * 1080}px)`;
+  }
+  if (cur === 1) w1chars.forEach((c, i) => { const p = P(t, 4.44 + i * .035, 4.44 + i * .035 + .34, E.outExpo); c.style.transform = `translateY(${(1 - p) * 110}%)`; });
+  if (cur === 2) { $('#w2 .sub').style.opacity = String(P(lt, .05, .2) * (1 - P(lt, .3, .45))); }
+  if (cur === 3) {
+    const p = P(t, 5.44, 5.9, E.outExpo), w = $('#w3 .w3t');
+    w.style.letterSpacing = lerp(.55, .04, p) + 'em'; w.style.opacity = String(P(t, 5.46, 5.62));
+    w.style.marginRight = -lerp(.55, .04, p) + 'em';
+  }
+  if (cur === 4) w4chars.forEach((c, i) => { const p = P(t, 5.95 + i * .035, 5.95 + i * .035 + .3, E.outExpo);
+    c.style.transform = `translateY(${-(1 - p) * 90}px)`; c.style.opacity = String(p); });
+  if (cur === 5) {
+    const w = $('#w5');
+    w.style.transform = `scale(${lerp(1.35, 1, P(t, 6.5, 6.78, E.outExpo)) * lerp(1, .94, P(t, 6.66, 6.82))})`;
+    w.style.filter = `blur(${10 * (1 - P(t, 6.5, 6.66, E.outCubic)) + 8 * P(t, 6.68, 6.8)}px)`;
+    w.style.opacity = String(1 - P(t, 6.66, 6.8));
+  }
+  $('#s3fill').style.width = (1600 * P(t, 4.0, 6.8, E.lin)) + 'px';
+  $('#s3bar').style.opacity = String(P(t, 4.0, 4.2) * (1 - P(t, 6.6, 6.8)));
+}
+
+const AR = { L: 490, M: 960, R: 1430, y: 470, w: 380, h: 540 };
+function S4(t) {
+  const vis = t >= 6.84 && t < 9.02; show($('#s4'), vis); if (!vis) return;
+  // middle arch: shrinks out of the full-frame TALK shot, later zooms through into RAUM SOLO
+  const g = P(t, 6.84, 7.2, E.inOutExpo), G = P(t, 8.62, 9.0, E.inExpo);
+  let w = lerp(3200, AR.w, g), h = lerp(4800, AR.h, g), cy = lerp(540, AR.y, g);
+  w = lerp(w, 3200, G); h = lerp(h, 4800, G); cy = lerp(cy, 540, G);
+  clip($('#s4M'), `path('${archPath(AR.M, cy, w, h)}')`);
+  // reframe onto the presenter + guests while the window closes
+  const rf = P(t, 6.84, 7.3, E.inOutCubic);
+  $('#s4Mp1').style.transform = `translate(${-384 * rf}px,${295 * rf}px) scale(${lerp(1.0, 1.06, P(t, 6.84, 8.6, E.outCubic))})`;
+  $('#s4Mp2').style.opacity = String(P(t, 8.46, 8.72, E.inOutCubic));
+  $('#s4Mp2').style.transform = `scale(${lerp(1.0, 1.1, P(t, 8.5, 9.0, E.inCubic))})`;
+  // side arches rise from the floor
+  const ex = P(t, 8.46, 8.74, E.inCubic);
+  [['#s4L', 7.42, -1], ['#s4R', 7.92, 1]].forEach(([id, st, dir]) => {
+    const el = $(id), cx = dir < 0 ? AR.L : AR.R;
+    clip(el, `path('${archPath(cx, AR.y, AR.w, AR.h)}')`);
+    const p = P(t, st, st + .42, E.outExpo);
+    const inner = el.querySelector('.s4in');
+    inner.style.clipPath = `inset(${(1 - p) * 100}% 0 0 0)`;
+    inner.querySelector('.s4p').style.transform = `scale(${lerp(1.25, 1.02, P(t, st, st + 1.1, E.outCubic))})`;
+    el.style.transform = `translateX(${dir * 90 * ex}px)`; el.style.opacity = String(1 - ex);
+  });
+  // hairline frames (offset 16px)
+  [['#s4oL', AR.L, 7.5], ['#s4oM', AR.M, 7.08], ['#s4oR', AR.R, 8.0]].forEach(([id, cx, st]) => {
+    const el = $(id); el.setAttribute('d', archOpen(cx, AR.y - 8, AR.w + 32, AR.h + 16));
+    el.style.strokeDasharray = '1 1'; el.style.strokeDashoffset = String(1 - P(t, st, st + .6, E.inOutCubic));
+    const dx = cx === AR.L ? -90 : cx === AR.R ? 90 : 0;
+    el.style.transform = `translateX(${dx * ex}px)`; el.style.opacity = String(1 - (cx === AR.M ? P(t, 8.5, 8.66) : ex));
+  });
+  // arrows between arches
+  [[1, 8.14], [2, 8.26]].forEach(([n, st]) => {
+    const x0 = n === 1 ? AR.L + AR.w / 2 + 34 : AR.M + AR.w / 2 + 34, len = 470 - AR.w - 68;
+    const p = P(t, st, st + .28, E.outExpo);
+    const l = $(`#s4a${n}l`); l.setAttribute('x1', x0); l.setAttribute('x2', x0 + len * p);
+    const hx = x0 + len * p;
+    $(`#s4a${n}h`).setAttribute('d', `M${hx - 7} ${470 - 6}L${hx} 470L${hx - 7} ${470 + 6}`);
+    $(`#s4a${n}h`).style.opacity = String(P(t, st + .06, st + .16));
+    $(`#s4a${n}`).style.opacity = String(1 - P(t, 8.46, 8.6));
+  });
+  // labels
+  const labs = document.querySelectorAll('.s4l');
+  [7.5, 7.14, 8.0].forEach((st, i) => {
+    const p = P(t, st, st + .45, E.outExpo), el = labs[i];
+    el.style.opacity = String(p * (1 - ex)); el.style.transform = `translateY(${(1 - p) * 18}px)`;
+    el.querySelector('.s4e').style.letterSpacing = lerp(.45, .2, p) + 'em';
+  });
+  const tg = P(t, 8.14, 8.5, E.outCubic);
+  $('#s4tag').style.opacity = String(tg * (1 - ex)); $('#s4tag').style.transform = `translateY(${(1 - tg) * 14}px)`;
+}
+
+function updSolo(o, t) {
+  o.ph.style.transform = `scale(${lerp(1.1, 1.22, P(t, 9.0, 10.9))})`;
+  const p = P(t, 9.0, 9.45, E.outExpo);
+  o.t.style.clipPath = `inset(0 ${(1 - p) * 100}% 0 0)`;
+  o.t.style.letterSpacing = lerp(.3, .14, P(t, 9.0, 9.9, E.outExpo)) + 'em';
+  o.t.style.marginLeft = lerp(.3, .14, P(t, 9.0, 9.9, E.outExpo)) * 190 + 'px';
+  o.ov.style.opacity = String(P(t, 9.08, 9.4));
+  const kp = P(t, 9.22, 9.6, E.outCubic);
+  o.k.style.opacity = String(.88 * kp); o.k.style.transform = `translateY(${(1 - kp) * 16}px)`;
+  o.num.style.opacity = String(P(t, 9.0, 9.5)); o.num.style.transform = `translateY(${lerp(40, -30, P(t, 9.0, 10.9))}px)`;
+  o.base.style.width = (1000 * P(t, 9.02, 9.35, E.outExpo)) + 'px';
+  // step progress on ticks
+  let cur = -1; for (let i = 0; i < 7; i++) if (t >= TICK0 + i * TICKD) cur = i;
+  let px = 0;
+  if (cur >= 0) {
+    const from = cur === 0 ? 0 : (cur - 1) * (1000 / 6), to = cur * (1000 / 6);
+    px = lerp(from, to, P(t, TICK0 + cur * TICKD, TICK0 + cur * TICKD + .14, E.outExpo));
+  }
+  o.prog.style.width = px + 'px';
+  o.D.forEach((d, i) => {
+    const on = i <= cur, pp = on ? P(t, TICK0 + i * TICKD, TICK0 + i * TICKD + .16, E.outBack) : 0;
+    d.style.background = on ? '#e2b478' : 'transparent'; d.style.borderColor = on ? '#e2b478' : 'rgba(242,238,229,.55)';
+    d.style.transform = `scale(${on ? lerp(2.2, 1, pp) : 1})`;
+    d.style.opacity = String(P(t, 9.05 + i * .03, 9.3 + i * .03));
+  });
+  o.N.forEach((n, i) => {
+    const st = TICK0 + i * TICKD;
+    const pin = P(t, st, st + .12, E.outCubic), pout = i < 6 ? P(t, st + TICKD, st + TICKD + .12, E.inCubic) : 0;
+    n.style.transform = `translateY(${(1 - pin) * 30 - pout * 30}px)`;
+    n.style.opacity = String(pin * (1 - pout));
+  });
+  // seam (drawn from centre just before the curtain split)
+  const sw = 1920 * P(t, 10.34, 10.5, E.outExpo);
+  for (const s of [o.seam1, o.seam2]) { s.style.left = (960 - sw / 2) + 'px'; s.style.width = sw + 'px'; }
+}
+function S5(t) {
+  const vis = t >= 8.98 && t < 10.92; show($('#s5top'), vis); show($('#s5bot'), vis); if (!vis) return;
+  updSolo(soloT, t); updSolo(soloB, t);
+  const u = P(t, 10.5, 10.9, E.inOutExpo);
+  $('#s5top').style.clipPath = 'inset(0 0 540px 0)'; $('#s5bot').style.clipPath = 'inset(540px 0 0 0)';
+  $('#s5top').style.transform = `translateY(${-560 * u}px)`; $('#s5bot').style.transform = `translateY(${560 * u}px)`;
+}
+
+const IRIS = { cy: 400, rx: 107, ry: 131 };
+function S6(t) {
+  const vis = t >= 10.3 && t < 12.45; show($('#s6'), vis); if (!vis) return;
+  $('#s6ph').style.transform = `scale(${lerp(1.04, 1.16, P(t, 10.5, 12.2))})`;
+  const lp = P(t, 10.5, 12.0);
+  $('#s6leak').style.background = `radial-gradient(ellipse 800px 620px at ${lerp(105, -5, lp)}% ${lerp(70, 35, lp)}%,rgba(236,186,118,.5),rgba(236,186,118,0) 70%)`;
+  $('#s6leak').style.opacity = String(.55 * bell(lp));
+  s6chars.forEach((c, i) => {
+    const st = 10.62 + i * .052, p = P(t, st, st + .9, E.outCubic);
+    c.style.opacity = String(p); c.style.filter = `blur(${(1 - p) * 14}px)`; c.style.transform = `translateY(${(1 - p) * 26}px)`;
+  });
+  const pe = P(t, 11.0, 11.4, E.outCubic);
+  $('#s6e').style.opacity = String(.72 * pe); $('#s6e').style.transform = `translateY(${(1 - pe) * 12}px)`;
+  const x = P(t, 11.4, 11.62, E.inCubic);
+  $('#s6txt').style.opacity = String(1 - x); $('#s6txt').style.filter = `blur(${x * 10}px)`;
+  // elliptical iris closes onto the emblem
+  const g = P(t, 11.5, 12.0, E.inOutExpo);
+  const rx = lerp(1500, IRIS.rx, g), ry = lerp(1850, IRIS.ry, g), cy = lerp(540, IRIS.cy, g);
+  clip($('#s6'), `ellipse(${rx}px ${ry}px at 960px ${cy}px)`);
+  $('#s6').style.opacity = String(1 - P(t, 12.0, 12.4, E.outCubic));
+  const ring = $('#irisRing');
+  ring.setAttribute('rx', String(rx + 4.5)); ring.setAttribute('ry', String(ry + 4.5)); ring.setAttribute('cy', String(cy));
+}
+
+function S7(t) {
+  const vis = t >= 11.45; show($('#s7'), vis); if (!vis) return;
+  $('#s7glow').style.opacity = String(P(t, 11.9, 12.9, E.outCubic) * (.85 + .15 * Math.sin(t * 2.2)));
+  $('#s7grp').style.transform = `scale(${lerp(1.0, 1.03, P(t, 12.0, 15.0))})`;
+  $('#irisRing').style.opacity = String(P(t, 11.62, 11.9) * (1 - P(t, 12.25, 12.7, E.inOutCubic)));
+  const e = $('#emb');
+  const r = P(t, 12.02, 12.95, E.inOutCubic);
+  e.style.webkitMaskPosition = `0 0, ${lerp(100, 0, r)}% 0`;
+  e.style.maskPosition = `0 0, ${lerp(100, 0, r)}% 0`;
+  e.style.opacity = String(P(t, 12.0, 12.2));
+  const sh = P(t, 13.05, 13.95, E.inOutCubic);
+  $('#embSheen').style.backgroundPosition = `${lerp(100, 0, sh)}% 0`;
+  $('#embSheen').style.opacity = String(sh > 0 && sh < 1 ? .9 : 0);
+  const wmP = P(t, 12.4, 13.25, E.inOutExpo);
+  const wm = $('#wm');
+  wm.style.clipPath = `inset(0 ${(1 - wmP) * 50}% 0 ${(1 - wmP) * 50}%)`;
+  wm.style.opacity = String(P(t, 12.4, 12.8));
+  wm.style.filter = `blur(${(1 - P(t, 12.4, 13.1, E.outCubic)) * 6}px)`;
+  const lw = 90 * P(t, 12.95, 13.45, E.outExpo);
+  $('#s7line').style.left = (960 - lw / 2) + 'px'; $('#s7line').style.width = lw + 'px';
+  const kp = P(t, 13.05, 13.65, E.outCubic);
+  $('#s7kr').style.opacity = String(.78 * kp); $('#s7kr').style.transform = `translateY(${(1 - kp) * 12}px)`;
+  const fp = P(t, 13.45, 14.05, E.outCubic);
+  $('#s7foot').style.opacity = String(.8 * fp); $('#s7foot').style.letterSpacing = lerp(.7, .46, fp) + 'em';
+}
+
+function HUD(t, frame) {
+  const v = P(t, .2, .6) * (1 - P(t, 11.3, 11.6));
+  $('#hud').style.opacity = String(v); show($('#hud'), v > 0);
+  const f = Math.floor(t * 30 + 1e-6);
+  const ss = Math.floor(f / 30), ff = f % 30;
+  $('#tc').textContent = `00:${String(ss).padStart(2, '0')}:${String(ff).padStart(2, '0')}`;
+  CHAPTERS.forEach(([st], i) => {
+    const nx = i < CHAPTERS.length - 1 ? CHAPTERS[i + 1][0] : 99;
+    const pin = i === 0 ? 1 : P(t, st, st + .3, E.outExpo), pout = P(t, nx, nx + .3, E.outExpo);
+    chapEls[i].style.transform = `translateY(${(1 - pin) * 16 - pout * 16}px)`;
+    chapEls[i].style.opacity = String(.75 * pin * (1 - pout));
+  });
+}
+
+function FX(t, frame) {
+  let fl = 0;
+  for (const [ft, a] of FLASHES) if (t >= ft) fl = Math.max(fl, a * (1 - P(t, ft, ft + .3, E.outCubic)));
+  $('#flash').style.opacity = String(fl);
+  $('#vig').style.opacity = String(1 - .72 * P(t, 6.84, 7.1) * (1 - P(t, 8.6, 9.0)));
+  $('#scrim').style.opacity = String(1 - P(t, 6.66, 6.84));
+  // dust: intro + logo
+  const da = Math.max(.55 * (1 - P(t, 1.6, 2.1)), P(t, 12.0, 13.0) * 1.0);
+  dctx.clearRect(0, 0, 1920, 1080);
+  if (da > 0) {
+    for (const d of DUST) {
+      const y = ((d.y - t * d.v) % 1080 + 1080) % 1080, x = d.x + Math.sin(t * d.f + d.ph) * d.sway;
+      const tw = .55 + .45 * Math.sin(t * d.f * 3 + d.ph * 2);
+      const a = da * d.a * tw * .5;
+      const gr = dctx.createRadialGradient(x, y, 0, x, y, d.r * 3);
+      gr.addColorStop(0, `rgba(240,205,150,${a})`); gr.addColorStop(1, 'rgba(240,205,150,0)');
+      dctx.fillStyle = gr; dctx.beginPath(); dctx.arc(x, y, d.r * 3, 0, 6.2832); dctx.fill();
+    }
+  }
+  gctx.putImageData(GRAIN[frame % GRAIN.length], 0, 0);
+}
+
+function seek(t) {
+  const frame = Math.round(t * 60);
+  S12(t); S3(t); S4(t); S5(t); S6(t); S7(t); HUD(t, frame); FX(t, frame);
+}
+window.seek = seek;
+window.DURATION = 15;
+
+/* ------------------------------------------------------------------ boot */
+const IMGS = ['hall-majestic', 'art-walk', 'hero', 'garden-grass', 'after-hours', 'run-brunch', 'talk-insight', 'taste-table',
+  'about', 'raum-solo', 'social-night'].map(n => `../../deploy/${n}.jpg`).concat(['../../deploy/logo-emblem.png', '../../deploy/logo-mtwj03w6-n1ft.png']);
+window.ready = Promise.all([document.fonts.ready, ...IMGS.map(src => { const i = new Image(); i.src = src; return i.decode().catch(() => {}); })])
+  .then(() => document.fonts.ready).then(() => { seek(0); return true; });
+
+const params = new URLSearchParams(location.search);
+if (!params.has('render')) {
+  const fit = () => { const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    Object.assign($('#stage').style, { transform: `scale(${s})`, left: ((innerWidth - 1920 * s) / 2) + 'px', top: ((innerHeight - 1080 * s) / 2) + 'px' }); };
+  addEventListener('resize', fit); fit();
+  const audio = new Audio('out/soundtrack.wav');
+  let t0 = performance.now(), useAudio = false;
+  const loop = () => {
+    let t = useAudio ? audio.currentTime : ((performance.now() - t0) / 1000) % 15;
+    if (useAudio && audio.ended) { audio.currentTime = 0; audio.play(); t = 0; }
+    if (params.has('t')) t = parseFloat(params.get('t'));
+    seek(Math.min(t, 14.999)); requestAnimationFrame(loop);
+  };
+  window.ready.then(() => { $('#play').style.display = 'flex'; loop(); });
+  $('#play').onclick = () => { $('#play').style.display = 'none'; audio.currentTime = 0; audio.play().then(() => useAudio = true).catch(() => {}); };
+}
+</script>
+</body>
+</html>
