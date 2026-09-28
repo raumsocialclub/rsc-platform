@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>RSC Reel — 15s</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{--cream:#f7f3ec;--cream2:#efe9de;--ink:#211e19;--brown:#5a3d24;--cognac:#9c6b3e;--gold:#e2b478}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#0d0b09;overflow:hidden;height:100%}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;background:var(--cream);
+  transform-origin:0 0;font-family:'Pretendard',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.sc{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;visibility:hidden}
+.bg{position:absolute;inset:0}
+.a{position:absolute;left:0;top:0}
+.ln{overflow:hidden;padding:.1em .06em .06em;margin:-.1em -.06em -.06em;white-space:nowrap}
+.ln>span{display:inline-block;will-change:transform}
+.blk{font-weight:900;letter-spacing:-.05em;line-height:.9}
+.kr{font-weight:900;letter-spacing:-.06em;line-height:1}
+.ui{font-family:'SamsungOne','Pretendard',sans-serif;font-weight:700;font-size:22px;letter-spacing:.16em;line-height:1.35;text-transform:uppercase}
+.rule{position:absolute;height:2px;transform-origin:0 50%}
+canvas.gl{position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none}
+#chrome{position:absolute;inset:0;pointer-events:none;z-index:60}
+#chrome .ui{position:absolute;font-size:19px;letter-spacing:.2em}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--gold);margin-right:12px;vertical-align:1px}
+.tile{position:absolute;width:200px;height:200px}
+.tile svg{position:absolute;left:30px;top:22px;width:140px;height:140px;overflow:visible}
+.tile .lb{position:absolute;left:18px;bottom:14px;font-size:17px;letter-spacing:.18em}
+.stroke{color:transparent!important;-webkit-text-stroke:3px var(--cream)}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ============ S2 · WHY (ink) ============ -->
+  <div class="sc" id="s2">
+    <div class="bg" style="background:var(--ink)"></div>
+    <div class="a ui" id="s2tag" style="left:72px;top:300px;color:var(--gold)"><div class="ln"><span>00 — WHY RAUM</span></div></div>
+    <div class="a kr" style="left:72px;top:400px;font-size:176px;color:var(--cream)">
+      <div class="ln"><span id="s2l1">만남을</span></div>
+      <div class="ln" style="margin-top:14px"><span id="s2l2">세지 않고,</span></div>
+    </div>
+    <div id="s2dots"></div>
+    <div class="rule" id="s2strike" style="left:150px;top:891px;width:780px;height:10px;background:var(--gold)"></div>
+    <div class="a kr" style="left:72px;top:1050px;font-size:176px">
+      <div class="ln"><span id="s2l3" style="color:var(--gold)">관계를</span></div>
+      <div class="ln" style="margin-top:14px"><span id="s2l4" style="color:var(--cream)">쌓습니다.</span></div>
+    </div>
+  </div>
+
+  <!-- ============ S3 · SOCIAL ×3 (cognac) ============ -->
+  <div class="sc" id="s3">
+    <div class="bg" style="background:var(--cognac)"></div>
+    <canvas class="gl" id="glBack" width="1080" height="1920"></canvas>
+    <div class="a ui" style="left:72px;top:300px;color:var(--cream)"><div class="ln"><span id="s3tag">NOT A DATING APP.</span></div></div>
+    <div class="a ui" style="left:0;top:300px;width:1008px;text-align:right;color:var(--cream)"><div class="ln"><span id="s3tag2">A PRIVATE SOCIAL MEMBERSHIP</span></div></div>
+    <div class="a blk" id="s3stack" style="left:0;top:560px;width:1080px;text-align:center;font-size:256px;color:var(--cream)">
+      <div class="ln"><span id="s3a">SOCIAL</span></div>
+      <div class="ln" style="margin-top:0"><span id="s3b">SOCIAL</span></div>
+      <div class="ln"><span id="s3c">SOCIAL</span></div>
+    </div>
+    <div class="rule" id="s3rule" style="left:72px;top:1370px;width:936px;background:rgba(247,243,236,.55)"></div>
+    <div class="a" style="left:72px;top:1400px;font-weight:700;font-size:50px;letter-spacing:-.03em;color:var(--cream)"><div class="ln"><span id="s3copy">매칭이 아니라, 커뮤니티.</span></div></div>
+  </div>
+
+  <!-- ============ S4 · 01 EXPERIENCE (cream) ============ -->
+  <div class="sc" id="s4">
+    <div class="bg" style="background:var(--cream)"></div>
+    <div class="a ui" style="left:72px;top:300px"><div class="ln"><span id="s4tag">01 / EXPERIENCE</span></div></div>
+    <div class="a ui" style="left:0;top:300px;width:1008px;text-align:right"><div class="ln"><span id="s4tag2">↗</span></div></div>
+    <div class="a kr" style="left:72px;top:372px;font-size:176px">
+      <div class="ln"><span id="s4l1">취향으로</span></div>
+      <div class="ln" style="margin-top:10px"><span id="s4l2" style="color:var(--cognac)">만나고</span></div>
+    </div>
+    <div id="s4grid"></div>
+    <div class="a ui" style="left:72px;top:1486px;font-size:21px"><div class="ln"><span id="s4foot">ART · WINE · WELLNESS · MUSIC · DINING · TALK</span></div></div>
+  </div>
+
+  <!-- ============ S5 · 02 PEOPLE (gold) ============ -->
+  <div class="sc" id="s5">
+    <div class="bg" style="background:var(--gold)"></div>
+    <div class="a ui" style="left:72px;top:300px"><div class="ln"><span id="s5tag">02 / PEOPLE</span></div></div>
+    <div class="a kr" style="left:72px;top:372px;font-size:176px">
+      <div class="ln"><span id="s5l1">사람으로</span></div>
+      <div class="ln" style="margin-top:10px"><span id="s5l2" style="color:var(--brown)">이어지고</span></div>
+    </div>
+    <svg class="a" id="s5net" width="1080" height="1920" style="overflow:visible"></svg>
+    <svg class="a" id="s5stamp" width="220" height="220" viewBox="-110 -110 220 220" style="left:790px;top:330px;overflow:visible">
+      <defs><path id="s5cp" d="M0,-84 A84,84 0 1,1 -0.01,-84"/></defs>
+      <circle r="104" fill="none" stroke="var(--ink)" stroke-width="2"/>
+      <g id="s5rot"><text font-family="SamsungOne" font-weight="700" font-size="19" letter-spacing="5.2" fill="var(--ink)"><textPath href="#s5cp">VERIFIED BY RAUM · MEMBERS ONLY · </textPath></text></g>
+      <path d="M-26 2 L-8 20 L28 -18" fill="none" stroke="var(--ink)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="a" style="left:72px;top:1352px;font-weight:700;font-size:34px;letter-spacing:-.02em"><div class="ln"><span id="s5kr">라움이 검증한 멤버만.</span></div></div>
+    <div class="a blk" style="left:72px;top:1418px;font-size:104px">
+      <div class="ln"><span id="s5b1">PEOPLE,</span></div>
+      <div class="ln"><span id="s5b2">VERIFIED.</span></div>
+    </div>
+  </div>
+
+  <!-- ============ S6 · 03 RELATIONSHIP (ink) ============ -->
+  <div class="sc" id="s6">
+    <div class="bg" style="background:var(--ink)"></div>
+    <div class="a" id="s6glow" style="left:-260px;top:420px;width:1600px;height:1300px;background:radial-gradient(closest-side,rgba(226,180,120,.34),rgba(156,107,62,.12) 55%,rgba(33,30,25,0))"></div>
+    <div class="a" id="s6photo" style="left:110px;top:613px;width:800px;height:1200px;background:url(../../deploy/after-hours.jpg) 0 0/100% 100% no-repeat"></div>
+    <div class="a ui" style="left:72px;top:300px;color:var(--gold)"><div class="ln"><span id="s6tag">03 / RELATIONSHIP</span></div></div>
+    <div class="a kr" style="left:72px;top:372px;font-size:176px">
+      <div class="ln"><span id="s6l1" style="color:var(--cream)">관계로</span></div>
+      <div class="ln" style="margin-top:10px"><span id="s6l2" style="color:var(--gold)">완성되다.</span></div>
+    </div>
+    <svg class="a" id="s6fx" width="1080" height="1920" style="overflow:visible"></svg>
+    <div class="a ui" style="left:72px;top:1532px;color:var(--gold)"><div class="ln"><span id="s6solo">RAUM SOLO — 6 WEEKS</span></div></div>
+    <div class="a blk" style="left:72px;top:1572px;font-size:96px;color:var(--cream)"><div class="ln"><span id="s6week">WEEK 01</span></div></div>
+    <div class="a" style="left:0;top:1556px;width:1000px;text-align:right;font-weight:700;font-size:38px;line-height:1.3;letter-spacing:-.02em;color:var(--cream)">
+      <div class="ln"><span id="s6k1">처음 만난 곳도,</span></div>
+      <div class="ln"><span id="s6k2">라움<span style="color:var(--gold)">.</span></span></div>
+    </div>
+  </div>
+
+  <!-- ============ S7 · LOGO (cognac) ============ -->
+  <div class="sc" id="s7">
+    <div class="bg" style="background:var(--cognac)"></div>
+    <div class="a ui" style="left:72px;top:300px;color:var(--cream)"><div class="ln"><span id="s7tag">THIS IS WHERE IT BEGINS.</span></div></div>
+    <div class="a blk" id="s7word" style="left:66px;top:470px;font-size:272px;color:var(--cream)">
+      <div class="ln" id="s7w1">RAUM</div>
+      <div class="ln" id="s7w2" style="color:var(--gold)">SOCIAL</div>
+      <div class="ln" id="s7w3">CLUB.</div>
+    </div>
+    <div class="a" style="left:72px;top:1300px;font-weight:700;font-size:54px;line-height:1.22;letter-spacing:-.035em;color:var(--cream)">
+      <div class="ln"><span id="s7k1">서로의 특별함을</span></div>
+      <div class="ln"><span id="s7k2">발견하는 곳.</span></div>
+    </div>
+    <div class="a ui" style="left:72px;top:1470px;color:var(--cream);opacity:.8"><div class="ln"><span id="s7en">A CURATED LIFESTYLE COMMUNITY FOR SINGLES</span></div></div>
+  </div>
+
+  <!-- ============ S8 · LOCKUP (cream) ============ -->
+  <div class="sc" id="s8">
+    <div class="bg" style="background:var(--cream)"></div>
+    <div class="a ui" style="left:72px;top:470px;color:var(--cognac)"><div class="ln"><span id="s8tag">A PRIVATE SOCIAL MEMBERSHIP</span></div></div>
+    <div class="a blk" style="left:68px;top:524px;font-size:142px">
+      <div class="ln"><span id="s8w1">RAUM SOCIAL</span></div>
+      <div class="ln"><span id="s8w2">CLUB<span style="color:var(--cognac)">.</span></span></div>
+    </div>
+    <div class="a" style="left:72px;top:862px;font-weight:700;font-size:44px;line-height:1.3;letter-spacing:-.03em">
+      <div class="ln"><span id="s8k1">라움이 검증한 멤버가 모이는</span></div>
+      <div class="ln"><span id="s8k2">싱글 라이프스타일 커뮤니티.</span></div>
+    </div>
+    <div class="rule" id="s8r1" style="left:72px;top:1030px;width:936px;background:var(--ink)"></div>
+    <div class="a ui" style="left:72px;top:1060px"><div class="ln"><span id="s8a1">FOUNDING MEMBER</span></div></div>
+    <div class="a" style="left:0;top:1052px;width:1008px;text-align:right;font-weight:800;font-size:34px;letter-spacing:-.02em"><div class="ln"><span id="s8b1">선착순 100명</span></div></div>
+    <div class="a ui" style="left:72px;top:1124px"><div class="ln"><span id="s8a2">OFFICIAL LAUNCH</span></div></div>
+    <div class="a" style="left:0;top:1116px;width:1008px;text-align:right;font-weight:800;font-size:34px;letter-spacing:-.01em"><div class="ln"><span id="s8b2">2026.12.02</span></div></div>
+    <div class="rule" id="s8r2" style="left:72px;top:1186px;width:936px;background:var(--ink)"></div>
+    <div class="a" id="s8emb" style="left:72px;top:1236px;width:118px;height:142px;background:var(--cognac);
+      -webkit-mask:url(../../deploy/logo-emblem.png) center/contain no-repeat;mask:url(../../deploy/logo-emblem.png) center/contain no-repeat"></div>
+    <div class="a ui" style="left:0;top:1330px;width:1008px;text-align:right;color:var(--cognac)"><div class="ln"><span id="s8url">RAUM SOCIAL CLUB · SEOUL</span></div></div>
+  </div>
+
+  <!-- ============ S1 · OPENER (cream) — also the loop landing ============ -->
+  <div class="sc" id="s1">
+    <div class="bg" style="background:var(--cream)"></div>
+    <div class="rule" id="s1rule" style="left:72px;top:472px;width:936px;background:var(--ink)"></div>
+    <div class="a blk" style="left:62px;top:496px;font-size:262px">
+      <div class="ln"><span id="s1w1">RAUM</span></div>
+      <div class="ln"><span id="s1w2">SOCIAL</span></div>
+      <div class="ln" style="padding-left:190px"><span id="s1w3">CLUB<span style="color:var(--cognac)">.</span></span></div>
+    </div>
+    <div class="a" style="left:72px;top:1282px;font-weight:700;font-size:40px;line-height:1.32;letter-spacing:-.03em">
+      <div class="ln"><span id="s1k1">서로의 특별함을</span></div>
+      <div class="ln"><span id="s1k2">발견하는 곳.</span></div>
+    </div>
+    <div class="a ui" style="left:0;top:1286px;width:1008px;text-align:right;font-size:20px;line-height:1.5">
+      <div class="ln"><span id="s1e1">EXPERIENCE.</span></div>
+      <div class="ln"><span id="s1e2">PEOPLE.</span></div>
+      <div class="ln"><span id="s1e3">RELATIONSHIP.</span></div>
+    </div>
+  </div>
+
+  <!-- transition helpers + 3D front layer -->
+  <div class="a" id="wipebar" style="left:0;width:1080px;height:26px;background:var(--gold);z-index:40;visibility:hidden"></div>
+  <div class="a" id="blinds" style="inset:0;z-index:40"></div>
+  <canvas class="gl" id="glFront" width="1080" height="1920" style="z-index:50"></canvas>
+
+  <div id="chrome">
+    <div class="ui" id="chTL" style="left:72px;top:150px"><span class="dot"></span>RAUM SOCIAL CLUB</div>
+    <div class="ui" id="chTR" style="right:72px;top:150px">BRAND IN MOTION</div>
+    <div class="ui" id="chBL" style="left:72px;top:1752px">EXPERIENCE. PEOPLE. RELATIONSHIP.</div>
+    <div class="ui" id="chBR" style="right:72px;top:1752px;letter-spacing:.06em">라움소셜클럽</div>
+    <div class="a" id="chLine" style="left:72px;top:1720px;width:936px;height:2px;transform-origin:0 50%"></div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from './vendor/three.min.js';
+
+// ------------------------------------------------------------------ timing (128 BPM, 8 bars = 15.0 s)
+const W = 1080, H = 1920, DUR = 15, FPS = 60;
+const B = 60 / 128, BAR = 4 * B, S16 = B / 4;
+const bt = n => n * B;                        // beat n → seconds
+const SC = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => i * BAR);   // scene boundaries
+
+// ------------------------------------------------------------------ helpers
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const E = {
+  lin: p => p,
+  inQuad: p => p * p, outQuad: p => 1 - (1 - p) ** 2,
+  inCubic: p => p ** 3, outCubic: p => 1 - (1 - p) ** 3,
+  inOutCubic: p => p < .5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2,
+  outQuart: p => 1 - (1 - p) ** 4, inQuart: p => p ** 4,
+  inOutQuart: p => p < .5 ? 8 * p ** 4 : 1 - (-2 * p + 2) ** 4 / 2,
+  outExpo: p => p >= 1 ? 1 : 1 - 2 ** (-10 * p),
+  inExpo: p => p <= 0 ? 0 : 2 ** (10 * p - 10),
+  inOutExpo: p => p <= 0 ? 0 : p >= 1 ? 1 : p < .5 ? 2 ** (20 * p - 10) / 2 : (2 - 2 ** (-20 * p + 10)) / 2,
+  inOutSine: p => -(Math.cos(Math.PI * p) - 1) / 2,
+  outBack: p => { const c = 1.9; return 1 + (c + 1) * (p - 1) ** 3 + c * (p - 1) ** 2; },
+  outBackS: p => { const c = 1.2; return 1 + (c + 1) * (p - 1) ** 3 + c * (p - 1) ** 2; },
+};
+const P = (t, a, b, e = E.lin) => e(clamp((t - a) / (b - a)));
+// keyframe track: [[t, v], [t, v, ease], ...] – ease applies to the segment ending at that key
+function track(t, keys) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    const [t1, v1, e] = keys[i];
+    if (t <= t1) {
+      const [t0, v0] = keys[i - 1];
+      const p = (e || E.inOutCubic)((t - t0) / (t1 - t0));
+      return Array.isArray(v0) ? v0.map((x, k) => lerp(x, v1[k], p)) : lerp(v0, v1, p);
+    }
+  }
+  return keys[keys.length - 1][1];
+}
+const $ = id => document.getElementById(id);
+const css = (el, o) => { for (const k in o) el.style[k] = o[k]; };
+const show = (el, on) => { el.style.visibility = on ? 'visible' : 'hidden'; };
+const hex = c => new THREE.Color(c);
+
+// directional motion blur via per-element SVG filters
+const svgNS = 'http://www.w3.org/2000/svg';
+const fxDefs = document.createElementNS(svgNS, 'svg');
+fxDefs.setAttribute('width', 0); fxDefs.setAttribute('height', 0);
+fxDefs.style.position = 'absolute';
+document.body.appendChild(fxDefs);
+const blurs = new Map();
+function mblur(el, bx, by) {
+  bx = Math.abs(bx); by = Math.abs(by);
+  if (bx < .35 && by < .35) { el.style.filter = ''; return; }
+  let f = blurs.get(el);
+  if (!f) {
+    const id = 'mb' + blurs.size;
+    const flt = document.createElementNS(svgNS, 'filter');
+    flt.setAttribute('id', id);
+    flt.setAttribute('x', '-50%'); flt.setAttribute('y', '-50%');
+    flt.setAttribute('width', '200%'); flt.setAttribute('height', '200%');
+    const g = document.createElementNS(svgNS, 'feGaussianBlur');
+    flt.appendChild(g); fxDefs.appendChild(flt);
+    f = { id, g }; blurs.set(el, f);
+  }
+  f.g.setAttribute('stdDeviation', `${bx.toFixed(2)} ${by.toFixed(2)}`);
+  el.style.filter = `url(#${f.id})`;
+}
+
+// Masked line reveal: element slides within its .ln mask. dir: 1 = from below, -1 = from above.
+// Returns nothing; applies transform + vertical motion blur from the eased velocity.
+function rise(el, t, t0, dur = .42, { out = null, outDur = .26, dir = 1, ease = E.outExpo, outEase = E.inCubic, dist = 110 } = {}) {
+  const f = tt => {
+    let y = (1 - ease(clamp((tt - t0) / dur))) * dist * dir;
+    if (out != null) y -= outEase(clamp((tt - out) / outDur)) * dist * dir;
+    return y;
+  };
+  const y = f(t), v = (f(t) - f(t - 1 / FPS));
+  el.style.transform = `translateY(${y.toFixed(2)}%)`;
+  mblur(el, 0, v * .09 * (el.offsetHeight || 100) / 100);
+}
+function slideX(el, t, t0, dur, from, { out = null, outDur = .3, to = 0, ease = E.outExpo, outEase = E.inExpo } = {}) {
+  const f = tt => {
+    let x = (1 - ease(clamp((tt - t0) / dur))) * from;
+    if (out != null) x += outEase(clamp((tt - out) / outDur)) * to;
+    return x;
+  };
+  const x = f(t), v = f(t) - f(t - 1 / FPS);
+  el.style.transform = `translateX(${x.toFixed(1)}px)`;
+  mblur(el, v * .35, 0);
+}
+
+// ------------------------------------------------------------------ 3D setup
+const glCanvas = document.createElement('canvas');
+glCanvas.width = W; glCanvas.height = H;
+const R = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+R.setPixelRatio(1); R.setSize(W, H, false);
+R.outputColorSpace = THREE.SRGBColorSpace;
+R.toneMapping = THREE.NeutralToneMapping;
+R.toneMappingExposure = 1.0;
+R.localClippingEnabled = true;
+R.setClearColor(0x000000, 0);
+
+// warm studio environment: brown room, cream sky, a few candle-warm softboxes
+function makeEnv() {
+  const s = new THREE.Scene();
+  const room = new THREE.Mesh(new THREE.SphereGeometry(20, 48, 24), new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms: {},
+    vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+    fragmentShader: `varying vec3 vP; void main(){ float h = normalize(vP).y;
+      vec3 lo = vec3(.10,.065,.04), mid = vec3(.42,.30,.19), hi = vec3(.95,.90,.82);
+      vec3 c = h < 0. ? mix(mid, lo, clamp(-h*1.6,0.,1.)) : mix(mid, hi, clamp(h*1.3,0.,1.));
+      gl_FragColor = vec4(c,1.); }`,
+  }));
+  s.add(room);
+  const box = (w, h, x, y, z, c, k) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide }));
+    m.position.set(x, y, z); m.lookAt(0, 0, 0); s.add(m);
+  };
+  box(10, 3, 0, 12, 6, 0xfff1dc, 6);      // overhead key
+  box(3, 9, -12, 2, 5, 0xffe2b8, 3.5);    // warm side strip
+  box(3, 9, 12, 1, -4, 0xfff6ea, 2.2);    // cool-ish rim
+  box(6, 2, 4, -3, 13, 0xffd9a0, 2.4);    // low candle bounce
+  return s;
+}
+const scene = new THREE.Scene();
+const pm = new THREE.PMREMGenerator(R);
+scene.environment = pm.fromScene(makeEnv(), 0.02).texture;
+
+const CAMZ = 20;
+const cam = new THREE.PerspectiveCamera(2 * Math.atan(0.25) * 180 / Math.PI, W / H, 0.1, 100);
+cam.position.set(0, 0, CAMZ);
+const UPX = 192;                                   // pixels per world unit on the z=0 plane
+const wx = px => (px - W / 2) / UPX, wy = py => (H / 2 - py) / UPX;
+
+// emblem-proportioned oval ring
+const RX = 1.25, RY = 1.55, TUBE = 0.3;
+class Oval extends THREE.Curve { getPoint(u, o = new THREE.Vector3()) { const a = u * Math.PI * 2; return o.set(Math.cos(a) * RX, Math.sin(a) * RY, 0); } }
+const clipBack = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+const clipFront = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+const ringMat = new THREE.MeshPhysicalMaterial({ color: 0xe0ac6c, metalness: 1, roughness: .2, clearcoat: .6, clearcoatRoughness: .15, envMapIntensity: 1.25 });
+const ring = new THREE.Mesh(new THREE.TubeGeometry(new Oval(), 360, TUBE, 72, true), ringMat);
+ring.rotation.order = 'YXZ';
+scene.add(ring);
+const GOLD_RING = hex(0xe0ac6c), BRONZE_RING = hex(0x5a3a22);
+
+const sphGeo = new THREE.SphereGeometry(1, 64, 40);
+const mkSphere = () => {
+  const m = new THREE.Mesh(sphGeo, new THREE.MeshPhysicalMaterial({ color: 0x9c6b3e, roughness: .28, clearcoat: 1, clearcoatRoughness: .12, envMapIntensity: 1.0 }));
+  scene.add(m); return m;
+};
+const sA = mkSphere(), sB = mkSphere(), sC = mkSphere();
+const mats = [ringMat, sA.material, sB.material, sC.material];
+
+const cBack = $('glBack').getContext('2d'), cFront = $('glFront').getContext('2d');
+const _v = new THREE.Vector3();
+function proj(x, y, z) { _v.set(x, y, z).project(cam); return [(_v.x + 1) / 2 * W, (1 - _v.y) / 2 * H]; }
+function projLocal(obj, x, y, z) { _v.set(x, y, z); obj.localToWorld(_v); _v.project(cam); return [(_v.x + 1) / 2 * W, (1 - _v.y) / 2 * H]; }
+// screen-space ellipse of the ring's inner hole (inset a little so the seam hides under the metal)
+function holeEllipse(inset = .12) {
+  const hx = RX - TUBE + inset, hy = RY - TUBE + inset;
+  const c = projLocal(ring, 0, 0, 0), r = projLocal(ring, hx, 0, 0), u = projLocal(ring, 0, hy, 0);
+  return { cx: c[0], cy: c[1], rx: Math.hypot(r[0] - c[0], r[1] - c[1]), ry: Math.hypot(u[0] - c[0], u[1] - c[1]) };
+}
+
+function render3D(split) {
+  // split: world z plane; geometry behind it goes to glBack (under S3 type), in front to glFront.
+  cBack.clearRect(0, 0, W, H); cFront.clearRect(0, 0, W, H);
+  if (split === null) {
+    mats.forEach(m => { m.clippingPlanes = []; });
+    R.render(scene, cam); cFront.drawImage(glCanvas, 0, 0);
+    return;
+  }
+  clipBack.constant = split; clipFront.constant = -split;
+  mats.forEach(m => { m.clippingPlanes = [clipBack]; m.side = THREE.DoubleSide; });
+  R.render(scene, cam); cBack.drawImage(glCanvas, 0, 0);
+  mats.forEach(m => { m.clippingPlanes = [clipFront]; });
+  R.render(scene, cam); cFront.drawImage(glCanvas, 0, 0);
+  mats.forEach(m => { m.side = THREE.FrontSide; });
+}
+
+// ------------------------------------------------------------------ build dynamic DOM
+// S2 counting dots
+const dots = [];
+for (let i = 0; i < 5; i++) {
+  const d = document.createElement('div');
+  d.className = 'a';
+  css(d, { left: (240 + i * 150 - 48) + 'px', top: (896 - 48) + 'px', width: '96px', height: '96px', borderRadius: '50%', border: '6px solid var(--cream)' });
+  const n = document.createElement('div');
+  n.className = 'a ui';
+  css(n, { left: (240 + i * 150 - 40) + 'px', top: '966px', width: '80px', textAlign: 'center', color: 'var(--cream)', fontSize: '19px' });
+  n.textContent = '0' + (i + 1);
+  $('s2dots').append(d, n);
+  dots.push({ d, n });
+}
+
+// S4 tile grid
+const ICON = {
+  art: '<path d="M26 84 V46 A24 24 0 0 1 74 46 V84 Z"/><path d="M40 84 V56 A10 10 0 0 1 60 56 V84"/>',
+  wine: '<path d="M32 14 H68 C68 44 60 56 50 56 C40 56 32 44 32 14 Z"/><path d="M50 56 V84 M34 86 H66"/>',
+  music: '<path d="M40 74 V22 L76 14 V66"/><circle cx="31" cy="74" r="9" fill="currentColor"/><circle cx="67" cy="66" r="9" fill="currentColor"/>',
+  well: '<circle cx="50" cy="50" r="15"/><path d="M50 14 V24 M50 76 V86 M14 50 H24 M76 50 H86 M24.5 24.5 L31.5 31.5 M68.5 68.5 L75.5 75.5 M24.5 75.5 L31.5 68.5 M68.5 31.5 L75.5 24.5"/>',
+  dine: '<circle cx="54" cy="50" r="28"/><circle cx="54" cy="50" r="14"/><path d="M16 22 V78 M10 22 V40 C10 46 22 46 22 40 V22"/>',
+  talk: '<path d="M16 22 H84 V64 H48 L30 82 V64 H16 Z"/><path d="M32 43 H68"/>',
+  arrow: '<path d="M28 72 L72 28 M38 28 H72 V62"/>',
+  dot: '<circle cx="50" cy="50" r="13" fill="currentColor" stroke="none"/>',
+  plus: '<path d="M50 24 V76 M24 50 H76"/>',
+  star: '<path d="M50 20 V80 M24 35 L76 65 M24 65 L76 35"/>',
+  inf: '<path d="M50 50 C42 36 20 34 20 50 C20 66 42 64 50 50 C58 36 80 34 80 50 C80 66 58 64 50 50 Z"/>',
+  run: '<path d="M18 50 H80 M58 28 L80 50 L58 72"/>',
+};
+const TILES = [
+  ['art', 'cognac', 'ART'], ['arrow', null], ['dot', null], ['wine', 'gold', 'WINE'],
+  ['plus', 'gold'], ['music', 'cognac', 'MUSIC'], ['well', 'gold', 'WELLNESS'], ['star', null],
+  ['inf', null], ['dine', 'cognac', 'DINING'], ['talk', 'ink', 'TALK'], ['run', null],
+];
+const TX0 = 104, TY0 = 790, TS = 200, TG = 24;
+const tiles = TILES.map(([ic, fill, label], i) => {
+  const el = document.createElement('div');
+  el.className = 'tile';
+  const col = i % 4, row = (i / 4) | 0;
+  const x = TX0 + col * (TS + TG), y = TY0 + row * (TS + TG);
+  const fg = fill === 'cognac' || fill === 'ink' ? 'var(--cream)' : 'var(--ink)';
+  css(el, { left: x + 'px', top: y + 'px', background: fill ? `var(--${fill})` : 'transparent', color: fg,
+    border: fill ? 'none' : '2px solid rgba(33,30,25,.16)' });
+  el.innerHTML = `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">${ICON[ic]}</svg>` +
+    (label ? `<div class="lb ui">${label}</div>` : '');
+  $('s4grid').appendChild(el);
+  return { el, x, y, fill, svg: el.querySelector('svg') };
+});
+
+// S7 per-letter spans
+function splitLetters(el) {
+  const txt = el.textContent; el.textContent = '';
+  return [...txt].map(ch => { const s = document.createElement('span'); s.textContent = ch; s.style.display = 'inline-block'; el.appendChild(s); return s; });
+}
+const s7L = [splitLetters($('s7w1')), splitLetters($('s7w2')), splitLetters($('s7w3'))];
+
+// S5 network lines, S6 pulse rings
+const net = [0, 1, 2].map(() => { const l = document.createElementNS(svgNS, 'line'); l.setAttribute('stroke', '#211e19'); l.setAttribute('stroke-width', '3'); $('s5net').appendChild(l); return l; });
+const orbitPath = document.createElementNS(svgNS, 'ellipse');
+orbitPath.setAttribute('fill', 'none'); orbitPath.setAttribute('stroke', 'rgba(33,30,25,.35)'); orbitPath.setAttribute('stroke-width', '2'); orbitPath.setAttribute('stroke-dasharray', '4 10');
+$('s5net').prepend(orbitPath);
+const pulses = [0, 1, 2].map(() => { const c = document.createElementNS(svgNS, 'circle'); c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#e2b478'); $('s6fx').appendChild(c); return c; });
+const blinds = [0, 1, 2, 3, 4, 5].map(i => { const d = document.createElement('div'); d.className = 'a'; css(d, { left: 0, top: (i * 320) + 'px', width: '1080px', height: '321px', background: 'var(--ink)', transformOrigin: '0 50%' }); $('blinds').appendChild(d); return d; });
+
+// ------------------------------------------------------------------ scene visibility + transitions
+const sc = [null, $('s1'), $('s2'), $('s3'), $('s4'), $('s5'), $('s6'), $('s7'), $('s8')];
+const THEME = { 1: 'ink', 2: 'cream', 3: 'cream', 4: 'ink', 5: 'ink', 6: 'cream', 7: 'cream', 8: 'ink' };
+
+// ------------------------------------------------------------------ 3D choreography
+const POSE0 = { p: [wx(896), wy(612), 0], r: [.3, .5, -.3], s: .36 };
+const S5C = [0, wy(1090), 0];
+const S6C = [0, wy(1160), 0], S6S = .88;
+
+function ringPose(t) {
+  // returns {vis, p:[x,y,z], r:[x,y,z], s, bronze}
+  if (t < SC[1] + .35) {                                     // S1 hold → zoom-through
+    const wob = (1 - Math.cos(Math.PI * clamp(t / 1.3))) / 2;
+    const hold = { p: POSE0.p, r: [POSE0.r[0] - .1 * wob, POSE0.r[1] + .32 * wob, POSE0.r[2] + .22 * wob], s: POSE0.s };
+    const k = P(t, 1.3, 1.64, E.inOutCubic);
+    const p = hold.p.map((v, i) => lerp(v, [0, wy(900), 0][i], k));
+    const r = hold.r.map((v, i) => lerp(v, [0, 0, 0][i], P(t, 1.3, 1.64, E.outCubic)));
+    const s = lerp(hold.s, 1, k);
+    p[2] = t < bt(3.5) ? 0 : t < SC[1] ? 16 * E.inCubic(clamp((t - bt(3.5)) / (SC[1] - bt(3.5)))) : lerp(16, 19.6, clamp((t - SC[1]) / .12));
+    return { vis: p[2] < 19.4, p, r, s, bronze: 0 };
+  }
+  if (t >= SC[2] - .14 && t < SC[3] + .1) {                 // S3 · through the type
+    const p = track(t, [[SC[2] - .14, [3.4, -5.2, 7]], [SC[2] + .3, [0, wy(904), 0], E.outExpo], [SC[3] - .34, [0, wy(904), 0]], [SC[3] + .1, [-3.2, 6.2, -5], E.inExpo]]);
+    const r = track(t, [[SC[2] - .14, [1.9, -1.4, 1.1]], [SC[2] + .3, [1.18, -.55, .42], E.outExpo], [SC[3] - .1, [.92, 1.05, -.25], E.inOutSine], [SC[3] + .1, [.5, 1.6, -.6], E.inCubic]]);
+    return { vis: true, p, r, s: 1.38, bronze: 0 };
+  }
+  if (t >= SC[4] - .08 && t < SC[6] + .1) {                 // S5 people → S6 relationship → S7
+    const p = track(t, [[SC[4] - .08, [0, -6.5, 2]], [SC[4] + .36, S5C, E.outExpo], [SC[5] - .3, S5C], [SC[5] + .06, S6C, E.inOutCubic],
+      [SC[6] - .2, S6C], [SC[6] + .1, [wx(930), wy(360), 0], E.inOutExpo]]);
+    const r = track(t, [[SC[4] - .08, [1.9, .3, -.6]], [SC[4] + .36, [1.2, .12, .25], E.outExpo], [SC[5] - .3, [1.1, -.25, 1.2], E.inOutSine],
+      [SC[5] + .06, [0, 0, 0], E.inOutCubic], [SC[6] - .2, [0, 0, 0]], [SC[6] + .1, [.95, .45, .5], E.inOutExpo]]);
+    if (t > SC[5] + .06 && t < SC[6] - .2) {                // gentle breathing while framing the photo
+      const k = (t - SC[5] - .06) / (SC[6] - .2 - SC[5] - .06);
+      const env = Math.sin(Math.PI * k);
+      r[1] += .2 * Math.sin(2 * Math.PI * k * 1.3) * env; r[0] += .08 * Math.sin(2 * Math.PI * k * .9) * env;
+    }
+    const s = track(t, [[SC[4], 1.25], [SC[5] - .3, 1.25], [SC[5] + .06, S6S, E.inOutCubic], [SC[6] - .2, S6S], [SC[6] + .1, 1.15, E.inOutExpo]]);
+    const bronze = 1 - P(t, SC[5] - .25, SC[5] + .1, E.inOutSine);
+    return { vis: true, p, r, s, bronze };
+  }
+  if (t >= SC[6] + .1 && t < SC[7] + .1) {                  // S7 logo – top-right tumble, then exit
+    const k = P(t, SC[6] + .1, SC[7] - .3, E.lin);
+    const p = track(t, [[SC[6] + .1, [wx(930), wy(360), 0]], [SC[7] - .3, [wx(900), wy(380), 0], E.inOutSine], [SC[7] + .1, [5.2, 6.4, 1], E.inExpo]]);
+    return { vis: true, p, r: [.95 + .25 * k, .45 + 1.1 * k, .5 - .2 * k], s: 1.15, bronze: 0 };
+  }
+  if (t >= bt(30.5) - .02) {                                // S8 → loop landing
+    const k = P(t, bt(30.5), DUR, E.outExpo);
+    const p = [lerp(5.4, POSE0.p[0], k), lerp(.8, POSE0.p[1], k), lerp(5, 0, k)];
+    const r = [lerp(1.6, POSE0.r[0], k), lerp(-1.3, POSE0.r[1], k), lerp(.9, POSE0.r[2], k)];
+    return { vis: true, p, r, s: POSE0.s, bronze: 0 };
+  }
+  return { vis: false };
+}
+
+function spheres(t, rp) {
+  // returns [{vis,p,s,color}] for sA, sB, sC
+  const off = { vis: false };
+  const out = [off, off, off];
+  // opener companion (S1 and loop landing)
+  const s1a = (tt, sc) => {
+    const ang = 1.05 + .5 * (1 - Math.cos(Math.PI * clamp(tt / 1.3))) / 2;
+    return { vis: sc > .01, p: [POSE0.p[0] + Math.cos(ang) * 1.02, POSE0.p[1] + Math.sin(ang) * 1.02 * .98, .45], s: .2 * sc, color: 0x9c6b3e };
+  };
+  if (t < SC[1]) out[0] = s1a(t, 1 - P(t, 1.25, 1.45, E.inBack || E.inCubic));
+  if (t > bt(31) - .05) out[0] = s1a(0, P(t, bt(31), bt(31) + .35, E.outBack));
+  // S3: a cream moon orbiting through the stack
+  if (t >= SC[2] && t < SC[3]) {
+    const k = (t - SC[2]) / BAR;
+    const a = -1.2 + k * 4.2;
+    const sc = P(t, SC[2] + .15, SC[2] + .4, E.outBack) * (1 - P(t, SC[3] - .3, SC[3] - .1, E.inCubic));
+    out[0] = { vis: sc > .01, p: [rp.p[0] + Math.cos(a) * 2.25, rp.p[1] + Math.sin(a) * .9, Math.sin(a) * 1.6], s: .26 * sc, color: 0xf7f3ec };
+  }
+  // S5 → S6 → S7 : members orbiting, then two of them meeting
+  if (t >= SC[4] && t < SC[7]) {
+    const tilt = (x, y, z) => {                     // orbit plane matches the lying ring
+      const e = new THREE.Euler(rp.r[0], rp.r[1], rp.r[2], 'YXZ');
+      return new THREE.Vector3(x, y, z).applyEuler(e);
+    };
+    const orbit = (ph, rad) => {
+      const a = ph + (t - SC[4]) * 2.3;
+      const v = tilt(Math.cos(a) * rad * 1.25, Math.sin(a) * rad * 1.35, 0);
+      return [rp.p[0] + v.x, rp.p[1] + v.y, rp.p[2] + v.z];
+    };
+    const grow = P(t, SC[4] + .12, SC[4] + .45, E.outBack);
+    const meet = P(t, bt(21), bt(22), E.inOutCubic);                     // converge on the downbeat of 10.31 s
+    const top = [S6C[0], S6C[1] + (RY + TUBE) * S6S + .16, .6];
+    const inS6 = t >= SC[5] - .2;
+    const oA = orbit(0, 1.75), oB = orbit(Math.PI, 1.75), oC = orbit(Math.PI / 2 + .6, 1.75);
+    // in S6 the orbit flattens to a front-facing loop so both spheres stay in front of the photo
+    const f6 = P(t, SC[5] - .2, SC[5] + .15, E.inOutCubic);
+    const loop = (ph, dir) => {
+      const a = ph + dir * (t - SC[5]) * 3.2;
+      return [S6C[0] + Math.cos(a) * 2.2, S6C[1] + Math.sin(a) * 1.7, .9 + .3 * Math.sin(a)];
+    };
+    const lA = loop(Math.PI * .2, 1), lB = loop(Math.PI * .8, -1);
+    const mix3 = (a, b, k) => a.map((v, i) => lerp(v, b[i], k));
+    let pA = mix3(oA, lA, f6), pB = mix3(oB, lB, f6);
+    pA = mix3(pA, [top[0] - .2, top[1], top[2]], meet);
+    pB = mix3(pB, [top[0] + .2, top[1], top[2]], meet);
+    const endK = P(t, SC[6] - .22, SC[6] + .05, E.inCubic);
+    const colA = inS6 ? 0x9c6b3e : 0xf7f3ec;
+    out[0] = { vis: true, p: pA, s: .2 * grow * (1 - endK), color: colA };
+    out[1] = { vis: true, p: pB, s: .2 * grow * (1 - endK), color: inS6 ? 0xf7f3ec : 0x211e19 };
+    out[2] = { vis: t < SC[5] + .1, p: oC, s: .26 * grow * (1 - P(t, SC[5] - .3, SC[5], E.inCubic)), color: 0x9c6b3e };
+  }
+  // S7 gold sphere, bouncing on the beat, then dropping into the cream circle
+  if (t >= SC[6] + .1 && t < SC[7] - .16) {
+    const bb = ((t - SC[6]) / B) % 1;
+    const bounce = Math.abs(Math.sin(Math.PI * bb)) * .22;
+    const drop = P(t, SC[7] - .42, SC[7] - .2, E.inQuad) * 1.1;
+    const sc = P(t, SC[6] + .2, SC[6] + .5, E.outBack);
+    out[0] = { vis: true, p: [wx(884), wy(1350) + bounce - drop, .3], s: .34 * sc, color: 0xe2b478, metal: true };
+  }
+  return out;
+}
+
+// ------------------------------------------------------------------ per-scene updates
+function S1(t) {
+  // intro phase (0 → 1.875) and landing phase (bt(30.5) → 15)
+  const on = t < SC[1] + .02 || t >= bt(30.5) - .02;
+  show(sc[1], on);
+  if (!on) return;
+  if (t < SC[1] + .1) {
+    rise($('s1w1'), t, -1, .1, { out: 1.34, outDur: .26 });
+    rise($('s1w2'), t, -1, .1, { out: 1.34 + S16 * .5, outDur: .26 });
+    rise($('s1w3'), t, -1, .1, { out: 1.34 + S16, outDur: .26 });
+    ['s1k1', 's1k2', 's1e1', 's1e2', 's1e3'].forEach((id, i) => rise($(id), t, -1, .1, { out: bt(2) + i * .03, outDur: .22 }));
+    $('s1rule').style.transform = `scaleX(${1 - P(t, 1.3, 1.6, E.inOutCubic)})`;
+    $('s1rule').style.transformOrigin = '100% 50%';
+  } else {
+    const t0 = bt(30.5);
+    $('s1rule').style.transformOrigin = '0 50%';
+    $('s1rule').style.transform = `scaleX(${P(t, t0, t0 + .4, E.outExpo)})`;
+    rise($('s1w1'), t, t0, .4);
+    rise($('s1w2'), t, t0 + S16, .4);
+    rise($('s1w3'), t, t0 + 2 * S16, .4);
+    ['s1k1', 's1k2', 's1e1', 's1e2', 's1e3'].forEach((id, i) => rise($(id), t, bt(31) + i * .03, .3));
+  }
+}
+
+function S2(t) {
+  const t0 = SC[1];
+  const on = t >= bt(3.5) && t < SC[2] + .02;
+  show(sc[2], on);
+  if (!on) return;
+  // revealed through the ring hole during the zoom-through (sits above the opener until it owns the frame)
+  sc[2].style.zIndex = t < t0 + .2 ? 1 : '';
+  if (t < t0) {
+    const h = holeEllipse();
+    sc[2].style.clipPath = `ellipse(${h.rx.toFixed(1)}px ${h.ry.toFixed(1)}px at ${h.cx.toFixed(1)}px ${h.cy.toFixed(1)}px)`;
+  } else sc[2].style.clipPath = 'none';
+  rise($('s2tag').firstElementChild.firstElementChild, t, t0 + .02, .4);
+  rise($('s2l1'), t, t0 + .02, .45);
+  rise($('s2l2'), t, t0 + B * .5, .45);
+  // five meetings, counted on 16ths, struck through, merged
+  const merge = P(t, bt(6.5), bt(7), E.inOutCubic);
+  dots.forEach(({ d, n }, i) => {
+    const tp = bt(5) + i * S16;
+    const s = P(t, tp, tp + .22, E.outBack);
+    const x = lerp(0, 540 - (240 + i * 150), merge);
+    d.style.transform = `translateX(${x}px) scale(${s * (1 - .5 * merge)})`;
+    d.style.opacity = merge > .98 ? 0 : 1;
+    n.style.opacity = P(t, tp, tp + .1) * (1 - P(t, bt(6.5), bt(6.5) + .12));
+    n.style.transform = `translateY(${(1 - P(t, tp, tp + .3, E.outExpo)) * 20}px)`;
+  });
+  const sk = P(t, bt(6), bt(6) + .16, E.outExpo) * (1 - P(t, bt(6.5), bt(6.5) + .2, E.inCubic));
+  $('s2strike').style.transform = `scaleX(${sk})`;
+  $('s2strike').style.transformOrigin = t < bt(6.5) ? '0 50%' : '100% 50%';
+  rise($('s2l3'), t, bt(6), .45);
+  rise($('s2l4'), t, bt(6.5), .45);
+}
+
+function S3(t) {
+  const t0 = SC[2];
+  const on = t >= bt(7) - .02 && t < SC[3] + .02;
+  show(sc[3], on);
+  if (!on) return;
+  // the merged dot IS this scene: circle grows from the dot, then floods the frame
+  if (t < t0) {
+    const r = t < bt(7.5) ? lerp(24, 60, P(t, bt(7), bt(7) + .2, E.outBack)) : lerp(60, 2300, P(t, bt(7.5), t0, E.inExpo));
+    sc[3].style.clipPath = `circle(${r.toFixed(1)}px at 540px 896px)`;
+  } else sc[3].style.clipPath = 'none';
+  slideX($('s3a'), t, t0, .5, 1100);
+  slideX($('s3b'), t, t0 + S16, .5, -1100);
+  slideX($('s3c'), t, t0 + 2 * S16, .5, 1100);
+  // beat-synced kinetic: offsets + outline flips
+  const beat = Math.floor((t - t0) / B);
+  const kick = P(t, t0 + beat * B, t0 + beat * B + .18, E.outExpo);
+  const offs = [[0, 0, 0], [0, 0, 0], [-70, 70, -70], [70, -70, 70], [0, 0, 0]][clamp(beat, 0, 4)];
+  const prev = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [-70, 70, -70], [70, -70, 70]][clamp(beat, 0, 4)];
+  ['s3a', 's3b', 's3c'].forEach((id, i) => {
+    const el = $(id);
+    if (t > t0 + .6) el.style.transform = `translateX(${lerp(prev[i], offs[i], kick).toFixed(1)}px)`;
+    const outline = (beat === 1 && i === 1) || (beat === 2 && i !== 1) || (beat === 3 && i === 1);
+    el.classList.toggle('stroke', outline);
+  });
+  rise($('s3tag'), t, t0 + .1, .4);
+  rise($('s3tag2'), t, t0 + .16, .4);
+  $('s3rule').style.transform = `scaleX(${P(t, t0 + .2, t0 + .7, E.outExpo)})`;
+  rise($('s3copy'), t, t0 + B, .45);
+}
+
+function S4(t) {
+  const t0 = SC[3];
+  const on = t >= t0 - .26 && t < SC[4] + .02;
+  show(sc[4], on);
+  const wb = $('wipebar');
+  if (!on) { show(wb, false); return; }
+  // cream panel rises with a gold leading edge
+  if (t < t0) {
+    const k = P(t, t0 - .26, t0, E.inOutCubic);
+    const top = (1 - k) * H;
+    sc[4].style.clipPath = `inset(${top.toFixed(1)}px 0 0 0)`;
+    show(wb, true); wb.style.top = (top - 26 * (1 - k)) + 'px'; wb.style.opacity = 1;
+  } else { sc[4].style.clipPath = 'none'; show(wb, t < t0 + .12); wb.style.top = '-26px'; }
+  rise($('s4tag'), t, t0 + .02, .4);
+  rise($('s4tag2'), t, t0 + .06, .4);
+  rise($('s4l1'), t, t0 + .02, .45);
+  rise($('s4l2'), t, t0 + B * .5, .45);
+  rise($('s4foot'), t, t0 + B * 1.5, .4);
+  // tiles pop on 32nds in a diagonal order, then swap on the beats
+  const expand = P(t, SC[4] - .3, SC[4], E.inOutExpo);
+  tiles.forEach((tl, i) => {
+    const col = i % 4, row = (i / 4) | 0;
+    const tp = t0 + .06 + (col + row) * S16 * .75 + (i % 2) * .03;
+    const s = P(t, tp, tp + .32, E.outBackS);
+    let rot = (1 - P(t, tp, tp + .38, E.outExpo)) * -90;
+    // beat 2: empty tiles spin their glyph 90°, beat 3: coloured tiles swap cognac ⇄ gold
+    if (!tl.fill) rot += 90 * P(t, t0 + bt(2), t0 + bt(2) + .25, E.outBack) + 90 * P(t, t0 + bt(3), t0 + bt(3) + .25, E.outBack);
+    tl.el.style.transform = `scale(${s}) rotate(${rot}deg)`;
+    if (tl.fill === 'cognac' || tl.fill === 'gold') {
+      const swap = t > t0 + bt(3) && i !== 6;
+      const f = swap ? (tl.fill === 'cognac' ? 'gold' : 'cognac') : tl.fill;
+      tl.el.style.background = `var(--${f})`;
+      tl.el.style.color = f === 'cognac' ? 'var(--cream)' : 'var(--ink)';
+    }
+    tl.el.style.opacity = i === 6 ? 1 : 1 - expand;
+  });
+}
+
+function S5(t) {
+  const t0 = SC[4];
+  const on = t >= t0 - .3 && t < SC[5] + .02;
+  show(sc[5], on);
+  if (!on) return;
+  // grows out of the WELLNESS tile
+  if (t < t0) {
+    const k = P(t, t0 - .3, t0, E.inOutExpo);
+    const tl = tiles[6];
+    const l = lerp(tl.x, 0, k), tp = lerp(tl.y, 0, k), r = lerp(W - tl.x - TS, 0, k), b = lerp(H - tl.y - TS, 0, k);
+    sc[5].style.clipPath = `inset(${tp}px ${r}px ${b}px ${l}px)`;
+  } else sc[5].style.clipPath = 'none';
+  const hide = t < t0 - .02;
+  ['s5tag', 's5l1', 's5l2', 's5kr', 's5b1', 's5b2'].forEach(id => $(id).style.visibility = hide ? 'hidden' : 'visible');
+  rise($('s5tag'), t, t0 + .02, .4);
+  rise($('s5l1'), t, t0 + .02, .45);
+  rise($('s5l2'), t, t0 + B * .5, .45);
+  rise($('s5kr'), t, t0 + B * 1.5, .4);
+  rise($('s5b1'), t, t0 + B * 2, .42);
+  rise($('s5b2'), t, t0 + B * 2 + S16, .42);
+  const st = $('s5stamp');
+  const ss = P(t, t0 + B, t0 + B + .4, E.outBack);
+  st.style.transform = `scale(${ss})`; st.style.transformOrigin = '110px 110px';
+  $('s5rot').setAttribute('transform', `rotate(${(t - t0) * 70})`);
+}
+
+function S6(t) {
+  const t0 = SC[5];
+  const on = t >= t0 - .32 && t < SC[6] + .02;
+  show(sc[6], on);
+  const bl = $('blinds');
+  if (!on) { show(bl, false); return; }
+  // ink blinds sweep in over the gold scene, then the scene sits beneath them
+  if (t < t0 + .02) {
+    sc[6].style.visibility = 'hidden';
+    show(bl, true);
+    blinds.forEach((d, i) => {
+      const tp = t0 - .32 + i * .03;
+      d.style.transform = `scaleX(${P(t, tp, tp + .2, E.inOutCubic)})`;
+    });
+  } else show(bl, false);
+  // photo sits in the ring hole
+  const h = holeEllipse(.14);
+  const ph = $('s6photo');
+  // photo drifts slower than the ring (parallax); the clip stays locked to the hole
+  const tx = (h.cx - 540) * .35, ty = (h.cy - 1160) * .35 + 30 - 60 * P(t, t0 - .3, SC[6], E.lin);
+  ph.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)`;
+  ph.style.clipPath = `ellipse(${h.rx.toFixed(1)}px ${h.ry.toFixed(1)}px at ${(h.cx - 110 - tx).toFixed(1)}px ${(h.cy - 613 - ty).toFixed(1)}px)`;
+  const po = P(t, t0 + .05, t0 + .4);
+  $('s6photo').style.opacity = po;
+  $('s6photo').style.filter = `saturate(${.9}) brightness(${lerp(.4, 1, po)})`;
+  $('s6glow').style.opacity = .6 + .4 * P(t, bt(22), bt(22) + .2) * (1 - P(t, bt(22) + .2, bt(23) + .4));
+  rise($('s6tag'), t, t0 + .02, .4);
+  rise($('s6l1'), t, t0 + .02, .45);
+  rise($('s6l2'), t, t0 + B * .5, .45);
+  rise($('s6solo'), t, t0 + B, .4);
+  rise($('s6week'), t, t0 + B, .4);
+  rise($('s6k1'), t, t0 + B * 2.5, .42);
+  rise($('s6k2'), t, t0 + B * 2.5 + S16, .42);
+  // six weeks tick past on 16ths, landing on the meeting
+  const wk = clamp(1 + Math.floor((t - (bt(22) - 5 * S16)) / S16), 1, 6);
+  $('s6week').textContent = 'WEEK 0' + wk;
+  // meeting pulse
+  const [mx, my] = proj(S6C[0], S6C[1] + (RY + TUBE) * S6S + .16, .6);
+  pulses.forEach((c, i) => {
+    const tp = bt(22) + i * .09;
+    const k = P(t, tp, tp + .7, E.outCubic);
+    c.setAttribute('cx', mx); c.setAttribute('cy', my);
+    c.setAttribute('r', 30 + k * (160 + i * 50));
+    c.setAttribute('stroke-width', 3 * (1 - k) + .5);
+    c.setAttribute('opacity', t < tp ? 0 : (1 - k) * .9);
+  });
+}
+
+function S7(t) {
+  const t0 = SC[6];
+  const on = t >= t0 - .26 && t < SC[7] + .02;
+  show(sc[7], on);
+  if (!on) return;
+  // curtain: ink halves of the previous scene part vertically → here drawn as the reveal gap
+  if (t < t0) {
+    const k = P(t, t0 - .26, t0, E.inOutExpo);
+    const g = k * H / 2;
+    sc[7].style.clipPath = `inset(${H / 2 - g}px 0 ${H / 2 - g}px 0)`;
+  } else sc[7].style.clipPath = 'none';
+  rise($('s7tag'), t, t0 + .02, .4);
+  s7L.forEach((row, ri) => row.forEach((ch, ci) => {
+    const tp = t0 + ri * B * .5 + ci * .035;
+    const f = tt => (1 - E.outExpo(clamp((tt - tp) / .5))) * 105;
+    const y = f(t);
+    ch.style.transform = `translateY(${y.toFixed(1)}%)`;
+    mblur(ch, 0, (f(t) - f(t - 1 / FPS)) * .12 * 2.4);
+  }));
+  rise($('s7k1'), t, t0 + B * 2, .45);
+  rise($('s7k2'), t, t0 + B * 2 + S16, .45);
+  rise($('s7en'), t, t0 + B * 2.5, .45);
+}
+
+function S8(t) {
+  const t0 = SC[7];
+  const on = t >= t0 - .2 && t < bt(31) + .1;
+  show(sc[8], on);
+  if (!on) return;
+  // cream circle out of the dropped gold sphere
+  if (t < t0) {
+    const r = lerp(64, 2300, P(t, t0 - .2, t0, E.inExpo));
+    sc[8].style.clipPath = `circle(${r.toFixed(1)}px at 884px ${1350 + 1.1 * UPX * .9}px)`;
+  } else sc[8].style.clipPath = 'none';
+  const out = bt(30) + .02;
+  const ids = ['s8tag', 's8w1', 's8w2', 's8k1', 's8k2', 's8a1', 's8b1', 's8a2', 's8b2', 's8url'];
+  ids.forEach((id, i) => rise($(id), t, t0 + .02 + i * .045, .45, { out: out + i * .018, outDur: .2, dist: 110 }));
+  ['s8r1', 's8r2'].forEach((id, i) => $(id).style.transform = `scaleX(${P(t, t0 + .15 + i * .1, t0 + .6 + i * .1, E.outExpo) * (1 - P(t, out, out + .2, E.inCubic))})`);
+  const es = P(t, t0 + .3, t0 + .75, E.outBack) * (1 - P(t, out, out + .18, E.inCubic));
+  $('s8emb').style.transform = `scale(${es}) rotate(${(1 - es) * -40}deg)`;
+}
+
+function chrome(t) {
+  // theme follows the scene that owns most of the frame
+  let idx = 1;
+  const cuts = [[bt(3.75), 2], [SC[2] - .1, 3], [SC[3] - .13, 4], [SC[4] - .15, 5], [SC[5] - .16, 6], [SC[6] - .1, 7], [SC[7] - .1, 8], [bt(30.25), 1]];
+  for (const [ct, i] of cuts) if (t >= ct) idx = i;
+  const c = THEME[idx] === 'ink' ? 'var(--ink)' : 'var(--cream)';
+  ['chTL', 'chTR', 'chBL', 'chBR'].forEach(id => $(id).style.color = c);
+  $('chLine').style.background = c;
+  $('chLine').style.opacity = .35;
+  $('chTR').textContent = 'BRAND IN MOTION';
+}
+
+// ------------------------------------------------------------------ master seek
+const loaded = new Promise(res => {
+  const imgs = ['../../deploy/after-hours.jpg', '../../deploy/logo-emblem.png'].map(src => new Promise(r => { const i = new Image(); i.onload = r; i.onerror = r; i.src = src; }));
+  Promise.all([document.fonts.ready, ...imgs]).then(res);
+});
+
+function seek(t) {
+  t = ((t % DUR) + DUR) % DUR;
+  // 3D first: DOM clips (ring-hole reveals, photo window) project through the ring's current matrix
+  const rp = ringPose(t);
+  ring.visible = !!rp.vis;
+  if (rp.vis) {
+    ring.position.set(...rp.p);
+    ring.rotation.set(...rp.r);
+    ring.scale.setScalar(rp.s);
+    ringMat.color.copy(GOLD_RING).lerp(BRONZE_RING, rp.bronze || 0);
+    ringMat.roughness = lerp(.2, .3, rp.bronze || 0);
+  }
+  const sp = spheres(t, rp.vis ? rp : { p: [0, 0, 0], r: [0, 0, 0] });
+  [sA, sB, sC].forEach((m, i) => {
+    const s = sp[i];
+    m.visible = !!s.vis && s.s > .002;
+    if (!m.visible) return;
+    m.position.set(...s.p); m.scale.setScalar(s.s);
+    m.material.color.set(s.color);
+    m.material.metalness = s.metal ? 1 : 0;
+    m.material.roughness = s.metal ? .16 : .28;
+  });
+  scene.updateMatrixWorld(true);
+  S1(t); S2(t); S3(t); S4(t); S5(t); S6(t); S7(t); S8(t);
+  chrome(t);
+  // S5 connection lines follow the projected members
+  if (t >= SC[4] && t < SC[5]) {
+    const pts = [sA, sB, sC].map(m => proj(m.position.x, m.position.y, m.position.z));
+    const draw = P(t, SC[4] + B, SC[4] + B + .5, E.outCubic);
+    net.forEach((l, i) => {
+      const a = pts[i], b = pts[(i + 1) % 3];
+      l.setAttribute('x1', a[0]); l.setAttribute('y1', a[1]);
+      l.setAttribute('x2', lerp(a[0], b[0], draw)); l.setAttribute('y2', lerp(a[1], b[1], draw));
+      l.setAttribute('opacity', (1 - P(t, SC[5] - .3, SC[5] - .1)) * .8);
+    });
+    const c = proj(...S5C);
+    orbitPath.setAttribute('cx', c[0]); orbitPath.setAttribute('cy', c[1]);
+    orbitPath.setAttribute('rx', 1.75 * 1.25 * UPX * P(t, SC[4] + .2, SC[4] + .7, E.outExpo)); orbitPath.setAttribute('ry', 1.75 * 1.35 * UPX * .36);
+    orbitPath.setAttribute('transform', `rotate(${-rp.r[2] * 57.3 * .5} ${c[0]} ${c[1]})`);
+  }
+  const split = t >= SC[2] - .14 && t < SC[3] + .1 ? 0 : null;
+  render3D(split);
+}
+
+window.seek = seek;
+window.ready = loaded.then(() => { seek(0); return true; });
+
+// ------------------------------------------------------------------ preview mode
+const qs = new URLSearchParams(location.search);
+const stage = $('stage');
+function fit() {
+  if (qs.has('render')) return;
+  const k = Math.min(innerWidth / W, innerHeight / H);
+  stage.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`;
+}
+addEventListener('resize', fit); fit();
+if (!qs.has('render')) {
+  loaded.then(() => {
+    if (qs.has('t')) { seek(+qs.get('t')); return; }
+    const audio = new Audio('out/soundtrack.wav');
+    let t0 = performance.now();
+    addEventListener('click', () => { audio.currentTime = 0; audio.play(); t0 = performance.now(); });
+    const loop = () => { seek((performance.now() - t0) / 1000); requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>
