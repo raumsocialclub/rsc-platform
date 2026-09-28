@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>RSC Mood — 15s</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{--cream:#f7f3ec;--ink:#211e19;--night:#120e0a;--cognac:#9c6b3e;--gold:#e2b478}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#0b0907;overflow:hidden;height:100%}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;background:var(--night);transform-origin:0 0;
+  color:var(--cream);-webkit-font-smoothing:antialiased}
+.a{position:absolute;left:0;top:0}
+.full{position:absolute;inset:0}
+.shot{position:absolute;left:-54px;top:-96px;width:1188px;height:2112px;background-size:cover;background-position:center;will-change:transform,opacity,filter;opacity:0}
+.kr{font-family:'Noto Serif KR',serif;font-weight:300;font-size:74px;letter-spacing:.04em;line-height:1.3;white-space:nowrap}
+.en{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:70px;line-height:1.12;letter-spacing:.005em}
+.cap{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:27px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold)}
+.line{position:absolute;left:0;top:0;width:100%;text-align:center}
+.ch{display:inline-block;will-change:opacity,filter,transform}
+.hair{position:absolute;height:1.5px;background:var(--gold);left:50%}
+.bokeh{position:absolute;border-radius:50%;mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(255,221,170,.95) 0,rgba(255,196,128,.45) 38%,rgba(255,170,90,0) 70%)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- photo plates (cropped from the brand film) -->
+  <div id="plates" class="full">
+    <div class="shot" id="p0" style="background-image:url(img/candles.jpg)"></div>
+    <div class="shot" id="p1" style="background-image:url(img/chandelier.jpg)"></div>
+    <div class="shot" id="p2" style="background-image:url(img/gothic.jpg)"></div>
+    <div class="shot" id="p3" style="background-image:url(img/table.jpg)"></div>
+    <div class="shot" id="p4" style="background-image:url(img/arch.jpg)"></div>
+  </div>
+
+  <!-- grade: darken, warm, vignette, legibility pool behind the type -->
+  <div class="full" id="shade" style="background:rgba(14,10,7,.34)"></div>
+  <div class="full" style="background:linear-gradient(180deg,rgba(12,9,6,.55) 0,rgba(12,9,6,0) 26%,rgba(12,9,6,0) 62%,rgba(12,9,6,.7) 100%)"></div>
+  <div class="full" id="pool" style="background:radial-gradient(ellipse 620px 360px at 540px 980px,rgba(12,9,6,.62),rgba(12,9,6,0))"></div>
+  <div class="full" style="background:#b07840;mix-blend-mode:soft-light;opacity:.28"></div>
+
+  <!-- light: leaks + candle bokeh -->
+  <div class="full" id="leaks" style="mix-blend-mode:screen">
+    <div class="a" id="lk1" style="width:1500px;height:1500px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,90,.55),rgba(255,140,60,.18) 40%,rgba(255,120,40,0) 68%)"></div>
+    <div class="a" id="lk2" style="width:1200px;height:1200px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,160,.5),rgba(255,190,120,.14) 42%,rgba(255,180,100,0) 70%)"></div>
+    <div class="a" id="flash" style="width:1080px;height:1920px;background:radial-gradient(ellipse 900px 1300px at 50% 45%,rgba(255,206,150,.9),rgba(255,170,100,.25) 50%,rgba(255,150,80,0) 80%)"></div>
+  </div>
+  <div class="full" id="bokeh"></div>
+
+  <!-- arch window: opening + closing shape -->
+  <div class="full" id="night" style="background:var(--night)"></div>
+  <svg class="a" id="archSvg" width="1080" height="1920" style="overflow:visible">
+    <path id="archLine" fill="none" stroke="#e2b478" stroke-width="2"/>
+    <path id="archLine2" fill="none" stroke="#e2b478" stroke-width="1" opacity=".45"/>
+  </svg>
+
+  <!-- type -->
+  <div id="type" class="full">
+    <div class="line cap" id="c1" style="top:872px">The Space</div>
+    <div class="line kr" id="t1" style="top:930px">아름다운 공간에서,</div>
+    <div class="line cap" id="c2" style="top:872px">The People</div>
+    <div class="line kr" id="t2" style="top:930px">서로의 특별함을</div>
+    <div class="line cap" id="c3" style="top:872px">The Beginning</div>
+    <div class="line kr" id="t3" style="top:930px">발견하는 곳.</div>
+    <div class="line en" id="t4a" style="top:900px">A private community</div>
+    <div class="line en" id="t4b" style="top:980px">for remarkable singles.</div>
+    <div class="hair" id="h1" style="top:846px"></div>
+  </div>
+
+  <!-- end lockup -->
+  <div id="lock" class="full">
+    <div class="a" id="emb" style="left:490px;top:620px;width:100px;height:121px;background:var(--gold);
+      -webkit-mask:url(../../deploy/logo-emblem.png) center/contain no-repeat;mask:url(../../deploy/logo-emblem.png) center/contain no-repeat"></div>
+    <div class="a" id="word" style="left:150px;top:1236px;width:780px;height:99px;background:var(--cream);
+      -webkit-mask:url(../../deploy/logo-mtwj03w6-n1ft.png) center/contain no-repeat;mask:url(../../deploy/logo-mtwj03w6-n1ft.png) center/contain no-repeat"></div>
+    <div class="hair" id="h2" style="top:1392px"></div>
+    <div class="line cap" id="fm" style="top:1420px;font-size:22px">Founding Members &nbsp;·&nbsp; 2026</div>
+  </div>
+
+  <canvas class="a" id="grain" width="1080" height="1920" style="width:1080px;height:1920px;mix-blend-mode:overlay;opacity:.22"></canvas>
+  <div class="full" style="background:radial-gradient(ellipse 820px 1250px at 50% 48%,rgba(0,0,0,0) 55%,rgba(6,4,3,.62) 100%)"></div>
+</div>
+
+<script>
+// ------------------------------------------------------------------ timing
+const W = 1080, H = 1920, DUR = 15, FPS = 60;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const E = {
+  lin: p => p,
+  outCubic: p => 1 - (1 - p) ** 3, inCubic: p => p ** 3,
+  inOutCubic: p => p < .5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2,
+  inOutSine: p => -(Math.cos(Math.PI * p) - 1) / 2,
+  outSine: p => Math.sin(Math.PI * p / 2),
+  outQuint: p => 1 - (1 - p) ** 5,
+  inOutQuint: p => p < .5 ? 16 * p ** 5 : 1 - (-2 * p + 2) ** 5 / 2,
+};
+const P = (t, a, b, e = E.lin) => e(clamp((t - a) / (b - a)));
+const $ = id => document.getElementById(id);
+
+// five plates, long cross-dissolves; each keeps drifting for its whole life (no static frames)
+const DIS = 1.1;
+const SHOTS = [
+  { el: 'p0', t0: 0.0, t1: 3.6, s: [1.06, 1.0], x: [0, 0], y: [30, -10] },     // candles – settle in
+  { el: 'p1', t0: 3.0, t1: 6.8, s: [1.0, 1.08], x: [0, 0], y: [40, -30] },      // chandelier – rise
+  { el: 'p2', t0: 6.2, t1: 9.9, s: [1.09, 1.0], x: [-30, 20], y: [0, 0] },      // gothic hall + carnations – drift
+  { el: 'p3', t0: 9.3, t1: 12.8, s: [1.02, 1.1], x: [0, 0], y: [-30, 20] },     // table – lean in
+  { el: 'p4', t0: 12.2, t1: 15.0, s: [1.1, 1.03], x: [0, 0], y: [0, 26] },      // exterior arch – the close
+];
+
+// type blocks: [id, in, out]
+const TYPE = [
+  { id: 't1', cap: 'c1', tin: 1.0, tout: 3.75 },
+  { id: 't2', cap: 'c2', tin: 4.15, tout: 7.2 },
+  { id: 't3', cap: 'c3', tin: 7.6, tout: 10.5 },
+  { id: 't4a', tin: 10.55, tout: 12.85 },
+  { id: 't4b', tin: 10.95, tout: 12.85 },
+];
+
+// ------------------------------------------------------------------ build
+const chars = {};
+TYPE.forEach(({ id }) => {
+  const el = $(id), txt = el.textContent;
+  el.textContent = '';
+  chars[id] = [...txt].map(c => { const s = document.createElement('span'); s.className = 'ch'; s.textContent = c === ' ' ? ' ' : c; el.appendChild(s); return s; });
+});
+
+// deterministic PRNG
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(7);
+const BOKEH = Array.from({ length: 30 }, () => {
+  const d = document.createElement('div');
+  d.className = 'bokeh';
+  const size = 14 + R() ** 2.2 * 120;
+  const b = { d, size, x: R() * W, y: R() * H, vy: 12 + R() * 34, sway: 10 + R() * 30, ph: R() * 6.28, tw: .6 + R() * 1.6, a: .1 + R() * .32, blur: R() };
+  d.style.width = d.style.height = size + 'px';
+  if (b.blur > .6) d.style.filter = `blur(${(b.blur * 6).toFixed(1)}px)`;
+  $('bokeh').appendChild(d);
+  return b;
+});
+
+// grain
+const gctx = $('grain').getContext('2d');
+const gimg = gctx.createImageData(1080, 1920);
+function grain(frame) {
+  const r = rng(frame * 9973 + 17), d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) { const v = 128 + (r() - .5) * 90; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
+  gctx.putImageData(gimg, 0, 0);
+}
+
+// arch geometry (Raum's arched windows): semicircular head, straight jambs
+function archD(cx, top, w, bottom) {
+  const r = w / 2, l = cx - r, rt = cx + r;
+  return `M${l.toFixed(1)},${bottom.toFixed(1)} L${l.toFixed(1)},${(top + r).toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${rt.toFixed(1)},${(top + r).toFixed(1)} L${rt.toFixed(1)},${bottom.toFixed(1)} Z`;
+}
+function archLen(w, top, bottom) { const r = w / 2; return Math.PI * r + 2 * (bottom - top - r) + w; }
+
+// arch state over time: {cx, top, w, bottom, line (0..1 drawn), lineAlpha, clip(bool)}
+const A_OPEN = { cx: 540, top: 470, w: 560, bottom: 1450 };
+const A_FULL = { cx: 540, top: -1500, w: 3200, bottom: 2600 };
+const A_END = { cx: 540, top: 330, w: 500, bottom: 1080 };
+function archState(t) {
+  if (t < 3.0) {
+    const k = P(t, 1.55, 2.85, E.inOutQuint);
+    const g = ['cx', 'top', 'w', 'bottom'].reduce((o, key) => (o[key] = lerp(A_OPEN[key], A_FULL[key], k), o), {});
+    return { ...g, draw: P(t, .05, 1.35, E.inOutCubic), lineA: 1 - P(t, 1.7, 2.5), on: true };
+  }
+  if (t >= 12.6) {
+    const k = P(t, 12.6, 13.9, E.inOutQuint);
+    const g = ['cx', 'top', 'w', 'bottom'].reduce((o, key) => (o[key] = lerp(A_FULL[key], A_END[key], k), o), {});
+    return { ...g, draw: P(t, 13.0, 14.2, E.inOutCubic), lineA: 1, on: true };
+  }
+  return { on: false };
+}
+
+// ------------------------------------------------------------------ per-frame
+function typeBlock(t, { id, cap, tin, tout }) {
+  const cs = chars[id];
+  const n = cs.length, st = Math.min(.075, .75 / n), dur = 1.15;
+  const outK = P(t, tout, tout + .9, E.inOutSine);
+  cs.forEach((c, i) => {
+    const k = P(t, tin + i * st, tin + i * st + dur, E.outCubic);
+    const o = k * (1 - outK);
+    c.style.opacity = o.toFixed(3);
+    const blur = (1 - k) * 14 + outK * 10;
+    c.style.filter = blur > .2 ? `blur(${blur.toFixed(2)}px)` : '';
+    c.style.transform = `translateY(${((1 - k) * 18 - outK * 10).toFixed(2)}px)`;
+  });
+  const el = $(id);
+  el.style.letterSpacing = `${(.04 + outK * .06 + (1 - P(t, tin, tin + n * st + dur, E.outCubic)) * .03).toFixed(3)}em`;
+  el.style.visibility = t > tin - .1 && t < tout + 1 ? 'visible' : 'hidden';
+  if (cap) {
+    const ce = $(cap), k = P(t, tin - .25, tin + .9, E.outCubic);
+    ce.style.opacity = (k * (1 - outK)).toFixed(3);
+    ce.style.letterSpacing = `${(.62 - .2 * k + .1 * outK).toFixed(3)}em`;
+    ce.style.visibility = t > tin - .3 && t < tout + 1 ? 'visible' : 'hidden';
+  }
+}
+
+function seek(t) {
+  t = clamp(t, 0, DUR - 1e-4);
+  const frame = Math.round(t * FPS);
+
+  // plates
+  SHOTS.forEach((s, i) => {
+    const el = $(s.el);
+    const on = t >= s.t0 - .01 && t <= s.t1 + DIS;
+    el.style.visibility = on ? 'visible' : 'hidden';
+    if (!on) return;
+    const life = P(t, s.t0, s.t1 + DIS, E.lin);
+    const sc = lerp(s.s[0], s.s[1], E.inOutSine(life));
+    const x = lerp(s.x[0], s.x[1], life), y = lerp(s.y[0], s.y[1], life);
+    const fin = i === 0 ? P(t, .35, 1.4, E.inOutSine) : P(t, s.t0, s.t0 + DIS, E.inOutSine);
+    el.style.opacity = fin.toFixed(3);
+    el.style.transform = `translate(${x.toFixed(2)}px,${y.toFixed(2)}px) scale(${sc.toFixed(4)})`;
+    const blur = i === 0 ? (1 - fin) * 10 : (1 - fin) * 16;
+    const bright = i === 0 ? lerp(.55, 1, P(t, .4, 2.6, E.inOutSine)) : 1 + .35 * Math.sin(Math.PI * fin);
+    el.style.filter = `${blur > .2 ? `blur(${blur.toFixed(2)}px) ` : ''}brightness(${bright.toFixed(3)})`;
+  });
+
+  // arch window
+  const a = archState(t);
+  const plates = $('plates'), night = $('night');
+  if (a.on) {
+    const d = archD(a.cx, a.top, a.w, a.bottom);
+    plates.style.clipPath = `path('${d}')`;
+    night.style.visibility = 'visible';
+    night.style.opacity = 1;
+    // night sits under the plates only where they are clipped away: draw it as a frame with an arch hole
+    night.style.clipPath = `path(evenodd,'M0,0 H${W} V${H} H0 Z ${d}')`;
+    const L = archLen(a.w, a.top, a.bottom);
+    ['archLine', 'archLine2'].forEach((id, k) => {
+      const p = $(id);
+      const g = k ? 14 : 0;
+      p.setAttribute('d', archD(a.cx, a.top - g, a.w + 2 * g, a.bottom + g));
+      const LL = archLen(a.w + 2 * g, a.top - g, a.bottom + g);
+      p.setAttribute('stroke-dasharray', `${LL}`);
+      p.setAttribute('stroke-dashoffset', `${(LL * (1 - a.draw)).toFixed(1)}`);
+      p.style.opacity = a.lineA * (k ? .45 : 1);
+    });
+    $('archSvg').style.visibility = 'visible';
+  } else {
+    plates.style.clipPath = 'none';
+    night.style.visibility = 'hidden';
+    $('archSvg').style.visibility = 'hidden';
+  }
+  // the pool behind type and the shade ease off inside the tiny closing window
+  $('pool').style.opacity = 1 - P(t, 12.4, 13.2);
+  $('shade').style.background = `rgba(14,10,7,${lerp(.34, .26, P(t, 12.8, 14))})`;
+
+  // light leaks drift; a warm flash breathes through every dissolve
+  const l1 = $('lk1'), l2 = $('lk2');
+  l1.style.transform = `translate(${(-500 + 380 * Math.sin(t * .31)).toFixed(1)}px,${(-420 + 900 * P(t, 0, DUR)).toFixed(1)}px)`;
+  l1.style.opacity = (.35 + .25 * Math.sin(t * .8 + 1)).toFixed(3);
+  l2.style.transform = `translate(${(420 - 300 * Math.sin(t * .27 + 2)).toFixed(1)}px,${(1200 - 700 * P(t, 0, DUR)).toFixed(1)}px)`;
+  l2.style.opacity = (.28 + .2 * Math.sin(t * .6)).toFixed(3);
+  let fl = 0;
+  SHOTS.slice(1).forEach(s => { fl = Math.max(fl, Math.sin(Math.PI * P(t, s.t0 - .15, s.t0 + DIS + .15))); });
+  fl = Math.max(fl, .8 * Math.sin(Math.PI * P(t, 1.5, 3.1)));
+  $('flash').style.opacity = (fl * .36).toFixed(3);
+
+  // bokeh – rising slowly like candle heat; they gather a little at the end
+  BOKEH.forEach((b, i) => {
+    const y = ((b.y - b.vy * t) % (H + 200) + H + 200) % (H + 200) - 100;
+    const x = b.x + Math.sin(t * .5 + b.ph) * b.sway;
+    const tw = .6 + .4 * Math.sin(t * b.tw + b.ph);
+    const fade = P(t, .6, 2.2) * (1 - .6 * P(t, 13, 14.2));
+    b.d.style.transform = `translate(${(x - b.size / 2).toFixed(1)}px,${(y - b.size / 2).toFixed(1)}px)`;
+    b.d.style.opacity = (b.a * tw * fade).toFixed(3);
+  });
+
+  // type
+  TYPE.forEach(b => typeBlock(t, b));
+  const hairs = [[1.0, 3.75], [4.15, 7.2], [7.6, 10.5]];
+  let hw = 0;
+  hairs.forEach(([a0, a1]) => { hw = Math.max(hw, P(t, a0 - .2, a0 + 1.0, E.inOutCubic) * (1 - P(t, a1, a1 + .7, E.inOutSine))); });
+  $('h1').style.width = (hw * 90).toFixed(1) + 'px';
+  $('h1').style.transform = `translateX(-50%)`;
+  $('h1').style.opacity = hw.toFixed(3);
+
+  // lockup
+  const e = P(t, 13.35, 14.4, E.outCubic);
+  $('emb').style.opacity = e;
+  $('emb').style.filter = `blur(${((1 - e) * 8).toFixed(2)}px)`;
+  $('emb').style.transform = `translateY(${((1 - e) * 16).toFixed(1)}px)`;
+  const w = P(t, 13.7, 14.7, E.outCubic);
+  $('word').style.opacity = w;
+  $('word').style.filter = `blur(${((1 - w) * 10).toFixed(2)}px)`;
+  $('word').style.transform = `scale(${lerp(1.04, 1, w).toFixed(4)})`;
+  // a slow light sweep across the wordmark
+  const sw = P(t, 14.0, 14.95, E.inOutSine);
+  $('word').style.background = `linear-gradient(100deg,var(--cream) ${(sw * 140 - 40).toFixed(1)}%,#fff4dc ${(sw * 140 - 25).toFixed(1)}%,var(--cream) ${(sw * 140 - 10).toFixed(1)}%)`;
+  const h2 = P(t, 14.0, 14.8, E.inOutCubic);
+  $('h2').style.width = (h2 * 70).toFixed(1) + 'px';
+  $('h2').style.transform = 'translateX(-50%)';
+  $('fm').style.opacity = P(t, 14.15, 14.95, E.outCubic);
+  $('fm').style.letterSpacing = `${lerp(.6, .42, P(t, 14.15, 14.95, E.outCubic)).toFixed(3)}em`;
+
+  grain(frame);
+}
+
+// ------------------------------------------------------------------ boot
+const loaded = Promise.all([document.fonts.ready,
+  ...['candles', 'chandelier', 'gothic', 'table', 'arch'].map(n => new Promise(r => { const i = new Image(); i.onload = r; i.onerror = r; i.src = `img/${n}.jpg`; })),
+  ...['logo-emblem.png', 'logo-mtwj03w6-n1ft.png'].map(n => new Promise(r => { const i = new Image(); i.onload = r; i.onerror = r; i.src = `../../deploy/${n}`; })),
+]);
+window.seek = seek;
+window.ready = loaded.then(() => { seek(0); return true; });
+
+const qs = new URLSearchParams(location.search);
+const stage = $('stage');
+function fit() {
+  if (qs.has('render')) return;
+  const k = Math.min(innerWidth / W, innerHeight / H);
+  stage.style.transform = `translate(${(innerWidth - W * k) / 2}px,${(innerHeight - H * k) / 2}px) scale(${k})`;
+}
+addEventListener('resize', fit); fit();
+if (!qs.has('render')) loaded.then(() => {
+  if (qs.has('t')) { seek(+qs.get('t')); return; }
+  const audio = new Audio('out/soundtrack.wav');
+  let t0 = performance.now();
+  addEventListener('click', () => { audio.currentTime = 0; audio.play(); t0 = performance.now(); });
+  const loop = () => { seek(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); };
+  loop();
+});
+</script>
+</body>
+</html>
