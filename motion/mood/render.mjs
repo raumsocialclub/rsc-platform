@@ -1,7 +1,7 @@
 // Render index.html frame-by-frame with headless Chromium (DOM + canvas grain), then mux with the soundtrack.
 //   node render.mjs stills 0.8 2.6 4.2      -> PNG stills in $OUT/stills
 //   node render.mjs sheet                    -> contact sheet frames (every 0.25 s) in $OUT/sheet
-//   node render.mjs video                    -> out/rsc-mood-15s.mp4 (+ -30fps copy)
+//   node render.mjs video                    -> out/rsc-mood-15s.mp4 (30 fps, Instagram-ready)
 import { createRequire } from 'module';
 import { spawn } from 'child_process';
 import http from 'http';
@@ -73,14 +73,12 @@ if (mode === 'stills') {
       if (++done % 60 === 0) console.log(`${done}/${N} frames  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
     }
   }));
+  // one Instagram-ready file: 30 fps (the film is slow; 60 fps adds nothing), grain kept by a CRF 19 cap at 16 Mb/s
   const mp4 = path.join(here, 'out', 'rsc-mood-15s.mp4');
   await ff(['-y', '-framerate', String(FPS), '-i', path.join(frames, 'f%04d.jpg'), '-i', path.join(here, 'out', 'soundtrack.wav'),
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-color_primaries', 'bt709',
-    '-color_trc', 'bt709', '-colorspace', 'bt709', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-t', String(DUR), '-movflags', '+faststart', mp4]);
-  // 30 fps copy: Instagram's recommended upload rate, and light enough for messengers
-  const ig = mp4.replace('.mp4', '-30fps.mp4');
-  await ff(['-y', '-i', mp4, '-vf', 'fps=30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '19', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
-    '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', ig]);
-  console.log(mp4, ig);
+    '-vf', 'fps=30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '19', '-maxrate', '16M', '-bufsize', '32M', '-pix_fmt', 'yuv420p',
+    '-profile:v', 'high', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709',
+    '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-t', String(DUR), '-movflags', '+faststart', mp4]);
+  console.log(mp4);
 }
 await browser.close(); server.close();

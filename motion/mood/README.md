@@ -4,8 +4,7 @@
 
 | 파일 | 용도 |
 |---|---|
-| `out/rsc-mood-15s-30fps.mp4` | 인스타그램 업로드용 (30fps) |
-| `out/rsc-mood-15s.mp4` | 마스터 (60fps, H.264 CRF 16, AAC 256k) |
+| `out/rsc-mood-15s.mp4` | 인스타그램 업로드용 (1080×1920, 30fps, H.264, AAC) |
 | `out/soundtrack.wav` | 사운드트랙 원본 (48kHz/24bit) |
 
 ## 구성
