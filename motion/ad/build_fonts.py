@@ -38,14 +38,17 @@ for weight, name in ((800, 'ExtraBold'), (700, 'Bold'), (600, 'SemiBold')):
                f"src:url({dst.name}) format('woff2')}}")
     print(dst.name, dst.stat().st_size // 1024, 'KB')
 
-# handwritten line (like the reference's brush caption): Nanum Pen Script, subset by the Google Fonts API
-UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36'}
+# handwritten caption lines (class="tl hand"), if any: Nanum Pen Script, subset by the Google Fonts API
 hand = ''.join(sorted(set(''.join(re.findall(r'class="tl hand"[^>]*>([^<]+)<', html)))))
-q = 'family=Nanum+Pen+Script&display=block&text=' + urllib.parse.quote(hand)
-gcss = urllib.request.urlopen(urllib.request.Request('https://fonts.googleapis.com/css2?' + q, headers=UA)).read().decode()
-url = re.search(r'url\((https://[^)]+)\)', gcss).group(1)
-(out / 'NanumPenScript.subset.woff2').write_bytes(urllib.request.urlopen(urllib.request.Request(url, headers=UA)).read())
-css.append("@font-face{font-family:'Nanum Pen Script';font-display:block;src:url(NanumPenScript.subset.woff2) format('woff2')}")
+if hand.strip():
+    UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36'}
+    q = 'family=Nanum+Pen+Script&display=block&text=' + urllib.parse.quote(hand)
+    gcss = urllib.request.urlopen(urllib.request.Request('https://fonts.googleapis.com/css2?' + q, headers=UA)).read().decode()
+    url = re.search(r'url\((https://[^)]+)\)', gcss).group(1)
+    (out / 'NanumPenScript.subset.woff2').write_bytes(urllib.request.urlopen(urllib.request.Request(url, headers=UA)).read())
+    css.append("@font-face{font-family:'Nanum Pen Script';font-display:block;src:url(NanumPenScript.subset.woff2) format('woff2')}")
+else:
+    (out / 'NanumPenScript.subset.woff2').unlink(missing_ok=True)
 
 # SamsungOne (the site's UI face) straight from deploy/
 css.append("@font-face{font-family:'SamsungOne';font-weight:700;font-display:block;"
