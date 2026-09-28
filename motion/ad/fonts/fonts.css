@@ -1,0 +1,5 @@
+@font-face{font-family:'Pretendard';font-weight:800;font-display:block;src:url(Pretendard-ExtraBold.subset.woff2) format('woff2')}
+@font-face{font-family:'Pretendard';font-weight:700;font-display:block;src:url(Pretendard-Bold.subset.woff2) format('woff2')}
+@font-face{font-family:'Pretendard';font-weight:600;font-display:block;src:url(Pretendard-SemiBold.subset.woff2) format('woff2')}
+@font-face{font-family:'Nanum Pen Script';font-display:block;src:url(NanumPenScript.subset.woff2) format('woff2')}
+@font-face{font-family:'SamsungOne';font-weight:700;font-display:block;src:url(../../../deploy/fonts/SamsungOne-700.ttf) format('truetype')}
