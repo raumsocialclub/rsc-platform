@@ -24,7 +24,7 @@ export function InquiriesView({ rows, selected, filter, options }: { rows: Inqui
         <div className={CARD}>
           <div className="overflow-x-auto">
             <table className="border-collapse w-full">
-              <thead><tr>{["신청일", "이름", "연락처", "성향 결과", "희망 시간", "유입 광고", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
+              <thead><tr>{["신청일", "이름", "연락처", "성향 결과", "가능 시간", "유입 광고", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>
                 {rows.length === 0 && <EmptyRow colSpan={7}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. /fit-check 에서 설문을 제출하면 여기에 표시됩니다."}</EmptyRow>}
                 {rows.map((r) => {

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { samsungOne } from "@/lib/fonts";
 import { PageTracker } from "@/components/site/PageTracker";
 import { EnvBanner } from "@/components/site/EnvBanner";
+import { MetaPixel } from "@/components/site/MetaPixel";
+import { getSettings } from "@/lib/settings/get";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getBrand, getTheme } from "@/lib/cms/get";
 import { getSeo, robotsFor, siteUrl, absUrl } from "@/lib/seo/get";
@@ -33,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /** 루트 레이아웃. 어드민 "색상 테마" 값을 :root CSS 변수로 주입한다(tailwind 토큰이 이 변수를 쓴다). */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [t, org] = await Promise.all([getTheme(), organizationJsonLd()]);
+  const [t, org, settings] = await Promise.all([getTheme(), organizationJsonLd(), getSettings()]);
   const css = `:root{--c-cream:${t.cream};--c-ink:${t.ink};--c-brown:${t.brown};--c-brownHover:${t.brownHover};--c-gold:${t.gold};--c-goldHover:${t.goldHover};--c-sand:${t.sand};--c-sandDeep:${t.sandDeep}}`;
   return (
     <html lang="ko" className={`${samsungOne.variable} h-full antialiased`}>
@@ -45,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {children}
         <JsonLd data={org} />
         <PageTracker />
+        <MetaPixel pixelId={settings.metaPixelId} />
       </body>
     </html>
   );

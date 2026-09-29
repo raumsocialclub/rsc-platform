@@ -20,6 +20,15 @@ export const SETTINGS_DOCS: DocDef[] = [
     defaults: { leadMode: false, maintenance: false, maintenanceMessage: "잠시 사이트를 점검하고 있습니다.\n곧 다시 찾아뵙겠습니다.", maintenanceAllowIps: "" },
   },
   {
+    id: "settings.inquiry",
+    page: "settings",
+    label: "상담 신청 · 광고 측정",
+    description:
+      "상담 신청(/fit-check)은 기본으로 이름·휴대폰·상담 가능 시간·개인정보 동의만 받는 한 화면입니다. '설문형 상담 신청'을 켜면 예전처럼 6문항 설문을 거쳐 성향 결과 유형(THE SETTLER 등)을 함께 저장합니다. 메타 픽셀 ID 를 넣으면 공개 페이지에 픽셀이 실리고 상담 신청 완료 시 Lead 이벤트를 보냅니다(비우면 실리지 않음).",
+    fields: [b("surveyMode", "설문형 상담 신청 켜기 (성향 결과 유형 저장)"), t("metaPixelId", "메타 픽셀 ID", "메타 이벤트 관리자 → 데이터 소스 → 픽셀 ID (숫자 15~16자리). 비우면 픽셀을 싣지 않습니다")],
+    defaults: { surveyMode: false, metaPixelId: "" },
+  },
+  {
     id: "settings.security",
     page: "settings",
     label: "보안",

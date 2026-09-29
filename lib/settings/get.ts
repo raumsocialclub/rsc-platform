@@ -3,6 +3,7 @@ import { SETTINGS_DOCS } from "./schema";
 
 export type Settings = {
   leadMode: boolean;
+  surveyMode: boolean; metaPixelId: string;
   maintenance: boolean; maintenanceMessage: string; maintenanceAllowIps: string;
   securityHeaders: boolean; adminAllowedIps: string; loginMaxFails: number; loginLockMinutes: number;
   blockedIps: string; blockedCountries: string; blockMessage: string;

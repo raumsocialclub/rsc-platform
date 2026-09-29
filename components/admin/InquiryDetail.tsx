@@ -20,6 +20,7 @@ export type InquiryRow = {
     profile?: string;
     route?: string;
     slot?: string;
+    consentAt?: string;
     answers?: { key: string; label: string; question: string; answer: string }[];
   } | null;
   /** 광고 유입(UTM). 광고 링크 없이 들어온 신청은 null */
@@ -90,7 +91,8 @@ export function InquiryDetail({ inquiry, profileKo, profileBody }: Props) {
   const rows: { q: string; a: string }[] = [
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
     ...(a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
-    ...(a.slot ? [{ q: "통화 희망 시간", a: a.slot }] : []),
+    ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
+    ...(a.consentAt ? [{ q: "개인정보 동의", a: fmtDate(a.consentAt, true) }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),
     ...(inquiry.utm?.utm_campaign ? [{ q: "캠페인", a: inquiry.utm.utm_campaign }] : []),
     ...(inquiry.utm?.utm_content ? [{ q: "광고 소재", a: inquiry.utm.utm_content }] : []),
@@ -103,11 +105,13 @@ export function InquiryDetail({ inquiry, profileKo, profileBody }: Props) {
       <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}</div>
       <div className="text-[13px] text-[rgba(33,30,25,.55)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
 
-      <div className="bg-cream p-[16px] mb-[20px]">
-        <div className="text-[11px] tracking-[.2em] text-brownHover mb-[6px]">성향 결과</div>
-        <b className="text-[15px]">{inquiry.result_type || "—"}{profileKo ? ` · ${profileKo}` : ""}</b>
-        {profileBody && <div className="text-[12.5px] text-[rgba(33,30,25,.6)] mt-[6px] leading-[1.6]">{profileBody}</div>}
-      </div>
+      {inquiry.result_type && (
+        <div className="bg-cream p-[16px] mb-[20px]">
+          <div className="text-[11px] tracking-[.2em] text-brownHover mb-[6px]">성향 결과 (설문형 신청)</div>
+          <b className="text-[15px]">{inquiry.result_type}{profileKo ? ` · ${profileKo}` : ""}</b>
+          {profileBody && <div className="text-[12.5px] text-[rgba(33,30,25,.6)] mt-[6px] leading-[1.6]">{profileBody}</div>}
+        </div>
+      )}
 
       <div className="grid gap-[10px] text-[13px] mb-[24px]">
         {rows.length === 0 && <div className="text-[rgba(33,30,25,.5)]">답변 정보가 없습니다.</div>}

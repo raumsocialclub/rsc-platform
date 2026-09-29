@@ -35,7 +35,7 @@ const PAGE_DEFAULTS: Record<string, { title: string; description: string }> = {
   pricing: { title: "멤버십 가격 안내", description: "RSC PREVIEW 165,000원(1회) · ACCESS 연 3,300,000원 · SIGNATURE 연 8,800,000원. 모든 금액 VAT 포함, 자동 갱신 없음. 상담 후 PREVIEW 행사로 먼저 경험해 보세요." },
   benefits: { title: "정회원 혜택 안내", description: "6개 카테고리 행사 우선참여, 지인 초대권 연 8매, RSC 라운지·미팅룸, 평일 무료주차, 라움아트센터 대관 우선, 제휴 브랜드 할인까지 라움소셜클럽 정회원 혜택." },
   news: { title: "소식", description: "라움소셜클럽의 새로운 프로그램, 행사 후기, 공지사항을 전합니다." },
-  fitcheck: { title: "RSC 상담 신청", description: "간단한 설문을 남기시면 운영팀이 연락드립니다. 상담 후 초대코드로 가입할 수 있습니다." },
+  fitcheck: { title: "RSC 상담 신청", description: "이름과 연락처만 남기시면 담당자가 직접 연락드립니다. 상담 후 초대코드로 가입할 수 있습니다." },
   terms: { title: "이용약관", description: "라움소셜클럽 이용약관" },
   privacy: { title: "개인정보처리방침", description: "라움소셜클럽 개인정보처리방침" },
   refund: { title: "환불규정", description: "라움소셜클럽 취소 · 환불 규정" },
@@ -47,7 +47,7 @@ const DEFAULT_LLMS = `# 라움소셜클럽 (RAUM SOCIAL CLUB, RSC)
 
 ## 핵심 사실
 - 운영: 라움(RAUM) · 서울특별시 강남구 언주로 564 라움아트센터 (역삼동 680-1)
-- 가입: 만 19세 이상, 법률상 배우자가 없는 싱글. 사이트에서 상담(Fit Check)을 신청하고 상담 후 초대코드로 가입
+- 가입: 만 19세 이상, 법률상 배우자가 없는 싱글. 사이트에서 상담을 신청하고 상담 후 초대코드로 가입
 - 멤버십: RSC PREVIEW 165,000원(가입 전 행사 1회, 생애 1회) · RSC ACCESS 연 3,300,000원 · RSC SIGNATURE 연 8,800,000원 (VAT 포함, 자동 갱신 없음)
 - 프로그램: ART WALK, SUNDAY RESET, TASTE TABLE, ONE QUESTION SALON, AFTER HOURS, RUN & BRUNCH 등 6개 카테고리 행사 · 매월 RAUM SOCIAL NIGHT · 6주 시즌 RAUM SOLO · 관계 프로그램 CONNECTION / RAUM MERRY
 - 문의: 02-538-3366 · support@theraum.co.kr · 인스타그램 @raum_socialclub

@@ -18,6 +18,7 @@ export type FitCheckSubmission = {
   route: string;
   slot: string;
   resultType: string;
+  consent: true;
   utm: Utm | null;
 };
 
@@ -88,6 +89,7 @@ export function FitCheck({ onSubmit }: Props) {
         route,
         slot,
         resultType: ev.profile.en,
+        consent: true,
         utm: readUtm(),
       });
       setView("done");
