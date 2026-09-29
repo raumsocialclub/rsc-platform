@@ -21,6 +21,7 @@ export type InquiryRow = {
     route?: string;
     slot?: string;
     consentAt?: string;
+    consentVersion?: string;
     answers?: { key: string; label: string; question: string; answer: string }[];
   } | null;
   /** 광고 유입(UTM). 광고 링크 없이 들어온 신청은 null */
@@ -92,7 +93,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody }: Props) {
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
     ...(a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
-    ...(a.consentAt ? [{ q: "개인정보 동의", a: fmtDate(a.consentAt, true) }] : []),
+    ...(a.consentAt ? [{ q: "개인정보 동의", a: `${fmtDate(a.consentAt, true)}${a.consentVersion ? ` · 동의문 ${a.consentVersion}` : ""}` }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),
     ...(inquiry.utm?.utm_campaign ? [{ q: "캠페인", a: inquiry.utm.utm_campaign }] : []),
     ...(inquiry.utm?.utm_content ? [{ q: "광고 소재", a: inquiry.utm.utm_content }] : []),

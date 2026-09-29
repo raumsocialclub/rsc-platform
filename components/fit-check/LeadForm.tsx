@@ -54,7 +54,7 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
       <div className="w-full max-w-[640px] mx-auto py-[40px]">
         <div className="text-[11px] tracking-[.34em] text-brown mb-[36px]">THANK YOU</div>
         <h2 className="font-medium text-[clamp(30px,3.6vw,48px)] leading-[1.36] mb-[28px] text-pretty">신청이 접수되었습니다</h2>
-        <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">영업일 기준 2일 이내에 가입 상담 담당자가 연락드립니다. 그 사이 궁금한 점이 있으시면 언제든 문의해 주세요.</p>
+        <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 아래 이메일 또는 전화(02-538-3366)로 알려 주세요.</p>
         <div className="flex gap-[12px] flex-wrap">
           <Link href="/" className="inline-flex items-center px-[34px] py-[16px] bg-brown text-cream text-[13.5px] hover:text-cream">홈으로 돌아가기</Link>
           <InstagramButton shape="square" />
@@ -92,7 +92,7 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
           <span className="block mt-[8px] text-[12.5px] text-[rgba(33,30,25,.45)]">숫자만 입력하시면 자동으로 하이픈이 붙습니다.</span>
         </label>
         <div>
-          <div className="text-[13.5px] font-medium mb-[14px]">상담 가능 시간 <span className="text-[rgba(33,30,25,.4)] font-medium">여러 개 선택 가능</span></div>
+          <div className="text-[13.5px] font-medium mb-[14px]">상담 가능 시간 <span className="text-[rgba(33,30,25,.4)] font-medium">선택 · 여러 개 고를 수 있어요</span></div>
           <div className="flex flex-wrap gap-[10px]">
             {SLOTS.map((t) => {
               const on = slots.includes(t);
@@ -110,12 +110,13 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
             <span className="text-[14px] leading-[1.7] text-ink font-medium">개인정보 수집·이용 동의 <span className="text-brown">(필수)</span></span>
           </label>
           <dl className="mt-[12px] ml-[31px] grid gap-[4px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.68)]">
-            <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름, 휴대폰 번호, 상담 가능 시간, 광고를 통해 들어온 경우 광고 유입 정보</dd></div>
-            <div><dt className="inline font-medium text-ink">이용 목적: </dt><dd className="inline">가입 상담 진행과 안내</dd></div>
-            <div><dt className="inline font-medium text-ink">보관 기간: </dt><dd className="inline">접수일로부터 180일, 이후 자동 삭제</dd></div>
+            <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름, 휴대폰 번호(필수) · 상담 가능 시간(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)</dd></div>
+            <div><dt className="inline font-medium text-ink">이용 목적: </dt><dd className="inline">신청하신 가입 상담의 진행과 일정 조율, 문의 응대</dd></div>
+            <div><dt className="inline font-medium text-ink">보관 기간: </dt><dd className="inline">접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)</dd></div>
+            <div><dt className="inline font-medium text-ink">거부 시: </dt><dd className="inline">필수 항목 동의를 거부하면 상담 신청이 접수되지 않습니다. 상담 가능 시간은 비워도 신청할 수 있습니다.</dd></div>
           </dl>
           <p className="mt-[10px] ml-[31px] text-[12.5px] leading-[1.7] text-[rgba(33,30,25,.55)]">
-            동의하지 않으면 상담 신청이 어렵습니다. 자세한 내용은 <Link href="/privacy" target="_blank" className="underline text-brown">개인정보처리방침</Link>을 확인해 주세요.
+            자세한 내용은 <Link href="/privacy" target="_blank" className="underline text-brown">개인정보처리방침</Link>에서 확인하실 수 있습니다. 사이트 이용 조건은 <Link href="/terms" target="_blank" className="underline text-brown">이용약관</Link>을 참고해 주세요.
           </p>
         </div>
       </div>
@@ -129,7 +130,7 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
       >
         {submitting ? "접수 중…" : "상담 신청하기 →"}
       </button>
-      <p className="mt-[14px] text-center text-[12.5px] text-[rgba(33,30,25,.45)]">제출하신 정보는 상담 안내 목적으로만 사용됩니다.</p>
+      <p className="mt-[14px] text-center text-[12.5px] text-[rgba(33,30,25,.45)]">신청은 회원 가입이 아니며, 담당자가 연락드린 뒤 상담이 진행됩니다.</p>
     </form>
   );
 }

@@ -4,6 +4,7 @@ import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { normalizePhone } from "@/lib/phone";
 import { UTM_KEYS } from "@/lib/utm/client";
+import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 
 /**
  * POST /api/inquiries — Fit Check 설문 완료 시 inquiries 에 저장한다. (FLOWS.md 1-1)
@@ -12,7 +13,7 @@ import { UTM_KEYS } from "@/lib/utm/client";
  *
  * 개인정보 최소화: 이름·휴대폰·상담 가능 시간·광고 UTM·동의 시각만 저장한다. (설문형 모드일 때만 결과 유형·유입 경로가 추가됨)
  * 설문 답변 원본(picks/answers)은 받더라도 버린다 (zod 가 정의되지 않은 키를 제거).
- * 개인정보 수집·이용 동의(consent) 없이는 저장하지 않는다.
+ * 개인정보 수집·이용 동의(consent) 없이는 저장하지 않으며, 동의 시각과 동의문 버전(PRIVACY_CONSENT_VERSION)을 서버에서 기록한다.
  * 보관: 180일 (DB purge_expired_inquiries 크론) — 개인정보처리방침 제4조와 일치.
  */
 const UtmSchema = z.object(Object.fromEntries(UTM_KEYS.map((k) => [k, z.string().trim().max(100).optional()])) as Record<(typeof UTM_KEYS)[number], z.ZodOptional<z.ZodString>>);
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
     name: body.name,
     phone,
     email: null,
-    answers: { route: body.route, slot: body.slot, consentAt: new Date().toISOString() },
+    answers: { route: body.route, slot: body.slot, consentAt: new Date().toISOString(), consentVersion: PRIVACY_CONSENT_VERSION },
     result_type: body.resultType || null,
     utm: cleanUtm(body.utm),
   };

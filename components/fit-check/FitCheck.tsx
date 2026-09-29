@@ -244,7 +244,7 @@ export function FitCheck({ onSubmit }: Props) {
             </div>
             <label className="flex items-start gap-[14px] cursor-pointer">
               <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="w-[17px] h-[17px] mt-[2px] accent-brown cursor-pointer" />
-              <span className="text-[14px] leading-[1.7] text-[rgba(33,30,25,.68)] text-pretty">개인정보 수집 및 이용에 동의합니다. 가입 상담 목적으로만 사용되며, 요청하시면 즉시 파기합니다.</span>
+              <span className="text-[14px] leading-[1.7] text-[rgba(33,30,25,.68)] text-pretty">개인정보 수집·이용에 동의합니다(필수). 이름·휴대폰 번호·설문 결과 유형·알게 된 경로·상담 가능 시간(선택)을 가입 상담 진행 목적으로 접수일부터 최대 180일 보관하며, 요청하시면 그 전에도 삭제합니다. 동의하지 않으면 상담 신청이 접수되지 않습니다. <Link href="/privacy" target="_blank" className="underline text-brown">개인정보처리방침</Link></span>
             </label>
           </div>
 
@@ -268,7 +268,7 @@ export function FitCheck({ onSubmit }: Props) {
         <div className="py-[60px]">
           <div className="text-[11px] tracking-[.34em] text-brown mb-[36px]">THANK YOU</div>
           <h2 className="font-medium text-[clamp(30px,3.6vw,48px)] leading-[1.36] mb-[28px] text-pretty">신청이 접수되었습니다</h2>
-          <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">영업일 기준 2일 이내에 가입 상담 담당자가 연락드립니다. 그 사이 궁금한 점이 있으시면 언제든 문의해 주세요.</p>
+          <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 아래 이메일 또는 전화(02-538-3366)로 알려 주세요.</p>
           <div className="flex gap-[12px] flex-wrap">
             <Link href="/" className="inline-flex items-center px-[34px] py-[16px] bg-brown text-cream text-[13.5px] hover:text-cream">홈으로 돌아가기</Link>
             <InstagramButton shape="square" />

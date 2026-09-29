@@ -25,6 +25,20 @@ describe("상담 신청 POST /api/inquiries", () => {
     expect(row.answers.slot).toBe("오후 2–4시, 저녁 6–8시");
     expect(row.answers.route).toBe("");
     expect(row.answers.consentAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(row.answers.consentVersion).toBe("2026-10-01");
+  });
+  it("상담 가능 시간을 비워도 접수된다 (선택 항목)", async () => {
+    const { POST } = await import("@/app/api/inquiries/route");
+    const res = await POST(post({ name: "홍길동", phone: "01012345678", consent: true }));
+    expect(res.status).toBe(200);
+    const row = db.calls[0].payload as { answers: Record<string, string> };
+    expect(row.answers.slot).toBe("");
+  });
+  it("클라이언트가 보낸 동의 버전은 무시하고 서버 버전을 기록한다", async () => {
+    const { POST } = await import("@/app/api/inquiries/route");
+    await POST(post({ ...base, consentVersion: "9999-01-01" }));
+    const row = db.calls[0].payload as { answers: Record<string, string> };
+    expect(row.answers.consentVersion).toBe("2026-10-01");
   });
   it("설문형 신청: 결과 유형·경로는 저장하되 설문 답변 원본은 버린다", async () => {
     const { POST } = await import("@/app/api/inquiries/route");
