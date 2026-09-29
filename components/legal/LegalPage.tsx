@@ -45,16 +45,22 @@ export async function LegalPage({ overline, title, updated, sections, current, p
             </div>
           )}
           <article className="grid gap-[32px]">
-            {sections.map((s, i) => (
-              <section key={i} id={`s${i + 1}`}>
-                <h2 className="font-semibold text-[17px] md:text-[19px] leading-[1.4] mb-[12px]">제{i + 1}조 ({s.title})</h2>
-                <div className="grid gap-[8px]">
-                  {s.body.map((p, j) => (
-                    <p key={j} className="m-0 text-[14.5px] leading-[1.85] text-[rgba(33,30,25,.78)]" style={{ textWrap: "pretty" }}>{s.body.length > 1 ? `${j + 1}. ` : ""}{p}</p>
-                  ))}
-                </div>
-              </section>
-            ))}
+            {sections.map((s, i) => {
+              // 제목이 "제N조 (…)"·"부칙"이거나 서문이면 그대로, 짧은 제목이면 번호를 붙인다
+              const heading = /^(제\s*\d+\s*조|부칙)/.test(s.title) || (i === 0 && /처리방침$/.test(s.title)) ? s.title : `제${i + 1}조 (${s.title})`;
+              // 본문 줄에 이미 "1." 같은 번호가 있으면 자동 번호를 붙이지 않는다
+              const autoNumber = s.body.length > 1 && !s.body.some((l) => /^\d+\.\s/.test(l));
+              return (
+                <section key={i} id={`s${i + 1}`}>
+                  <h2 className="font-semibold text-[17px] md:text-[19px] leading-[1.4] mb-[12px]">{heading}</h2>
+                  <div className="grid gap-[8px]">
+                    {s.body.map((p, j) => (
+                      <p key={j} className="m-0 text-[14.5px] leading-[1.85] text-[rgba(33,30,25,.78)]" style={{ textWrap: "pretty" }}>{autoNumber ? `${j + 1}. ` : ""}{p}</p>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </article>
           <div className="mt-[48px] pt-[24px] border-t border-[rgba(33,30,25,.12)] text-[13px] leading-[1.7] text-[rgba(33,30,25,.62)]">
             문의: RAUM SOCIAL CLUB · 02-538-3366 · <a href="mailto:theraumai@gmail.com" className="text-brown underline">theraumai@gmail.com</a>
