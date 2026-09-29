@@ -4,6 +4,7 @@ import { Txt } from "@/components/cms/Txt";
 import { getBrand } from "@/lib/cms/get";
 import { getSettings } from "@/lib/settings/get";
 import { InstagramButton } from "./InstagramButton";
+import { FamilySiteMenu } from "./FamilySiteMenu";
 
 const INK_FILTER = "invert(1) brightness(0.15)";
 
@@ -17,8 +18,11 @@ export async function SiteFooter() {
   return (
     <footer className="px-[40px] pt-[110px] pb-[140px] border-t border-[rgba(33,30,25,.09)] bg-sand">
       <div className="max-w-[1240px] mx-auto">
-        <div className="font-semibold text-[clamp(22px,2.2vw,32px)] leading-[1.35] mb-[80px] max-w-[820px] text-pretty">
-          <Txt v={b.footerHeadline} />
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-[28px] mb-[80px]">
+          <div className="font-semibold text-[clamp(22px,2.2vw,32px)] leading-[1.35] max-w-[820px] text-pretty">
+            <Txt v={b.footerHeadline} />
+          </div>
+          <FamilySiteMenu sites={[{ label: b.familySite1Label, url: b.familySite1Url }, { label: b.familySite2Label, url: b.familySite2Url }]} />
         </div>
         <div className="grid grid-cols-2 gap-[32px] md:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] md:gap-[48px] mb-[80px]">
           <div>
