@@ -57,7 +57,7 @@ export async function LegalPage({ overline, title, updated, sections, current, p
             ))}
           </article>
           <div className="mt-[48px] pt-[24px] border-t border-[rgba(33,30,25,.12)] text-[13px] leading-[1.7] text-[rgba(33,30,25,.62)]">
-            문의: RAUM SOCIAL CLUB · 02-538-3366 · <a href="mailto:support@theraum.co.kr" className="text-brown underline">support@theraum.co.kr</a>
+            문의: RAUM SOCIAL CLUB · 02-538-3366 · <a href="mailto:theraumai@gmail.com" className="text-brown underline">theraumai@gmail.com</a>
           </div>
         </div>
       </main>

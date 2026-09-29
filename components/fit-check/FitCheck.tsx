@@ -272,7 +272,7 @@ export function FitCheck({ onSubmit }: Props) {
           <div className="flex gap-[12px] flex-wrap">
             <Link href="/" className="inline-flex items-center px-[34px] py-[16px] bg-brown text-cream text-[13.5px] hover:text-cream">홈으로 돌아가기</Link>
             <InstagramButton shape="square" />
-            <a href="mailto:support@theraum.co.kr" className="inline-flex items-center px-[34px] py-[16px] border border-[rgba(33,30,25,.3)] text-[13.5px] hover:border-brown hover:text-brown">support@theraum.co.kr</a>
+            <a href="mailto:theraumai@gmail.com" className="inline-flex items-center px-[34px] py-[16px] border border-[rgba(33,30,25,.3)] text-[13.5px] hover:border-brown hover:text-brown">theraumai@gmail.com</a>
           </div>
         </div>
       )}

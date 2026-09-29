@@ -47,7 +47,7 @@ export const SETTINGS_DOCS: DocDef[] = [
     label: "접근 차단",
     description: "차단된 IP·국가는 사이트 전체(관리자 포함)에 접속할 수 없습니다. 국가 코드는 KR, CN 처럼 2글자.",
     fields: [ta("blockedIps", "차단 IP", "줄마다 하나. 1.2.3.4 / 1.2.3.* / 1.2.3.0/24"), t("blockedCountries", "차단 국가", "쉼표로 구분. 예: CN, RU"), ta("blockMessage", "차단 안내 문구")],
-    defaults: { blockedIps: "", blockedCountries: "", blockMessage: "접속이 제한된 환경입니다.\n문의: support@theraum.co.kr" },
+    defaults: { blockedIps: "", blockedCountries: "", blockMessage: "접속이 제한된 환경입니다.\n문의: theraumai@gmail.com" },
   },
   {
     id: "settings.cache",
