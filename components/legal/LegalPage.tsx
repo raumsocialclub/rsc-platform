@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { UpButton } from "@/components/site/UpButton";
+import { getSettings } from "@/lib/settings/get";
+import { isLeadHiddenHref } from "@/lib/settings/leadMode";
 
 export type LegalSection = { title: string; body: string[] };
 
@@ -14,8 +16,11 @@ const NAV = [
 /**
  * 약관류 공통 레이아웃 (Design.md 규칙: 크림 배경, 좌측 정렬 본문, 상단 라벨 + 제목).
  * 본문은 lib/legal/*.ts 의 자리 문구 — 실제 문구는 사용자 제공 후 교체한다.
+ * 리드 모드면 상단 탭에서 환불규정(숨김 페이지)을 뺀다 (푸터 링크와 같은 스위치).
  */
-export function LegalPage({ overline, title, updated, sections, current, placeholder = true }: { overline: string; title: string; updated: string; sections: LegalSection[]; current: string; placeholder?: boolean }) {
+export async function LegalPage({ overline, title, updated, sections, current, placeholder = true }: { overline: string; title: string; updated: string; sections: LegalSection[]; current: string; placeholder?: boolean }) {
+  const { leadMode } = await getSettings();
+  const nav = NAV.filter((n) => !(leadMode && isLeadHiddenHref(n.href)));
   return (
     <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">
       <Header />
@@ -25,7 +30,7 @@ export function LegalPage({ overline, title, updated, sections, current, placeho
           <h1 className="font-medium text-[28px] md:text-[clamp(28px,3.4vw,40px)] leading-[1.3] mb-[14px]">{title}</h1>
           <div className="text-[13px] text-[rgba(33,30,25,.62)] mb-[28px]">시행일 {updated}</div>
           <nav aria-label="약관 문서" className="flex gap-[8px] flex-wrap mb-[36px]">
-            {NAV.map((n) => {
+            {nav.map((n) => {
               const on = n.href === current;
               return (
                 <Link key={n.href} href={n.href} className="border border-[rgba(33,30,25,.2)] px-[16px] py-[8px] rounded-pill text-[12.5px] font-semibold" style={{ background: on ? "#5a3d24" : "transparent", color: on ? "#f7f3ec" : "#5a3d24" }} aria-current={on ? "page" : undefined}>
