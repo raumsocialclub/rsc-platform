@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { leadModeGuard } from "@/lib/settings/leadModeGuard";
 import { getCurrentMember } from "@/lib/auth/session";
 import { cancelBooking } from "@/lib/bookings/cancel";
 import { getRefundRules, refundQuote } from "@/lib/bookings/refund";
@@ -9,6 +10,8 @@ import { createClient } from "@/lib/supabase/server";
  * 환불 정책(lib/bookings/refund.ts) 으로 환불액 계산 → 토스 취소 → payments/bookings 갱신.
  */
 export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const closed = await leadModeGuard();
+  if (closed) return closed;
   const me = await getCurrentMember();
   if (!me) return NextResponse.json({ ok: false, message: "로그인이 필요합니다." }, { status: 401 });
   const { id } = await ctx.params;

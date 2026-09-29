@@ -15,12 +15,15 @@ export type InquiryRow = {
   status: string;
   memo: string | null;
   created_at: string;
+  /** 저장 항목은 route·slot 뿐. answers 배열은 설문 원본을 저장하던 이전 신청에만 남아 있다. */
   answers: {
     profile?: string;
     route?: string;
     slot?: string;
     answers?: { key: string; label: string; question: string; answer: string }[];
   } | null;
+  /** 광고 유입(UTM). 광고 링크 없이 들어온 신청은 null */
+  utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string } | null;
   /** 이미 발급된 코드 (있으면) */
   invite?: { code: string; expires_at: string | null; used_at: string | null } | null;
 };
@@ -88,6 +91,10 @@ export function InquiryDetail({ inquiry, profileKo, profileBody }: Props) {
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
     ...(a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
     ...(a.slot ? [{ q: "통화 희망 시간", a: a.slot }] : []),
+    ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),
+    ...(inquiry.utm?.utm_campaign ? [{ q: "캠페인", a: inquiry.utm.utm_campaign }] : []),
+    ...(inquiry.utm?.utm_content ? [{ q: "광고 소재", a: inquiry.utm.utm_content }] : []),
+    ...(inquiry.utm?.utm_term ? [{ q: "검색어", a: inquiry.utm.utm_term }] : []),
   ];
 
   return (

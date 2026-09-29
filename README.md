@@ -56,6 +56,15 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 
 **M10(일반 설정)**: `/admin/settings` — 점검 모드, 보안 헤더, 관리자 허용 IP, 로그인 연속 실패 잠금, 차단 IP·국가, 공개 페이지 CDN 캐시 시간·캐시 비우기, 이메일 발송 켜기/발신자, 환불 정책(일수·환불률).
 저장 즉시 적용(요청 앞단 `proxy.ts` 가 30초 캐시로 읽음). HTTPS 는 Vercel 자동. 국가 차단·요청 제한(Rate Limit)·공격 대응은 Vercel 대시보드 → Firewall 에서(안내는 일반 설정 화면 하단).
+
+**리드 모드(M14)**: 일반 설정 → 사이트 상태 → "리드 모드" 스위치 하나로 사이트를 "광고 → 상담 신청" 전용으로 바꾼다(코드 삭제 없음, 끄면 원상복구).
+- 숨김: GNB 프로그램 예약·내 예약·로그인, 메인 07 멤버십 섹션, 금액이 들어간 FAQ, 혜택 페이지의 금액 문구·가격 안내 버튼, 푸터 멤버십·환불규정 링크
+- 직접 접속 시 메인으로: `/pricing` `/join` `/programs` `/my` `/checkout` `/refund` `/auth/naver` (`lib/settings/leadMode.ts`)
+- 닫히는 API(404): 예약·취소·결제 승인·결제 웹훅·초대코드 검증/사용 (`lib/settings/leadModeGuard.ts`)
+- 그대로: 서비스 소개·혜택·소식·상담 신청·약관·개인정보처리방침, 관리자 `/admin` 과 `/login`(링크만 숨김)
+- SEO: 숨김 페이지는 사이트맵·llms.txt 에서 빠지고 robots 에 disallow
+- 상담 신청 저장 항목(리드 모드와 무관하게 항상): 이름·휴대폰·희망 시간·유입 경로·결과 유형·광고 UTM. 설문 답변 원본은 저장하지 않음. 180일 뒤 자동 삭제(`purge-expired-inquiries` 크론). 어드민 상담 목록에서 유입 광고(utm_source/캠페인)로 필터
+- 광고 링크 예: `https://도메인/?utm_source=instagram&utm_medium=paid&utm_campaign=oct-launch` → 브라우저가 30일 기억 → 상담 신청에 자동 저장
 서버 함수 리전은 `vercel.json` 으로 서울(icn1)에 고정해 Supabase(서울)와의 왕복 지연을 줄였습니다.
 
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
@@ -121,7 +130,7 @@ Layout
 
 ### B. 상담 신청 (Fit Check) — `design/RSC Fit Check.dc.html` (`/fit-check`)
 - 단계별 설문(한 화면에 한 질문, 선택 시 하단에 선택별 문구 노출) → 마지막에 이름·연락처 입력 → 결과 유형 노출.
-- **실서비스**: 완료 시 `inquiries` 테이블에 answers(JSON)+result_type 저장, 어드민 "상담 신청" 탭에서 열람. 로그인 불필요.
+- **실서비스**: 완료 시 `inquiries` 테이블에 이름·휴대폰·answers `{route, slot}`·result_type·utm 저장(설문 답변 원본은 저장하지 않음, 180일 뒤 자동 삭제), 어드민 "상담 신청" 탭에서 열람. 로그인 불필요. 완료 화면에 인스타그램 버튼.
 
 ### C. 가격 안내 — `design/RSC Pricing.dc.html` (`/pricing`)
 정적 페이지. 가격은 DB `membership_plans`에서 읽도록 구현(어드민에서 수정 가능). 현행 값:

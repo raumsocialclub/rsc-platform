@@ -64,7 +64,7 @@ VERCEL_DEPLOY_HOOK_PRODUCTION=     # Vercel 이 아니라 GitHub → Settings �
   - 요청 제한: Condition = Request Path (예: starts with `/api`) → Action = **Rate Limit** → 허용 횟수 → Save → Publish
   - IP 차단: Condition = IP Address → Action = Deny (어드민 일반 설정의 차단 IP 와 동일 효과)
   - 트래픽 폭주 시 상단 **Attack Challenge Mode** 를 잠시 켠다
-- 어드민 `/admin/settings` 에서 되는 것: 점검 모드, 보안 헤더, 관리자 허용 IP, 로그인 잠금, 차단 IP·국가, 캐시, 알림, 환불 정책
+- 어드민 `/admin/settings` 에서 되는 것: 리드 모드(상담 신청 전용 사이트), 점검 모드, 보안 헤더, 관리자 허용 IP, 로그인 잠금, 차단 IP·국가, 캐시, 알림, 환불 정책
 
 ## 4-2. 검색엔진 등록 (SEO · GEO, 실도메인 연결 후)
 - 오픈 전에는 어드민 `/admin/seo` 의 **검색 노출 켜기** 가 꺼져 있어 robots.txt 가 검색엔진을 막고 모든 페이지에 noindex 가 붙는다. AI 크롤러(GPTBot·ClaudeBot·PerplexityBot·Google-Extended)는 기본 허용.

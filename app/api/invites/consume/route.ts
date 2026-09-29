@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { leadModeGuard } from "@/lib/settings/leadModeGuard";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,6 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 const Body = z.object({ code: z.string().trim().min(1).max(20) });
 
 export async function POST(req: Request) {
+  const closed = await leadModeGuard();
+  if (closed) return closed;
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, message: "코드를 입력해 주세요." }, { status: 400 });
 

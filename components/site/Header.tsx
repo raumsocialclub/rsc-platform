@@ -1,6 +1,7 @@
 import { SiteHeader } from "./SiteHeader";
 import { getCurrentMember, initialOf } from "@/lib/auth/session";
 import { getBrand } from "@/lib/cms/get";
+import { getSettings } from "@/lib/settings/get";
 
 /** 서버에서 로그인 상태와 브랜드 설정(CMS)을 읽어 SiteHeader 에 넘긴다. */
 export async function Header() {
@@ -11,6 +12,6 @@ export async function Header() {
   } catch {
     user = null;
   }
-  const b = await getBrand();
-  return <SiteHeader user={user} brand={{ ctaLabel: b.ctaLabel || "RSC 상담 신청", ctaHref: b.ctaHref || "/fit-check", logoEmblem: b.logoEmblem || "/images/logo-emblem.png", logoText: b.logoText || "/images/logo-text-nav.png" }} />;
+  const [b, settings] = await Promise.all([getBrand(), getSettings()]);
+  return <SiteHeader user={user} leadMode={settings.leadMode} brand={{ ctaLabel: b.ctaLabel || "RSC 상담 신청", ctaHref: b.ctaHref || "/fit-check", logoEmblem: b.logoEmblem || "/images/logo-emblem.png", logoText: b.logoText || "/images/logo-text-nav.png" }} />;
 }

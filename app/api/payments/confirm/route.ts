@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { leadModeGuard } from "@/lib/settings/leadModeGuard";
 import { z } from "zod";
 import { getCurrentMember } from "@/lib/auth/session";
 import { confirmBookingPayment } from "@/lib/bookings/confirm";
@@ -7,6 +8,8 @@ import { confirmBookingPayment } from "@/lib/bookings/confirm";
 const Body = z.object({ paymentKey: z.string().min(1).max(200), orderId: z.string().min(1).max(64), amount: z.number().int().nonnegative() });
 
 export async function POST(req: Request) {
+  const closed = await leadModeGuard();
+  if (closed) return closed;
   const me = await getCurrentMember();
   if (!me) return NextResponse.json({ ok: false, message: "로그인이 필요합니다." }, { status: 401 });
   const parsed = Body.safeParse(await req.json().catch(() => null));

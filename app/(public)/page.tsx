@@ -9,6 +9,8 @@ import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/seo/get";
 import { faqJsonLd } from "@/lib/seo/jsonld";
+import { getSettings } from "@/lib/settings/get";
+import { hasPrice } from "@/lib/settings/leadMode";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("home");
@@ -40,12 +42,17 @@ function Cta({ href, className, children }: { href: string; className: string; c
   return href.startsWith("/") ? <Link href={href} className={className}>{children}</Link> : <a href={href} className={className} {...(href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}>{children}</a>;
 }
 
-/** 메인 페이지. 모든 문구·사진은 CMS(site_content home.*) — 기본값은 lib/cms/schema.ts */
+/**
+ * 메인 페이지. 모든 문구·사진은 CMS(site_content home.*) — 기본값은 lib/cms/schema.ts
+ * 리드 모드(일반 설정)면 07 멤버십 섹션과 금액이 들어간 FAQ 를 숨긴다.
+ */
 export default async function HomePage() {
-  const d = await getPageDocs("home");
+  const [d, settings] = await Promise.all([getPageDocs("home"), getSettings()]);
+  const lead = settings.leadMode;
   const hero = d["home.hero"], about = d["home.about"], why = d["home.why"], promise = d["home.promise"], social = d["home.social"], solo = d["home.solo"], spaces = d["home.spaces"], mem = d["home.membership"], faq = d["home.faq"];
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a);
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
   const showFaq = on(faq, "visible") && faqItems.length > 0;
+  const showMembership = on(mem, "visible") && !lead;
   const promiseSize = (i: number) => (i === 1 ? "text-[22px]" : "text-[23px]");
 
   return (
@@ -207,8 +214,8 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 07 MEMBERSHIP */}
-      {on(mem, "visible") && (
+      {/* 07 MEMBERSHIP (리드 모드면 숨김) */}
+      {showMembership && (
         <section id="membership" className={SECTION}>
           <div className={INNER}>
             <SectionLabel><Label v={s(mem, "label")} /></SectionLabel>

@@ -17,5 +17,5 @@ vi.mock("@/lib/notify", () => ({
 }));
 // 일반 설정은 기본값
 vi.mock("@/lib/settings/get", () => ({
-  getSettings: vi.fn(async () => ({ refundDays: 3, refundRate: 100, lateRefundRate: 0, emailEnabled: true, fromName: "RSC", fromEmail: "t@t", alertEmail: "", adminAllowedIps: "", loginMaxFails: 5, loginLockMinutes: 15 })),
+  getSettings: vi.fn(async () => ({ leadMode: false, refundDays: 3, refundRate: 100, lateRefundRate: 0, emailEnabled: true, fromName: "RSC", fromEmail: "t@t", alertEmail: "", adminAllowedIps: "", loginMaxFails: 5, loginLockMinutes: 15 })),
 }));

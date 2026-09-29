@@ -2,24 +2,31 @@ import Link from "next/link";
 import { CARD, TH, TD, Badge, EmptyRow, PageTitle } from "./ui";
 import { InquiryDetail, type InquiryRow } from "./InquiryDetail";
 import { IssueInviteForm } from "./IssueInviteForm";
+import { InquiriesFilter } from "./InquiriesFilter";
 import { CopyButton } from "./CopyButton";
 import { INQUIRY_STATUS, badgeStyle, fmtDate, fmtShortDate, inquiryBadge } from "@/lib/admin/format";
 import { PROFILES } from "@/lib/fit-check/questions";
 
 /* ---------- 상담 신청 ---------- */
-export function InquiriesView({ rows, selected }: { rows: InquiryRow[]; selected: InquiryRow | null }) {
+/** 유입 광고 요약: utm_source / utm_campaign (없으면 "직접") */
+export const utmLabel = (utm: InquiryRow["utm"]) => (utm?.utm_source ? [utm.utm_source, utm.utm_campaign].filter(Boolean).join(" / ") : "직접");
+
+export function InquiriesView({ rows, selected, filter, options }: { rows: InquiryRow[]; selected: InquiryRow | null; filter: { source: string; campaign: string }; options: { sources: string[]; campaigns: string[] } }) {
   const pending = rows.filter((r) => r.status === "pending").length;
   const profile = selected?.result_type ? Object.values(PROFILES).find((p) => p.en === selected.result_type) : undefined;
+  const filtered = !!(filter.source || filter.campaign);
   return (
     <>
-      <PageTitle overline="FIT CHECK" title="상담 신청" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">대기 {pending}건</span>} />
+      <PageTitle overline="FIT CHECK" title="상담 신청" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">대기 {pending}건</span>}>
+        <InquiriesFilter filter={filter} options={options} />
+      </PageTitle>
       <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-[20px] items-start">
         <div className={CARD}>
           <div className="overflow-x-auto">
             <table className="border-collapse w-full">
-              <thead><tr>{["신청일", "이름", "연락처", "성향 결과", "희망 시간", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
+              <thead><tr>{["신청일", "이름", "연락처", "성향 결과", "희망 시간", "유입 광고", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>
-                {rows.length === 0 && <EmptyRow colSpan={6}>아직 상담 신청이 없습니다. /fit-check 에서 설문을 제출하면 여기에 표시됩니다.</EmptyRow>}
+                {rows.length === 0 && <EmptyRow colSpan={7}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. /fit-check 에서 설문을 제출하면 여기에 표시됩니다."}</EmptyRow>}
                 {rows.map((r) => {
                   const active = selected?.id === r.id;
                   return (
@@ -29,6 +36,7 @@ export function InquiriesView({ rows, selected }: { rows: InquiryRow[]; selected
                       <td className={TD}>{r.phone || "—"}</td>
                       <td className={TD}>{r.result_type || "—"}</td>
                       <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{r.answers?.slot || "—"}</td>
+                      <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{utmLabel(r.utm)}</td>
                       <td className={TD}><Badge style={inquiryBadge(r.status)}>{INQUIRY_STATUS[r.status] ?? r.status}</Badge></td>
                     </tr>
                   );

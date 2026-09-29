@@ -1,8 +1,10 @@
 import type { MetadataRoute } from "next";
 import { getSeo, siteUrl } from "@/lib/seo/get";
 import { AI_BOTS } from "@/lib/seo/schema";
+import { getSettings } from "@/lib/settings/get";
+import { LEAD_HIDDEN_PREFIXES } from "@/lib/settings/leadMode";
 
-/** 회원·관리자·결제·API 영역은 항상 크롤링 제외 */
+/** 회원·관리자·결제·API 영역은 항상 크롤링 제외. 리드 모드면 숨김 페이지(가격·환불규정)도 제외 */
 const PRIVATE = ["/admin", "/admin-invite", "/my", "/checkout", "/api", "/auth", "/login", "/join", "/programs"];
 
 /**
@@ -11,11 +13,12 @@ const PRIVATE = ["/admin", "/admin-invite", "/my", "/checkout", "/api", "/auth",
  * - 검색 노출 켜짐: 공개 영역 허용 + 사이트맵 안내
  */
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const seo = await getSeo();
+  const [seo, settings] = await Promise.all([getSeo(), getSettings()]);
+  const disallow = settings.leadMode ? Array.from(new Set([...PRIVATE, ...LEAD_HIDDEN_PREFIXES])) : PRIVATE;
   const rules: MetadataRoute.Robots["rules"] = [];
-  if (seo.aiCrawlers) rules.push({ userAgent: AI_BOTS, allow: "/", disallow: PRIVATE });
+  if (seo.aiCrawlers) rules.push({ userAgent: AI_BOTS, allow: "/", disallow });
   else rules.push({ userAgent: AI_BOTS, disallow: "/" });
-  if (seo.indexing) rules.push({ userAgent: "*", allow: "/", disallow: PRIVATE });
+  if (seo.indexing) rules.push({ userAgent: "*", allow: "/", disallow });
   else rules.push({ userAgent: "*", disallow: "/" });
   return { rules, sitemap: seo.indexing ? `${siteUrl()}/sitemap.xml` : undefined, host: siteUrl() };
 }

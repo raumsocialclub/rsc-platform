@@ -122,6 +122,8 @@ create table payments (
 );
 
 -- ---------- inquiries (Fit Check) & invites
+-- 개인정보 최소화: answers 에는 {route, slot} 만 저장 (설문 답변 원본은 저장하지 않음). utm 은 광고 유입 매개변수(utm_source 등).
+-- 보관 180일 → purge_expired_inquiries 크론이 자동 삭제 (개인정보처리방침 제4조).
 create table inquiries (
   id uuid primary key default gen_random_uuid(),
   name text, phone text, email text,
@@ -129,13 +131,14 @@ create table inquiries (
   result_type text,
   status inquiry_status not null default 'pending',
   memo text,
+  utm jsonb,
   created_at timestamptz default now()
 );
 
 create table invite_codes (
   id uuid primary key default gen_random_uuid(),
   code text unique not null,                  -- RSC-XXXX-XXXX
-  inquiry_id uuid references inquiries(id),
+  inquiry_id uuid references inquiries(id) on delete set null,  -- 상담 기록이 180일 뒤 지워져도 코드 이력은 남긴다
   issued_to_name text, issued_to_phone text,
   expires_at timestamptz default now() + interval '30 days',
   used_by uuid references members(id),
@@ -545,3 +548,10 @@ create or replace function purge_expired_logs() returns void language sql securi
 $$;
 revoke all on function purge_expired_logs() from public, anon, authenticated;
 select cron.schedule('purge-expired-logs', '17 3 * * *', $$select public.purge_expired_logs()$$);
+
+-- ---------- 상담 신청(inquiries) 180일 보관 → 자동 삭제 (매일 03:23 UTC). invite_codes.inquiry_id 는 on delete set null.
+create or replace function purge_expired_inquiries() returns void language sql security definer set search_path = public as $$
+  delete from inquiries where created_at < now() - interval '180 days';
+$$;
+revoke all on function purge_expired_inquiries() from public, anon, authenticated;
+select cron.schedule('purge-expired-inquiries', '23 3 * * *', $$select public.purge_expired_inquiries()$$);

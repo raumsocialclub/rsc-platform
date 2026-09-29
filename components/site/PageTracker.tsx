@@ -2,8 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { captureUtm } from "@/lib/utm/client";
 
-/** 접속 통계 비콘 (M9). 경로가 바뀔 때마다 /api/track 으로 보낸다. 어드민·API 경로는 제외. */
+/** 접속 통계 비콘 (M9). 경로가 바뀔 때마다 /api/track 으로 보낸다. 어드민·API 경로는 제외. 광고 utm_* 는 상담 신청에 붙이려고 브라우저에 기억한다. */
 export function PageTracker() {
   const pathname = usePathname();
   const last = useRef<string | null>(null);
@@ -11,6 +12,7 @@ export function PageTracker() {
     if (!pathname || pathname.startsWith("/admin") || pathname.startsWith("/api")) return;
     if (last.current === pathname) return;
     last.current = pathname;
+    captureUtm();
     const body = JSON.stringify({ path: pathname, referrer: document.referrer || "", search: window.location.search, width: window.innerWidth });
     try {
       if (navigator.sendBeacon) navigator.sendBeacon("/api/track", new Blob([body], { type: "application/json" }));

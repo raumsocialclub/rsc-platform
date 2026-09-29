@@ -3,17 +3,22 @@
 import Link from "next/link";
 import { useState } from "react";
 import { QUESTIONS, SLOTS, ROUTES, evaluate } from "@/lib/fit-check/questions";
+import { InstagramButton } from "@/components/site/InstagramButton";
+import { readUtm, type Utm } from "@/lib/utm/client";
 
 type View = "intro" | "q" | "result" | "form" | "done";
 
+/**
+ * 서버로 보내는 값. 개인정보 최소화: 이름·휴대폰·희망 시간·유입 경로·결과 유형·광고 UTM 만 보낸다.
+ * 설문 답변 원본(picks)은 결과 유형 계산에만 쓰고 브라우저 밖으로 내보내지 않는다.
+ */
 export type FitCheckSubmission = {
   name: string;
   phone: string;
   route: string;
   slot: string;
-  picks: Record<string, number>;
-  answers: { key: string; label: string; question: string; answer: string }[];
   resultType: string;
+  utm: Utm | null;
 };
 
 type Props = {
@@ -82,11 +87,8 @@ export function FitCheck({ onSubmit }: Props) {
         phone: phone.trim(),
         route,
         slot,
-        picks,
-        answers: QUESTIONS.filter((qq) => picks[qq.key] != null).map((qq) => ({
-          key: qq.key, label: qq.summary, question: qq.title, answer: qq.options[picks[qq.key]].t,
-        })),
         resultType: ev.profile.en,
+        utm: readUtm(),
       });
       setView("done");
     } catch (e) {
@@ -267,6 +269,7 @@ export function FitCheck({ onSubmit }: Props) {
           <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">영업일 기준 2일 이내에 가입 상담 담당자가 연락드립니다. 그 사이 궁금한 점이 있으시면 언제든 문의해 주세요.</p>
           <div className="flex gap-[12px] flex-wrap">
             <Link href="/" className="inline-flex items-center px-[34px] py-[16px] bg-brown text-cream text-[13.5px] hover:text-cream">홈으로 돌아가기</Link>
+            <InstagramButton shape="square" />
             <a href="mailto:support@theraum.co.kr" className="inline-flex items-center px-[34px] py-[16px] border border-[rgba(33,30,25,.3)] text-[13.5px] hover:border-brown hover:text-brown">support@theraum.co.kr</a>
           </div>
         </div>

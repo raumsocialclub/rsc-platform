@@ -2,12 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { Txt } from "@/components/cms/Txt";
 import { getBrand } from "@/lib/cms/get";
+import { getSettings } from "@/lib/settings/get";
+import { InstagramButton } from "./InstagramButton";
 
 const INK_FILTER = "invert(1) brightness(0.15)";
 
-/** 메인 페이지 푸터. deploy/index.html <footer> 재현. 연락처·문구는 CMS(global.brand). */
+/**
+ * 메인 페이지 푸터. deploy/index.html <footer> 재현. 연락처·문구는 CMS(global.brand).
+ * 리드 모드면 멤버십·환불규정 링크를 숨긴다 (결제를 다시 켜면 같이 돌아온다).
+ */
 export async function SiteFooter() {
-  const b = await getBrand();
+  const [b, settings] = await Promise.all([getBrand(), getSettings()]);
+  const lead = settings.leadMode;
   return (
     <footer className="px-[40px] pt-[110px] pb-[140px] border-t border-[rgba(33,30,25,.09)] bg-sand">
       <div className="max-w-[1240px] mx-auto">
@@ -31,6 +37,9 @@ export async function SiteFooter() {
             <div className="text-[15px] leading-[1.28] text-[rgba(33,30,25,.72)]">
               <a href={b.instagramUrl || "#"} target="_blank" rel="noreferrer">@{b.instagramHandle}</a>
             </div>
+            <div className="mt-[14px]">
+              <InstagramButton href={b.instagramUrl} size="sm" />
+            </div>
           </div>
           <div>
             <div className="text-[10.5px] tracking-[.28em] text-brownHover mb-[16px]">MENU</div>
@@ -39,7 +48,7 @@ export async function SiteFooter() {
               <Link href="/#why">포지셔닝</Link>
               <Link href="/#social">RSC SOCIAL</Link>
               <Link href="/#solo">RAUM SOLO</Link>
-              <Link href="/#membership">멤버십</Link>
+              {!lead && <Link href="/#membership">멤버십</Link>}
               <Link href="/#faq">FAQ</Link>
               <Link href="/news">소식</Link>
             </nav>
@@ -53,7 +62,7 @@ export async function SiteFooter() {
           <div className="flex items-center gap-[16px] flex-wrap text-[12px] text-[rgba(33,30,25,.55)]">
             <Link href="/terms">이용약관</Link>
             <Link href="/privacy" className="font-semibold">개인정보처리방침</Link>
-            <Link href="/refund">환불규정</Link>
+            {!lead && <Link href="/refund">환불규정</Link>}
             <span className="text-[rgba(33,30,25,.4)]">{b.copyright}</span>
           </div>
         </div>

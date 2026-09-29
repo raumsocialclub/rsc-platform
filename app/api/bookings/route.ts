@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { leadModeGuard } from "@/lib/settings/leadModeGuard";
 import { z } from "zod";
 import { getCurrentMember } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +22,8 @@ const MESSAGES: Record<string, string> = {
 };
 
 export async function POST(req: Request) {
+  const closed = await leadModeGuard();
+  if (closed) return closed;
   const me = await getCurrentMember();
   if (!me) return NextResponse.json({ ok: false, message: "로그인이 필요합니다." }, { status: 401 });
   const parsed = Body.safeParse(await req.json().catch(() => null));

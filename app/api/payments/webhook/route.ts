@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { leadModeGuard } from "@/lib/settings/leadModeGuard";
 import { finalize } from "@/lib/bookings/confirm";
 import type { Booking } from "@/lib/bookings/types";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -11,6 +12,8 @@ import { opsAlert } from "@/lib/alert";
  * TOSS_WEBHOOK_SECRET 이 설정되어 있으면 ?key= 가 일치해야 한다. 항상 200 을 돌려 재전송 폭주를 막는다.
  */
 export async function POST(req: Request) {
+  const closed = await leadModeGuard();
+  if (closed) return closed;
   const secret = process.env.TOSS_WEBHOOK_SECRET;
   if (secret && new URL(req.url).searchParams.get("key") !== secret) return NextResponse.json({ ok: false }, { status: 401 });
 

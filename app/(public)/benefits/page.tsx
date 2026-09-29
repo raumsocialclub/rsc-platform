@@ -6,12 +6,16 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { UpButton } from "@/components/site/UpButton";
 import { Txt, lines } from "@/components/cms/Txt";
 import { getPageDocs, list, s } from "@/lib/cms/get";
+import { getSettings } from "@/lib/settings/get";
+import { hasPrice, isLeadHiddenHref } from "@/lib/settings/leadMode";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("benefits");
 }
 
-/* deploy/benefits.html 재현. 혜택 목록은 CMS(site_content benefits.rows) */
+/* deploy/benefits.html 재현. 혜택 목록은 CMS(site_content benefits.rows)
+ * 리드 모드(일반 설정)면 금액이 들어간 오른쪽 요약과 가격 안내 버튼만 뺀다. 혜택 목록 자체는 그대로. */
+const LEAD_CTA_TITLE = "멤버십 혜택은 상담에서 자세히 안내해 드립니다";
 
 type Row = { group: string; title: string; badge: string; lines: string; right: string; rightStrong?: string };
 
@@ -36,9 +40,12 @@ function Right({ v, strong }: { v: string; strong?: string }) {
 }
 
 export default async function BenefitsPage() {
-  const d = await getPageDocs("benefits");
+  const [d, settings] = await Promise.all([getPageDocs("benefits"), getSettings()]);
+  const lead = settings.leadMode;
   const hero = d["benefits.hero"], cta = d["benefits.cta"];
-  const items = list<Row>(d["benefits.rows"], "items");
+  const items = list<Row>(d["benefits.rows"], "items").map((r) => (lead && hasPrice(`${r.right ?? ""} ${r.rightStrong ?? ""}`) ? { ...r, right: "", rightStrong: "" } : r));
+  const ctaTitle = lead && /가격/.test(s(cta, "title")) ? LEAD_CTA_TITLE : s(cta, "title");
+  const showCta = (label: string, href: string) => !!label && !(lead && isLeadHiddenHref(href));
   const groups: { name: string; rows: (Row & { n: string })[] }[] = [];
   items.forEach((r, i) => {
     const n = String(i + 1).padStart(2, "0");
@@ -89,10 +96,10 @@ export default async function BenefitsPage() {
 
           <section className="bg-ink text-cream px-[48px] py-[56px] text-center">
             <div className="text-[11px] tracking-[.3em] text-gold mb-[18px]">{s(cta, "label")}</div>
-            <h2 className="font-semibold text-[22px] md:text-[clamp(22px,2.6vw,32px)] leading-[1.3] mb-[32px]">{s(cta, "title")}</h2>
+            <h2 className="font-semibold text-[22px] md:text-[clamp(22px,2.6vw,32px)] leading-[1.3] mb-[32px]">{ctaTitle}</h2>
             <div className="flex gap-[12px] justify-center flex-wrap">
-              {s(cta, "cta1Label") && <Link href={s(cta, "cta1Href") || "/pricing"} className="inline-flex items-center px-[32px] py-[16px] rounded-pill bg-gold text-ink text-[14px] font-bold hover:bg-goldHover hover:text-ink">{s(cta, "cta1Label")}</Link>}
-              {s(cta, "cta2Label") && <Link href={s(cta, "cta2Href") || "/fit-check"} className="inline-flex items-center px-[32px] py-[16px] rounded-pill border border-[rgba(247,243,236,.35)] text-cream text-[14px] hover:border-gold hover:text-gold">{s(cta, "cta2Label")}</Link>}
+              {showCta(s(cta, "cta1Label"), s(cta, "cta1Href") || "/pricing") && <Link href={s(cta, "cta1Href") || "/pricing"} className="inline-flex items-center px-[32px] py-[16px] rounded-pill bg-gold text-ink text-[14px] font-bold hover:bg-goldHover hover:text-ink">{s(cta, "cta1Label")}</Link>}
+              {showCta(s(cta, "cta2Label"), s(cta, "cta2Href") || "/fit-check") && <Link href={s(cta, "cta2Href") || "/fit-check"} className="inline-flex items-center px-[32px] py-[16px] rounded-pill border border-[rgba(247,243,236,.35)] text-cream text-[14px] hover:border-gold hover:text-gold">{s(cta, "cta2Label")}</Link>}
             </div>
           </section>
         </div>

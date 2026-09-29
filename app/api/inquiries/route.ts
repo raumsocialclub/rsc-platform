@@ -3,28 +3,35 @@ import { z } from "zod";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { normalizePhone } from "@/lib/phone";
+import { UTM_KEYS } from "@/lib/utm/client";
 
 /**
  * POST /api/inquiries — Fit Check 설문 완료 시 inquiries 에 저장한다. (FLOWS.md 1-1)
  * 로그인 불필요. service role key 가 있으면 관리자 클라이언트로, 없으면
  * "anyone can submit inquiry" RLS 정책에 따라 anon 클라이언트로 insert 한다.
+ *
+ * 개인정보 최소화: 이름·휴대폰·희망 시간·유입 경로·결과 유형·광고 UTM 만 저장한다.
+ * 설문 답변 원본(picks/answers)은 받더라도 버린다 (zod 가 정의되지 않은 키를 제거).
+ * 보관: 180일 (DB purge_expired_inquiries 크론) — 개인정보처리방침 제4조와 일치.
  */
-const AnswerSchema = z.object({
-  key: z.string().min(1).max(40),
-  label: z.string().max(60),
-  question: z.string().max(200),
-  answer: z.string().max(200),
-});
+const UtmSchema = z.object(Object.fromEntries(UTM_KEYS.map((k) => [k, z.string().trim().max(100).optional()])) as Record<(typeof UTM_KEYS)[number], z.ZodOptional<z.ZodString>>);
 
 const BodySchema = z.object({
   name: z.string().trim().min(1, "성함을 입력해 주세요").max(50, "성함이 너무 깁니다"),
   phone: z.string().trim().min(1, "연락처를 입력해 주세요").max(30),
   route: z.string().max(40).optional().default(""),
   slot: z.string().max(40).optional().default(""),
-  picks: z.record(z.string(), z.number().int().min(0).max(20)),
-  answers: z.array(AnswerSchema).max(20),
   resultType: z.string().max(60),
+  utm: UtmSchema.nullable().optional(),
 });
+
+/** 값이 있는 utm_* 만 남긴다. 하나도 없으면 null. */
+function cleanUtm(utm: z.infer<typeof UtmSchema> | null | undefined): Record<string, string> | null {
+  if (!utm) return null;
+  const out: Record<string, string> = {};
+  for (const k of UTM_KEYS) if (utm[k]) out[k] = utm[k]!;
+  return Object.keys(out).length ? out : null;
+}
 
 export async function POST(req: Request) {
   let json: unknown;
@@ -50,14 +57,9 @@ export async function POST(req: Request) {
     name: body.name,
     phone,
     email: null,
-    answers: {
-      picks: body.picks,
-      answers: body.answers,
-      route: body.route,
-      slot: body.slot,
-      profile: body.resultType,
-    },
+    answers: { route: body.route, slot: body.slot },
     result_type: body.resultType,
+    utm: cleanUtm(body.utm),
   };
 
   try {
