@@ -146,7 +146,7 @@ Layout
 정적 페이지. 혜택 목록(카테고리 행사 우선 참여, 지인 초대권 연 8매, 전용 미팅룸·세미나룸 예약, RSC 라운지 이용, 평일 무료주차, 라움 아트센터 대관 우선, 제휴 시설 할인). CTA 2개 유지.
 
 ### D-2. 소식 — `/news`, `/news/[slug]` (M11 → M16 월별 달력형)
-목록: 연도 선택 + 1~12월 탭(`?y=2026&m=10`). 글의 달은 어드민의 **행사 일자**(`posts.event_date`)가 있으면 그 달, 없으면 발행일(KST) 기준. 기본 달은 이번 달에 글이 있으면 이번 달, 아니면 가장 가까운 달(같은 거리면 다가오는 달). 달 안에서는 행사 일자 순. 카드: 대표 사진을 **인스타그램 피드 비율(1080×1350) 원본 그대로**(잘라내지 않음, `w-full h-auto`) · 분류 · 행사일(요일) · 제목 · 요약. 달별 화면은 noindex. 상세: 760px 본문(간단 마크다운), 대표 사진 원본 비율, 행사일·게시일, 요약, 하단 목록/상담 CTA. NewsArticle·Breadcrumb JSON-LD, OG 이미지는 대표 사진. 로직은 `lib/posts/calendar.ts`(테스트 `tests/posts-calendar.test.ts`).
+목록: 연도 선택 + 1~12월 탭(`?y=2026&m=10`). 글의 달은 어드민의 **행사 일자**(`posts.event_date`)가 있으면 그 달, 없으면 발행일(KST) 기준. 기본 달은 이번 달에 글이 있으면 이번 달, 아니면 가장 가까운 달(같은 거리면 다가오는 달). 달 안에서는 행사 일자 순. 카드: 대표 사진은 **4:5(1080×1350) 상자로 통일**(비율이 다르면 가운데 기준 `object-cover`, 카드 크기 동일) · 분류 · 행사일(요일) · 제목 · 요약. 달별 화면은 noindex. 상세: 760px 본문(간단 마크다운), 대표 사진 원본 비율, 행사일·게시일, 요약, 하단 목록/상담 CTA. NewsArticle·Breadcrumb JSON-LD, OG 이미지는 대표 사진. 로직은 `lib/posts/calendar.ts`(테스트 `tests/posts-calendar.test.ts`).
 메인 08 FAQ 섹션(`home.faq`)은 `<details>` 아코디언 + FAQPage JSON-LD.
 
 ### E. 회원 영역 — `design/RSC Member.dc.html` (`/join`, `/login`, `/programs`, `/programs/[id]`, `/checkout/[bookingId]`, `/my`)

@@ -169,14 +169,14 @@ export function PostForm({ post }: { post?: Post }) {
           <div className={`${CARD} p-[22px] grid gap-[12px]`}>
             <div className={SECTION}>대표 사진</div>
             <div className="relative w-full aspect-[4/5] bg-[#e7e0d3] overflow-hidden border border-[rgba(33,30,25,.1)]">
-              {f.cover_image && <Image src={f.cover_image} alt="" fill sizes="320px" className="object-contain" unoptimized={f.cover_image.startsWith("http")} />}
+              {f.cover_image && <Image src={f.cover_image} alt="" fill sizes="320px" className="object-cover" unoptimized={f.cover_image.startsWith("http")} />}
             </div>
             <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const x = e.target.files?.[0]; if (x) void onCover(x); }} />
             <div className="flex gap-[6px]">
               <button type="button" onClick={() => coverRef.current?.click()} disabled={uploading === "cover"} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>{uploading === "cover" ? "업로드 중…" : "사진 업로드"}</button>
               {f.cover_image && <button type="button" onClick={() => set("cover_image", "")} className="bg-transparent border-0 text-[12px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error">비우기</button>}
             </div>
-            <div className="text-[11.5px] text-[rgba(33,30,25,.5)]">인스타그램 피드 이미지(1080×1350, 4:5)를 그대로 올리면 목록·상세에서 잘리지 않고 원본 비율로 표시됩니다. 공유 미리보기에도 쓰입니다.</div>
+            <div className="text-[11.5px] text-[rgba(33,30,25,.5)]">인스타그램 피드 이미지(1080×1350, 4:5) 권장. 목록에서는 모든 카드가 4:5 상자로 같은 크기로 정렬되며, 비율이 다른 사진은 가운데 기준으로 상자에 맞춰집니다. 상세와 공유 미리보기는 원본 비율입니다.</div>
           </div>
         </div>
       </div>

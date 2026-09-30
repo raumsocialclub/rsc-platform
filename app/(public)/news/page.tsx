@@ -24,7 +24,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Search 
 
 /**
  * 소식 목록 (M11 → M16 월별 달력형). 연도 선택 + 1~12월 탭, 그 달의 행사·소식을 행사 일자 순으로.
- * 대표 사진은 인스타그램 피드 비율(1080×1350) 그대로 — 잘라내지 않고 원본 비율로 표시한다.
+ * 목록 카드의 대표 사진은 인스타그램 피드 비율(1080×1350 = 4:5) 상자로 통일한다(같은 크기로 정렬). 상세는 원본 비율.
  */
 export default async function NewsPage({ searchParams }: { searchParams: Search }) {
   const { y, m } = await searchParams;
@@ -63,12 +63,9 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
               {posts.map((p) => (
                 <article key={p.id} className="min-w-0">
                   <Link href={`/news/${encodeURIComponent(p.slug)}`} className="block group">
-                    <div className="mb-[18px] overflow-hidden bg-[#e7e0d3]">
-                      {p.cover_image ? (
-                        <Image src={p.cover_image} alt="" width={1080} height={1350} sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="block w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]" unoptimized={p.cover_image.startsWith("http")} />
-                      ) : (
-                        <div className="aspect-[4/5]" />
-                      )}
+                    {/* 모든 카드를 인스타 피드 비율(4:5) 상자로 통일. 1080×1350 은 그대로, 비율이 다른 사진은 상자에 맞춰 가운데 기준으로 채운다 */}
+                    <div className="relative mb-[18px] aspect-[4/5] overflow-hidden bg-[#e7e0d3]">
+                      {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]" unoptimized={p.cover_image.startsWith("http")} />}
                     </div>
                     <div className="flex items-center gap-[12px] text-[10.5px] tracking-[.28em] text-brownHover mb-[10px]">
                       <span>{p.category.toUpperCase()}</span>
