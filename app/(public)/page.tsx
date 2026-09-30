@@ -23,12 +23,8 @@ const INNER = "max-w-[1240px] mx-auto";
 const H2 = "font-semibold text-[25px] leading-[1.36] md:text-[clamp(28px,2.8vw,44px)] text-pretty";
 const BODY_M = "text-[15px] leading-[1.6]";
 const LINE_GRID = "bg-[rgba(33,30,25,.14)] border border-[rgba(33,30,25,.14)]";
-const SPACE_LAYOUT = [
-  { span: "md:col-span-4", h: "h-[220px] md:h-[520px]" },
-  { span: "md:col-span-2", h: "h-[220px] md:h-[520px]" },
-  { span: "md:col-span-3", h: "h-[200px] md:h-[380px]" },
-  { span: "md:col-span-3", h: "h-[200px] md:h-[380px]" },
-];
+/** 06 MOMENTS 카드의 사진 높이. 글 카드는 같은 행의 사진 카드 높이에 맞춰 늘어난다 */
+const MOMENT_IMG = "h-[240px] md:h-[340px]";
 
 function SectionLabel({ children, className = "mb-[40px]" }: { children: React.ReactNode; className?: string }) {
   return <div className={`text-[11px] tracking-[.34em] text-brownHover ${className}`}>{children}</div>;
@@ -184,32 +180,47 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 06 SPACES */}
+      {/* 06 MOMENTS — 공간이 아니라 경험 중심. 사진이 비어 있으면 타이포그래피 카드 */}
       {on(spaces, "visible") && (
         <section id="spaces" className={`${SECTION} bg-sand`}>
           <div className={INNER}>
             <SectionLabel><Label v={s(spaces, "label")} /></SectionLabel>
-            <div className="flex flex-col items-start gap-[20px] md:flex-row md:items-end md:justify-between md:gap-[40px] md:flex-wrap mb-[26px]">
+            <div className="flex flex-col items-start gap-[20px] md:flex-row md:items-end md:justify-between md:gap-[40px] md:flex-wrap mb-[48px] md:mb-[64px]">
               <h2 className={`${H2} md:leading-[1.28] max-w-[660px]`}>{s(spaces, "title")}</h2>
-              <p className={`${BODY_M} md:text-[15px] md:leading-[1.32] text-[rgba(33,30,25,.6)] max-w-[340px] text-pretty`}>{s(spaces, "lead")}</p>
+              <p className={`${BODY_M} md:text-[15px] md:leading-[1.6] text-[rgba(33,30,25,.6)] max-w-[380px] text-pretty`}><Txt v={s(spaces, "lead")} breaks="hard" /></p>
             </div>
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-6 mt-[64px]">
-              {list(spaces, "items").map((c, i) => {
-                const lay = SPACE_LAYOUT[i % SPACE_LAYOUT.length];
-                return (
-                  <div key={i} className={`min-w-0 ${lay.span}`}>
-                    <ImageBlock src={c.image} alt={c.title} className={lay.h} filter="brightness(0.85) saturate(0.85)" sizes="(min-width: 761px) 66vw, 100vw" />
+            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[28px] md:items-stretch">
+              {list(spaces, "items").map((c, i) =>
+                c.image ? (
+                  <article key={i} className="min-w-0">
+                    <ImageBlock src={c.image} alt={c.alt || c.title} className={MOMENT_IMG} filter="brightness(0.98) saturate(0.96)" focus={c.position || undefined} sizes="(min-width: 761px) 50vw, 100vw" />
                     <div className="flex items-baseline gap-[16px] pt-[22px]">
                       <span className="text-[11px] tracking-[.2em] text-brownHover">{c.n}</span>
-                      <div>
-                        <div className="text-[22px] mb-[8px] font-semibold">{c.title}</div>
-                        <div className={`${BODY_M} md:text-[14px] md:leading-[1.28] text-[rgba(33,30,25,.62)] text-pretty`}>{c.desc}</div>
+                      <div className="min-w-0">
+                        <h3 className="text-[22px] mb-[8px] font-semibold text-pretty">{c.title}</h3>
+                        <p className={`${BODY_M} md:text-[14px] md:leading-[1.5] text-[rgba(33,30,25,.62)] text-pretty m-0`}><Txt v={c.desc} /></p>
+                        {c.note && <div className="text-[11px] tracking-[.16em] text-[rgba(33,30,25,.42)] mt-[10px]">{c.note}</div>}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  </article>
+                ) : (
+                  <article key={i} className="min-w-0 flex flex-col justify-between bg-cream border border-[rgba(33,30,25,.14)] px-[26px] py-[30px] md:px-[40px] md:py-[40px] min-h-[280px]">
+                    <span className="text-[11px] tracking-[.2em] text-brownHover">{c.n}</span>
+                    <div className="pt-[56px] md:pt-[80px]">
+                      <h3 className="font-semibold text-[25px] leading-[1.32] md:text-[clamp(26px,2.3vw,34px)] mb-[16px] text-pretty max-w-[420px]">{c.title}</h3>
+                      <div className="w-[36px] h-px bg-brownHover mb-[18px]" aria-hidden />
+                      <p className={`${BODY_M} md:text-[15px] md:leading-[1.6] text-[rgba(33,30,25,.66)] text-pretty m-0 max-w-[420px]`}><Txt v={c.desc} /></p>
+                      {c.note && <div className="text-[11px] tracking-[.16em] text-[rgba(33,30,25,.42)] mt-[14px]">{c.note}</div>}
+                    </div>
+                  </article>
+                ),
+              )}
             </div>
+            {s(spaces, "ctaLabel") && s(spaces, "ctaHref") && (
+              <div className="mt-[48px] md:mt-[64px]">
+                <Cta href={s(spaces, "ctaHref")} className="inline-flex items-center px-[28px] py-[15px] rounded-pill bg-ink text-cream text-[13.5px] hover:bg-brownHover hover:text-cream">{s(spaces, "ctaLabel")}</Cta>
+              </div>
+            )}
           </div>
         </section>
       )}

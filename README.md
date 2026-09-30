@@ -145,6 +145,9 @@ Layout
 ### D. 혜택 안내 — `design/RSC Benefits.dc.html` (`/benefits`)
 정적 페이지. 혜택 목록(카테고리 행사 우선 참여, 지인 초대권 연 8매, 전용 미팅룸·세미나룸 예약, RSC 라운지 이용, 평일 무료주차, 라움 아트센터 대관 우선, 제휴 시설 할인). CTA 2개 유지.
 
+### D-1a. 메인 06 "함께하는 시간" (MOMENTS, 구 공간 섹션) — M16
+`home.spaces` 문서. 공간명 중심 4장을 경험 중심 4장(대화·취향·움직임·저녁)으로 교체. 카드마다 사진이 있으면 사진 카드(사진 + 번호·제목·설명·보조 정보), 사진을 비우면 브랜드 컬러(크림 바탕·브라운 선) 타이포그래피 카드. 데스크톱 2열 체크무늬, 모바일 1열. 필드: `image` `n` `title` `desc` `alt`(대체 텍스트) `position`(사진 초점 = object-position, `ImageBlock focus`) `note`(장소명 등, 사진과 장소 관계가 확실할 때만). 섹션 `ctaLabel`/`ctaHref`(기본 "프로그램 살펴보기" → `/#social`). 기본 사진: 01 `hero.jpg`(히어로와 같은 사진, 다른 크롭), 03 `moment-garden-class.jpg`(10월 웰니스 클래스 안내 이미지 속 정원 사진 부분). 02·04 는 사진 없음 → 글 카드.
+
 ### D-2. 소식 — `/news`, `/news/[slug]` (M11 → M16 월별 달력형)
 목록: 연도 선택 + 1~12월 탭(`?y=2026&m=10`). 글의 달은 어드민의 **행사 일자**(`posts.event_date`)가 있으면 그 달, 없으면 발행일(KST) 기준. 기본 달은 이번 달에 글이 있으면 이번 달, 아니면 가장 가까운 달(같은 거리면 다가오는 달). 달 안에서는 행사 일자 순. 카드: 대표 사진은 **4:5(1080×1350) 상자로 통일**(비율이 다르면 가운데 기준 `object-cover`, 카드 크기 동일) · 분류 · 행사일(요일) · 제목 · 요약. 달별 화면은 noindex. 상세: 760px 본문(간단 마크다운), 대표 사진 원본 비율, 행사일·게시일, 요약, 하단 목록/상담 CTA. NewsArticle·Breadcrumb JSON-LD, OG 이미지는 대표 사진. 로직은 `lib/posts/calendar.ts`(테스트 `tests/posts-calendar.test.ts`).
 메인 08 FAQ 섹션(`home.faq`)은 `<details>` 아코디언 + FAQPage JSON-LD.

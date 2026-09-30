@@ -9,10 +9,12 @@ type Props = {
   filter?: string;
   priority?: boolean;
   sizes?: string;
+  /** 사진 초점 = CSS object-position (예: "50% 60%"). 모바일에서 핵심 피사체가 잘리지 않도록 초점을 옮긴다 */
+  focus?: string;
 };
 
 /** 프로토타입의 <image-slot fit="cover"> 를 대체한다. 래퍼를 꽉 채우는 cover 이미지. */
-export function ImageBlock({ src, alt, className = "", filter, priority, sizes = "100vw" }: Props) {
+export function ImageBlock({ src, alt, className = "", filter, priority, sizes = "100vw", focus }: Props) {
   // 래퍼가 absolute 로 배치되는 경우(히어로)에는 relative 를 붙이지 않는다.
   const position = /\babsolute\b/.test(className) ? "" : "relative";
   return (
@@ -24,7 +26,7 @@ export function ImageBlock({ src, alt, className = "", filter, priority, sizes =
         sizes={sizes}
         priority={priority}
         className="object-cover"
-        style={filter ? { filter } : undefined}
+        style={filter || focus ? { ...(filter ? { filter } : {}), ...(focus ? { objectPosition: focus } : {}) } : undefined}
       />
     </div>
   );
