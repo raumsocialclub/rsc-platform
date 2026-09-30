@@ -60,5 +60,7 @@
 
 ## 4. 배포 상태
 
-- 브랜치·스테이징에만 반영. 운영 배포는 하지 않았다. DB 의 `legal.privacy` 저장본도 갱신하지 않았다(배포 시 코드 기본값으로 교체).
+- 2026-09-29 10:16 UTC: 스테이징 확인 후 운영 배포 완료(커밋 5586661, 배포 dpl_63JXF1ZbXJ5tLVZExC1uwYZVXZEV, rsc-platform.vercel.app).
+- DB 의 `legal.privacy` 저장본을 코드 기본값(17개 절, 시행일 2026년 10월 1일)으로 교체. 이전 저장본은 `site_content_history` 에 보관.
+- 운영 주소 확인: /privacy (보호책임자·공고일·시행일 표시, 자리 문구·토스/Sentry 언급 없음), /terms (최초 제정 부칙, 순차 연락, 금지행위 예외), /fit-check (새 동의문) 모두 200.
 - 고객 데이터 삭제·변경 없음.
