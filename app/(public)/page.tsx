@@ -23,8 +23,8 @@ const INNER = "max-w-[1240px] mx-auto";
 const H2 = "font-semibold text-[25px] leading-[1.36] md:text-[clamp(28px,2.8vw,44px)] text-pretty";
 const BODY_M = "text-[15px] leading-[1.6]";
 const LINE_GRID = "bg-[rgba(33,30,25,.14)] border border-[rgba(33,30,25,.14)]";
-/** 06 MOMENTS 카드의 사진 높이. 글 카드는 같은 행의 사진 카드 높이에 맞춰 늘어난다 */
-const MOMENT_IMG = "h-[240px] md:h-[340px]";
+/** 06 MOMENTS 카드 사진 상자: 정사각형(1:1). 네 장 모두 같은 크기 */
+const MOMENT_IMG = "aspect-square w-full";
 
 function SectionLabel({ children, className = "mb-[40px]" }: { children: React.ReactNode; className?: string }) {
   return <div className={`text-[11px] tracking-[.34em] text-brownHover ${className}`}>{children}</div>;
