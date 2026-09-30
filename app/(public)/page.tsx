@@ -180,7 +180,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 06 MOMENTS — 공간이 아니라 경험 중심. 사진이 비어 있으면 타이포그래피 카드 */}
+      {/* 06 MOMENTS — 공간이 아니라 경험 중심. 카드 4장 같은 구조(사진 + 번호·제목·설명) */}
       {on(spaces, "visible") && (
         <section id="spaces" className={`${SECTION} bg-sand`}>
           <div className={INNER}>
@@ -189,32 +189,25 @@ export default async function HomePage() {
               <h2 className={`${H2} md:leading-[1.28] max-w-[660px]`}>{s(spaces, "title")}</h2>
               <p className={`${BODY_M} md:text-[15px] md:leading-[1.6] text-[rgba(33,30,25,.6)] max-w-[380px] text-pretty`}><Txt v={s(spaces, "lead")} breaks="hard" /></p>
             </div>
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[28px] md:items-stretch">
-              {list(spaces, "items").map((c, i) =>
-                c.image ? (
-                  <article key={i} className="min-w-0">
+            <div className="grid grid-cols-1 gap-[32px] md:grid-cols-2 md:gap-x-[28px] md:gap-y-[48px]">
+              {list(spaces, "items").map((c, i) => (
+                <article key={i} className="min-w-0">
+                  {/* 네 카드 모두 같은 구조: 사진(없으면 같은 크기의 빈 프레임) + 번호·제목·설명. 글 크기·배치를 통일 */}
+                  {c.image ? (
                     <ImageBlock src={c.image} alt={c.alt || c.title} className={MOMENT_IMG} filter="brightness(0.98) saturate(0.96)" focus={c.position || undefined} sizes="(min-width: 761px) 50vw, 100vw" />
-                    <div className="flex items-baseline gap-[16px] pt-[22px]">
-                      <span className="text-[11px] tracking-[.2em] text-brownHover">{c.n}</span>
-                      <div className="min-w-0">
-                        <h3 className="text-[22px] mb-[8px] font-semibold text-pretty">{c.title}</h3>
-                        <p className={`${BODY_M} md:text-[14px] md:leading-[1.5] text-[rgba(33,30,25,.62)] text-pretty m-0`}><Txt v={c.desc} /></p>
-                        {c.note && <div className="text-[11px] tracking-[.16em] text-[rgba(33,30,25,.42)] mt-[10px]">{c.note}</div>}
-                      </div>
-                    </div>
-                  </article>
-                ) : (
-                  <article key={i} className="min-w-0 flex flex-col justify-between bg-cream border border-[rgba(33,30,25,.14)] px-[26px] py-[30px] md:px-[40px] md:py-[40px] min-h-[280px]">
+                  ) : (
+                    <div className={`${MOMENT_IMG} border border-[rgba(33,30,25,.14)] bg-cream`} aria-hidden />
+                  )}
+                  <div className="flex items-baseline gap-[16px] pt-[22px]">
                     <span className="text-[11px] tracking-[.2em] text-brownHover">{c.n}</span>
-                    <div className="pt-[56px] md:pt-[80px]">
-                      <h3 className="font-semibold text-[25px] leading-[1.32] md:text-[clamp(26px,2.3vw,34px)] mb-[16px] text-pretty max-w-[420px]">{c.title}</h3>
-                      <div className="w-[36px] h-px bg-brownHover mb-[18px]" aria-hidden />
-                      <p className={`${BODY_M} md:text-[15px] md:leading-[1.6] text-[rgba(33,30,25,.66)] text-pretty m-0 max-w-[420px]`}><Txt v={c.desc} /></p>
-                      {c.note && <div className="text-[11px] tracking-[.16em] text-[rgba(33,30,25,.42)] mt-[14px]">{c.note}</div>}
+                    <div className="min-w-0">
+                      <h3 className="text-[22px] mb-[8px] font-semibold text-pretty">{c.title}</h3>
+                      <p className={`${BODY_M} md:text-[14px] md:leading-[1.5] text-[rgba(33,30,25,.62)] text-pretty m-0`}><Txt v={c.desc} /></p>
+                      {c.note && <div className="text-[11px] tracking-[.16em] text-[rgba(33,30,25,.42)] mt-[10px]">{c.note}</div>}
                     </div>
-                  </article>
-                ),
-              )}
+                  </div>
+                </article>
+              ))}
             </div>
             {s(spaces, "ctaLabel") && s(spaces, "ctaHref") && (
               <div className="mt-[48px] md:mt-[64px]">

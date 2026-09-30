@@ -211,9 +211,9 @@ export const DOCS: DocDef[] = [
     id: "home.spaces",
     page: "home",
     label: "06 함께하는 시간 (MOMENTS)",
-    description: "경험 중심 4장 카드. 사진을 비우면 브랜드 컬러의 타이포그래피 카드로 표시됩니다(사진·글 카드를 섞어도 한 디자인으로 보이게 만들어져 있음). 사진 초점은 '가로% 세로%'.",
+    description: "경험 중심 4장 카드. 네 장 모두 사진 + 번호·제목·설명 구조(글 크기·배치 동일). 02·04 사진은 임시(다른 섹션 사진 재사용) — 교체 예정. 사진 초점은 '가로% 세로%'.",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨"), t("title", "제목"), ta("lead", "설명", "hard"), t("ctaLabel", "버튼 문구", undefined, "비우면 버튼을 표시하지 않음"), link("ctaHref", "버튼 링크")],
-    lists: [{ key: "items", label: "카드", itemLabel: "카드", fields: [img("image", "사진 (비우면 글 카드)"), t("n", "번호"), t("title", "제목"), ta("desc", "설명", "soft"), t("alt", "사진 설명(대체 텍스트)", undefined, "화면 낭독기·검색엔진용. 사진이 보여주는 장면을 한 문장으로"), t("position", "사진 초점", undefined, "예: 50% 60% — 모바일에서 잘리는 부분을 조정"), t("note", "보조 정보(선택)", undefined, "예: 장소명. 사진과 장소의 관계가 확실할 때만")], min: 1, max: 6 }],
+    lists: [{ key: "items", label: "카드", itemLabel: "카드", fields: [img("image", "사진 (가로 3:2 권장)"), t("n", "번호"), t("title", "제목"), ta("desc", "설명", "soft"), t("alt", "사진 설명(대체 텍스트)", undefined, "화면 낭독기·검색엔진용. 사진이 보여주는 장면을 한 문장으로"), t("position", "사진 초점", undefined, "예: 50% 60% — 모바일에서 잘리는 부분을 조정"), t("note", "보조 정보(선택)", undefined, "예: 장소명. 사진과 장소의 관계가 확실할 때만")], min: 1, max: 6 }],
     defaults: {
       visible: true,
       label: "06  /  MOMENTS",
@@ -223,9 +223,9 @@ export const DOCS: DocDef[] = [
       ctaHref: "/#social",
       items: [
         { image: "/images/hero.jpg", n: "01", title: "대화가 이어지는 시간", desc: "함께한 경험이 대화가 되고, 다음 만남의 이유가 됩니다.", alt: "꽃이 놓인 테이블 위로 여러 사람이 잔을 들어 올리는 손", position: "62% 55%", note: "" },
-        { image: "", n: "02", title: "취향을 나누는 시간", desc: "음악과 이야기, 새로운 시선을 함께 나누며 서로의 취향을 알아갑니다.", alt: "", position: "", note: "" },
+        { image: "/images/talk-insight.jpg", n: "02", title: "취향을 나누는 시간", desc: "음악과 이야기, 새로운 시선을 함께 나누며 서로의 취향을 알아갑니다.", alt: "테이블에 둘러앉은 사람들 뒤에서 본 소규모 토크 장면", position: "50% 45%", note: "" },
         { image: "/images/moment-garden-class.jpg", n: "03", title: "함께 움직이는 시간", desc: "함께 움직이고 쉬어가는 사이, 첫 만남의 긴장도 자연스럽게 풀립니다.", alt: "정원 잔디 위 매트에 앉아 팔을 뻗어 스트레칭하는 사람들의 뒷모습", position: "50% 68%", note: "그라스 가든" },
-        { image: "", n: "04", title: "조금 더 가까워지는 저녁", desc: "와인 한 잔과 편안한 대화로 서로를 조금 더 알아가는 저녁.", alt: "", position: "", note: "" },
+        { image: "/images/about.jpg", n: "04", title: "조금 더 가까워지는 저녁", desc: "와인 한 잔과 편안한 대화로 서로를 조금 더 알아가는 저녁.", alt: "촛불과 꽃이 놓인 테이블 위로 와인잔을 부딪치는 손들", position: "50% 35%", note: "" },
       ],
     },
   },
