@@ -224,8 +224,8 @@ export const DOCS: DocDef[] = [
       items: [
         { image: "/images/moment-01-table.jpg", n: "01", title: "대화가 이어지는 시간", desc: "함께한 경험이 대화가 되고, 다음 만남의 이유가 됩니다.", alt: "꽃이 놓인 저녁 식탁에서 와인잔을 든 손과 대화하는 사람들", position: "50% 50%", note: "" },
         { image: "/images/moment-02-concert.jpg", n: "02", title: "취향을 나누는 시간", desc: "음악과 이야기, 새로운 시선을 함께 나누며 서로의 취향을 알아갑니다.", alt: "벽돌 아치 홀에서 관객이 둘러앉아 피아노 연주를 감상하는 모습", position: "50% 60%", note: "" },
-        { image: "/images/moment-03-garden.jpg", n: "03", title: "함께 움직이는 시간", desc: "함께 움직이고 쉬어가는 사이, 첫 만남의 긴장도 자연스럽게 풀립니다.", alt: "정원 잔디 위 매트에 앉아 팔을 뻗어 스트레칭하는 사람들의 뒷모습", position: "50% 65%", note: "그라스 가든" },
-        { image: "/images/moment-04-evening.jpg", n: "04", title: "조금 더 가까워지는 저녁", desc: "와인 한 잔과 편안한 대화로 서로를 조금 더 알아가는 저녁.", alt: "전구 조명이 걸린 저녁 정원에서 잔을 들고 이야기 나누는 사람들", position: "50% 55%", note: "그라스 가든" },
+        { image: "/images/moment-03-garden.jpg", n: "03", title: "함께 움직이는 시간", desc: "함께 움직이고 쉬어가는 사이, 첫 만남의 긴장도 자연스럽게 풀립니다.", alt: "정원 잔디 위 매트에 앉아 팔을 뻗어 스트레칭하는 사람들의 뒷모습", position: "50% 65%", note: "" },
+        { image: "/images/moment-04-evening.jpg", n: "04", title: "조금 더 가까워지는 저녁", desc: "와인 한 잔과 편안한 대화로 서로를 조금 더 알아가는 저녁.", alt: "전구 조명이 걸린 저녁 정원에서 잔을 들고 이야기 나누는 사람들", position: "50% 55%", note: "" },
       ],
     },
   },
