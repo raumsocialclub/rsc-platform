@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getDoc, s } from "@/lib/cms/get";
 import { getPostBySlug } from "@/lib/posts/queries";
 import { fmtDate, plainText } from "@/lib/posts/types";
+import { fmtPostDate } from "@/lib/posts/calendar";
 import { pageMetadata } from "@/lib/seo/get";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
 
@@ -43,10 +44,13 @@ export default async function NewsDetailPage({ params }: Params) {
             <span>{p.category.toUpperCase()}</span>
           </div>
           <h1 className="font-semibold text-[28px] md:text-[clamp(30px,3.4vw,42px)] leading-[1.3] mb-[18px] text-pretty">{p.title}</h1>
-          <div className="text-[12.5px] tracking-[.1em] text-[rgba(33,30,25,.5)] mb-[40px]">{fmtDate(p.published_at)}</div>
+          <div className="text-[12.5px] tracking-[.1em] text-[rgba(33,30,25,.5)] mb-[40px]">
+            {p.event_date ? <>행사일 {fmtPostDate(p)}<span className="mx-[10px] text-[rgba(33,30,25,.25)]">|</span>{fmtDate(p.published_at)} 게시</> : fmtDate(p.published_at)}
+          </div>
           {p.cover_image && (
-            <div className="relative w-full aspect-[3/2] overflow-hidden bg-[#e7e0d3] mb-[44px]">
-              <Image src={p.cover_image} alt="" fill priority sizes="(min-width: 761px) 760px, 100vw" className="object-cover" unoptimized={p.cover_image.startsWith("http")} />
+            <div className="w-full overflow-hidden bg-[#e7e0d3] mb-[44px]">
+              {/* 인스타그램 피드 비율(1080×1350) 원본 그대로 — 잘라내지 않는다 */}
+              <Image src={p.cover_image} alt="" width={1080} height={1350} priority sizes="(min-width: 761px) 760px, 100vw" className="block w-full h-auto" unoptimized={p.cover_image.startsWith("http")} />
             </div>
           )}
           {p.summary && <p className="text-[17px] md:text-[18px] leading-[1.7] text-ink font-semibold mb-[36px] text-pretty">{p.summary}</p>}

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { POST_PAGE_SIZE, type Post } from "./types";
 
-const COLS = "id, slug, title, category, summary, body, cover_image, published, published_at, created_at, updated_at";
+const COLS = "id, slug, title, category, summary, body, cover_image, published, published_at, event_date, created_at, updated_at";
 
 /** 공개 목록 (발행된 글만, 최신순). RLS 가 비공개 글을 숨긴다. */
 export async function listPublishedPosts(page = 1, size = POST_PAGE_SIZE): Promise<{ posts: Post[]; total: number; page: number; pages: number }> {
@@ -19,6 +19,29 @@ export async function listPublishedPosts(page = 1, size = POST_PAGE_SIZE): Promi
   }
   const total = count ?? 0;
   return { posts: (data ?? []) as Post[], total, page, pages: Math.max(1, Math.ceil(total / size)) };
+}
+
+/** 연도·월 탭용: 발행된 글의 id·행사 일자·발행일만 (최대 limit 건) */
+export async function listPublishedPostMonths(limit = 1000): Promise<Pick<Post, "id" | "event_date" | "published_at">[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("posts").select("id, event_date, published_at").eq("published", true).limit(limit);
+  if (error) {
+    console.error("[posts/months]", error);
+    return [];
+  }
+  return (data ?? []) as Pick<Post, "id" | "event_date" | "published_at">[];
+}
+
+/** id 목록으로 발행된 글 전체 (정렬은 호출부에서) */
+export async function listPublishedPostsByIds(ids: string[]): Promise<Post[]> {
+  if (ids.length === 0) return [];
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("posts").select(COLS).eq("published", true).in("id", ids);
+  if (error) {
+    console.error("[posts/byIds]", error);
+    return [];
+  }
+  return (data ?? []) as Post[];
 }
 
 /** 사이트맵·llms.txt 용 (slug, 제목, 날짜만) */

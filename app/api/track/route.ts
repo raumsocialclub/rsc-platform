@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 /** POST /api/track — 페이지뷰 1건 저장. 방문자 id 는 1년 쿠키. 개인정보 최소 수집. */
 export async function POST(req: Request) {
-  if (!hasServiceRoleKey()) return NextResponse.json({ ok: false }, { status: 204 });
+  if (!hasServiceRoleKey()) return new NextResponse(null, { status: 204 }); // 204 에는 본문을 넣을 수 없다
   const body = (await req.json().catch(() => null)) as { path?: string; referrer?: string; search?: string; width?: number } | null;
   const path = (body?.path ?? "").slice(0, 200);
   if (!path.startsWith("/") || path.startsWith("/admin") || path.startsWith("/api")) return NextResponse.json({ ok: true });

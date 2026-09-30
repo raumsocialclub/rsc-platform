@@ -11,6 +11,7 @@ export const PostInputSchema = z.object({
   cover_image: z.string().trim().max(1000).default(""),
   published: z.boolean().default(false),
   published_at: z.string().trim().default(""),
+  event_date: z.string().trim().regex(/^(\d{4}-\d{2}-\d{2})?$/, "행사 일자 형식이 올바르지 않습니다.").default(""),
 });
 export type PostInput = z.infer<typeof PostInputSchema>;
 

@@ -9,6 +9,7 @@ export type Post = {
   cover_image: string | null;
   published: boolean;
   published_at: string | null;
+  event_date: string | null;                  // "YYYY-MM-DD" 행사 일자(선택). 월 탭 분류 기준
   created_at: string;
   updated_at: string;
 };

@@ -8,7 +8,7 @@ import { BTN_PRIMARY, BTN_SECONDARY, CARD } from "./ui";
 import { fromKstIso } from "@/lib/programs/format";
 import { POST_CATEGORIES, slugify, type Post } from "@/lib/posts/types";
 
-type FormState = { title: string; slug: string; slugTouched: boolean; category: string; summary: string; body: string; cover_image: string; published: boolean; published_at: string };
+type FormState = { title: string; slug: string; slugTouched: boolean; category: string; summary: string; body: string; cover_image: string; published: boolean; published_at: string; event_date: string };
 
 const LABEL = "grid gap-[6px] text-[12.5px] text-[rgba(33,30,25,.6)]";
 const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(33,30,25,.2)] outline-none text-ink bg-white rounded-none focus:border-brown w-full min-w-0";
@@ -35,8 +35,8 @@ async function shrink(file: File): Promise<Blob> {
 }
 
 function initial(p?: Post): FormState {
-  if (!p) return { title: "", slug: "", slugTouched: false, category: POST_CATEGORIES[0], summary: "", body: "", cover_image: "", published: false, published_at: "" };
-  return { title: p.title, slug: p.slug, slugTouched: true, category: p.category, summary: p.summary ?? "", body: p.body, cover_image: p.cover_image ?? "", published: p.published, published_at: p.published_at ? fromKstIso(p.published_at).date : "" };
+  if (!p) return { title: "", slug: "", slugTouched: false, category: POST_CATEGORIES[0], summary: "", body: "", cover_image: "", published: false, published_at: "", event_date: "" };
+  return { title: p.title, slug: p.slug, slugTouched: true, category: p.category, summary: p.summary ?? "", body: p.body, cover_image: p.cover_image ?? "", published: p.published, published_at: p.published_at ? fromKstIso(p.published_at).date : "", event_date: p.event_date ? p.event_date.slice(0, 10) : "" };
 }
 
 /** 소식 작성·편집 폼 (M11). 본문은 간단 마크다운, 사진은 site 버킷에 업로드 */
@@ -78,7 +78,7 @@ export function PostForm({ post }: { post?: Post }) {
   const submit = async (publish?: boolean) => {
     setBusy(true); setErr(null); setMsg(null);
     try {
-      const payload = { title: f.title, slug: f.slug || slugify(f.title), category: f.category, summary: f.summary, body: f.body, cover_image: f.cover_image, published: publish ?? f.published, published_at: f.published_at };
+      const payload = { title: f.title, slug: f.slug || slugify(f.title), category: f.category, summary: f.summary, body: f.body, cover_image: f.cover_image, published: publish ?? f.published, published_at: f.published_at, event_date: f.event_date };
       const res = await fetch(post ? `/api/admin/posts/${post.id}` : "/api/admin/posts", { method: post ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; id?: string; message?: string } | null;
       if (!j?.ok) throw new Error(j?.message ?? "저장하지 못했습니다.");
@@ -151,6 +151,9 @@ export function PostForm({ post }: { post?: Post }) {
             <label className="flex items-center gap-[10px] text-[13.5px]">
               <input type="checkbox" checked={f.published} onChange={(e) => set("published", e.target.checked)} /> 공개 화면에 표시
             </label>
+            <label className={LABEL}>행사 일자 <span className="text-[11px]">(소식 목록의 연도·월 탭에 들어갈 달. 비우면 발행일로 분류)</span>
+              <input type="date" value={f.event_date} onChange={(e) => set("event_date", e.target.value)} className={INPUT} />
+            </label>
             <label className={LABEL}>발행일 <span className="text-[11px]">(비우면 발행 시각)</span>
               <input type="date" value={f.published_at} onChange={(e) => set("published_at", e.target.value)} className={INPUT} />
             </label>
@@ -165,15 +168,15 @@ export function PostForm({ post }: { post?: Post }) {
           </div>
           <div className={`${CARD} p-[22px] grid gap-[12px]`}>
             <div className={SECTION}>대표 사진</div>
-            <div className="relative w-full aspect-[3/2] bg-[#e7e0d3] overflow-hidden border border-[rgba(33,30,25,.1)]">
-              {f.cover_image && <Image src={f.cover_image} alt="" fill sizes="320px" className="object-cover" unoptimized={f.cover_image.startsWith("http")} />}
+            <div className="relative w-full aspect-[4/5] bg-[#e7e0d3] overflow-hidden border border-[rgba(33,30,25,.1)]">
+              {f.cover_image && <Image src={f.cover_image} alt="" fill sizes="320px" className="object-contain" unoptimized={f.cover_image.startsWith("http")} />}
             </div>
             <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const x = e.target.files?.[0]; if (x) void onCover(x); }} />
             <div className="flex gap-[6px]">
               <button type="button" onClick={() => coverRef.current?.click()} disabled={uploading === "cover"} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>{uploading === "cover" ? "업로드 중…" : "사진 업로드"}</button>
               {f.cover_image && <button type="button" onClick={() => set("cover_image", "")} className="bg-transparent border-0 text-[12px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error">비우기</button>}
             </div>
-            <div className="text-[11.5px] text-[rgba(33,30,25,.5)]">가로 1200px 이상, 3:2 비율 권장. 목록 카드와 공유 미리보기에 쓰입니다.</div>
+            <div className="text-[11.5px] text-[rgba(33,30,25,.5)]">인스타그램 피드 이미지(1080×1350, 4:5)를 그대로 올리면 목록·상세에서 잘리지 않고 원본 비율로 표시됩니다. 공유 미리보기에도 쓰입니다.</div>
           </div>
         </div>
       </div>
