@@ -541,10 +541,14 @@ alter table admin_invites enable row level security;
 create policy "admin invites owner" on admin_invites for all using (is_owner()) with check (is_owner());
 -- 주관리자 지정: update members set role = 'owner' where lower(email) = '<주관리자 이메일>';
 
--- ---------- 개인정보처리방침 보유 기간과 일치: 로그인 보안 기록 30일, 접속 기록 1년 지나면 자동 삭제 (매일 03:17 UTC)
+-- ---------- 개인정보처리방침 보유 기간과 일치 (매일 03:17 UTC):
+--   로그인 보안 기록 30일, 접속 기록 1년, 관리자 활동 기록 1년(방침 제4조 7호),
+--   관리자 접근권한 부여·변경·말소 이력(action 'admin.*')은 안전성 확보조치 기준에 따라 3년 보관 후 삭제.
 create or replace function purge_expired_logs() returns void language sql security definer set search_path = public as $$
   delete from login_attempts where updated_at < now() - interval '30 days';
   delete from page_views where ts < now() - interval '1 year';
+  delete from admin_logs where ts < now() - interval '1 year' and action not like 'admin.%';
+  delete from admin_logs where ts < now() - interval '3 years';
 $$;
 revoke all on function purge_expired_logs() from public, anon, authenticated;
 select cron.schedule('purge-expired-logs', '17 3 * * *', $$select public.purge_expired_logs()$$);

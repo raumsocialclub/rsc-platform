@@ -5,16 +5,19 @@ import { getBrand } from "@/lib/cms/get";
 import { getSettings } from "@/lib/settings/get";
 import { InstagramButton } from "./InstagramButton";
 import { FamilySiteMenu } from "./FamilySiteMenu";
+import { businessLine } from "@/lib/site/business";
 
 const INK_FILTER = "invert(1) brightness(0.15)";
 
 /**
  * 메인 페이지 푸터. deploy/index.html <footer> 재현. 연락처·문구는 CMS(global.brand).
  * 리드 모드면 멤버십·환불규정 링크를 숨긴다 (결제를 다시 켜면 같이 돌아온다).
+ * 맨 아래 줄의 사업자 정보(상호·대표자·사업자등록번호·통신판매업 신고번호·주소)는 global.brand 의 biz* 값이 있을 때만 표시.
  */
 export async function SiteFooter() {
   const [b, settings] = await Promise.all([getBrand(), getSettings()]);
   const lead = settings.leadMode;
+  const biz = businessLine(b);
   return (
     <footer className="px-[40px] pt-[110px] pb-[140px] border-t border-[rgba(33,30,25,.09)] bg-sand">
       <div className="max-w-[1240px] mx-auto">
@@ -70,6 +73,11 @@ export async function SiteFooter() {
             <span className="text-[rgba(33,30,25,.4)]">{b.copyright}</span>
           </div>
         </div>
+        {biz && (
+          <div className="pt-[10px] text-[12px] leading-[1.8] text-[rgba(33,30,25,.5)]" data-testid="business-info">
+            {biz}
+          </div>
+        )}
       </div>
     </footer>
   );

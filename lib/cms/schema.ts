@@ -60,6 +60,11 @@ export const DOCS: DocDef[] = [
       t("familySite2Label", "패밀리 사이트 2 이름"),
       link("familySite2Url", "패밀리 사이트 2 주소"),
       t("copyright", "저작권 표기"),
+      t("bizName", "정식 상호", undefined, "사업자등록증의 상호. 비우면 푸터·약관의 사업자 정보가 표시되지 않습니다"),
+      t("bizRep", "대표자"),
+      t("bizNumber", "사업자등록번호", undefined, "예: 000-00-00000"),
+      t("bizMailOrder", "통신판매업 신고번호", undefined, "신고 전이면 비워 두세요 (표시되지 않음)"),
+      t("bizAddress", "사업장 주소", undefined, "비우면 위 '주소' 값을 씁니다"),
     ],
     defaults: {
       siteName: "RAUM SOCIAL CLUB",
@@ -77,6 +82,7 @@ export const DOCS: DocDef[] = [
       familySite1Label: "라움아트센터", familySite1Url: "https://www.theraum.co.kr",
       familySite2Label: "하우스오브더라움", familySite2Url: "https://houseoftheraum.co.kr",
       copyright: "© 2026 RAUM SOCIAL CLUB",
+      bizName: "", bizRep: "", bizNumber: "", bizMailOrder: "", bizAddress: "",
     },
   },
   {
