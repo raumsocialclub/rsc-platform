@@ -7,7 +7,7 @@
 
 ## 색상 (Tailwind `theme.extend.colors`에 이 이름으로 등록)
 ```
-cream:      #f2eee5   // 페이지 배경
+cream:      #f7f3ec   // 페이지 배경 (실제 배포본 기준. 카드와 같은 색이며 카드는 1px 테두리로만 구분)
 card:       #f7f3ec   // 카드 배경
 ink:        #211e19   // 본문 텍스트, 다크 섹션 배경
 brown:      #5a3d24   // 포인트: 주 버튼, GNB 메뉴, 라벨, 링크 hover
@@ -49,7 +49,7 @@ error:      #a3402c
 - breakpoint 하나: **760px**.
 
 ## 컴포넌트
-**GNB** — sticky top, bg `rgba(242,238,229,.9)` + `backdrop-filter: blur(14px)`, 하단 1px ink/.1, padding `16px 40px`(모바일 `14px 18px`). 좌: 엠블럼 로고(h 32px) + 텍스트 로고(h 15px). 우: 메뉴 텍스트 13px/600 `brown` + "상담신청" pill. 모바일: 햄버거 → 전체화면 오버레이(bg ink, 메뉴 크게 세로 나열).
+**GNB** — sticky top, bg `rgba(247,243,236,.86)` + `backdrop-filter: blur(14px)`, 하단 1px ink/.1, padding `16px 40px`(모바일 `14px 18px`). 좌: 엠블럼 로고(h 32px) + 텍스트 로고(h 15px). 우: 메뉴 텍스트 13px/600 `brown` + "상담신청" pill. 모바일: 햄버거 → 전체화면 오버레이(bg ink, 메뉴 크게 세로 나열).
 
 **버튼**
 - 주(primary): bg `brown`, text `cream`, pill `radius 999px`, padding `15px 28px`, hover bg `brownHover`. 다크 배경 위에서는 bg `gold` text `ink`, hover `goldHover`.
