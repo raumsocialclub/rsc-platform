@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { BTN_SECONDARY } from "./ui";
 
 const SELECT = "px-[14px] py-[10px] text-[13px] border border-[rgba(33,30,25,.2)] bg-white rounded-none outline-none";
 
-/** 상담 신청 목록의 유입 광고(UTM) 필터. 선택지는 실제 신청에 있는 값만. */
+/** 상담 신청 목록의 유입 광고(UTM) 필터 + 현재 필터 그대로 메타 리드 양식 CSV 내려받기. 선택지는 실제 신청에 있는 값만. */
 export function InquiriesFilter({ filter, options }: { filter: { source: string; campaign: string }; options: { sources: string[]; campaigns: string[] } }) {
   const router = useRouter();
   const go = (next: Partial<typeof filter>) => {
@@ -14,6 +15,7 @@ export function InquiriesFilter({ filter, options }: { filter: { source: string;
     if (f.campaign) p.set("campaign", f.campaign);
     router.push(`/admin/inquiries${p.toString() ? `?${p}` : ""}`);
   };
+  const exportHref = `/api/admin/inquiries/export?${new URLSearchParams({ ...(filter.source ? { source: filter.source } : {}), ...(filter.campaign ? { campaign: filter.campaign } : {}) })}`;
   return (
     <div className="flex gap-[8px] flex-wrap">
       <select value={filter.source} onChange={(e) => go({ source: e.target.value })} className={SELECT} aria-label="유입 매체">
@@ -25,6 +27,7 @@ export function InquiriesFilter({ filter, options }: { filter: { source: string;
         <option value="">전체 캠페인</option>
         {options.campaigns.map((v) => <option key={v} value={v}>{v}</option>)}
       </select>
+      <a href={exportHref} className={`${BTN_SECONDARY} px-[16px] py-[10px] text-[12.5px] inline-flex items-center`} title="메타 광고 관리자 리드 파일과 같은 열">CSV 다운로드</a>
     </div>
   );
 }

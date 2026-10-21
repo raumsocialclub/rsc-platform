@@ -65,6 +65,7 @@ Supabase Authentication → Sign In / Providers → Email 의 "Confirm email" �
 - SEO: 숨김 페이지는 사이트맵·llms.txt 에서 빠지고 robots 에 disallow
 - 상담 신청 저장 항목(리드 모드와 무관하게 항상): 이름·휴대폰·희망 시간·유입 경로·결과 유형·광고 UTM. 설문 답변 원본은 저장하지 않음. 180일 뒤 자동 삭제(`purge-expired-inquiries` 크론). 어드민 상담 목록에서 유입 광고(utm_source/캠페인)로 필터
 - 광고 링크 예: `https://도메인/?utm_source=instagram&utm_medium=paid&utm_campaign=oct-launch` → 브라우저가 30일 기억 → 상담 신청에 자동 저장
+- 어드민 상담 신청 → "CSV 다운로드": 현재 유입 필터의 신청을 **메타 광고 관리자 리드 파일과 같은 열**(id, created_time, ad_id, ad_name, adset_id, adset_name, campaign_id, campaign_name, form_id, form_name, is_organic, platform, full_name, phone_number)로 내려준다 (`/api/admin/inquiries/export`, `lib/admin/leads.ts`). utm_campaign→campaign, utm_term→adset, utm_content→ad (숫자만이면 `*_id`, 아니면 `*_name`), utm_source→platform(ig/fb), 광고 없이 온 신청은 is_organic=true, 전화는 `p:+8210…`, 시각은 한국 시간. 메타 광고의 웹사이트 URL 매개변수를 `utm_source={{site_source_name}}&utm_medium=paid&utm_campaign={{campaign.id}}&utm_term={{adset.id}}&utm_content={{ad.id}}` 로 두면 리드 파일과 ID 가 그대로 맞는다.
 서버 함수 리전은 `vercel.json` 으로 서울(icn1)에 고정해 Supabase(서울)와의 왕복 지연을 줄였습니다.
 
 기타 명령: `npm run build`(배포용 빌드 확인), `npm run lint`(코드 검사).
