@@ -6,7 +6,7 @@ import { InviteRowActions } from "@/components/admin/InviteRowActions";
 import { Badge, CARD, EmptyRow, PageTitle, TD, TH } from "@/components/admin/ui";
 import { badgeStyle } from "@/lib/admin/format";
 import { listAdmins, listInvites } from "@/lib/admins/queries";
-import { INVITE_STATE_KO, inviteState } from "@/lib/admins/types";
+import { INVITE_KIND_KO, INVITE_STATE_KO, inviteState } from "@/lib/admins/types";
 import { getCurrentMember, isOwnerRole, ROLE_KO } from "@/lib/auth/session";
 import { fmtFull } from "@/lib/programs/format";
 
@@ -19,9 +19,10 @@ const PERMS: [string, string, string][] = [
   ["회원 목록 CSV 내려받기", "불가", "가능"],
   ["일반 설정 · SEO 설정 저장", "보기만", "가능"],
   ["관리자 초대 · 정지 · 권한 해제", "불가", "가능"],
+  ["비밀번호 재설정 링크 발급", "불가 (주관리자에게 요청)", "가능"],
 ];
 
-/** 관리자 관리 (주관리자 전용, M12): 초대 · 관리자 목록 · 초대 이력 · 권한표 */
+/** 관리자 관리 (주관리자 전용, M12·M16): 초대 · 관리자 목록(비밀번호 재설정 링크) · 초대/재설정 이력 · 권한표 */
 export default async function AdminAdminsPage() {
   const me = await getCurrentMember();
   if (!isOwnerRole(me)) redirect("/admin");
@@ -56,16 +57,17 @@ export default async function AdminAdminsPage() {
         </div>
 
         <div className={CARD}>
-          <div className="px-[14px] py-[12px] border-b border-[rgba(33,30,25,.12)] text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)]">초대 이력</div>
+          <div className="px-[14px] py-[12px] border-b border-[rgba(33,30,25,.12)] text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)]">초대 · 비밀번호 재설정 이력</div>
           <div className="overflow-x-auto">
             <table className="border-collapse w-full">
-              <thead><tr>{["이메일", "이름", "상태", "만료", "보낸 날짜", ""].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
+              <thead><tr>{["종류", "이메일", "이름", "상태", "만료", "보낸 날짜", ""].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>
-                {invites.length === 0 && <EmptyRow colSpan={6}>아직 보낸 초대가 없습니다.</EmptyRow>}
+                {invites.length === 0 && <EmptyRow colSpan={7}>아직 보낸 초대가 없습니다.</EmptyRow>}
                 {invites.map((i) => {
                   const st = inviteState(i);
                   return (
                     <tr key={i.id} className="hover:bg-[#faf7f1]">
+                      <td className={TD}>{INVITE_KIND_KO[i.kind] ?? i.kind}</td>
                       <td className={TD}>{i.email}</td>
                       <td className={TD}>{i.name || "—"}</td>
                       <td className={TD}><Badge style={badgeStyle(st === "pending" ? "warn" : st === "used" ? "ok" : "mute")}>{INVITE_STATE_KO[st]}</Badge></td>
@@ -88,7 +90,7 @@ export default async function AdminAdminsPage() {
               <tbody>{PERMS.map(([k, a, o]) => <tr key={k}><td className={`${TD} whitespace-normal`}>{k}</td><td className={`${TD} whitespace-normal`}>{a}</td><td className={`${TD} whitespace-normal`}>{o}</td></tr>)}</tbody>
             </table>
           </div>
-          <div className="mt-[10px] text-[11.5px] text-[rgba(33,30,25,.5)]">주관리자 본인 계정은 강등·정지·삭제할 수 없습니다. 초대 링크 유효기간 48시간, 1회 사용.</div>
+          <div className="mt-[10px] text-[11.5px] text-[rgba(33,30,25,.5)]">주관리자 본인 계정은 강등·정지·삭제할 수 없습니다. 초대 링크 유효기간 48시간, 비밀번호 재설정 링크 24시간, 모두 1회 사용. 비밀번호를 잊은 관리자에게는 목록의 「비밀번호 재설정 링크」를 만들어 본인에게만 전달해 주세요.</div>
         </div>
       </div>
     </>

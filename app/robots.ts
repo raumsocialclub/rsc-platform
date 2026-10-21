@@ -5,7 +5,7 @@ import { getSettings } from "@/lib/settings/get";
 import { LEAD_HIDDEN_PREFIXES } from "@/lib/settings/leadMode";
 
 /** 회원·관리자·결제·API 영역은 항상 크롤링 제외. 리드 모드면 숨김 페이지(가격·환불규정)도 제외 */
-const PRIVATE = ["/admin", "/admin-invite", "/my", "/checkout", "/api", "/auth", "/login", "/join", "/programs"];
+const PRIVATE = ["/admin", "/admin-invite", "/admin-reset", "/my", "/checkout", "/api", "/auth", "/login", "/join", "/programs"];
 
 /**
  * robots.txt — 어드민 "SEO 설정" 값으로 매번 생성한다(DB 를 읽으므로 동적).

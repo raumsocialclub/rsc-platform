@@ -8,6 +8,7 @@ export type Call = { table: string; op: "insert" | "update" | "upsert" | "delete
 export function fakeDb(seed: Record<string, Row[]> = {}) {
   const tables: Record<string, Row[]> = Object.fromEntries(Object.entries(seed).map(([k, v]) => [k, v.map((r) => ({ ...r }))]));
   const calls: Call[] = [];
+  const authCalls: { op: string; id: string; attrs: Record<string, unknown> }[] = [];
   const rpc = { handlers: {} as Record<string, (args: Record<string, unknown>) => { data?: unknown; error?: { message: string } | null }> };
 
   function from(table: string) {
@@ -99,8 +100,13 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
       const r = h(args);
       return { data: r.data ?? null, error: r.error ?? null };
     },
-    auth: { getUser: async () => ({ data: { user: client.user }, error: null }), signInWithPassword: async () => ({ error: null }) },
+    auth: {
+      getUser: async () => ({ data: { user: client.user }, error: null }),
+      signInWithPassword: async () => ({ error: null }),
+      /** service role 전용 호출 흉내. 호출 내용은 authCalls 에 기록 */
+      admin: { updateUserById: async (id: string, attrs: Record<string, unknown>) => { authCalls.push({ op: "updateUserById", id, attrs }); return { data: { user: { id } }, error: null }; } },
+    },
     user: null as null | { id: string; email?: string },
   };
-  return { client, tables, calls, rpc };
+  return { client, tables, calls, authCalls, rpc };
 }

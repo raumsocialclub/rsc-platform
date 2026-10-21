@@ -27,6 +27,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         enabled={[...enabledProviders()]}
         next={safeNext}
         initialError={LOGIN_ERRORS[error ?? ""] ?? null}
+        canEmailReset={!!process.env.RESEND_API_KEY}
       />
     </AuthShell>
   );

@@ -77,6 +77,7 @@ VERCEL_DEPLOY_HOOK_PRODUCTION=     # Vercel 이 아니라 GitHub → Settings �
 - 주관리자(owner)는 DB 에서 한 번만 지정: Supabase SQL Editor → `update members set role = 'owner' where lower(email) = '<이메일>';` (현재 nse101@kakao.com)
 - 부관리자는 어드민 → **관리자 관리** 에서 초대한다(링크 48시간·1회용). `RESEND_API_KEY` 가 있으면 메일로 나가고, 없으면 화면의 링크를 복사해 전달한다.
 - 초대 수락(`/admin-invite/<token>`)은 서버의 `SUPABASE_SERVICE_ROLE_KEY` 가 있어야 동작한다(Vercel 에 등록됨). 로컬 `.env.local` 에 키가 없으면 로컬에서는 수락 화면이 "처리할 수 없습니다" 로 나온다.
+- **부관리자가 비밀번호를 잊었을 때(M16)**: 주관리자가 `/admin/admins` 관리자 목록에서 그 사람의 「비밀번호 재설정 링크」를 눌러 링크를 복사 → 본인에게만 전달(카카오톡 등) → 본인이 링크에서 새 비밀번호를 정하면 바로 로그인된다. 링크는 24시간·1회용, 새로 만들면 이전 링크는 취소된다. 이메일 발송 키(`RESEND_API_KEY`)를 등록하면 발급 시 메일도 가고, 로그인 화면 "비밀번호 찾기"에서 본인이 직접 메일로 받을 수도 있다. (2026-10-21 운영 DB 에 `admin_invites.kind` 적용됨)
 - 관리자 권한 잠김 복구: 주관리자가 정지되었거나 허용 IP 에 막힌 경우 Supabase SQL Editor 에서 `update members set status='active' where role='owner';`, 허용 IP 는 `delete from site_content where id='settings.security';`
 
 ## 4-4. 유료 플랜 전환 (오픈 전 필수, 대표가 직접 결제)

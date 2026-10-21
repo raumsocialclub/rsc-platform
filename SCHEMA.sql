@@ -246,7 +246,7 @@ begin
   v_inv_id := nullif(coalesce(new.raw_app_meta_data->>'admin_invite', new.raw_user_meta_data->>'admin_invite', ''), '')::uuid;
   if v_inv_id is not null then
     select * into v_inv from admin_invites where id = v_inv_id for update;
-    if v_inv.id is null or v_inv.used_at is not null or v_inv.revoked_at is not null or v_inv.expires_at < now()
+    if v_inv.id is null or v_inv.kind <> 'invite' or v_inv.used_at is not null or v_inv.revoked_at is not null or v_inv.expires_at < now()
        or lower(v_inv.email) <> lower(coalesce(new.email, '')) then
       raise exception 'ADMIN_INVITE_INVALID';
     end if;
@@ -535,7 +535,9 @@ create table admin_invites (
   used_at timestamptz,
   used_by uuid,
   revoked_at timestamptz,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  -- M16: 'invite' 부관리자 초대(48h) · 'reset' 관리자 비밀번호 재설정 링크(24h). 재설정 행은 계정 생성에 쓸 수 없다(handle_new_user 가 거부)
+  kind text not null default 'invite' check (kind in ('invite', 'reset'))
 );
 create index admin_invites_email_idx on admin_invites(email);
 alter table admin_invites enable row level security;

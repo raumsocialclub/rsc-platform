@@ -65,6 +65,18 @@ export async function sendAdminInvite(params: { to: string; name?: string | null
   return sendEmail(params.to, "[RSC] 관리자 초대", html);
 }
 
+/** 관리자 비밀번호 재설정 링크 (M16). 24시간 · 1회용 */
+export async function sendAdminPasswordReset(params: { to: string; name?: string | null; link: string; expiresAt: string }): Promise<NotifyResult> {
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#211e19;line-height:1.7">
+      <p>${params.name || "안녕하세요"}님, RAUM SOCIAL CLUB 관리자 계정의 비밀번호 재설정 링크입니다.</p>
+      <p>아래 링크에서 새 비밀번호를 정하면 바로 관리자 화면에 들어갈 수 있습니다. 본인이 요청한 것이 아니면 이 메일은 무시해 주세요.</p>
+      <p><a href="${params.link}" style="display:inline-block;padding:12px 20px;background:#5a3d24;color:#f7f3ec;text-decoration:none;font-weight:600">새 비밀번호 정하기</a></p>
+      <p style="font-size:12px;color:#5a3d24">${params.link}<br>유효기간: ${params.expiresAt} 까지 · 한 번만 사용할 수 있습니다.</p>
+    </div>`;
+  return sendEmail(params.to, "[RSC] 관리자 비밀번호 재설정", html);
+}
+
 /** 운영 알림 메일 (M13, lib/alert.ts 가 호출). 일반 설정 → 알림 → 운영 알림 받는 이메일 */
 export async function sendOpsAlert(params: { to: string; title: string; kind: string; detail: Record<string, unknown>; level: "error" | "warning" }): Promise<NotifyResult> {
   const rows = Object.entries(params.detail).map(([k, v]) => `<tr><td style="padding:4px 10px 4px 0;color:#5a3d24;white-space:nowrap">${k}</td><td style="padding:4px 0">${String(typeof v === "object" ? JSON.stringify(v) : v ?? "")}</td></tr>`).join("");

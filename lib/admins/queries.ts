@@ -9,9 +9,9 @@ export async function listAdmins(): Promise<AdminRow[]> {
   return rows.sort((a, b) => (a.role === b.role ? a.name.localeCompare(b.name, "ko") : a.role === "owner" ? -1 : 1));
 }
 
-/** 초대 목록 (최근 50). RLS: 주관리자만 */
+/** 초대·재설정 링크 이력 (최근 50). RLS: 주관리자만 */
 export async function listInvites(): Promise<InviteRow[]> {
   const supabase = await createClient();
-  const { data } = await supabase.from("admin_invites").select("id, email, name, role, expires_at, used_at, revoked_at, created_at").order("created_at", { ascending: false }).limit(50);
+  const { data } = await supabase.from("admin_invites").select("id, email, name, role, kind, expires_at, used_at, revoked_at, created_at").order("created_at", { ascending: false }).limit(50);
   return (data ?? []) as InviteRow[];
 }

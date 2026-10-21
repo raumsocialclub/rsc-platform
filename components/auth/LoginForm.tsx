@@ -8,15 +8,33 @@ import { describeAuthError } from "@/lib/auth/errors";
 import { SocialButtons } from "./SocialButtons";
 import { INPUT, SUBMIT, OVERLINE, ERROR, DIVIDER } from "./ui";
 
-type Props = { enabled: SocialProviderId[]; next: string; initialError?: string | null };
+type Props = { enabled: SocialProviderId[]; next: string; initialError?: string | null; canEmailReset?: boolean };
 
-/** deploy/member.html LOGIN 화면 재현 */
-export function LoginForm({ enabled, next, initialError = null }: Props) {
+/** deploy/member.html LOGIN 화면 재현. "비밀번호 찾기"(M16): 관리자 계정은 메일 발송이 켜져 있으면 재설정 링크를 메일로, 아니면 주관리자에게 요청 안내 */
+export function LoginForm({ enabled, next, initialError = null, canEmailReset = false }: Props) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [error, setError] = useState<string | null>(initialError);
   const [busy, setBusy] = useState(false);
+  const [help, setHelp] = useState(false);
+  const [resetMsg, setResetMsg] = useState<string | null>(null);
+  const [resetBusy, setResetBusy] = useState(false);
+
+  const requestReset = async () => {
+    const target = email.trim().toLowerCase();
+    if (!target) return setResetMsg("위 이메일 칸에 관리자 이메일을 입력한 뒤 눌러 주세요.");
+    setResetBusy(true);
+    try {
+      const res = await fetch("/api/auth/reset-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: target }) });
+      const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+      setResetMsg(j?.message ?? "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } catch {
+      setResetMsg("네트워크 오류입니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setResetBusy(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,8 +77,22 @@ export function LoginForm({ enabled, next, initialError = null }: Props) {
       </form>
       <div className="flex justify-between mt-[22px] text-[13px] text-[rgba(33,30,25,.5)]">
         <Link href="/join" className="text-brown font-semibold">초대코드로 가입</Link>
-        <span>비밀번호 찾기</span>
+        <button type="button" onClick={() => setHelp((v) => !v)} className="bg-transparent border-0 p-0 cursor-pointer text-[13px] text-[rgba(33,30,25,.5)] hover:text-brown" aria-expanded={help}>비밀번호 찾기</button>
       </div>
+      {help && (
+        <div className="mt-[14px] border border-[rgba(33,30,25,.14)] bg-[#faf7f1] p-[14px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.7)]">
+          <p className="mb-[8px]"><b>관리자 계정</b>은 주관리자(대표)에게 <b>비밀번호 재설정 링크</b>를 요청해 주세요. 링크를 열어 새 비밀번호를 정하면 바로 로그인됩니다.</p>
+          {canEmailReset ? (
+            <div className="grid gap-[8px]">
+              <p>또는 위 이메일 칸에 관리자 이메일을 넣고 아래 버튼을 누르면 재설정 링크를 메일로 보내 드립니다.</p>
+              <button type="button" onClick={requestReset} disabled={resetBusy} className="justify-self-start border border-brown text-brown bg-transparent px-[14px] py-[8px] text-[12.5px] font-semibold cursor-pointer hover:border-brownHover hover:text-brownHover disabled:opacity-60">{resetBusy ? "보내는 중…" : "재설정 링크 메일 받기"}</button>
+              {resetMsg && <p className="text-[12.5px]">{resetMsg}</p>}
+            </div>
+          ) : (
+            <p className="text-[12.5px] text-[rgba(33,30,25,.55)]">소셜 로그인(카카오·네이버) 회원은 비밀번호가 없으니 해당 버튼으로 로그인하세요.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
