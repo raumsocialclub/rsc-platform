@@ -4,6 +4,8 @@ import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { UpButton } from "@/components/site/UpButton";
 import { ImageBlock } from "@/components/site/ImageBlock";
+import { SitePopups } from "@/components/site/SitePopups";
+import { listLivePopups } from "@/lib/popups/queries";
 import { Txt } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -43,7 +45,7 @@ function Cta({ href, className, children }: { href: string; className: string; c
  * 리드 모드(일반 설정)면 07 멤버십 섹션과 금액이 들어간 FAQ 를 숨긴다.
  */
 export default async function HomePage() {
-  const [d, settings] = await Promise.all([getPageDocs("home"), getSettings()]);
+  const [d, settings, popups] = await Promise.all([getPageDocs("home"), getSettings(), listLivePopups()]);
   const lead = settings.leadMode;
   const hero = d["home.hero"], about = d["home.about"], why = d["home.why"], promise = d["home.promise"], social = d["home.social"], solo = d["home.solo"], spaces = d["home.spaces"], mem = d["home.membership"], faq = d["home.faq"];
   const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
@@ -285,6 +287,7 @@ export default async function HomePage() {
 
       <SiteFooter />
       <UpButton />
+      {popups.length > 0 && <SitePopups popups={popups} />}
     </>
   );
 }

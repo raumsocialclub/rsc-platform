@@ -522,6 +522,27 @@ alter table posts enable row level security;
 create policy "posts public read" on posts for select using (published = true or is_admin());
 create policy "posts admin write" on posts for all using (is_admin()) with check (is_admin());
 
+-- ---------- M17: 홈 팝업 — 어드민 /admin/popups 에서 1:1(1000×1000) · 4:5(1080×1350) 사진 등록. 켜짐 + 기간 안인 것만 홈에 노출
+create table popups (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,                        -- 관리용 이름
+  image_url text not null,                    -- site 버킷 공개 URL (업로드 시 비율에 맞춰 잘라 저장)
+  ratio text not null default '1:1' check (ratio in ('1:1', '4:5')),
+  link_url text,                              -- 클릭 시 이동 (/경로 또는 https://)
+  starts_at timestamptz,                      -- 비우면 바로
+  ends_at timestamptz,                        -- 비우면 계속
+  active boolean not null default true,
+  sort_order int not null default 0,          -- 작을수록 먼저
+  created_by uuid references members(id),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index popups_live_idx on popups(active, sort_order);
+create trigger popups_updated_at before update on popups for each row execute function set_updated_at();
+alter table popups enable row level security;
+create policy "popups public read" on popups for select using ((active and (starts_at is null or starts_at <= now()) and (ends_at is null or ends_at >= now())) or is_admin());
+create policy "popups admin write" on popups for all using (is_admin()) with check (is_admin());
+
 -- ---------- M12: 관리자 관리 — 주관리자(owner)가 부관리자(admin) 초대. 링크 토큰은 해시만 저장, 48시간, 1회용
 -- (members.role 에 'owner' 추가, members.last_login_at, is_admin/is_owner, handle_new_user 의 admin_invite 경로는 위에 반영)
 create table admin_invites (

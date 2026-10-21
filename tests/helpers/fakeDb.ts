@@ -57,7 +57,8 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
         }
         if (pending.op === "delete") {
           tables[table] = rows().filter((r) => !matched.includes(r));
-          return { data: null, error: null, count: matched.length };
+          // supabase 처럼 delete().select() 는 지운 행을 돌려준다
+          return { data: single ? matched[0] ?? null : matched, error: null, count: matched.length };
         }
       }
       let out = apply(rows());
