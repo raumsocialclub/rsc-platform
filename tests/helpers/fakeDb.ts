@@ -16,6 +16,7 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
     let pending: Call | null = null;
     let single: "maybe" | "single" | null = null;
     let limitN: number | null = null;
+    let rangeFrom = 0;
     let countMode = false;
 
     const apply = (rs: Row[]) =>
@@ -59,7 +60,7 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
         }
       }
       let out = apply(rows());
-      if (limitN != null) out = out.slice(0, limitN);
+      if (limitN != null) out = out.slice(rangeFrom, rangeFrom + limitN);
       if (countMode) return { data: null, error: null, count: out.length };
       if (single === "maybe") return { data: out[0] ?? null, error: null };
       if (single === "single") return out[0] ? { data: out[0], error: null } : { data: null, error: { message: "no rows" } };
@@ -78,7 +79,7 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
       gte: chain((col: unknown, v: unknown) => { filters.push(["gte", col as string, v]); }),
       order: chain(() => {}),
       limit: chain((n: unknown) => { limitN = n as number; }),
-      range: chain(() => {}),
+      range: chain((a: unknown, b: unknown) => { rangeFrom = a as number; limitN = (b as number) - (a as number) + 1; }),
       maybeSingle: () => { single = "maybe"; return Promise.resolve(exec()); },
       single: () => { single = "single"; return Promise.resolve(exec()); },
       insert: (payload: unknown) => { pending = { table, op: "insert", payload, filters }; calls.push(pending); return b; },

@@ -59,5 +59,5 @@ export async function GET(req: Request) {
   }
   const csv = "﻿" + out.join("\r\n");
   const name = `rsc-${type}-${range.from}_${range.to}.csv`;
-  return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${name}"` } });
+  return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${name}"`, "Cache-Control": "private, no-store" } });
 }

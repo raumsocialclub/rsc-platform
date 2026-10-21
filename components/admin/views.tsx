@@ -8,17 +8,17 @@ import { INQUIRY_STATUS, badgeStyle, fmtDate, fmtShortDate, inquiryBadge } from 
 import { PROFILES } from "@/lib/fit-check/questions";
 
 /* ---------- 상담 신청 ---------- */
-/** 유입 광고 요약: utm_source / utm_campaign (없으면 "직접") */
-export const utmLabel = (utm: InquiryRow["utm"]) => (utm?.utm_source ? [utm.utm_source, utm.utm_campaign].filter(Boolean).join(" / ") : "직접");
+/** 유입 광고 요약: utm_source / utm_campaign (UTM 이 없으면 "기록 없음" — 광고를 안 봤다는 뜻은 아님) */
+export const utmLabel = (utm: InquiryRow["utm"]) => (utm?.utm_source ? [utm.utm_source, utm.utm_campaign].filter(Boolean).join(" / ") : "기록 없음");
 
-export function InquiriesView({ rows, selected, filter, options }: { rows: InquiryRow[]; selected: InquiryRow | null; filter: { source: string; campaign: string }; options: { sources: string[]; campaigns: string[] } }) {
+export function InquiriesView({ rows, selected, filter, options, canExport = false }: { rows: InquiryRow[]; selected: InquiryRow | null; filter: { source: string; campaign: string }; options: { sources: string[]; campaigns: string[] }; canExport?: boolean }) {
   const pending = rows.filter((r) => r.status === "pending").length;
   const profile = selected?.result_type ? Object.values(PROFILES).find((p) => p.en === selected.result_type) : undefined;
   const filtered = !!(filter.source || filter.campaign);
   return (
     <>
       <PageTitle overline="FIT CHECK" title="상담 신청" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">대기 {pending}건</span>}>
-        <InquiriesFilter filter={filter} options={options} />
+        <InquiriesFilter filter={filter} options={options} canExport={canExport} />
       </PageTitle>
       <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-[20px] items-start">
         <div className={CARD}>

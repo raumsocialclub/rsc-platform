@@ -16,5 +16,5 @@ export async function GET(req: Request) {
     r.qty, r.payment?.method ?? "", r.amount, r.payment?.status ?? "", BOOKING_STATUS_KO[r.status], r.payment?.approved_at ? fmtFull(r.payment.approved_at) : "", r.cancelled_at ? fmtFull(r.cancelled_at) : "",
   ].map(esc).join(","));
   const csv = "﻿" + [head.map(esc).join(","), ...lines].join("\r\n");
-  return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="rsc-orders-${new Date().toISOString().slice(0, 10)}.csv"` } });
+  return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="rsc-orders-${new Date().toISOString().slice(0, 10)}.csv"`, "Cache-Control": "private, no-store" } });
 }
