@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { InstagramButton } from "@/components/site/InstagramButton";
-import { SLOTS } from "@/lib/fit-check/questions";
 import { formatPhoneInput } from "@/lib/phone";
 import { readUtm } from "@/lib/utm/client";
 import { trackLead } from "@/components/site/MetaPixel";
 
 /**
- * 간단 상담 신청 (기본). 이름·휴대폰·상담 가능 시간(복수)·개인정보 동의만 받는다.
+ * 간단 상담 신청 (기본). 이름·휴대폰·개인정보 동의만 받는다.
+ * 「상담 가능 시간」 선택은 인터뷰 기간 동안 잠시 뺐다 (2026-10). 다시 넣을 땐 git 이력의 SLOTS 버튼 블록을 되살리고
+ * slot 값을 함께 보내면 된다 — API(/api/inquiries)·관리자 화면·DB 는 slot 을 그대로 받는다.
  * 설문형(성향 결과 유형)은 일반 설정 → 상담 신청 → "설문형 상담 신청 켜기" 로 되돌릴 수 있다 (FitCheck.tsx).
  * 완료 시 메타 픽셀 Lead 이벤트를 보낸다(픽셀 ID 가 설정된 경우에만 실제 전송).
  */
@@ -18,7 +19,6 @@ const FIELD = "w-full border-0 border-b border-[rgba(33,30,25,.28)] bg-transpare
 export function LeadForm({ title, note }: { title: string; note: string }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [slots, setSlots] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,6 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
 
   const phoneOk = /^01[016789]-\d{3,4}-\d{4}$/.test(phone);
   const canSubmit = name.trim() !== "" && phoneOk && agreed;
-  const toggle = (t: string) => setSlots((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]));
 
   const submit = async () => {
     if (!canSubmit || submitting) return;
@@ -36,7 +35,7 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
       const res = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), phone, slot: SLOTS.filter((s) => slots.includes(s)).join(", "), consent: true, utm: readUtm() }),
+        body: JSON.stringify({ name: name.trim(), phone, consent: true, utm: readUtm() }),
       });
       const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !json?.ok) throw new Error(json?.message ?? "신청을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
@@ -91,29 +90,16 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
           />
           <span className="block mt-[8px] text-[12.5px] text-[rgba(33,30,25,.45)]">숫자만 입력하시면 자동으로 하이픈이 붙습니다.</span>
         </label>
-        <div>
-          <div className="text-[13.5px] font-medium mb-[14px]">상담 가능 시간 <span className="text-[rgba(33,30,25,.4)] font-medium">선택 · 여러 개 고를 수 있어요</span></div>
-          <div className="flex flex-wrap gap-[10px]">
-            {SLOTS.map((t) => {
-              const on = slots.includes(t);
-              return (
-                <button key={t} type="button" aria-pressed={on} onClick={() => toggle(t)} className={`cursor-pointer px-[20px] py-[13px] text-[14px] border text-ink transition-all duration-200 ${on ? "bg-sandActive border-brown" : "bg-transparent border-[rgba(33,30,25,.22)]"}`}>
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-        </div>
         <div className="border border-[rgba(33,30,25,.16)] bg-[rgba(255,255,255,.35)] p-[18px]">
           <label className="flex items-start gap-[14px] cursor-pointer">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="w-[17px] h-[17px] mt-[3px] accent-brown cursor-pointer flex-none" />
             <span className="text-[14px] leading-[1.7] text-ink font-medium">개인정보 수집·이용 동의 <span className="text-brown">(필수)</span></span>
           </label>
           <dl className="mt-[12px] ml-[31px] grid gap-[4px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.68)]">
-            <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름, 휴대폰 번호(필수) · 상담 가능 시간(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)</dd></div>
+            <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름, 휴대폰 번호(필수) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)</dd></div>
             <div><dt className="inline font-medium text-ink">이용 목적: </dt><dd className="inline">신청하신 가입 상담의 진행과 일정 조율, 문의 응대</dd></div>
             <div><dt className="inline font-medium text-ink">보관 기간: </dt><dd className="inline">접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)</dd></div>
-            <div><dt className="inline font-medium text-ink">거부 시: </dt><dd className="inline">필수 항목 동의를 거부하면 상담 신청이 접수되지 않습니다. 상담 가능 시간은 비워도 신청할 수 있습니다.</dd></div>
+            <div><dt className="inline font-medium text-ink">거부 시: </dt><dd className="inline">필수 항목 동의를 거부하면 상담 신청이 접수되지 않습니다.</dd></div>
           </dl>
           <p className="mt-[10px] ml-[31px] text-[12.5px] leading-[1.7] text-[rgba(33,30,25,.55)]">
             자세한 내용은 <Link href="/privacy" target="_blank" className="underline text-brown">개인정보처리방침</Link>에서 확인하실 수 있습니다. 사이트 이용 조건은 <Link href="/terms" target="_blank" className="underline text-brown">이용약관</Link>을 참고해 주세요.
