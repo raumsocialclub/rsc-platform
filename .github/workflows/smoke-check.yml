@@ -1,0 +1,71 @@
+name: smoke-check
+
+# 배포된 주소가 의도대로 동작하는지 밖에서 확인한다 (Actions 탭 → smoke-check → Run workflow).
+# 리드 모드: 숨김 페이지 → 메인(307), 닫힌 API → 404, 메인·혜택 HTML 에 금액·가격 링크 없음, robots 에 /pricing 제외.
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "확인할 주소 (예: https://rsc-platform.vercel.app)"
+        required: true
+        default: "https://rsc-platform.vercel.app"
+      lead_mode:
+        description: "리드 모드가 켜져 있어야 하면 true"
+        required: true
+        default: "true"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 페이지 응답 코드
+        env:
+          BASE: ${{ inputs.base_url }}
+        run: |
+          for p in / /benefits /news /fit-check /privacy /terms /login /pricing /join /join/register /programs /my /checkout/x /refund /auth/naver/start; do
+            printf "%-20s " "$p"; curl -s -o /dev/null -w "%{http_code} -> %{redirect_url}\n" "$BASE$p"
+          done
+      - name: 닫힌 API
+        env:
+          BASE: ${{ inputs.base_url }}
+        run: |
+          for p in /api/bookings /api/invites/verify /api/invites/consume /api/payments/confirm /api/payments/webhook; do
+            printf "%-26s " "$p"; curl -s -o /dev/null -w "%{http_code}\n" -X POST -H "Content-Type: application/json" -d '{}' "$BASE$p"
+          done
+      - name: robots · sitemap · llms
+        env:
+          BASE: ${{ inputs.base_url }}
+        run: |
+          echo "--- robots"; curl -s "$BASE/robots.txt" | grep -i disallow | sort -u | tr '\n' ' '; echo
+          echo "--- sitemap"; curl -s "$BASE/sitemap.xml" | grep -o "<loc>[^<]*</loc>" | tr '\n' ' '; echo
+          echo "--- llms 금액 줄"; curl -s "$BASE/llms.txt" | grep -cE "[0-9][0-9,]*[[:space:]]*(원|만원)" || true
+      - name: 화면 내용
+        env:
+          BASE: ${{ inputs.base_url }}
+        run: |
+          H=$(curl -s "$BASE/")
+          echo "home: 로그인링크=$(echo "$H" | grep -o 'href="/login"' | wc -l) programs링크=$(echo "$H" | grep -o 'href="/programs"' | wc -l) membership섹션=$(echo "$H" | grep -o 'id="membership"' | wc -l) 환불규정=$(echo "$H" | grep -o 'href="/refund"' | wc -l) 인스타버튼=$(echo "$H" | grep -o '인스타그램 보기' | wc -l) 회비FAQ=$(echo "$H" | grep -o '회비는 얼마인가요' | wc -l) 금액=$(echo "$H" | grep -oE '[0-9][0-9,]{2,}원' | wc -l)"
+          B=$(curl -s "$BASE/benefits")
+          echo "benefits: 금액=$(echo "$B" | grep -oE '[0-9][0-9,]{1,}원' | wc -l) pricing링크=$(echo "$B" | grep -o 'href="/pricing"' | wc -l)"
+          P=$(curl -s "$BASE/privacy")
+          echo "privacy: 180일=$(echo "$P" | grep -o '180일' | wc -l) 설문원본미저장=$(echo "$P" | grep -o '답변 원본은 결과 유형 계산에만' | wc -l)"
+      - name: 리드 모드 판정
+        if: ${{ inputs.lead_mode == 'true' }}
+        env:
+          BASE: ${{ inputs.base_url }}
+        run: |
+          fail=0
+          for p in /pricing /join /programs /my /refund; do
+            c=$(curl -s -o /dev/null -w "%{http_code}|%{redirect_url}" "$BASE$p")
+            case "$c" in 307\|*/|308\|*/) ;; *) echo "FAIL $p -> $c"; fail=1;; esac
+          done
+          for p in /api/bookings /api/invites/verify /api/payments/confirm; do
+            c=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" -d '{}' "$BASE$p")
+            [ "$c" = "404" ] || { echo "FAIL $p -> $c"; fail=1; }
+          done
+          H=$(curl -s "$BASE/")
+          [ "$(echo "$H" | grep -c 'href="/login"')" = "0" ] || { echo "FAIL 로그인 링크 보임"; fail=1; }
+          [ "$(echo "$H" | grep -c 'id="membership"')" = "0" ] || { echo "FAIL 멤버십 섹션 보임"; fail=1; }
+          [ "$(echo "$H" | grep -cE '[0-9][0-9,]{2,}원')" = "0" ] || { echo "FAIL 메인에 금액 보임"; fail=1; }
+          [ $fail = 0 ] && echo "리드 모드 OK" || exit 1

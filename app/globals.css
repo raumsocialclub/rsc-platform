@@ -1,0 +1,85 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/* Design.md 토큰 기본값. 어드민 "색상 테마" 저장값이 layout 에서 :root 에 덮어쓴다. */
+:root {
+  --c-cream: #f7f3ec;
+  --c-ink: #211e19;
+  --c-brown: #5a3d24;
+  --c-brownHover: #9c6b3e;
+  --c-gold: #e2b478;
+  --c-goldHover: #f0c98e;
+  --c-sand: #efe9de;
+  --c-sandDeep: #e9e3d6;
+}
+
+/* Design.md 기본 규칙 — 크림 종이 위 짙은 브라운 잉크 */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* 프로토타입은 브라우저 기본 행간(normal)을 쓴다. Tailwind preflight의 1.5를 되돌린다. */
+    line-height: normal;
+  }
+
+  body {
+    margin: 0;
+    background: var(--c-cream);
+    color: var(--c-ink);
+    font-family: var(--font-samsung), Arial, sans-serif;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease,
+      background 0.25s ease;
+  }
+
+  a:hover {
+    color: var(--c-brownHover);
+  }
+
+  ::selection {
+    background: var(--c-brownHover);
+    color: var(--c-cream);
+  }
+
+  input,
+  select,
+  button,
+  textarea {
+    font-family: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(33, 30, 25, 0.35);
+  }
+
+  section[id] {
+    scroll-margin-top: 76px;
+  }
+
+  /* 접근성: 키보드 포커스 링 (마우스 클릭에는 표시하지 않음). Design.md 브라운 강조색. */
+  :focus-visible {
+    outline: 2px solid var(--c-brownHover);
+    outline-offset: 2px;
+  }
+
+  /* 모션 축소 설정 존중 */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
