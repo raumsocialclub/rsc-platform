@@ -550,6 +550,7 @@ create table crm_call_state (
   tab text not null,
   calls jsonb not null default '[]',          -- ["1차 셀","2차 셀","3차 셀"] 마지막으로 본 값
   memo text not null default '',
+  note_hash text not null default '',        -- 인터뷰 노트는 내용 대신 해시만 (변경 감지용)
   first_seen_at timestamptz not null default now(),
   changed_at timestamptz not null default now()
 );
@@ -557,7 +558,7 @@ create table crm_call_events (
   id bigserial primary key,
   lead_key text not null,
   tab text not null,
-  field text not null check (field in ('call1', 'call2', 'call3', 'memo', 'new')),
+  field text not null check (field in ('call1', 'call2', 'call3', 'memo', 'note', 'new')),
   "before" text not null default '',
   "after" text not null default '',
   at timestamptz not null default now()

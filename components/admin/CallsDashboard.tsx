@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CallInsights } from "./CallInsights";
 import { BTN_SECONDARY, CARD, FIELD, TH, TD as TD0, Badge, EmptyRow, PageTitle } from "./ui";
 import { badgeStyle } from "@/lib/admin/format";
 import { FIELD_KO, STATUS_KO, STATUS_ORDER, type CallLead, type CallStatus, type CallsData } from "@/lib/crm/types";
@@ -30,7 +31,7 @@ function ago(iso: string): string {
 
 /**
  * 콜 현황 대시보드 (M18). 서버가 넘긴 첫 데이터를 보여주고 30초마다 /api/admin/crm-calls 로 갱신한다(탭이 보일 때만).
- * KPI → 콜 단계·탭별 진행 → 최근 변경·인터뷰 메모 요약 → 전체 목록(필터) 순서의 한 페이지.
+ * KPI → 인터뷰 니즈 분석 → 콜 단계·탭별 진행 → 최근 변경·인터뷰 내용 요약 → 전체 목록(필터) 순서의 한 페이지.
  */
 export function CallsDashboard({ initial, initialError }: { initial: CallsData | null; initialError: string | null }) {
   const [data, setData] = useState<CallsData | null>(initial);
@@ -70,7 +71,7 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
   const leads = useMemo(() => data?.leads ?? [], [data]);
   const rows = useMemo(() => {
     const needle = q.trim().replace(/-/g, "");
-    return leads.filter((l) => (tab === "all" || l.tab === tab) && (status === "all" || l.status === status) && (!needle || l.name.includes(needle) || l.phone.replace(/-/g, "").includes(needle) || l.memo.includes(needle) || l.calls.some((c) => c.includes(needle))));
+    return leads.filter((l) => (tab === "all" || l.tab === tab) && (status === "all" || l.status === status) && (!needle || l.name.includes(needle) || l.phone.replace(/-/g, "").includes(needle) || l.memo.includes(needle) || l.note.includes(needle) || l.calls.some((c) => c.includes(needle))));
   }, [leads, tab, status, q]);
 
   const s = data?.summary;
@@ -115,6 +116,8 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
         </div>
       )}
 
+      {data && <CallInsights r={data.insights} />}
+
       {s && (
         <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-[16px] mb-[24px]">
           <div className={`${CARD} p-[22px]`}>
@@ -129,7 +132,7 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
                 </div>
               );
             })}
-            <div className="text-[12px] text-[rgba(33,30,25,.5)] mt-[14px]">인터뷰 메모가 적힌 신청 {s.withMemo}건</div>
+            <div className="text-[12px] text-[rgba(33,30,25,.5)] mt-[14px]">인터뷰 내용 칸이 적힌 신청 {s.withMemo}건 · 노트가 있는 고객 {data?.insights.interviewed ?? 0}명</div>
           </div>
           <div className={`${CARD} overflow-x-auto`}>
             <table className="w-full border-collapse">
@@ -169,7 +172,7 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
             )}
           </div>
           <div className={`${CARD} p-[22px]`}>
-            <div className="flex justify-between items-baseline mb-[14px]"><b className="text-[14px]">인터뷰 메모 요약</b><span className="text-[12px] text-[rgba(33,30,25,.5)]">같은 내용끼리 묶음</span></div>
+            <div className="flex justify-between items-baseline mb-[14px]"><b className="text-[14px]">인터뷰 내용 칸 요약</b><span className="text-[12px] text-[rgba(33,30,25,.5)]">같은 글끼리 묶음</span></div>
             {data.memos.length === 0 ? (
               <div className="text-[13px] text-[rgba(33,30,25,.5)]">인터뷰 내용 칸에 적힌 메모가 없습니다.</div>
             ) : (
@@ -202,10 +205,10 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
           </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead><tr><th className={TH}>신청</th><th className={TH}>탭</th><th className={TH}>이름</th><th className={TH}>연락처</th><th className={TH}>유입</th><th className={TH}>1차</th><th className={TH}>2차</th><th className={TH}>3차</th><th className={TH}>상태</th><th className={TH}>인터뷰 메모</th></tr></thead>
+              <thead><tr><th className={TH}>신청</th><th className={TH}>탭</th><th className={TH}>이름</th><th className={TH}>연락처</th><th className={TH}>유입</th><th className={TH}>1차</th><th className={TH}>2차</th><th className={TH}>3차</th><th className={TH}>상태</th><th className={TH}>인터뷰 내용</th><th className={TH}>노트</th></tr></thead>
               <tbody>
                 {rows.map((l) => <LeadRow key={l.key} l={l} />)}
-                {rows.length === 0 && <EmptyRow colSpan={10}>조건에 맞는 신청이 없습니다.</EmptyRow>}
+                {rows.length === 0 && <EmptyRow colSpan={11}>조건에 맞는 신청이 없습니다.</EmptyRow>}
               </tbody>
             </table>
           </div>
@@ -226,7 +229,8 @@ function LeadRow({ l }: { l: CallLead }) {
       <td className={`${TD} max-w-[220px] overflow-hidden text-ellipsis text-[12.5px] text-[rgba(33,30,25,.6)]`} title={src}>{src || "—"}</td>
       {l.calls.map((c, i) => <td key={i} className={`${TD} text-[12.5px]`}>{c || <span className="text-[rgba(33,30,25,.3)]">·</span>}</td>)}
       <td className={TD}><Badge style={statusBadge(l.status)}>{STATUS_KO[l.status]}{l.attempts ? ` ${l.attempts}차` : ""}</Badge></td>
-      <td className={`${TD} whitespace-normal min-w-[200px] text-[12.5px]`}>{l.memo || <span className="text-[rgba(33,30,25,.3)]">—</span>}</td>
+      <td className={`${TD} whitespace-normal min-w-[160px] text-[12.5px]`}>{l.memo || <span className="text-[rgba(33,30,25,.3)]">—</span>}</td>
+      <td className={`${TD} whitespace-normal min-w-[240px] max-w-[420px] text-[12px] leading-[1.5] text-[rgba(33,30,25,.75)]`} title={l.note}>{l.note ? l.note.split(/\r?\n/).filter(Boolean).slice(0, 4).map((x, i) => <div key={i}>{x}</div>) : <span className="text-[rgba(33,30,25,.3)]">—</span>}{l.note.split(/\r?\n/).filter(Boolean).length > 4 && <div className="text-[rgba(33,30,25,.45)]">… 위 「고객별 인터뷰」에서 전체 보기</div>}</td>
     </tr>
   );
 }

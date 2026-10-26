@@ -1,34 +1,37 @@
+import { createHash } from "node:crypto";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import type { CallEvent, CallField, CallLead } from "./types";
 
 const EVENT_KEEP_DAYS = 30;
 const RECENT_LIMIT = 60;
 
-type StateRow = { lead_key: string; calls: unknown; memo: string | null };
+type StateRow = { lead_key: string; calls: unknown; memo: string | null; note_hash: string | null };
+const noteHash = (note: string) => (note ? createHash("sha256").update(note).digest("hex").slice(0, 24) : "");
+const noteLabel = (note: string) => (note ? `${note.split(/\r?\n/).filter((l) => l.trim()).length}줄` : "");
 type EventRow = { id: number; lead_key: string; tab: string; field: CallField; before: string; after: string; at: string };
 
 /**
  * 시트를 읽을 때마다 지난 상태(crm_call_state)와 비교해 바뀐 칸을 crm_call_events 에 남긴다 (실시간 변경 피드).
- * 개인정보는 저장하지 않는다 — 키·탭·셀 글만. 첫 실행(상태 테이블이 빔)은 기준선만 잡고 이벤트를 만들지 않는다.
+ * 개인정보는 저장하지 않는다 — 키·탭·셀 글만. 인터뷰 노트는 내용 대신 해시와 줄 수만 남긴다. 첫 실행(상태 테이블이 빔)은 기준선만 잡고 이벤트를 만들지 않는다.
  * service role 키가 없으면 기록을 건너뛴다(화면은 그대로 동작).
  */
 export async function syncCallEvents(leads: CallLead[]): Promise<{ enabled: boolean; events: Omit<CallEvent, "name">[] }> {
   if (!hasServiceRoleKey()) return { enabled: false, events: [] };
   try {
     const db = createAdminClient();
-    const { data: states, error } = await db.from("crm_call_state").select("lead_key, calls, memo");
+    const { data: states, error } = await db.from("crm_call_state").select("lead_key, calls, memo, note_hash");
     if (error) throw error;
     const prev = new Map<string, StateRow>((states ?? []).map((s) => [s.lead_key, s as StateRow]));
     const firstRun = prev.size === 0;
     const now = new Date().toISOString();
-    const upserts: { lead_key: string; tab: string; calls: string[]; memo: string; changed_at: string }[] = [];
+    const upserts: { lead_key: string; tab: string; calls: string[]; memo: string; note_hash: string; changed_at: string }[] = [];
     const events: Omit<EventRow, "id">[] = [];
     const push = (l: CallLead, field: CallField, before: string, after: string) => events.push({ lead_key: l.key, tab: l.tab, field, before, after, at: now });
 
     for (const l of leads) {
       const p = prev.get(l.key);
       if (!p) {
-        upserts.push({ lead_key: l.key, tab: l.tab, calls: l.calls, memo: l.memo, changed_at: now });
+        upserts.push({ lead_key: l.key, tab: l.tab, calls: l.calls, memo: l.memo, note_hash: noteHash(l.note), changed_at: now });
         if (!firstRun) push(l, "new", "", l.last);
         continue;
       }
@@ -38,7 +41,9 @@ export async function syncCallEvents(leads: CallLead[]): Promise<{ enabled: bool
         if ((pc[i] ?? "") !== l.calls[i]) { changed = true; push(l, f, pc[i] ?? "", l.calls[i]); }
       });
       if ((p.memo ?? "") !== l.memo) { changed = true; push(l, "memo", p.memo ?? "", l.memo); }
-      if (changed) upserts.push({ lead_key: l.key, tab: l.tab, calls: l.calls, memo: l.memo, changed_at: now });
+      const nh = noteHash(l.note);
+      if ((p.note_hash ?? "") !== nh) { changed = true; push(l, "note", p.note_hash ? "수정 전" : "", noteLabel(l.note)); }
+      if (changed) upserts.push({ lead_key: l.key, tab: l.tab, calls: l.calls, memo: l.memo, note_hash: nh, changed_at: now });
     }
 
     if (upserts.length) {

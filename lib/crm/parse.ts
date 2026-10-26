@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { emptyByStatus, leadStatus, type CallLead, type CallsSummary, type MemoGroup, type TabSummary } from "./types";
 
-/** Apps Script 가 돌려주는 탭 하나: 첫 줄은 머리글, 나머지는 행 (빈 칸은 "" 로 자리 유지) */
-export type SheetTab = { name: string; rows: string[][] };
+/** Apps Script 가 돌려주는 탭 하나: 첫 줄은 머리글, 나머지는 행 (빈 칸은 "" 로 자리 유지). notes 는 셀 노트가 있는 칸만 [행, 열, 내용] */
+export type SheetTab = { name: string; rows: string[][]; notes?: [number, number, string][] };
 
 const HEADERS = {
   id: ["id"],
@@ -65,9 +65,17 @@ export function parseTab(tab: SheetTab): CallLead[] {
     memo: findCol(header, HEADERS.memo),
   };
   if (col.phone < 0 && col.name < 0) return [];
+  const notesByRow = new Map<number, string[]>();
+  for (const n of tab.notes ?? []) {
+    if (!Array.isArray(n) || n.length < 3 || !String(n[2] ?? "").trim()) continue;
+    const list = notesByRow.get(Number(n[0])) ?? [];
+    list.push(String(n[2]).trim());
+    notesByRow.set(Number(n[0]), list);
+  }
   const out: CallLead[] = [];
-  for (const row of rows) {
+  for (const [ri, row] of rows.entries()) {
     if (!row.some((c) => String(c ?? "").trim())) continue;
+    const note = (notesByRow.get(ri + 1) ?? []).join("\n");
     let name = cell(row, col.name);
     let phone = cell(row, col.phone);
     let id = cell(row, col.id);
@@ -96,6 +104,7 @@ export function parseTab(tab: SheetTab): CallLead[] {
       form: shifted ? "" : cell(row, col.form),
       calls,
       memo,
+      note,
       status,
       attempts,
       last,

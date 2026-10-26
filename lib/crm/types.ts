@@ -2,6 +2,8 @@
  * 콜 현황 대시보드 (M18): 구글 시트(CRM)에 적는 1차·2차·3차 콜 결과와 인터뷰 메모를 어드민 한 화면에서 본다.
  * 시트 셀에 적힌 글을 아래 상태로 분류한다. 분류는 표시용일 뿐 시트는 바꾸지 않는다.
  */
+import type { InsightReport } from "./insights";
+
 export type CallStatus = "done" | "callback" | "missed" | "invalid" | "declined" | "other" | "pending";
 
 export const STATUS_ORDER: CallStatus[] = ["done", "callback", "missed", "invalid", "declined", "other", "pending"];
@@ -15,8 +17,8 @@ export const STATUS_KO: Record<CallStatus, string> = {
   pending: "미진행",
 };
 
-export type CallField = "call1" | "call2" | "call3" | "memo" | "new";
-export const FIELD_KO: Record<CallField, string> = { call1: "1차 콜", call2: "2차 콜", call3: "3차 콜", memo: "인터뷰 메모", new: "새 신청" };
+export type CallField = "call1" | "call2" | "call3" | "memo" | "note" | "new";
+export const FIELD_KO: Record<CallField, string> = { call1: "1차 콜", call2: "2차 콜", call3: "3차 콜", memo: "인터뷰 내용", note: "인터뷰 노트", new: "새 신청" };
 
 export type CallLead = {
   key: string;                       // "<탭>|<id>" 또는 "<탭>|p:<전화 해시>" — DB 에는 이 키와 상태만 저장
@@ -29,7 +31,8 @@ export type CallLead = {
   campaign: string;
   form: string;
   calls: [string, string, string];   // 1차·2차·3차 셀 원문
-  memo: string;                      // 인터뷰 내용 원문
+  memo: string;                      // 「인터뷰 내용」 칸 원문
+  note: string;                      // 그 행의 셀에 붙인 노트(노란 말풍선) 원문. 여러 칸이면 줄바꿈으로 이어 붙임
   status: CallStatus;                // 종합 상태 (통화완료가 하나라도 있으면 통화완료, 아니면 마지막 시도 기준)
   attempts: number;                  // 0~3
   last: string;                      // 마지막 시도 셀 원문
@@ -49,6 +52,7 @@ export type CallsData = {
   leads: CallLead[];
   summary: CallsSummary;
   memos: MemoGroup[];
+  insights: InsightReport;           // 인터뷰 니즈 분석 (lib/crm/insights.ts)
   events: CallEvent[];               // 최근 변경 (service role 키가 있을 때만 기록)
   eventsEnabled: boolean;
 };

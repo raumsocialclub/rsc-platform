@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeDb } from "./helpers/fakeDb";
 import { memoGroups, parseTab, parseTabs, phoneKey, summarize } from "@/lib/crm/parse";
 import { classifyCell, leadStatus } from "@/lib/crm/types";
+import { analyzeInsights, splitLines, tagLine } from "@/lib/crm/insights";
 
 /** 콜 현황 (M18): 시트 셀 분류 · 탭 파싱 · 집계 · 변경 기록. 전부 가상 데이터 */
 const db = fakeDb();
@@ -53,6 +54,15 @@ describe("탭 파싱", () => {
     expect(leads[0].key).toBe(`10/22|${phoneKey("010-5555-6666")}`);
     expect(leads[0].key).not.toContain("5555");
   });
+  it("셀 노트(노란 말풍선)는 행 번호로 붙이고, 여러 칸이면 줄바꿈으로 잇는다", () => {
+    const t = tab("웹사이트", [
+      row({ id: "n1", full_name: "가상A", phone_number: "010-0000-0001", "1차 콜": "통화완료" }),
+      row({ id: "n2", full_name: "가상B", phone_number: "010-0000-0002" }),
+    ]);
+    const leads = parseTab({ ...t, notes: [[1, 14, "- 1:1 관심\n- 평일 저녁 가능"], [1, 17, "런칭시 연락"], [5, 2, "범위 밖"]] });
+    expect(leads[0].note).toBe("- 1:1 관심\n- 평일 저녁 가능\n런칭시 연락");
+    expect(leads[1].note).toBe("");
+  });
   it("전화번호가 없는 행·머리글 없는 탭은 무시, 여러 탭은 최신 신청 순", () => {
     expect(parseTab({ name: "메모", rows: [["안내", "x"], ["아무거나", "y"]] })).toHaveLength(0);
     expect(parseTab(tab("웹사이트", [row({ id: "no-phone", full_name: "x" })]))).toHaveLength(0);
@@ -93,6 +103,48 @@ describe("집계·메모 요약", () => {
   });
 });
 
+describe("인터뷰 니즈 분석", () => {
+  it("노트 문장을 나누고 앞의 기호를 뗀다", () => {
+    expect(splitLines("- 1:1 관심. 싱글 커뮤니티도 괜찮음\n- 이성만남\n-평일 일정 조율 가능\n\n")).toEqual(["1:1 관심. 싱글 커뮤니티도 괜찮음", "이성만남", "평일 일정 조율 가능"]);
+    expect(splitLines("- 와인 - 러닝 - 골프")).toEqual(["와인", "러닝", "골프"]);
+  });
+  it("문장을 주제 태그로 (가상 문장)", () => {
+    const tags = (s: string) => tagLine(s).map((t) => `${t.theme}:${t.tag}`);
+    expect(tags("1:1 관심. 싱글 커뮤니티도 괜찮음")).toEqual(expect.arrayContaining(["interest:1:1 매칭", "interest:싱글 커뮤니티"]));
+    expect(tags("이성만남. 인맥형성. 취미")).toEqual(expect.arrayContaining(["interest:이성 만남", "interest:인맥·비즈니스", "interest:취미·액티비티"]));
+    expect(tags("평일 저녁 조율 가능")).toEqual(expect.arrayContaining(["schedule:평일", "schedule:저녁·퇴근 후", "schedule:일정 조율 가능"]));
+    expect(tags("와인. 러닝. 스쿠버다이빙. 비지니스 니즈")).toEqual(expect.arrayContaining(["activity:와인·미식", "activity:러닝·운동", "activity:수상·스쿠버", "interest:인맥·비즈니스"]));
+    expect(tags("결정사 이용 경험 없음")).toEqual(["experience:결정사 경험 없음"]);
+    expect(tags("결정사 이용중(좋은 조건의 남성이신듯. 적은 금액으로 이용중)")).toEqual(expect.arrayContaining(["experience:결정사 이용 중·경험 있음", "budget:금액 부담·민감", "profile:남성"]));
+    expect(tags("결정사 이용중(좋은 조건의 남성이신듯. 적은 금액으로 이용중)")).not.toContain("experience:결정사 경험 없음");
+    expect(tags("금액 무관. 퀄리티에 따라 결정")).toEqual(["budget:금액 무관·유연"]);
+    expect(tags("금액은 융통성. 컨텐츠에 따라.")).toEqual(["budget:금액 무관·유연"]);
+    expect(tags("41세 여성")).toEqual(expect.arrayContaining(["profile:여성", "profile:40대"]));
+    expect(tags("30대 중반 남성 / 조건 좋은 느낌")).toEqual(expect.arrayContaining(["profile:남성", "profile:30대"]));
+    expect(tags("런칭시 연락 바람 (할인)")).toEqual(expect.arrayContaining(["followup:런칭 때 연락", "budget:할인 요청"]));
+    expect(tags("27일 연락 요청")).toContain("followup:추후·재연락");
+    expect(tags("관심 없음. 여성 요가 모임 중")).toEqual(expect.arrayContaining(["followup:관심 없음·거절", "profile:여성"]));
+    expect(tags("ㅇㅇ")).toEqual([]);
+  });
+  it("고객 단위로 집계하고, 안 걸린 문장은 따로 모은다", () => {
+    const base = tab("웹사이트", [
+      row({ id: "a", full_name: "가", phone_number: "010-0000-0001", "1차 콜": "통화완료", "인터뷰 내용": "런칭 연락" }),
+      row({ id: "b", full_name: "나", phone_number: "010-0000-0002", "1차 콜": "통화완료" }),
+      row({ id: "c", full_name: "다", phone_number: "010-0000-0003", "1차 콜": "부재중" }),
+    ]);
+    const leads = parseTabs([{ ...base, notes: [[1, 14, "- 1:1 관심\n- 1:1 로 꼭\n- 와인\n- 흠"], [2, 14, "- 싱글 커뮤니티\n- 와인"]] }]);
+    const r = analyzeInsights(leads);
+    expect(r.interviewed).toBe(2);
+    expect(r.customers.map((c) => c.name)).toEqual(["가", "나"]);
+    const interest = r.themes.find((t) => t.theme === "interest")!;
+    expect(interest.tags).toEqual(expect.arrayContaining([expect.objectContaining({ tag: "1:1 매칭", count: 1 }), expect.objectContaining({ tag: "싱글 커뮤니티", count: 1 })]));
+    expect(r.themes.find((t) => t.theme === "activity")!.tags[0]).toMatchObject({ tag: "와인·미식", count: 2 });
+    expect(r.themes.find((t) => t.theme === "followup")!.tags[0]).toMatchObject({ tag: "런칭 때 연락", count: 1 });
+    expect(r.untagged).toEqual([{ name: "가", line: "흠" }]);
+    expect(r.customers[0].lines).toEqual(["1:1 관심", "1:1 로 꼭", "와인", "흠"]);
+  });
+});
+
 describe("변경 기록 (crm_call_events)", () => {
   const L = (calls: [string, string, string], memo = "") => parseTab(tab("웹사이트", [row({ id: "x1", full_name: "홍길동", phone_number: "010-1234-5678", "1차 콜": calls[0], "2차 콜": calls[1], "3차 콜": calls[2], "인터뷰 내용": memo })]));
   beforeEach(() => { db.tables.crm_call_state = []; db.tables.crm_call_events = []; db.calls.length = 0; });
@@ -126,5 +178,15 @@ describe("변경 기록 (crm_call_events)", () => {
     await syncCallEvents(L(["", "", ""]));
     await syncCallEvents(L(["부재중", "", ""]));
     expect(JSON.stringify(db.tables.crm_call_events)).not.toMatch(/홍길동|1234-5678/);
+  });
+  it("인터뷰 노트는 내용 대신 해시·줄 수만 남긴다", async () => {
+    const { syncCallEvents } = await import("@/lib/crm/events");
+    const withNote = (note: string) => { const l = L(["통화완료", "", ""]); l[0].note = note; return l; };
+    await syncCallEvents(withNote(""));
+    const r = await syncCallEvents(withNote("- 1:1 관심\n- 41세 여성"));
+    expect(r.events).toEqual([expect.objectContaining({ field: "note", before: "", after: "2줄" })]);
+    expect(JSON.stringify(db.tables)).not.toMatch(/41세|1:1 관심/);
+    const same = await syncCallEvents(withNote("- 1:1 관심\n- 41세 여성"));
+    expect(same.events).toHaveLength(1);
   });
 });

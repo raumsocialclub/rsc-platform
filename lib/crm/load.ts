@@ -1,4 +1,5 @@
 import { syncCallEvents } from "./events";
+import { analyzeInsights } from "./insights";
 import { memoGroups, parseTabs, summarize } from "./parse";
 import { fetchSheetTabs } from "./sheet";
 import type { CallsData } from "./types";
@@ -17,6 +18,7 @@ export async function loadCallsData(): Promise<CallsData> {
     leads,
     summary: summarize(leads),
     memos: memoGroups(leads),
+    insights: analyzeInsights(leads),
     events: events.map((e) => ({ ...e, name: names.get(e.key) ?? "" })),
     eventsEnabled: enabled,
   };
