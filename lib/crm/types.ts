@@ -55,6 +55,7 @@ export type CallsData = {
   insights: InsightReport;           // 인터뷰 니즈 분석 (lib/crm/insights.ts)
   events: CallEvent[];               // 최근 변경 (service role 키가 있을 때만 기록)
   eventsEnabled: boolean;
+  sheet: { notesSupported: boolean; noteCount: number; scriptVersion: number }; // 연결 진단: 스크립트가 셀 노트를 보내는지, 몇 개 왔는지
 };
 
 /** 셀 한 칸의 글 → 상태. 운영진이 자유롭게 적으므로 키워드로 판단하고, 모르는 글은 "기타"로 두고 원문을 보여준다 */

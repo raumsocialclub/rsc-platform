@@ -190,3 +190,32 @@ describe("변경 기록 (crm_call_events)", () => {
     expect(same.events).toHaveLength(1);
   });
 });
+
+describe("시트 읽기 (Apps Script 응답)", () => {
+  const ok = (body: unknown) => vi.fn(async () => new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } }));
+  beforeEach(() => {
+    process.env.CRM_SHEET_URL = "https://script.example/macros/s/x/exec";
+    process.env.CRM_SHEET_TOKEN = "test-token";
+  });
+  it("셀 노트를 버리지 않고 파서까지 전달하며, 개수를 센다", async () => {
+    vi.stubGlobal("fetch", ok({ ok: true, version: 2, url: "https://docs.google.com/x", tabs: [{ name: "웹", rows: [HEAD, row({ id: "a", full_name: "가상", phone_number: "010-0000-0009" })], notes: [[1, 14, "1:1 관심"], [1, 17, "평일 저녁"], ["x", 0, "깨진 값"], [2, 0, "   "]] }] }));
+    const { fetchSheetTabs } = await import("@/lib/crm/sheet");
+    const r = await fetchSheetTabs();
+    expect(r.notesSupported).toBe(true);
+    expect(r.noteCount).toBe(2);
+    expect(r.scriptVersion).toBe(2);
+    expect(parseTabs(r.tabs)[0].note).toBe("1:1 관심\n평일 저녁");
+    const u = new URL((vi.mocked(fetch).mock.calls[0][0] as URL).toString());
+    expect(u.searchParams.get("token")).toBe("test-token");
+    vi.unstubAllGlobals();
+  });
+  it("구버전 스크립트(notes 칸 없음)는 notesSupported=false 로 알려 준다", async () => {
+    vi.stubGlobal("fetch", ok({ ok: true, tabs: [{ name: "웹", rows: [HEAD] }] }));
+    const { fetchSheetTabs } = await import("@/lib/crm/sheet");
+    const r = await fetchSheetTabs();
+    expect(r.notesSupported).toBe(false);
+    expect(r.noteCount).toBe(0);
+    expect(r.scriptVersion).toBe(1);
+    vi.unstubAllGlobals();
+  });
+});

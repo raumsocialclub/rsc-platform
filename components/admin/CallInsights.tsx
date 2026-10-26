@@ -30,7 +30,7 @@ export function CallInsights({ r }: { r: InsightReport }) {
         {sel && <button type="button" onClick={() => setSel(null)} className="text-[12.5px] underline bg-transparent border-0 cursor-pointer text-brown">「{sel.tag}」 필터 해제</button>}
       </div>
       {r.interviewed === 0 ? (
-        <div className={`${CARD} p-[22px] text-[13px] text-[rgba(33,30,25,.55)]`}>아직 인터뷰 노트가 없습니다. 시트의 콜 결과 칸에 노트(마우스 오른쪽 → 메모 삽입)로 상담 내용을 적으면 여기에 주제별로 모입니다. Apps Script 를 노트까지 읽는 새 버전으로 다시 배포했는지도 확인해 주세요.</div>
+        <div className={`${CARD} p-[22px] text-[13px] text-[rgba(33,30,25,.55)]`}>아직 인터뷰 노트가 없습니다. 시트의 콜 결과 칸에 노트(마우스 오른쪽 → 메모 삽입)로 상담 내용을 적으면 여기에 주제별로 모입니다. 「댓글」(말풍선에 이름이 붙는 것)은 읽지 못하니 「메모」로 적어 주세요. 위 「셀 노트 N개 수신」 숫자로 들어오는지 확인할 수 있습니다.</div>
       ) : (
         <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-[16px]">
           <div className="grid grid-cols-1 min-[761px]:grid-cols-2 gap-[12px] content-start">

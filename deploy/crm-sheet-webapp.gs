@@ -26,7 +26,8 @@ function doGet(e) {
       }
       return { name: s.getName(), rows: rows, notes: notes };
     });
-  return json_({ ok: true, url: ss.getUrl(), updatedAt: new Date().toISOString(), tabs: tabs });
+  // version: 어드민이 "새 버전으로 배포됐는지" 알아보는 표시. 스크립트를 고치면 숫자를 올린다
+  return json_({ ok: true, version: 2, url: ss.getUrl(), updatedAt: new Date().toISOString(), tabs: tabs });
 }
 
 function json_(obj) {

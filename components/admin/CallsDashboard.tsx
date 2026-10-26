@@ -95,8 +95,15 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
           <label className="flex items-center gap-[6px] cursor-pointer"><input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} className="accent-brown" />30초마다 자동 갱신</label>
           <button type="button" onClick={() => void refresh()} disabled={busy} className={BTN_SECONDARY}>{busy ? "읽는 중…" : "지금 새로고침"}</button>
           {data?.sheetUrl && <a href={data.sheetUrl} target="_blank" rel="noreferrer" className={BTN_SECONDARY}>시트 열기 ↗</a>}
+          {data && <span className="text-[rgba(33,30,25,.55)]">{data.sheet.notesSupported ? `셀 노트 ${data.sheet.noteCount}개 수신` : "셀 노트 미수신"}</span>}
         </div>
       </PageTitle>
+
+      {data && !data.sheet.notesSupported && (
+        <div className="mb-[18px] rounded-[10px] border border-[#e0b96a] bg-[#fff7e3] px-[16px] py-[12px] text-[13px] text-[#6b4a00]">
+          <b>Apps Script 가 구버전이라 셀 노트(노란 말풍선)를 받지 못하고 있습니다.</b> 시트 → 확장 프로그램 → Apps Script 에서 <code>deploy/crm-sheet-webapp.gs</code> 최신 내용을 붙여 넣고 저장한 뒤, 배포 → 배포 관리 → 연필 → 버전 「새 버전」 → 배포를 누르면 (주소는 그대로) 다음 갱신부터 노트가 들어옵니다.
+        </div>
+      )}
 
       {error && (
         <div className="mb-[20px] px-[18px] py-[14px] text-[13px]" style={{ background: "rgba(163,64,44,.08)", color: "#a3402c", border: "1px solid rgba(163,64,44,.25)" }}>
