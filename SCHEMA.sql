@@ -543,6 +543,32 @@ alter table popups enable row level security;
 create policy "popups public read" on popups for select using ((active and (starts_at is null or starts_at <= now()) and (ends_at is null or ends_at >= now())) or is_admin());
 create policy "popups admin write" on popups for all using (is_admin()) with check (is_admin());
 
+-- ---------- M18: 콜 현황 대시보드 — 구글 시트(CRM)의 1차·2차·3차 콜 결과와 인터뷰 메모를 /admin/calls 에서 실시간으로 본다.
+-- 시트는 Apps Script 웹앱(deploy/crm-sheet-webapp.gs)으로 읽고, 여기에는 "바뀐 칸" 만 남긴다. 이름·전화 등 개인정보는 저장하지 않는다(키는 시트 id 또는 전화 해시).
+create table crm_call_state (
+  lead_key text primary key,                  -- '<탭>|<시트 id>' 또는 '<탭>|p:<전화 sha256 앞 16자>'
+  tab text not null,
+  calls jsonb not null default '[]',          -- ["1차 셀","2차 셀","3차 셀"] 마지막으로 본 값
+  memo text not null default '',
+  first_seen_at timestamptz not null default now(),
+  changed_at timestamptz not null default now()
+);
+create table crm_call_events (
+  id bigserial primary key,
+  lead_key text not null,
+  tab text not null,
+  field text not null check (field in ('call1', 'call2', 'call3', 'memo', 'new')),
+  "before" text not null default '',
+  "after" text not null default '',
+  at timestamptz not null default now()
+);
+create index crm_call_events_at_idx on crm_call_events(at desc);
+alter table crm_call_state enable row level security;
+alter table crm_call_events enable row level security;
+create policy "crm call state admin" on crm_call_state for all using (is_admin()) with check (is_admin());
+create policy "crm call events admin" on crm_call_events for all using (is_admin()) with check (is_admin());
+-- 이벤트는 앱이 읽을 때마다 30일 지난 것을 지운다 (lib/crm/events.ts)
+
 -- ---------- M12: 관리자 관리 — 주관리자(owner)가 부관리자(admin) 초대. 링크 토큰은 해시만 저장, 48시간, 1회용
 -- (members.role 에 'owner' 추가, members.last_login_at, is_admin/is_owner, handle_new_user 의 admin_invite 경로는 위에 반영)
 create table admin_invites (

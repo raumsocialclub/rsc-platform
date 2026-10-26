@@ -50,6 +50,8 @@ NEXT_PUBLIC_SITE_URL=https://rsc-platform.vercel.app   # Production. Preview(스
 NEXT_PUBLIC_APP_ENV=production     # Preview 에는 staging (화면 상단 STAGING 띠)
 NEXT_PUBLIC_SENTRY_DSN=            # Sentry (M13). 4-6 참고
 VERCEL_DEPLOY_HOOK_PRODUCTION=     # Vercel 이 아니라 GitHub → Settings → Secrets 에 넣는 값 (4-5)
+CRM_SHEET_URL=                     # 콜 현황(M18): 구글 시트 Apps Script 웹앱 주소 (4-4)
+CRM_SHEET_TOKEN=                   # 서버 전용. Apps Script 스크립트 속성 TOKEN 과 같은 값
 ```
 
 ## 4. Vercel 배포
@@ -72,6 +74,16 @@ VERCEL_DEPLOY_HOOK_PRODUCTION=     # Vercel 이 아니라 GitHub → Settings �
 - **네이버 서치어드바이저**: searchadvisor.naver.com → 웹마스터 도구 → 사이트 등록 `https://도메인` → **HTML 태그** → `content="…"` 값 복사 → 어드민 네이버 칸에 저장 → 소유확인 → 요청 → 사이트맵 제출 `https://도메인/sitemap.xml`, 검증 → robots.txt 검증
 - **오픈 때**: 어드민 SEO 설정 → 검색 노출 켜기 → 저장. 이후 서치콘솔·서치어드바이저에서 색인 요청.
 - 확인 주소: `/robots.txt` `/sitemap.xml` `/llms.txt`. 공유 미리보기 확인: 카카오톡 채팅창에 주소 붙여넣기(캐시가 남으면 developers.kakao.com/tool/debugger/sharing 에서 초기화)
+
+## 4-4. 콜 현황 대시보드 — 구글 시트 연결 (M18)
+어드민 **콜 현황**(`/admin/calls`)은 CRM 구글 시트(「라움소셜클럽 DB 광고」)의 모든 탭을 읽어 1차·2차·3차 콜 결과(부재중·없는 번호·통화완료·재통화 시간 등)와 인터뷰 메모를 한 화면에 보여주고 30초마다 갱신한다. 시트는 바꾸지 않는다. 한 번만 연결하면 된다:
+1. 구글 시트 → **확장 프로그램 → Apps Script** → 편집기에 있는 내용을 지우고 저장소의 `deploy/crm-sheet-webapp.gs` 내용 전체를 붙여 넣기 → 저장(💾)
+2. 비밀 토큰을 하나 정한다(영문·숫자 24자 이상, 예: 비밀번호 생성기). 왼쪽 톱니바퀴(**프로젝트 설정**) → 아래 **스크립트 속성** → 「스크립트 속성 추가」 → 속성 `TOKEN`, 값에 그 토큰 → 저장. 같은 값을 Vercel → Settings → Environment Variables → `CRM_SHEET_TOKEN` (Production·Preview, Sensitive) 에도 넣는다. 토큰은 채팅으로 주고받지 않는다
+3. 오른쪽 위 **배포 → 새 배포** → 유형 선택(톱니) **웹 앱** → 실행 사용자 **나**, 액세스 권한 **모든 사용자** → 배포 → 권한 허용(구글 계정 선택 → 고급 → 이동 → 허용) → **웹 앱 URL** 복사 (`https://script.google.com/macros/s/…/exec`)
+4. Vercel → Settings → Environment Variables → `CRM_SHEET_URL` 에 그 URL 저장(Production·Preview) → 재배포. (URL 은 비밀이 아니므로 Claude 에게 알려주면 대신 넣고 배포한다)
+5. 확인: `/admin/calls` 에 시트 탭별 집계가 보이면 끝. 스크립트를 고친 뒤에는 **배포 → 배포 관리 → 새 버전** 으로 다시 배포해야 반영된다
+- 보안: 웹앱은 「모든 사용자」 접근이지만 `TOKEN` 이 맞을 때만 데이터를 준다. 토큰을 바꾸려면 Vercel 값과 스크립트 속성 값을 같이 바꾼다. 개인정보(이름·전화)는 우리 DB 에 저장하지 않고 화면에만 보여준다(변경 기록 `crm_call_events` 는 키·상태만).
+- 상태 분류 규칙(`lib/crm/types.ts`): 셀에 「통화완료」→ 통화완료, 「부재」→ 부재중, 「없는 번호/결번」→ 없는 번호, 「거절/보류」→ 거절·보류, 「2시/230/14:00/문자/재통화」→ 재통화 예정, 그 밖의 글은 「기타」로 두고 원문을 보여준다. (2026-10-26 운영 DB 에 `crm_call_state`·`crm_call_events` 적용됨)
 
 ## 4-3. 관리자 계정 (M12)
 - 주관리자(owner)는 DB 에서 한 번만 지정: Supabase SQL Editor → `update members set role = 'owner' where lower(email) = '<이메일>';` (현재 nse101@kakao.com)

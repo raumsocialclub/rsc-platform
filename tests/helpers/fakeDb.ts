@@ -1,5 +1,5 @@
 /**
- * Supabase 쿼리 빌더 흉내. 테이블별 행 배열을 주면 select/eq/in/is/ilike/order/limit/maybeSingle/single 과
+ * Supabase 쿼리 빌더 흉내. 테이블별 행 배열을 주면 select/eq/in/is/ilike/gte/lt/order/limit/maybeSingle/single 과
  * insert/update/upsert/delete 를 처리하고, 쓰기 호출은 calls 에 기록한다. 테스트 전용.
  */
 type Row = Record<string, unknown>;
@@ -30,6 +30,7 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
           if (op === "is") return x === v || (v === null && x === undefined);
           if (op === "ilike") return String(x ?? "").toLowerCase() === String(v).toLowerCase();
           if (op === "gte") return (x as number) >= (v as number);
+          if (op === "lt") return (x as number) < (v as number);
           return true;
         }),
       );
@@ -44,11 +45,13 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
           return { data: single ? inserted[0] : inserted, error: null, count: null };
         }
         if (pending.op === "upsert") {
-          const it = pending.payload as Row;
-          const key = Object.keys(it).find((k) => k.endsWith("_key")) ?? "id";
-          const idx = rows().findIndex((r) => r[key] === it[key]);
-          if (idx >= 0) rows()[idx] = { ...rows()[idx], ...it };
-          else rows().push({ id: it.id ?? `id-${rows().length + 1}`, ...it });
+          const items = Array.isArray(pending.payload) ? (pending.payload as Row[]) : [pending.payload as Row];
+          for (const it of items) {
+            const key = Object.keys(it).find((k) => k.endsWith("_key")) ?? "id";
+            const idx = rows().findIndex((r) => r[key] === it[key]);
+            if (idx >= 0) rows()[idx] = { ...rows()[idx], ...it };
+            else rows().push({ id: it.id ?? `id-${rows().length + 1}`, ...it });
+          }
           return { data: null, error: null, count: null };
         }
         if (pending.op === "update") {
@@ -79,6 +82,7 @@ export function fakeDb(seed: Record<string, Row[]> = {}) {
       is: chain((col: unknown, v: unknown) => { filters.push(["is", col as string, v]); }),
       ilike: chain((col: unknown, v: unknown) => { filters.push(["ilike", col as string, v]); }),
       gte: chain((col: unknown, v: unknown) => { filters.push(["gte", col as string, v]); }),
+      lt: chain((col: unknown, v: unknown) => { filters.push(["lt", col as string, v]); }),
       order: chain(() => {}),
       limit: chain((n: unknown) => { limitN = n as number; }),
       range: chain((a: unknown, b: unknown) => { rangeFrom = a as number; limitN = (b as number) - (a as number) + 1; }),

@@ -1,0 +1,31 @@
+import { requireEnv } from "@/lib/supabase/env";
+import type { SheetTab } from "./parse";
+
+/**
+ * 구글 시트는 Apps Script 웹앱(deploy/crm-sheet-webapp.gs)으로 읽는다. SETUP.md 4-4.
+ * CRM_SHEET_URL  = 웹앱 배포 주소 (…/exec)
+ * CRM_SHEET_TOKEN = 스크립트 속성 TOKEN 과 같은 값 (서버 전용)
+ */
+export function crmConfigured(): boolean {
+  return !!(process.env.CRM_SHEET_URL && process.env.CRM_SHEET_TOKEN);
+}
+
+type WebAppJson = { ok?: boolean; message?: string; url?: unknown; tabs?: unknown };
+
+export async function fetchSheetTabs(): Promise<{ tabs: SheetTab[]; url: string | null }> {
+  const u = new URL(requireEnv("CRM_SHEET_URL"));
+  u.searchParams.set("token", requireEnv("CRM_SHEET_TOKEN"));
+  const res = await fetch(u, { cache: "no-store", redirect: "follow", signal: AbortSignal.timeout(20_000) });
+  if (!res.ok) throw new Error(`시트에서 ${res.status} 응답이 왔습니다. 웹앱 배포 주소(CRM_SHEET_URL)를 확인해 주세요.`);
+  const json = (await res.json().catch(() => null)) as WebAppJson | null;
+  if (!json) throw new Error("시트 응답을 읽지 못했습니다. Apps Script 배포가 「모든 사용자」 접근으로 되어 있는지 확인해 주세요.");
+  if (!json.ok) throw new Error(json.message === "unauthorized" ? "시트 토큰이 맞지 않습니다. Apps Script 스크립트 속성 TOKEN 과 Vercel 의 CRM_SHEET_TOKEN 이 같은지 확인해 주세요." : "시트 응답 형식이 올바르지 않습니다.");
+  const tabs: SheetTab[] = Array.isArray(json.tabs)
+    ? (json.tabs as unknown[]).map((t) => {
+        const o = (t ?? {}) as { name?: unknown; rows?: unknown };
+        const rows = Array.isArray(o.rows) ? (o.rows as unknown[]).map((r) => (Array.isArray(r) ? r.map((c) => (c == null ? "" : String(c))) : [])) : [];
+        return { name: String(o.name ?? ""), rows };
+      })
+    : [];
+  return { tabs, url: typeof json.url === "string" ? json.url : null };
+}
