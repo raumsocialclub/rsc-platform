@@ -18,8 +18,9 @@
  *     처음 한 번, CRM관리가 수식으로 차 있으면 백업 탭(CRM관리_백업_날짜)을 만든 뒤 그 시점 값으로 굳힌다.
  *  v6 (2026-10-27): 백업을 탭 복사 대신 값 복사로 (5,000행 수식 탭 복사가 몇 분 걸리다 실패하던 것)
  *  v7 (2026-10-27): syncCrmNow 도 잠금 사용(1분 자동 작업과 겹침 방지). 겹쳐서 두 번 들어간 신청은 손 입력 없는 복사본만 자동 제거
+ *  v8 (2026-10-27): 깨진 행 자가 복구(healCrm_) — #REF! 행 제거, 날짜 숫자(46321) 복원, 현재 상태 수식 복구, 계산 칸을 원본 기준으로 맞춤
  */
-var VERSION = 7;
+var VERSION = 8;
 var SRC_TAB = "DB추출용";   // 홈페이지·메타 CSV 를 누적하는 원본 (A~N: id … phone_number)
 var CRM_TAB = "CRM관리";    // CRM 팀이 상태를 적는 한 장
 var CRM_HEAD = ["수집일", "수집 채널", "이름", "전화번호", "현재 상태", "1차 콜 · 입력", "2차 콜 · 입력", "3차 콜 · 입력", "상담 메모 · 입력", "방문경로", "신청폼", "중복 / 재신청", "추출용 행", "신청 ID"];
@@ -89,6 +90,24 @@ function syncCrm() {
   var S = { id: col("id"), created: col("created_time"), formId: col("form_id"), form: col("form_name"), platform: col("platform"), name: col("full_name"), phone: col("phone_number") };
   if (S.phone < 0 && S.name < 0) return;
 
+  // 원본 행 → 계산 칸 (수집일·채널·이름·전화 / 방문경로·신청폼·추출용 행·신청 ID)
+  var srcByKey = {};
+  for (var q = 1; q < sv.length; q++) {
+    var w = sv[q];
+    var qid = S.id >= 0 ? String(w[S.id]).trim() : "";
+    var qphone = S.phone >= 0 ? String(w[S.phone]).trim() : "";
+    var qkey = keyOf_(qid, qphone);
+    if (!qkey || srcByKey[qkey]) continue;
+    var qformId = S.formId >= 0 ? String(w[S.formId]).trim() : "";
+    var qform = S.form >= 0 ? String(w[S.form]).trim() : "";
+    var qplat = S.platform >= 0 ? String(w[S.platform]).trim().toLowerCase() : "";
+    srcByKey[qkey] = {
+      head: [kstDay_(S.created >= 0 ? w[S.created] : ""), channelOf_(qid, qformId, qform), S.name >= 0 ? w[S.name] : "", qphone],
+      tail: [qplat === "ig" ? "인스타그램" : qplat === "fb" ? "페이스북" : qplat, qform, null, q + 1, qid] // null = 중복/재신청 칸은 건드리지 않음
+    };
+  }
+  healCrm_(crm, srcByKey);
+
   var cv = crm.getDataRange().getDisplayValues();
   var crmLast = cv.length;
   while (crmLast > 1 && cv[crmLast - 1].every(function (c) { return c === ""; })) crmLast--;
@@ -129,9 +148,51 @@ function syncCrm() {
   crm.getRange(start, 1, add.length, CRM_HEAD.length).setValues(add);
   // E열(현재 상태): 3차 → 2차 → 1차 순으로 마지막에 적힌 것
   var f = [];
-  for (var j = 0; j < add.length; j++) f.push(['=IF(RC[3]<>"",RC[3],IF(RC[2]<>"",RC[2],RC[1]))']);
+  for (var j = 0; j < add.length; j++) f.push([STATUS_FORMULA]);
   crm.getRange(start, CRM_COL.status + 1, add.length, 1).setFormulasR1C1(f);
   console.log("CRM관리에 " + add.length + "행 추가 (DB추출용 " + (sv.length - 1) + "행 / CRM관리 " + (crmLast - 1 + add.length) + "행)");
+}
+
+var STATUS_FORMULA = '=IF(RC[3]<>"",RC[3],IF(RC[2]<>"",RC[2],RC[1]))';
+var isErr_ = function (v) { return /^#(REF|N\/A|VALUE|NAME|DIV\/0|NUM|ERROR)/.test(String(v || "")); };
+
+/**
+ * 깨진 행 자가 복구 (매번 실행, 바뀐 칸만 쓴다). 손 입력(F~I)과 셀 노트는 절대 건드리지 않는다.
+ *  - 모든 칸이 #REF! 같은 오류인 행(손 입력 없음)은 지운다
+ *  - 원본(DB추출용)에 있는 신청은 수집일·채널·이름·전화·방문경로·신청폼·추출용 행·신청 ID 를 원본 기준으로 맞춘다 (46321 같은 날짜 숫자도 복원)
+ *  - 현재 상태(E)는 행마다 수식이어야 한다 — 값으로 굳어 있으면("미연락" 등) 수식으로 되돌린다
+ */
+function healCrm_(crm, srcByKey) {
+  var cv = crm.getDataRange().getDisplayValues();
+  var last = cv.length;
+  while (last > 1 && cv[last - 1].every(function (c) { return c === ""; })) last--;
+  if (last < 2) return;
+  var fixed = 0;
+  var drop = [];
+  for (var i = 1; i < last; i++) {
+    var row = cv[i];
+    var manual = [row[CRM_COL.c1], row[CRM_COL.c2], row[CRM_COL.c3], row[CRM_COL.memo]].some(function (x) { return String(x || "").trim() !== ""; });
+    var allErr = [row[CRM_COL.date], row[CRM_COL.name], row[CRM_COL.phone], row[CRM_COL.id]].every(function (x) { return isErr_(x) || String(x || "").trim() === ""; }) && isErr_(row[CRM_COL.id]);
+    if (allErr && !manual) {
+      var notes = crm.getRange(i + 1, 1, 1, CRM_HEAD.length).getNotes()[0];
+      if (!notes.some(function (n) { return n; })) { drop.push(i + 1); continue; }
+    }
+    var src = srcByKey[keyOf_(row[CRM_COL.id], row[CRM_COL.phone])];
+    if (!src) continue;
+    var head = [row[CRM_COL.date], row[CRM_COL.channel], row[CRM_COL.name], row[CRM_COL.phone]];
+    if (String(head.join("\u0001")) !== String(src.head.join("\u0001"))) { crm.getRange(i + 1, 1, 1, 4).setValues([src.head]); fixed++; }
+    var tailNow = [row[CRM_COL.platform], row[CRM_COL.form], row[CRM_COL.dup], row[CRM_COL.srcRow], row[CRM_COL.id]];
+    var tailNew = src.tail.map(function (v, j) { return v === null ? (isErr_(tailNow[j]) ? "" : tailNow[j]) : v; });
+    if (String(tailNow.join("\u0001")) !== String(tailNew.join("\u0001"))) { crm.getRange(i + 1, CRM_COL.platform + 1, 1, 5).setValues([tailNew]); fixed++; }
+  }
+  // E열 수식 복구
+  var ef = crm.getRange(2, CRM_COL.status + 1, last - 1, 1).getFormulasR1C1();
+  var norm = function (f) { return String(f || "").replace(/\s/g, "").toUpperCase(); };
+  var fixE = 0;
+  for (var e = 0; e < ef.length; e++) if (norm(ef[e][0]) !== norm(STATUS_FORMULA)) fixE++;
+  if (fixE) { var fs = []; for (var x = 0; x < last - 1; x++) fs.push([STATUS_FORMULA]); crm.getRange(2, CRM_COL.status + 1, last - 1, 1).setFormulasR1C1(fs); } // 한 번에
+  for (var d = drop.length - 1; d >= 0; d--) crm.deleteRow(drop[d]);
+  if (fixed || fixE || drop.length) console.log("CRM관리 복구: 칸 " + fixed + "곳 · 상태 수식 " + fixE + "행 · 오류 행 " + drop.length + "개 제거");
 }
 
 /**
@@ -183,7 +244,7 @@ function takeOverCrm_(ss, crm) {
   crm.getRange(1, 1, last, vals[0].length).setValues(snapshot);
   if (last > 1) {
     var f = [];
-    for (var j = 0; j < last - 1; j++) f.push(['=IF(RC[3]<>"",RC[3],IF(RC[2]<>"",RC[2],RC[1]))']);
+    for (var j = 0; j < last - 1; j++) f.push([STATUS_FORMULA]);
     crm.getRange(2, CRM_COL.status + 1, last - 1, 1).setFormulasR1C1(f);
   }
   console.log("CRM관리를 값으로 굳혔습니다 (백업: " + CRM_TAB + "_백업_" + stamp + ")");
