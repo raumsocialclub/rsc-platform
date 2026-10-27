@@ -19,8 +19,9 @@
  *  v6 (2026-10-27): 백업을 탭 복사 대신 값 복사로 (5,000행 수식 탭 복사가 몇 분 걸리다 실패하던 것)
  *  v7 (2026-10-27): syncCrmNow 도 잠금 사용(1분 자동 작업과 겹침 방지). 겹쳐서 두 번 들어간 신청은 손 입력 없는 복사본만 자동 제거
  *  v8 (2026-10-27): 깨진 행 자가 복구(healCrm_) — #REF! 행 제거, 날짜 숫자(46321) 복원, 현재 상태 수식 복구, 계산 칸을 원본 기준으로 맞춤
+ *  v9 (2026-10-27): 전화번호가 두 번 이상이면 CRM관리 D열·DB추출용 phone_number 열을 주황색으로 (조건부 서식)
  */
-var VERSION = 8;
+var VERSION = 9;
 var SRC_TAB = "DB추출용";   // 홈페이지·메타 CSV 를 누적하는 원본 (A~N: id … phone_number)
 var CRM_TAB = "CRM관리";    // CRM 팀이 상태를 적는 한 장
 var CRM_HEAD = ["수집일", "수집 채널", "이름", "전화번호", "현재 상태", "1차 콜 · 입력", "2차 콜 · 입력", "3차 콜 · 입력", "상담 메모 · 입력", "방문경로", "신청폼", "중복 / 재신청", "추출용 행", "신청 ID"];
@@ -50,6 +51,7 @@ function refreshCache() {
   if (!lock.tryLock(5000)) return; // 앞 작업이 아직 읽는 중이면 이번 회차는 건너뜀
   try {
     try { syncCrm(); } catch (err) { console.error("syncCrm 실패: " + err); } // 동기화가 실패해도 어드민 캐시는 채운다
+    try { markDuplicatePhones_(); } catch (err2) { console.error("중복 표시 실패: " + err2); }
     writeCache_(buildJson_("cache"));
   } finally {
     lock.releaseLock();
@@ -62,8 +64,9 @@ function syncCrmNow() {
   lock.waitLock(60000);
   try {
     syncCrm();
+    markDuplicatePhones_();
     writeCache_(buildJson_("cache"));
-    Logger.log("완료: CRM관리 동기화 + 캐시 갱신");
+    Logger.log("완료: CRM관리 동기화 + 중복 전화 표시 + 캐시 갱신");
   } finally {
     lock.releaseLock();
   }
@@ -248,6 +251,49 @@ function takeOverCrm_(ss, crm) {
     crm.getRange(2, CRM_COL.status + 1, last - 1, 1).setFormulasR1C1(f);
   }
   console.log("CRM관리를 값으로 굳혔습니다 (백업: " + CRM_TAB + "_백업_" + stamp + ")");
+}
+
+/**
+ * 전화번호가 두 번 이상 나오면 그 칸을 전부 주황색으로 (조건부 서식). CRM관리 D열과 DB추출용 phone_number 열.
+ * 규칙이 이미 있으면 다시 만들지 않는다. 하이픈 유무가 달라도 같은 번호로 본다.
+ */
+var DUP_BG = "#FCE8B2";
+var DUP_FG = "#9C4A00";
+function markDuplicatePhones_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var crm = ss.getSheetByName(CRM_TAB);
+  if (crm) dupRule_(crm, CRM_COL.phone + 1);
+  var src = ss.getSheetByName(SRC_TAB);
+  if (src && src.getLastRow() > 0) {
+    var head = src.getRange(1, 1, 1, src.getLastColumn()).getDisplayValues()[0].map(function (h) { return String(h).trim().toLowerCase(); });
+    var pc = head.indexOf("phone_number");
+    if (pc >= 0) dupRule_(src, pc + 1);
+  }
+}
+function dupRule_(sheet, col) {
+  var letter = colLetter_(col);
+  // 같은 글자의 번호가 둘 이상이면 (CSV 는 010-1234-5678 꼴로 일정하다. 가볍게 두려고 숫자만 비교하는 식은 쓰지 않는다)
+  var formula = '=AND($' + letter + '2<>"",COUNTIF($' + letter + '$2:$' + letter + ',$' + letter + '2)>1)';
+  var rules = sheet.getConditionalFormatRules();
+  for (var i = 0; i < rules.length; i++) {
+    var bc = rules[i].getBooleanCondition();
+    if (bc && bc.getCriteriaValues().some(function (v) { return String(v).indexOf("COUNTIF($" + letter + "$2:$" + letter) >= 0; })) return; // 이미 있음
+  }
+  var rule = SpreadsheetApp.newConditionalFormatRule()
+    .whenFormulaSatisfied(formula)
+    .setBackground(DUP_BG)
+    .setFontColor(DUP_FG)
+    .setBold(true)
+    .setRanges([sheet.getRange(2, col, Math.max(1, sheet.getMaxRows() - 1), 1)])
+    .build();
+  rules.push(rule);
+  sheet.setConditionalFormatRules(rules);
+  console.log(sheet.getName() + " " + letter + "열에 중복 전화 표시 규칙 추가");
+}
+function colLetter_(col) {
+  var s = "";
+  while (col > 0) { var m = (col - 1) % 26; s = String.fromCharCode(65 + m) + s; col = Math.floor((col - 1) / 26); }
+  return s;
 }
 
 function keyOf_(id, phone) {
