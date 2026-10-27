@@ -347,3 +347,29 @@ describe("CRM관리 탭 (상태 입력 한 장) 연동", () => {
     expect(k).toMatchObject({ calls: ["부재중", "통화완료", ""], status: "done", attempts: 2 });
   });
 });
+
+describe("CRM관리 셀 노트 → 니즈 분석 (스크린샷 문장, 가상 데이터)", () => {
+  const CRM_HEAD = ["수집일", "수집 채널", "이름", "전화번호", "현재 상태", "1차 콜 · 입력", "2차 콜 · 입력", "3차 콜 · 입력", "상담 메모 · 입력", "방문경로", "신청폼", "중복 / 재신청", "추출용 행", "신청 ID"];
+  const NOTE = "- 싱글 커뮤니티\n- 인맥형성 / 이성만남\n- 평일 일정 조율 가능\n- 와인 등 관심\n- 타업체 이용 경험 없음\n- 금액은 융통성\n- 79년생 여성\n- 런칭시 연락 바람 (할인)";
+  it("상담 메모 칸(I열)에 붙인 노트가 사람에게 붙고, 마스터 탭 행과 합쳐져도 남는다", () => {
+    const r = buildLeads([
+      tab("DB추출용", [row({ id: "l:9", created_time: "2026-10-24T10:00:00+09:00", form_id: "f:1", full_name: "가상L", phone_number: "010-7000-0012" })]),
+      { name: "CRM관리", rows: [CRM_HEAD, ["2026-10-24", "메타", "가상L", "010-7000-0012", "통화완료", "통화완료", "", "", "런칭 연락", "인스타그램", "라움소셜클럽 파운딩 멤버신청", "신규", "2", "l:9"]], notes: [[1, 8, NOTE]] },
+    ]);
+    expect(r.leads).toHaveLength(1);
+    expect(r.leads[0].note).toBe(NOTE);
+    expect(r.leads[0].memo).toBe("런칭 연락");
+    const ins = analyzeInsights(r.leads);
+    expect(ins.interviewed).toBe(1);
+    const tags = ins.customers[0].tags.map((t) => t.tag);
+    expect(tags).toEqual(expect.arrayContaining(["싱글 커뮤니티", "인맥·비즈니스", "이성 만남", "평일", "일정 조율 가능", "와인·미식", "결정사 경험 없음", "금액 무관·유연", "여성", "40대", "런칭 때 연락", "할인 요청"]));
+    expect(tags).not.toContain("결정사 이용 중·경험 있음");
+    expect(ins.customers[0].untagged).toEqual([]);
+  });
+  it("경험 표현: 타업체 이용 중 → 있음, 이용 경험 없음 → 없음, NN년생 → 나이대", () => {
+    expect(tagLine("타업체 이용 중").map((t) => t.tag)).toContain("결정사 이용 중·경험 있음");
+    expect(tagLine("이용 경험 없음").map((t) => t.tag)).toEqual(["결정사 경험 없음"]);
+    expect(tagLine("결정사는 처음").map((t) => t.tag)).toEqual(["결정사 경험 없음"]);
+    expect(tagLine("85년생 남성").map((t) => t.tag)).toEqual(expect.arrayContaining(["남성", `${Math.floor((new Date().getFullYear() - 1985) / 10) * 10}대`]));
+  });
+});

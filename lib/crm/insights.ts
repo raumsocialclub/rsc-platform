@@ -41,8 +41,9 @@ const RULES: Rule[] = [
   R("schedule", "저녁·퇴근 후", /저녁|퇴근|야간/),
   R("schedule", "낮·점심", /점심|오전|낮\s*시간/),
   R("schedule", "일정 조율 가능", /조율|유동|맞출\s*수|자유로/),
-  R("experience", "결정사 이용 중·경험 있음", /(결정사|결혼정보|듀오|가연|노블레스|바로연|선우)(?![^\n]*(없|안\s*해|미이용|처음))/),
-  R("experience", "결정사 경험 없음", /(결정사|결혼정보|듀오|가연|노블레스)[^\n]*(없|안\s*해|미이용|처음)/),
+  // 결정사·타업체 경험: 「결정사 이용 중」「타업체 이용 경험 없음」「이용 경험 없음」(인터뷰 맥락상 결정사 얘기) 모두 잡는다
+  R("experience", "결정사 이용 중·경험 있음", /(결정사|결혼정보|듀오|가연|노블레스|바로연|선우|타\s*업체|다른\s*업체|타사)(?![^\n]*(없|안\s*해|미이용|처음))/),
+  R("experience", "결정사 경험 없음", /(결정사|결혼정보|듀오|가연|노블레스|바로연|선우|타\s*업체|다른\s*업체|타사)[^\n]*(없|안\s*해|미이용|처음)|(이용|가입)\s*경험\s*(없|전무)|경험\s*없음/),
   R("budget", "금액 무관·유연", /(금액|가격|비용|회비|예산)[^\n]*(무관|상관\s*없|괜찮|부담\s*없|융통|문제\s*없|컨텐츠|콘텐츠|퀄리티)/),
   R("budget", "금액 부담·민감", /(금액|가격|비용|회비|예산)[^\n]*(부담|비싸|고민|어렵|저렴|적은)|(부담|비싸|고민|적은|저렴한|싼)\s*(금액|가격|비용)/),
   R("budget", "할인 요청", /할인|프로모션|얼리버드/),
@@ -71,8 +72,10 @@ export function tagLine(line: string): Tag[] {
   const out: Tag[] = [];
   for (const r of RULES) if (r.re.test(line)) out.push({ theme: r.theme, tag: r.tag });
   const age = line.match(/(\d{2})\s*(세|살)\b/) ?? line.match(/(\d{2})\s*(세|살)/);
+  const born = line.match(/(\d{2})\s*년생/); // 79년생 → 만 나이 대략 → 40대
   const decade = line.match(/([2-6]0)\s*대/);
   if (age) out.push({ theme: "profile", tag: `${Math.floor(Number(age[1]) / 10) * 10}대` });
+  else if (born) { const y = Number(born[1]); const full = y >= 30 ? 1900 + y : 2000 + y; const a = new Date().getFullYear() - full; if (a >= 18 && a < 80) out.push({ theme: "profile", tag: `${Math.floor(a / 10) * 10}대` }); }
   else if (decade) out.push({ theme: "profile", tag: `${decade[1]}대` });
   return out;
 }
