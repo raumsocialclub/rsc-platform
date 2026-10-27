@@ -373,3 +373,30 @@ describe("CRM관리 셀 노트 → 니즈 분석 (스크린샷 문장, 가상 �
     expect(tagLine("85년생 남성").map((t) => t.tag)).toEqual(expect.arrayContaining(["남성", `${Math.floor((new Date().getFullYear() - 1985) / 10) * 10}대`]));
   });
 });
+
+describe("시트가 느리거나 실패할 때 (loadCallsDataSafe)", () => {
+  beforeEach(() => {
+    process.env.CRM_SHEET_URL = "https://script.example/macros/s/x/exec";
+    process.env.CRM_SHEET_TOKEN = "test-token";
+    db.tables.crm_call_state = []; db.tables.crm_call_events = [];
+  });
+  it("한 번 성공한 뒤 실패하면 마지막 성공분을 stale 로 돌려주고 사정을 알린다", async () => {
+    const good = { ok: true, version: 3, tabs: [{ name: "DB추출용", rows: [HEAD, row({ id: "u1", created_time: "2026-10-25T10:00:00+09:00", form_id: "rsc-website", full_name: "가상M", phone_number: "010-7000-0013" })], notes: [] }] };
+    let calls = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => {
+      calls++;
+      if (calls === 1) return new Response(JSON.stringify(good), { status: 200, headers: { "content-type": "application/json" } });
+      const e = new Error("The operation was aborted due to timeout"); e.name = "TimeoutError"; throw e;
+    }));
+    const { loadCallsDataSafe } = await import("@/lib/crm/load");
+    const first = await loadCallsDataSafe();
+    expect(first.error).toBeNull();
+    expect(first.data?.leads.map((l) => l.name)).toEqual(["가상M"]);
+    const second = await loadCallsDataSafe();
+    expect(second.stale).toBe(true);
+    expect(second.data?.leads).toHaveLength(1);
+    expect(second.error).toContain("25초");
+    expect(second.error).toContain("v3");
+    vi.unstubAllGlobals();
+  });
+});

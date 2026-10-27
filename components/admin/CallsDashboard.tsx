@@ -51,10 +51,10 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
     setBusy(true);
     try {
       const res = await fetch("/api/admin/crm-calls", { cache: "no-store" });
-      const json = (await res.json().catch(() => null)) as CallsData | { ok: false; message?: string } | null;
+      const json = (await res.json().catch(() => null)) as (CallsData & { stale?: boolean; message?: string }) | { ok: false; message?: string } | null;
       if (!res.ok || !json || !json.ok) throw new Error((json && "message" in json && json.message) || "시트를 읽지 못했습니다.");
       setData(json);
-      setError(null);
+      setError(json.stale ? json.message ?? "시트를 읽지 못해 마지막 내용을 보여줍니다." : null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "시트를 읽지 못했습니다.");
     } finally {

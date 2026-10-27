@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { CallsDashboard } from "@/components/admin/CallsDashboard";
 import { CARD, PageTitle } from "@/components/admin/ui";
-import { loadCallsData } from "@/lib/crm/load";
+import { loadCallsDataSafe } from "@/lib/crm/load";
 import { crmConfigured } from "@/lib/crm/sheet";
-import type { CallsData } from "@/lib/crm/types";
 
 export const metadata: Metadata = { title: "콜 현황" };
+/** 시트(Apps Script) 응답을 최대 25초 기다리므로 서버 함수 한도를 넉넉히 */
+export const maxDuration = 30;
 
 /**
  * /admin/calls — 구글 시트(CRM)의 콜 결과·인터뷰 메모를 한 화면에 (M18).
@@ -14,15 +15,8 @@ export const metadata: Metadata = { title: "콜 현황" };
  */
 export default async function AdminCallsPage() {
   if (!crmConfigured()) return <SetupGuide />;
-  let initial: CallsData | null = null;
-  let error: string | null = null;
-  try {
-    initial = await loadCallsData();
-  } catch (e) {
-    console.error("[admin/calls]", e);
-    error = e instanceof Error ? e.message : "시트를 읽지 못했습니다.";
-  }
-  return <CallsDashboard initial={initial} initialError={error} />;
+  const { data, error } = await loadCallsDataSafe();
+  return <CallsDashboard initial={data} initialError={error} />;
 }
 
 function SetupGuide() {

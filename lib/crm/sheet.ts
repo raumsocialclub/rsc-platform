@@ -10,6 +10,9 @@ export function crmConfigured(): boolean {
   return !!(process.env.CRM_SHEET_URL && process.env.CRM_SHEET_TOKEN);
 }
 
+/** Apps Script 응답 대기 한도. 수식 탭을 건너뛰는 v3 스크립트면 보통 2~5초 */
+const FETCH_TIMEOUT_MS = 25_000;
+
 type WebAppJson = { ok?: boolean; message?: string; url?: unknown; tabs?: unknown; version?: unknown };
 
 /** 시트 읽기 결과. notesSupported 는 Apps Script 가 셀 노트를 보내는 새 버전인지 (구버전이면 notes 칸 자체가 없다) */
@@ -18,7 +21,12 @@ export type SheetFetch = { tabs: SheetTab[]; url: string | null; notesSupported:
 export async function fetchSheetTabs(): Promise<SheetFetch> {
   const u = new URL(requireEnv("CRM_SHEET_URL"));
   u.searchParams.set("token", requireEnv("CRM_SHEET_TOKEN"));
-  const res = await fetch(u, { cache: "no-store", redirect: "follow", signal: AbortSignal.timeout(20_000) });
+  const res = await fetch(u, { cache: "no-store", redirect: "follow", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }).catch((e: unknown) => {
+    if (e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError")) {
+      throw new Error(`시트 응답이 ${FETCH_TIMEOUT_MS / 1000}초를 넘었습니다. Apps Script 를 최신 버전(v3, 수식 탭 건너뛰기)으로 다시 배포하면 빨라집니다 — 시트 → 확장 프로그램 → Apps Script 에 deploy/crm-sheet-webapp.gs 를 붙여 넣고 배포 → 배포 관리 → 새 버전.`);
+    }
+    throw e;
+  });
   if (!res.ok) throw new Error(`시트에서 ${res.status} 응답이 왔습니다. 웹앱 배포 주소(CRM_SHEET_URL)를 확인해 주세요.`);
   const json = (await res.json().catch(() => null)) as WebAppJson | null;
   if (!json) throw new Error("시트 응답을 읽지 못했습니다. Apps Script 배포가 「모든 사용자」 접근으로 되어 있는지 확인해 주세요.");
