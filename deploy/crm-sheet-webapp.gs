@@ -20,8 +20,10 @@
  *  v7 (2026-10-27): syncCrmNow 도 잠금 사용(1분 자동 작업과 겹침 방지). 겹쳐서 두 번 들어간 신청은 손 입력 없는 복사본만 자동 제거
  *  v8 (2026-10-27): 깨진 행 자가 복구(healCrm_) — #REF! 행 제거, 날짜 숫자(46321) 복원, 현재 상태 수식 복구, 계산 칸을 원본 기준으로 맞춤
  *  v9 (2026-10-27): 전화번호가 두 번 이상이면 CRM관리 D열·DB추출용 phone_number 열을 주황색으로 (조건부 서식)
+ *  v10 (2026-10-27): CRM관리 가운데 빈 줄(옛 수식이 남긴 2~97행 같은 것)을 걷어 내 2행부터 바로 보이게. 전화번호를 010-0000-0000 모양으로
+ *     통일(메타 CSV 의 p:+8210… 도 같은 번호로 인식 → 재신청·중복 표시가 형식과 상관없이 맞음). 오류(#REF!) 행 제거를 한 번에 처리
  */
-var VERSION = 9;
+var VERSION = 10;
 var SRC_TAB = "DB추출용";   // 홈페이지·메타 CSV 를 누적하는 원본 (A~N: id … phone_number)
 var CRM_TAB = "CRM관리";    // CRM 팀이 상태를 적는 한 장
 var CRM_HEAD = ["수집일", "수집 채널", "이름", "전화번호", "현재 상태", "1차 콜 · 입력", "2차 콜 · 입력", "3차 콜 · 입력", "상담 메모 · 입력", "방문경로", "신청폼", "중복 / 재신청", "추출용 행", "신청 ID"];
@@ -105,7 +107,7 @@ function syncCrm() {
     var qform = S.form >= 0 ? String(w[S.form]).trim() : "";
     var qplat = S.platform >= 0 ? String(w[S.platform]).trim().toLowerCase() : "";
     srcByKey[qkey] = {
-      head: [kstDay_(S.created >= 0 ? w[S.created] : ""), channelOf_(qid, qformId, qform), S.name >= 0 ? w[S.name] : "", qphone],
+      head: [kstDay_(S.created >= 0 ? w[S.created] : ""), channelOf_(qid, qformId, qform), S.name >= 0 ? w[S.name] : "", prettyPhone_(qphone)],
       tail: [qplat === "ig" ? "인스타그램" : qplat === "fb" ? "페이스북" : qplat, qform, null, q + 1, qid] // null = 중복/재신청 칸은 건드리지 않음
     };
   }
@@ -141,7 +143,7 @@ function syncCrm() {
     if (d) { seenPhone[d] = before.concat([channel]); }
     var platform = S.platform >= 0 ? String(v[S.platform]).trim().toLowerCase() : "";
     add.push([
-      kstDay_(S.created >= 0 ? v[S.created] : ""), channel, S.name >= 0 ? v[S.name] : "", phone, "",
+      kstDay_(S.created >= 0 ? v[S.created] : ""), channel, S.name >= 0 ? v[S.name] : "", prettyPhone_(phone), "",
       "", "", "", "",
       platform === "ig" ? "인스타그램" : platform === "fb" ? "페이스북" : platform, form, dup, r + 1, id
     ]);
@@ -161,7 +163,7 @@ var isErr_ = function (v) { return /^#(REF|N\/A|VALUE|NAME|DIV\/0|NUM|ERROR)/.te
 
 /**
  * 깨진 행 자가 복구 (매번 실행, 바뀐 칸만 쓴다). 손 입력(F~I)과 셀 노트는 절대 건드리지 않는다.
- *  - 모든 칸이 #REF! 같은 오류인 행(손 입력 없음)은 지운다
+ *  - 모든 칸이 #REF! 같은 오류인 행, 완전히 빈 행(손 입력·노트 없음)은 지운다 → 데이터가 2행부터 이어진다
  *  - 원본(DB추출용)에 있는 신청은 수집일·채널·이름·전화·방문경로·신청폼·추출용 행·신청 ID 를 원본 기준으로 맞춘다 (46321 같은 날짜 숫자도 복원)
  *  - 현재 상태(E)는 행마다 수식이어야 한다 — 값으로 굳어 있으면("미연락" 등) 수식으로 되돌린다
  */
@@ -172,13 +174,17 @@ function healCrm_(crm, srcByKey) {
   if (last < 2) return;
   var fixed = 0;
   var drop = [];
+  var kept = 0;
+  var notesAll = crm.getRange(2, 1, last - 1, CRM_HEAD.length).getNotes(); // 한 번에 읽는다 (행마다 읽으면 느리다)
   for (var i = 1; i < last; i++) {
     var row = cv[i];
     var manual = [row[CRM_COL.c1], row[CRM_COL.c2], row[CRM_COL.c3], row[CRM_COL.memo]].some(function (x) { return String(x || "").trim() !== ""; });
+    var blank = row.every(function (x) { return String(x || "").trim() === ""; });
     var allErr = [row[CRM_COL.date], row[CRM_COL.name], row[CRM_COL.phone], row[CRM_COL.id]].every(function (x) { return isErr_(x) || String(x || "").trim() === ""; }) && isErr_(row[CRM_COL.id]);
-    if (allErr && !manual) {
-      var notes = crm.getRange(i + 1, 1, 1, CRM_HEAD.length).getNotes()[0];
-      if (!notes.some(function (n) { return n; })) { drop.push(i + 1); continue; }
+    if (blank || (allErr && !manual)) {
+      var hasNote = (notesAll[i - 1] || []).some(function (n) { return n; });
+      if (!hasNote) { drop.push(i + 1); continue; }
+      kept++;
     }
     var src = srcByKey[keyOf_(row[CRM_COL.id], row[CRM_COL.phone])];
     if (!src) continue;
@@ -194,8 +200,17 @@ function healCrm_(crm, srcByKey) {
   var fixE = 0;
   for (var e = 0; e < ef.length; e++) if (norm(ef[e][0]) !== norm(STATUS_FORMULA)) fixE++;
   if (fixE) { var fs = []; for (var x = 0; x < last - 1; x++) fs.push([STATUS_FORMULA]); crm.getRange(2, CRM_COL.status + 1, last - 1, 1).setFormulasR1C1(fs); } // 한 번에
-  for (var d = drop.length - 1; d >= 0; d--) crm.deleteRow(drop[d]);
-  if (fixed || fixE || drop.length) console.log("CRM관리 복구: 칸 " + fixed + "곳 · 상태 수식 " + fixE + "행 · 오류 행 " + drop.length + "개 제거");
+  deleteRows_(crm, drop);
+  if (fixed || fixE || drop.length || kept) console.log("CRM관리 복구: 칸 " + fixed + "곳 · 상태 수식 " + fixE + "행 · 빈 행·오류 행 " + drop.length + "개 제거" + (kept ? " · 노트가 있어 남긴 빈/오류 행 " + kept + "개" : ""));
+}
+
+/** 행 번호 목록(오름차순)을 아래에서부터, 이어진 구간은 한 번에 지운다 */
+function deleteRows_(sheet, rows) {
+  if (!rows.length) return;
+  var end = rows.length - 1;
+  for (var i = rows.length - 1; i >= 0; i--) {
+    if (i === 0 || rows[i - 1] !== rows[i] - 1) { sheet.deleteRows(rows[i], rows[end] - rows[i] + 1); end = i - 1; }
+  }
 }
 
 /**
@@ -217,7 +232,7 @@ function dedupeCrm_(crm) {
     if (notes.some(function (n) { return n; })) continue;
     drop.push(i + 1);
   }
-  for (var d = drop.length - 1; d >= 0; d--) crm.deleteRow(drop[d]);
+  deleteRows_(crm, drop);
   if (drop.length) console.log("CRM관리 중복 " + drop.length + "행 제거 (손 입력 없는 복사본만)");
 }
 
@@ -302,7 +317,19 @@ function keyOf_(id, phone) {
   var d = digits_(phone);
   return d ? "p:" + d : "";
 }
-function digits_(s) { return String(s || "").replace(/\D/g, ""); }
+/** 전화번호 → 숫자만. 국가번호(+82, p:+8210…)는 0 으로 바꿔 010-… 과 같은 번호로 본다 */
+function digits_(s) {
+  var d = String(s || "").replace(/\D/g, "");
+  if (/^82\d{9,10}$/.test(d)) d = "0" + d.slice(2);
+  return d;
+}
+/** 시트에 적는 전화번호 모양: 010-0000-0000 (11자리), 02-0000-0000 / 010-000-0000 (10자리). 그 밖엔 원래 글자 그대로 */
+function prettyPhone_(raw) {
+  var d = digits_(raw);
+  if (d.length === 11) return d.slice(0, 3) + "-" + d.slice(3, 7) + "-" + d.slice(7);
+  if (d.length === 10) return d.slice(0, 2) === "02" ? d.slice(0, 2) + "-" + d.slice(2, 6) + "-" + d.slice(6) : d.slice(0, 3) + "-" + d.slice(3, 6) + "-" + d.slice(6);
+  return String(raw || "").trim();
+}
 function channelOf_(id, formId, form) {
   if (/^l:\d+/.test(id) || /^f:\d+/.test(formId)) return "메타";
   if (formId === "rsc-website" || /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(id) || /웹사이트/.test(form)) return "홈페이지";
