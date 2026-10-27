@@ -22,6 +22,6 @@ export async function loadCallsData(): Promise<CallsData> {
     insights: analyzeInsights(leads),
     events: events.map((e) => ({ ...e, name: names.get(e.key) ?? "" })),
     eventsEnabled: enabled,
-    sheet: { notesSupported, noteCount, scriptVersion, masterTab: parsed.masterTab, ignoredTabs: parsed.ignoredTabs },
+    sheet: { notesSupported, noteCount, scriptVersion, masterTab: parsed.masterTab, statusTab: parsed.statusTab, ignoredTabs: parsed.ignoredTabs },
   };
 }

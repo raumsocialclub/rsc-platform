@@ -163,10 +163,12 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
                 {s.byTab.length === 0 && <EmptyRow colSpan={8}>시트에 신청 행이 없습니다.</EmptyRow>}
               </tbody>
             </table>
-            {(s.resubmitted > 0 || s.crossChannel > 0) && (
+            {data && (data.sheet.masterTab || data.sheet.statusTab || s.resubmitted > 0 || s.crossChannel > 0) && (
               <div className="px-[14px] py-[10px] text-[12px] text-[rgba(33,30,25,.55)] border-t border-[rgba(33,30,25,.08)]">
-                전화번호가 같은 신청은 한 사람으로 합쳤습니다 · 두 번 이상 신청 {s.resubmitted}명 · 홈페이지·메타 양쪽 신청 {s.crossChannel}명
-                {data?.sheet.ignoredTabs.length ? ` · 수식 탭 제외: ${data.sheet.ignoredTabs.join(", ")}` : ""}
+                {data.sheet.masterTab ? `신청은 「${data.sheet.masterTab}」 탭 기준` : "시트 탭을 모두 읽음"}
+                {data.sheet.statusTab ? ` · 콜 결과·메모는 「${data.sheet.statusTab}」 탭 기준` : ""}
+                {` · 전화번호가 같으면 한 사람 (두 번 이상 신청 ${s.resubmitted}명 · 홈페이지·메타 양쪽 ${s.crossChannel}명)`}
+                {data.sheet.ignoredTabs.length ? ` · 수식 탭 제외: ${data.sheet.ignoredTabs.join(", ")}` : ""}
               </div>
             )}
           </div>

@@ -11,6 +11,8 @@ export type SheetTab = { name: string; rows: string[][]; notes?: [number, number
  *  - 파생 탭(DB관리 · 일별현황 · 자동정리 · 사용안내): 수식으로 만든 보기용. 읽으면 이중 집계가 되므로 건너뛴다
  */
 export const MASTER_TABS = ["DB추출용"];
+/** 상태 탭(CRM관리): CRM 팀이 1차·2차·3차 콜 결과와 상담 메모를 적는 한 장. 있으면 콜 결과·메모는 이 탭을 우선한다 */
+export const STATUS_TABS = ["CRM관리"];
 export const DERIVED_TABS = ["DB관리", "일별현황", "자동정리", "사용안내"];
 const DERIVED_HEADER_MARKS = ["입력시트 행", "누적 신청수", "신규 / 재신청", "채널 중복"];
 export const isDerivedTab = (tab: { name: string; rows: string[][] }) =>
@@ -19,7 +21,8 @@ export const isDerivedTab = (tab: { name: string; rows: string[][] }) =>
 const HEADERS = {
   id: ["id"],
   formId: ["form_id"],
-  created: ["created_time", "created", "생성", "신청일", "접수"],
+  created: ["created_time", "created", "생성", "신청일", "수집일", "접수"],
+  channel: ["수집 채널", "수집채널", "채널"],
   name: ["full_name", "name", "이름", "성함"],
   phone: ["phone_number", "phone", "전화", "휴대폰", "연락처"],
   platform: ["platform", "플랫폼"],
@@ -67,6 +70,15 @@ export function channelOf(r: { id: string; formId: string; form: string }): Chan
   return "";
 }
 
+/** 시트의 「수집 채널」 칸(홈페이지 · 메타 · 인스타그램 …) → 채널 */
+export function channelFromLabel(label: string): Channel {
+  const t = label.replace(/\s+/g, "").toLowerCase();
+  if (!t) return "";
+  if (/홈페이지|웹|web|site/.test(t)) return "web";
+  if (/메타|meta|인스타|insta|ig|페이스북|facebook|fb/.test(t)) return "meta";
+  return "";
+}
+
 /** 한국 날짜 YYYY-MM-DD */
 export const kstDay = (iso: string | null) => (iso ? new Date(new Date(iso).getTime() + 9 * 3600_000).toISOString().slice(0, 10) : "");
 
@@ -77,6 +89,7 @@ export function parseTab(tab: SheetTab): CallLead[] {
   const col = {
     id: findCol(header, HEADERS.id),
     formId: findCol(header, HEADERS.formId),
+    channel: findCol(header, HEADERS.channel),
     created: findCol(header, HEADERS.created),
     name: findCol(header, HEADERS.name),
     phone: findCol(header, HEADERS.phone),
@@ -119,7 +132,7 @@ export function parseTab(tab: SheetTab): CallLead[] {
     const form = shifted ? "" : cell(row, col.form);
     const formId = shifted ? "" : cell(row, col.formId);
     const createdAt = shifted ? null : toIso(cell(row, col.created));
-    const channel = channelOf({ id, formId, form });
+    const channel = channelOf({ id, formId, form }) || (shifted ? "" : channelFromLabel(cell(row, col.channel)));
     out.push({
       key: phoneKey(phone),
       tab: tab.name,
@@ -155,7 +168,7 @@ const uniq = <T,>(xs: T[]) => Array.from(new Set(xs));
  *  - 인터뷰 내용: 대표 행 것, 비었으면 다른 행 것. 셀 노트: 모든 행의 노트를 겹치지 않게 이어 붙임
  *  - 신청 건(subs): 신청 id 가 같으면 한 건 (마스터 탭과 날짜 탭에 같은 신청이 복사돼 있어도 1건). id 가 없으면 신청 시각으로 구분
  */
-export function mergeLeads(rows: CallLead[], masterTab: string | null): CallLead[] {
+export function mergeLeads(rows: CallLead[], masterTab: string | null, statusTab: string | null = null): CallLead[] {
   const groups = new Map<string, CallLead[]>();
   for (const r of rows) {
     const g = groups.get(r.key) ?? [];
@@ -167,7 +180,9 @@ export function mergeLeads(rows: CallLead[], masterTab: string | null): CallLead
     g.sort((a, b) => Number(b.tab === masterTab) - Number(a.tab === masterTab) || byTime(a.createdAt, b.createdAt));
     const p = g[0];
     if (g.length === 1) { out.push(p); continue; }
-    const best = g.reduce((m, r) => (r.attempts > m.attempts ? r : m), p);
+    // 콜 결과: 상태 탭(CRM관리) 행에 적힌 것이 있으면 그것 (거기서 고치면 바로 반영), 없으면 시도가 가장 많이 적힌 행
+    const st = statusTab ? g.find((r) => r.tab === statusTab) : undefined;
+    const best = st && st.attempts > 0 ? st : g.reduce((m, r) => (r.attempts > m.attempts ? r : m), p);
     const calls = best.calls;
     const { status, attempts, last } = leadStatus(calls);
     const subMap = new Map<string, Submission>();
@@ -190,7 +205,7 @@ export function mergeLeads(rows: CallLead[], masterTab: string | null): CallLead
       campaign: first("campaign"),
       form: first("form"),
       calls,
-      memo: first("memo"),
+      memo: st?.memo || first("memo"),
       note: uniq(g.flatMap((r) => r.note.split(/\r?\n/)).map((l) => l.trim()).filter(Boolean)).join("\n"),
       status,
       attempts,
@@ -200,16 +215,17 @@ export function mergeLeads(rows: CallLead[], masterTab: string | null): CallLead
   return out.sort((a, b) => byTime(a.lastAt ?? a.createdAt, b.lastAt ?? b.createdAt));
 }
 
-export type ParsedSheet = { leads: CallLead[]; rows: number; masterTab: string | null; ignoredTabs: string[]; tabs: string[] };
+export type ParsedSheet = { leads: CallLead[]; rows: number; masterTab: string | null; statusTab: string | null; ignoredTabs: string[]; tabs: string[] };
 
 /** 모든 탭 → 파생 탭 제외 → 전화번호로 합침 → 최근 신청 순 */
 export function buildLeads(tabs: SheetTab[]): ParsedSheet {
   const ignoredTabs = tabs.filter(isDerivedTab).map((t) => t.name);
   const usable = tabs.filter((t) => !isDerivedTab(t));
   const masterTab = usable.find((t) => MASTER_TABS.includes(t.name.trim()))?.name ?? null;
+  const statusTab = usable.find((t) => STATUS_TABS.includes(t.name.trim()))?.name ?? null;
   const rows = usable.flatMap(parseTab);
-  const leads = mergeLeads(rows, masterTab);
-  return { leads, rows: rows.length, masterTab, ignoredTabs, tabs: uniq(rows.map((r) => r.tab)) };
+  const leads = mergeLeads(rows, masterTab, statusTab);
+  return { leads, rows: rows.length, masterTab, statusTab, ignoredTabs, tabs: uniq(rows.map((r) => r.tab)) };
 }
 
 /** (호환) 모든 탭 → 합쳐진 리드 목록 */

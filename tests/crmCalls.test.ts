@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeDb } from "./helpers/fakeDb";
-import { buildLeads, channelOf, isDerivedTab, memoGroups, mergeLeads, parseTab, parseTabs, phoneKey, summarize } from "@/lib/crm/parse";
+import { buildLeads, channelFromLabel, channelOf, isDerivedTab, memoGroups, mergeLeads, parseTab, parseTabs, phoneKey, summarize } from "@/lib/crm/parse";
 import { classifyCell, leadStatus } from "@/lib/crm/types";
 import { analyzeInsights, splitLines, tagLine } from "@/lib/crm/insights";
 
@@ -304,5 +304,46 @@ describe("중복 합치기 (전화번호 기준) · 파생 탭 제외 · 채널"
     expect(s.byDay).toHaveLength(2);
     expect(s.byDay[0]).toMatchObject({ total: 2, web: 2, meta: 0, fresh: 1, again: 1 });
     expect(s.byDay[1]).toMatchObject({ total: 1, web: 0, meta: 1, fresh: 1, again: 0 });
+  });
+});
+
+describe("CRM관리 탭 (상태 입력 한 장) 연동", () => {
+  const CRM_HEAD = ["수집일", "수집 채널", "이름", "전화번호", "현재 상태", "1차 콜 · 입력", "2차 콜 · 입력", "3차 콜 · 입력", "상담 메모 · 입력", "방문경로", "신청폼", "중복 / 재신청", "추출용 행", "신청 ID"];
+  const crm = (rows: string[][]) => ({ name: "CRM관리", rows: [CRM_HEAD, ...rows] });
+  const extract = (rows: string[][]) => tab("DB추출용", rows);
+  it("CRM관리 머리글(수집일·수집 채널·전화번호·N차 콜 · 입력·상담 메모 · 입력·신청 ID)을 읽는다", () => {
+    const leads = parseTab(crm([
+      ["2026-10-26", "홈페이지", "가상H", "010-7000-0008", "부재중", "부재중", "부재중", "", "", "인스타그램", "라움소셜클럽 웹사이트 상담 신청", "신규", "2", "f2ece977-0000-4079-a1c2-441202969b15"],
+      ["2026-10-25", "메타", "가상I", "010-7000-0009", "통화완료", "통화완료", "", "", "추후 본인이 연락", "인스타그램", "라움소셜클럽 파운딩 멤버신청", "신규", "9", "l:2090186471630200"],
+      ["", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+    ]));
+    expect(leads).toHaveLength(2);
+    expect(leads[0]).toMatchObject({ name: "가상H", channel: "web", calls: ["부재중", "부재중", ""], status: "missed", attempts: 2, id: "f2ece977-0000-4079-a1c2-441202969b15", form: "라움소셜클럽 웹사이트 상담 신청" });
+    expect(leads[0].createdAt && leads[0].createdAt.slice(0, 10)).toBe("2026-10-26");
+    expect(leads[1]).toMatchObject({ name: "가상I", channel: "meta", status: "done", memo: "추후 본인이 연락" });
+    expect(channelFromLabel("홈페이지")).toBe("web");
+    expect(channelFromLabel("메타")).toBe("meta");
+    expect(channelFromLabel("")).toBe("");
+  });
+  it("콜 결과·메모는 CRM관리 행을 우선한다 — 거기서 고치면(줄여도) 그대로 반영, 비어 있으면 다른 탭 값", () => {
+    const r = buildLeads([
+      extract([
+        row({ id: "u1", created_time: "2026-10-25T21:43:47+09:00", form_id: "rsc-website", full_name: "가상J", phone_number: "010-7000-0010", "1차 콜": "부재중", "2차 콜": "부재중", "3차 콜": "부재중", "인터뷰 내용": "옛 메모" }),
+        row({ id: "l:5", created_time: "2026-10-24T10:00:00+09:00", form_id: "f:1", full_name: "가상K", phone_number: "010-7000-0011", "1차 콜": "부재중" }),
+      ]),
+      crm([
+        ["2026-10-25", "홈페이지", "가상J", "010-7000-0010", "통화완료", "통화완료", "", "", "런칭 때 연락", "인스타그램", "라움소셜클럽 웹사이트 상담 신청", "신규", "2", "u1"],
+        ["2026-10-24", "메타", "가상K", "010-7000-0011", "", "", "", "", "", "인스타그램", "라움소셜클럽 파운딩 멤버신청", "신규", "3", "l:5"],
+      ]),
+      tab("10/24", [row({ id: "l:5", created_time: "2026-10-24T10:00:00+09:00", form_id: "f:1", full_name: "가상K", phone_number: "010-7000-0011", "1차 콜": "부재중", "2차 콜": "통화완료" })]),
+    ]);
+    expect(r.masterTab).toBe("DB추출용");
+    expect(r.statusTab).toBe("CRM관리");
+    expect(r.leads).toHaveLength(2);
+    const j = r.leads.find((l) => l.name === "가상J")!;
+    expect(j).toMatchObject({ calls: ["통화완료", "", ""], status: "done", attempts: 1, memo: "런칭 때 연락", createdAt: "2026-10-25T12:43:47.000Z" });
+    expect(j.subs).toHaveLength(1);
+    const k = r.leads.find((l) => l.name === "가상K")!;
+    expect(k).toMatchObject({ calls: ["부재중", "통화완료", ""], status: "done", attempts: 2 });
   });
 });
