@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeDb } from "./helpers/fakeDb";
-import { memoGroups, parseTab, parseTabs, phoneKey, summarize } from "@/lib/crm/parse";
+import { buildLeads, channelOf, isDerivedTab, memoGroups, mergeLeads, parseTab, parseTabs, phoneKey, summarize } from "@/lib/crm/parse";
 import { classifyCell, leadStatus } from "@/lib/crm/types";
 import { analyzeInsights, splitLines, tagLine } from "@/lib/crm/insights";
 
@@ -43,7 +43,8 @@ describe("탭 파싱", () => {
       row({ id: "bbb", created_time: "2026-10-25T10:00:00+09:00", full_name: "김영희", phone_number: "010-3333-4444" }),
     ]));
     expect(leads).toHaveLength(2);
-    expect(leads[0]).toMatchObject({ key: "웹사이트|aaa", tab: "웹사이트", name: "홍길동", phone: "010-1111-2222", calls: ["부재중", "통화완료", ""], memo: "런칭 연락", status: "done", attempts: 2, platform: "ig" });
+    expect(leads[0]).toMatchObject({ key: phoneKey("010-1111-2222"), tab: "웹사이트", tabs: ["웹사이트"], name: "홍길동", phone: "010-1111-2222", calls: ["부재중", "통화완료", ""], memo: "런칭 연락", status: "done", attempts: 2, platform: "ig", channel: "web" });
+    expect(leads[0].key).toMatch(/^p:[0-9a-f]{16}$/);
     expect(leads[0].createdAt).toBe("2026-10-25T16:31:37.000Z");
     expect(leads[1]).toMatchObject({ status: "pending", attempts: 0, memo: "" });
   });
@@ -51,7 +52,7 @@ describe("탭 파싱", () => {
     const leads = parseTab(tab("10/22", [["정예림", "010-5555-6666", "", "", "", ""]]));
     expect(leads).toHaveLength(1);
     expect(leads[0]).toMatchObject({ name: "정예림", phone: "010-5555-6666", id: "", status: "pending", createdAt: null });
-    expect(leads[0].key).toBe(`10/22|${phoneKey("010-5555-6666")}`);
+    expect(leads[0].key).toBe(phoneKey("010-5555-6666"));
     expect(leads[0].key).not.toContain("5555");
   });
   it("셀 노트(노란 말풍선)는 행 번호로 붙이고, 여러 칸이면 줄바꿈으로 잇는다", () => {
@@ -155,7 +156,7 @@ describe("변경 기록 (crm_call_events)", () => {
     expect(r.enabled).toBe(true);
     expect(r.events).toEqual([]);
     expect(db.tables.crm_call_state).toHaveLength(1);
-    expect(db.tables.crm_call_state[0]).toMatchObject({ lead_key: "웹사이트|x1", calls: ["부재중", "", ""], memo: "" });
+    expect(db.tables.crm_call_state[0]).toMatchObject({ lead_key: phoneKey("010-1234-5678"), calls: ["부재중", "", ""], memo: "" });
     expect(JSON.stringify(db.tables.crm_call_state)).not.toContain("홍길동");
   });
   it("바뀐 칸마다 이벤트(이전 → 이후), 새 행은 '새 신청'", async () => {
@@ -163,13 +164,14 @@ describe("변경 기록 (crm_call_events)", () => {
     await syncCallEvents(L(["부재중", "", ""]));
     const r = await syncCallEvents([...L(["부재중", "통화완료", ""], "런칭 연락"), ...parseTab(tab("10/26", [row({ id: "l:9", full_name: "새사람", phone_number: "010-9999-0000" })]))]);
     const fields = r.events.map((e) => [e.key, e.field, e.before, e.after]);
+    const K = phoneKey("010-1234-5678");
     expect(fields).toEqual(expect.arrayContaining([
-      ["웹사이트|x1", "call2", "", "통화완료"],
-      ["웹사이트|x1", "memo", "", "런칭 연락"],
-      ["10/26|l:9", "new", "", ""],
+      [K, "call2", "", "통화완료"],
+      [K, "memo", "", "런칭 연락"],
+      [phoneKey("010-9999-0000"), "new", "", ""],
     ]));
     expect(r.events).toHaveLength(3);
-    expect(db.tables.crm_call_state.find((s) => s.lead_key === "웹사이트|x1")).toMatchObject({ calls: ["부재중", "통화완료", ""], memo: "런칭 연락" });
+    expect(db.tables.crm_call_state.find((s) => s.lead_key === K)).toMatchObject({ calls: ["부재중", "통화완료", ""], memo: "런칭 연락" });
     const again = await syncCallEvents(L(["부재중", "통화완료", ""], "런칭 연락"));
     expect(again.events).toHaveLength(3);
   });
@@ -188,6 +190,15 @@ describe("변경 기록 (crm_call_events)", () => {
     expect(JSON.stringify(db.tables)).not.toMatch(/41세|1:1 관심/);
     const same = await syncCallEvents(withNote("- 1:1 관심\n- 41세 여성"));
     expect(same.events).toHaveLength(1);
+  });
+  it("예전 키 체계(탭|id)만 남아 있으면 기준선을 다시 잡고 '새 신청' 폭주 없이 옛 상태를 지운다", async () => {
+    const { syncCallEvents } = await import("@/lib/crm/events");
+    db.tables.crm_call_state = [{ lead_key: "웹사이트|x1", tab: "웹사이트", calls: ["", "", ""], memo: "", note_hash: "" }, { lead_key: "10/22|l:3", tab: "10/22", calls: ["", "", ""], memo: "", note_hash: "" }];
+    const r = await syncCallEvents(L(["부재중", "", ""]));
+    expect(r.events).toEqual([]);
+    expect(db.tables.crm_call_state.map((s) => s.lead_key)).toEqual([phoneKey("010-1234-5678")]);
+    const next = await syncCallEvents(L(["부재중", "통화완료", ""]));
+    expect(next.events).toHaveLength(1);
   });
 });
 
@@ -217,5 +228,81 @@ describe("시트 읽기 (Apps Script 응답)", () => {
     expect(r.noteCount).toBe(0);
     expect(r.scriptVersion).toBe(1);
     vi.unstubAllGlobals();
+  });
+});
+
+describe("중복 합치기 (전화번호 기준) · 파생 탭 제외 · 채널", () => {
+  const master = (rows: string[][]) => tab("DB추출용", rows);
+  it("채널 판정: 메타 리드 id 는 l:…, 홈페이지는 UUID 또는 form_id rsc-website", () => {
+    expect(channelOf({ id: "l:1838526270921341", formId: "f:1448093067468448", form: "라움소셜클럽 파운딩 멤버신청" })).toBe("meta");
+    expect(channelOf({ id: "f2ece977-8f41-4079-a1c2-441202969b15", formId: "rsc-website", form: "라움소셜클럽 웹사이트 상담 신청" })).toBe("web");
+    expect(channelOf({ id: "", formId: "", form: "" })).toBe("");
+  });
+  it("수식으로 만든 탭(DB관리·일별현황·자동정리·사용안내, 또는 '입력시트 행' 머리글)은 건너뛴다", () => {
+    expect(isDerivedTab({ name: "DB관리", rows: [["RAUM SOCIAL CLUB | DB 관리"]] })).toBe(true);
+    expect(isDerivedTab({ name: "일별현황", rows: [["수집일", "전체 신청", "홈페이지", "메타", "신규 연락처"]] })).toBe(true);
+    expect(isDerivedTab({ name: "뭔가", rows: [["수집일", "이름 · full_name", "전화번호 · phone_number", "입력시트 행", "신청 ID"]] })).toBe(true);
+    expect(isDerivedTab({ name: "웹사이트", rows: [HEAD] })).toBe(false);
+    const r = buildLeads([
+      { name: "자동정리", rows: [["수집일", "이름 · full_name", "전화번호 · phone_number", "1차 콜", "입력시트 행"], ["2026-10-25", "가상", "010-7000-0001", "통화완료", "2"]] },
+      master([row({ id: "u1", created_time: "2026-10-25T10:00:00+09:00", form_id: "rsc-website", full_name: "가상", phone_number: "010-7000-0001", "1차 콜": "통화완료" })]),
+    ]);
+    expect(r.ignoredTabs).toEqual(["자동정리"]);
+    expect(r.masterTab).toBe("DB추출용");
+    expect(r.leads).toHaveLength(1);
+    expect(r.rows).toBe(1);
+  });
+  it("같은 사람이 마스터 탭과 날짜 탭에 있으면 1명: 대표는 마스터 행, 콜 결과는 가장 많이 적힌 행, 노트는 합침", () => {
+    const sheet = [
+      master([
+        row({ id: "u1", created_time: "2026-10-25T21:43:47+09:00", form_id: "rsc-website", form_name: "라움소셜클럽 웹사이트 상담 신청", platform: "ig", full_name: "가상A", phone_number: "010-7000-0001", "1차 콜": "부재중" }),
+        row({ id: "l:77", created_time: "2026-10-23T12:00:00+09:00", form_id: "f:1448", form_name: "라움소셜클럽 파운딩 멤버신청", platform: "fb", full_name: "가상B", phone_number: "010-7000-0002", "1차 콜": "통화완료", "인터뷰 내용": "런칭 연락" }),
+      ]),
+      { ...tab("웹사이트", [row({ id: "u1", created_time: "2026-10-25T21:43:47+09:00", form_id: "rsc-website", full_name: "가상A", phone_number: "010-7000-0001", "1차 콜": "부재중", "2차 콜": "통화완료", "인터뷰 내용": "런칭 때 연락" })]), notes: [[1, 14, "- 와인 모임 관심"]] as [number, number, string][] },
+      { ...tab("10/23", [row({ id: "l:77", created_time: "2026-10-23T12:00:00+09:00", form_id: "f:1448", full_name: "가상B", phone_number: "010-7000-0002", "1차 콜": "통화완료" })]), notes: [[1, 17, "- 평일 저녁 가능"]] as [number, number, string][] },
+    ];
+    const r = buildLeads(sheet);
+    expect(r.rows).toBe(4);
+    expect(r.leads).toHaveLength(2);
+    const a = r.leads.find((l) => l.name === "가상A")!;
+    expect(a).toMatchObject({ tab: "DB추출용", tabs: ["DB추출용", "웹사이트"], channel: "web", calls: ["부재중", "통화완료", ""], status: "done", attempts: 2, memo: "런칭 때 연락", note: "- 와인 모임 관심" });
+    expect(a.subs).toHaveLength(1); // 같은 신청 id 가 두 탭에 복사된 것 → 1건
+    const b = r.leads.find((l) => l.name === "가상B")!;
+    expect(b).toMatchObject({ channel: "meta", memo: "런칭 연락", note: "- 평일 저녁 가능", status: "done" });
+    const s = summarize(r.leads, r.rows);
+    expect(s).toMatchObject({ total: 2, rows: 4, submissions: 2, resubmitted: 0, crossChannel: 0 });
+    expect(s.byChannel.map((c) => [c.tab, c.total])).toEqual([["홈페이지", 1], ["메타", 1]]);
+  });
+  it("같은 사람이 두 번(다른 id) 신청하면 재신청, 홈페이지·메타 양쪽이면 채널 중복, 최초·최근 신청일을 둘 다 가진다", () => {
+    const leads = mergeLeads([
+      ...parseTab(master([
+        row({ id: "l:1", created_time: "2026-10-21T10:00:00+09:00", form_id: "f:1", full_name: "가상C", phone_number: "010-7000-0003" }),
+        row({ id: "u9", created_time: "2026-10-25T10:00:00+09:00", form_id: "rsc-website", full_name: "가상C", phone_number: "010-7000-0003", "1차 콜": "통화완료" }),
+        row({ id: "l:5", created_time: "2026-10-24T10:00:00+09:00", form_id: "f:1", full_name: "가상D", phone_number: "010-7000-0004" }),
+      ])),
+    ], "DB추출용");
+    expect(leads).toHaveLength(2);
+    const c = leads.find((l) => l.name === "가상C")!;
+    expect(c.subs).toHaveLength(2);
+    expect(c.channels.sort()).toEqual(["meta", "web"]);
+    expect(c.createdAt).toBe("2026-10-21T01:00:00.000Z");
+    expect(c.lastAt).toBe("2026-10-25T01:00:00.000Z");
+    expect(c.status).toBe("done");
+    expect(leads[0].name).toBe("가상C"); // 최근 신청 순
+    const s = summarize(leads, 3);
+    expect(s).toMatchObject({ total: 2, rows: 3, submissions: 3, resubmitted: 1, crossChannel: 1 });
+  });
+  it("일별 신청 집계는 최근 14일, 신청 건 단위로 채널·처음/재신청을 센다", () => {
+    const d = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+    const leads = mergeLeads(parseTab(master([
+      row({ id: "l:1", created_time: d(1), form_id: "f:1", full_name: "가상E", phone_number: "010-7000-0005" }),
+      row({ id: "u2", created_time: d(0), form_id: "rsc-website", full_name: "가상E", phone_number: "010-7000-0005" }),
+      row({ id: "u3", created_time: d(0), form_id: "rsc-website", full_name: "가상F", phone_number: "010-7000-0006" }),
+      row({ id: "l:4", created_time: d(40), form_id: "f:1", full_name: "가상G", phone_number: "010-7000-0007" }),
+    ])), "DB추출용");
+    const s = summarize(leads);
+    expect(s.byDay).toHaveLength(2);
+    expect(s.byDay[0]).toMatchObject({ total: 2, web: 2, meta: 0, fresh: 1, again: 1 });
+    expect(s.byDay[1]).toMatchObject({ total: 1, web: 0, meta: 1, fresh: 1, again: 0 });
   });
 });

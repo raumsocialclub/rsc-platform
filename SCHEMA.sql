@@ -546,7 +546,7 @@ create policy "popups admin write" on popups for all using (is_admin()) with che
 -- ---------- M18: 콜 현황 대시보드 — 구글 시트(CRM)의 1차·2차·3차 콜 결과와 인터뷰 메모를 /admin/calls 에서 실시간으로 본다.
 -- 시트는 Apps Script 웹앱(deploy/crm-sheet-webapp.gs)으로 읽고, 여기에는 "바뀐 칸" 만 남긴다. 이름·전화 등 개인정보는 저장하지 않는다(키는 시트 id 또는 전화 해시).
 create table crm_call_state (
-  lead_key text primary key,                  -- '<탭>|<시트 id>' 또는 '<탭>|p:<전화 sha256 앞 16자>'
+  lead_key text primary key,                  -- 'p:<전화 sha256 앞 16자>' (같은 전화면 탭이 달라도 한 사람. 2026-10-27 전에는 '<탭>|<시트 id>')
   tab text not null,
   calls jsonb not null default '[]',          -- ["1차 셀","2차 셀","3차 셀"] 마지막으로 본 값
   memo text not null default '',

@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CallInsights } from "./CallInsights";
 import { BTN_SECONDARY, CARD, FIELD, TH, TD as TD0, Badge, EmptyRow, PageTitle } from "./ui";
 import { badgeStyle } from "@/lib/admin/format";
-import { FIELD_KO, STATUS_KO, STATUS_ORDER, type CallLead, type CallStatus, type CallsData } from "@/lib/crm/types";
+import { CHANNEL_KO, FIELD_KO, STATUS_KO, STATUS_ORDER, type CallLead, type CallStatus, type CallsData, type Channel, type TabSummary } from "@/lib/crm/types";
 import { fmtFull, fmtTime, kstParts } from "@/lib/programs/format";
 
 const TD = `${TD0} px-[10px]`;
 const POLL_MS = 30_000;
 const STATUS_FILTER: ("all" | CallStatus)[] = ["all", ...STATUS_ORDER];
+const CHANNEL_FILTER: { k: "all" | Channel; l: string }[] = [{ k: "all", l: "모든 채널" }, { k: "web", l: "홈페이지" }, { k: "meta", l: "메타" }, { k: "", l: "채널 미상" }];
+const channelKo = (c: Channel) => (c ? CHANNEL_KO[c] : "채널 미상");
 
 const statusBadge = (s: CallStatus) =>
   badgeStyle(s === "done" ? "ok" : s === "callback" ? "warn" : s === "invalid" || s === "declined" ? "bad" : s === "pending" ? "mute" : "mute");
@@ -39,6 +41,7 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
   const [busy, setBusy] = useState(false);
   const [auto, setAuto] = useState(true);
   const [tab, setTab] = useState<string>("all");
+  const [channel, setChannel] = useState<"all" | Channel>("all");
   const [status, setStatus] = useState<"all" | CallStatus>("all");
   const [q, setQ] = useState("");
   const [, tick] = useState(0);
@@ -71,14 +74,19 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
   const leads = useMemo(() => data?.leads ?? [], [data]);
   const rows = useMemo(() => {
     const needle = q.trim().replace(/-/g, "");
-    return leads.filter((l) => (tab === "all" || l.tab === tab) && (status === "all" || l.status === status) && (!needle || l.name.includes(needle) || l.phone.replace(/-/g, "").includes(needle) || l.memo.includes(needle) || l.note.includes(needle) || l.calls.some((c) => c.includes(needle))));
-  }, [leads, tab, status, q]);
+    return leads.filter((l) => (tab === "all" || l.tabs.includes(tab)) && (channel === "all" || l.channel === channel) && (status === "all" || l.status === status) && (!needle || l.name.includes(needle) || l.phone.replace(/-/g, "").includes(needle) || l.memo.includes(needle) || l.note.includes(needle) || l.calls.some((c) => c.includes(needle))));
+  }, [leads, tab, channel, status, q]);
+
+  const pickChannel = (label: string) => {
+    const k = (Object.keys(CHANNEL_KO) as Exclude<Channel, "">[]).find((c) => CHANNEL_KO[c] === label) ?? "";
+    setChannel((cur) => (cur === k ? "all" : k));
+  };
 
   const s = data?.summary;
   const pct = (n: number) => (s && s.total ? `${Math.round((n / s.total) * 100)}%` : "0%");
   const cards = s
     ? [
-        { label: "전체 신청", value: `${s.total}건`, sub: `시트 탭 ${data?.tabs.length ?? 0}개` },
+        { label: "전체 신청", value: `${s.total}명`, sub: s.rows > s.total ? `신청 ${s.submissions}건 · 중복 ${s.rows - s.total}행 합침` : `시트 탭 ${data?.tabs.length ?? 0}개` },
         { label: "통화완료", value: `${s.byStatus.done}건`, sub: pct(s.byStatus.done), color: "#2e6b3e" },
         { label: "재통화 예정", value: `${s.byStatus.callback}건`, sub: "시간 약속·문자 요청", color: "#7a5420" },
         { label: "부재중", value: `${s.byStatus.missed}건`, sub: `${s.attempts[3]}건은 3차까지 시도` },
@@ -141,12 +149,13 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
             })}
             <div className="text-[12px] text-[rgba(33,30,25,.5)] mt-[14px]">인터뷰 내용 칸이 적힌 신청 {s.withMemo}건 · 노트가 있는 고객 {data?.insights.interviewed ?? 0}명</div>
           </div>
+          <div className="grid gap-[16px]">
           <div className={`${CARD} overflow-x-auto`}>
             <table className="w-full border-collapse">
-              <thead><tr><th className={TH}>시트 탭</th><th className={TH}>전체</th><th className={TH}>통화완료</th><th className={TH}>재통화</th><th className={TH}>부재중</th><th className={TH}>없는 번호</th><th className={TH}>미진행</th><th className={TH}>완료율</th></tr></thead>
+              <thead><tr><th className={TH}>{data?.sheet.masterTab ? "수집 채널" : "시트 탭"}</th><th className={TH}>전체</th><th className={TH}>통화완료</th><th className={TH}>재통화</th><th className={TH}>부재중</th><th className={TH}>없는 번호</th><th className={TH}>미진행</th><th className={TH}>완료율</th></tr></thead>
               <tbody>
-                {s.byTab.map((t) => (
-                  <tr key={t.tab} className="cursor-pointer hover:bg-[rgba(33,30,25,.03)]" onClick={() => setTab(tab === t.tab ? "all" : t.tab)} style={{ background: tab === t.tab ? "rgba(90,61,36,.06)" : undefined }}>
+                {(data?.sheet.masterTab ? s.byChannel : s.byTab).map((t: TabSummary) => (
+                  <tr key={t.tab} className="cursor-pointer hover:bg-[rgba(33,30,25,.03)]" onClick={() => (data?.sheet.masterTab ? pickChannel(t.tab) : setTab(tab === t.tab ? "all" : t.tab))} style={{ background: (data?.sheet.masterTab ? channelKo(channel as Channel) === t.tab && channel !== "all" : tab === t.tab) ? "rgba(90,61,36,.06)" : undefined }}>
                     <td className={`${TD} font-medium`}>{t.tab}</td><td className={TD}>{t.total}</td><td className={TD} style={{ color: "#2e6b3e" }}>{t.done}</td><td className={TD}>{t.callback}</td><td className={TD}>{t.missed}</td><td className={TD} style={{ color: t.invalid ? "#a3402c" : undefined }}>{t.invalid}</td><td className={TD}>{t.pending}</td>
                     <td className={TD}>{t.total ? Math.round((t.done / t.total) * 100) : 0}%</td>
                   </tr>
@@ -154,6 +163,26 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
                 {s.byTab.length === 0 && <EmptyRow colSpan={8}>시트에 신청 행이 없습니다.</EmptyRow>}
               </tbody>
             </table>
+            {(s.resubmitted > 0 || s.crossChannel > 0) && (
+              <div className="px-[14px] py-[10px] text-[12px] text-[rgba(33,30,25,.55)] border-t border-[rgba(33,30,25,.08)]">
+                전화번호가 같은 신청은 한 사람으로 합쳤습니다 · 두 번 이상 신청 {s.resubmitted}명 · 홈페이지·메타 양쪽 신청 {s.crossChannel}명
+                {data?.sheet.ignoredTabs.length ? ` · 수식 탭 제외: ${data.sheet.ignoredTabs.join(", ")}` : ""}
+              </div>
+            )}
+          </div>
+          <div className={`${CARD} overflow-x-auto`}>
+            <table className="w-full border-collapse">
+              <thead><tr><th className={TH}>신청일 (최근 14일)</th><th className={TH}>신청</th><th className={TH}>홈페이지</th><th className={TH}>메타</th><th className={TH}>처음 신청</th><th className={TH}>재신청</th></tr></thead>
+              <tbody>
+                {s.byDay.map((d) => (
+                  <tr key={d.day}>
+                    <td className={`${TD} font-medium`}>{d.day.slice(5).replace("-", ".")}</td><td className={TD}>{d.total}</td><td className={TD}>{d.web}</td><td className={TD}>{d.meta}</td><td className={TD}>{d.fresh}</td><td className={TD} style={{ color: d.again ? "#7a5420" : undefined }}>{d.again}</td>
+                  </tr>
+                ))}
+                {s.byDay.length === 0 && <EmptyRow colSpan={6}>최근 14일 신청이 없습니다.</EmptyRow>}
+              </tbody>
+            </table>
+          </div>
           </div>
         </div>
       )}
@@ -200,10 +229,15 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
         <div className={CARD}>
           <div className="flex items-center gap-[10px] flex-wrap p-[16px] border-b border-[rgba(33,30,25,.1)]">
             <b className="text-[14px] mr-[6px]">전체 콜 목록</b>
-            <select value={tab} onChange={(e) => setTab(e.target.value)} className={`${FIELD} !w-auto`}>
-              <option value="all">모든 탭</option>
-              {data.tabs.map((t) => <option key={t} value={t}>{t}</option>)}
+            <select value={channel} onChange={(e) => setChannel(e.target.value as "all" | Channel)} className={`${FIELD} !w-auto`}>
+              {CHANNEL_FILTER.map((c) => <option key={c.k} value={c.k}>{c.l}</option>)}
             </select>
+            {data.tabs.length > 1 && (
+              <select value={tab} onChange={(e) => setTab(e.target.value)} className={`${FIELD} !w-auto`}>
+                <option value="all">모든 탭</option>
+                {data.tabs.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            )}
             <select value={status} onChange={(e) => setStatus(e.target.value as "all" | CallStatus)} className={`${FIELD} !w-auto`}>
               {STATUS_FILTER.map((k) => <option key={k} value={k}>{k === "all" ? "모든 상태" : STATUS_KO[k]}</option>)}
             </select>
@@ -212,7 +246,7 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
           </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead><tr><th className={TH}>신청</th><th className={TH}>탭</th><th className={TH}>이름</th><th className={TH}>연락처</th><th className={TH}>유입</th><th className={TH}>1차</th><th className={TH}>2차</th><th className={TH}>3차</th><th className={TH}>상태</th><th className={TH}>인터뷰 내용</th><th className={TH}>노트</th></tr></thead>
+              <thead><tr><th className={TH}>신청</th><th className={TH}>채널</th><th className={TH}>이름</th><th className={TH}>연락처</th><th className={TH}>유입</th><th className={TH}>1차</th><th className={TH}>2차</th><th className={TH}>3차</th><th className={TH}>상태</th><th className={TH}>인터뷰 내용</th><th className={TH}>노트</th></tr></thead>
               <tbody>
                 {rows.map((l) => <LeadRow key={l.key} l={l} />)}
                 {rows.length === 0 && <EmptyRow colSpan={11}>조건에 맞는 신청이 없습니다.</EmptyRow>}
@@ -229,8 +263,12 @@ function LeadRow({ l }: { l: CallLead }) {
   const src = [l.platform, l.campaign || l.form].filter(Boolean).join(" · ");
   return (
     <tr className="hover:bg-[rgba(33,30,25,.03)]">
-      <td className={`${TD} text-[rgba(33,30,25,.6)]`} title={l.createdAt ? fmtFull(l.createdAt) : ""}>{shortWhen(l.createdAt)}</td>
-      <td className={TD}>{l.tab}</td>
+      <td className={`${TD} text-[rgba(33,30,25,.6)]`} title={[l.createdAt ? `처음 ${fmtFull(l.createdAt)}` : "", l.lastAt && l.lastAt !== l.createdAt ? `최근 ${fmtFull(l.lastAt)}` : ""].filter(Boolean).join(" · ")}>{shortWhen(l.lastAt ?? l.createdAt)}</td>
+      <td className={`${TD} text-[12.5px]`} title={l.tabs.join(", ")}>
+        {channelKo(l.channel)}
+        {l.subs.length > 1 && <span className="ml-[6px] text-[11px] px-[6px] py-[1px]" style={{ background: "rgba(122,84,32,.1)", color: "#7a5420" }}>재신청 {l.subs.length}회</span>}
+        {l.channels.length > 1 && <span className="ml-[6px] text-[11px] px-[6px] py-[1px]" style={{ background: "rgba(90,61,36,.1)", color: "#5a3d24" }}>채널 중복</span>}
+      </td>
       <td className={`${TD} font-medium`}>{l.name || "—"}</td>
       <td className={TD}>{l.phone}</td>
       <td className={`${TD} max-w-[220px] overflow-hidden text-ellipsis text-[12.5px] text-[rgba(33,30,25,.6)]`} title={src}>{src || "—"}</td>

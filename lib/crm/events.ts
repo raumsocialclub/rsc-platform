@@ -22,7 +22,13 @@ export async function syncCallEvents(leads: CallLead[]): Promise<{ enabled: bool
     const { data: states, error } = await db.from("crm_call_state").select("lead_key, calls, memo, note_hash");
     if (error) throw error;
     const prev = new Map<string, StateRow>((states ?? []).map((s) => [s.lead_key, s as StateRow]));
-    const firstRun = prev.size === 0;
+    // 키 체계가 바뀌어(탭|id → p:전화해시) 지난 상태와 하나도 안 맞으면 기준선을 다시 잡는다 — 전부 '새 신청'으로 쏟아지지 않게
+    const overlap = leads.some((l) => prev.has(l.key));
+    const firstRun = prev.size === 0 || (!overlap && leads.length > 0);
+    if (firstRun && prev.size > 0) {
+      const stale = Array.from(prev.keys()).filter((k) => !k.startsWith("p:"));
+      for (let i = 0; i < stale.length; i += 200) await db.from("crm_call_state").delete().in("lead_key", stale.slice(i, i + 200));
+    }
     const now = new Date().toISOString();
     const upserts: { lead_key: string; tab: string; calls: string[]; memo: string; note_hash: string; changed_at: string }[] = [];
     const events: Omit<EventRow, "id">[] = [];

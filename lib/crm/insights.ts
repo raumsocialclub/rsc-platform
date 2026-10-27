@@ -1,4 +1,4 @@
-import type { CallLead, CallStatus } from "./types";
+import { CHANNEL_KO, type CallLead, type CallStatus } from "./types";
 
 /**
  * 인터뷰 니즈 분석 (M18-2). 시트 셀에 붙인 노트(노란 말풍선)와 「인터뷰 내용」 칸의 문장을
@@ -107,7 +107,8 @@ export function analyzeInsights(leads: CallLead[]): InsightReport {
       }
     }
     for (const tag of tags) counts.get(`${tag.theme}|${tag.tag}`)!.count++;
-    customers.push({ key: l.key, name: l.name, tab: l.tab, status: l.status, memo: l.memo, lines: splitLines(l.note), tags, untagged: un });
+    const where = [l.channel ? CHANNEL_KO[l.channel] : l.tab, l.channels.length > 1 ? "채널 중복" : "", l.subs.length > 1 ? `재신청 ${l.subs.length}회` : ""].filter(Boolean).join(" · ");
+    customers.push({ key: l.key, name: l.name, tab: where, status: l.status, memo: l.memo, lines: splitLines(l.note), tags, untagged: un });
   }
   const themes: ThemeReport[] = THEMES.map((t) => {
     const tags = Array.from(counts.values()).filter((c) => c.tag.theme === t.key).sort((a, b) => b.count - a.count || a.tag.tag.localeCompare(b.tag.tag)).map((c) => ({ tag: c.tag.tag, count: c.count, samples: c.samples }));
