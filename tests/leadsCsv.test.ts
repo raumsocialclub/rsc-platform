@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeDb } from "./helpers/fakeDb";
-import { CSV_COLUMNS, LEAD_COLUMNS, csvCell, isOrganic, leadsCsv, matchesUtmFilter, toKstIso, toLeadPhone, toLeadRow } from "@/lib/admin/leads";
+import { CSV_COLUMNS, LEAD_COLUMNS, csvCell, isOrganic, leadRangeBounds, leadsCsv, matchesUtmFilter, parseLeadRange, toKstIso, toLeadPhone, toLeadRow } from "@/lib/admin/leads";
 
 /** 상담 신청 → 메타 리드 CSV 양식 (가상 데이터) */
 const db = fakeDb();
@@ -122,7 +122,7 @@ describe("GET /api/admin/inquiries/export", () => {
     const res = await GET(new Request("https://test.example/api/admin/inquiries/export?source=ig"));
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toContain("text/csv");
-    expect(res.headers.get("Content-Disposition")).toMatch(/rsc-leads-\d{4}-\d{2}-\d{2}\.csv/);
+    expect(res.headers.get("Content-Disposition")).toMatch(/rsc-leads-all-\d{4}-\d{2}-\d{2}\.csv/);
     expect(res.headers.get("Cache-Control")).toContain("no-store");
     const lines = (await res.text()).split("\r\n");
     expect(lines).toHaveLength(3);
@@ -131,6 +131,25 @@ describe("GET /api/admin/inquiries/export", () => {
     const all = await (await GET(new Request("https://test.example/api/admin/inquiries/export"))).text();
     expect(all.split("\r\n")).toHaveLength(4);
   });
+  it("from/to 는 한국 날짜(양 끝 포함)로 신청일을 거르고 파일명에 기간이 들어간다", async () => {
+    const { GET } = await import("@/app/api/admin/inquiries/export/route");
+    // paid 10-20 14:32 KST, noUtm 10-20 08:10 KST(UTC 로는 19일 밤), profile 10-19 19:00 KST
+    const day = await GET(new Request("https://test.example/api/admin/inquiries/export?from=2026-10-20&to=2026-10-20"));
+    expect(day.headers.get("Content-Disposition")).toContain('filename="rsc-leads-2026-10-20_2026-10-20.csv"');
+    const lines = (await day.text()).split("\r\n");
+    expect(lines).toHaveLength(3);
+    expect(lines[1]).toContain('"inq-1"');
+    expect(lines[2]).toContain('"inq-2"');
+    const prev = (await (await GET(new Request("https://test.example/api/admin/inquiries/export?from=2026-10-19&to=2026-10-19"))).text()).split("\r\n");
+    expect(prev).toHaveLength(2);
+    expect(prev[1]).toContain('"inq-3"');
+    // 기간 + 유입 필터 함께
+    const both = (await (await GET(new Request("https://test.example/api/admin/inquiries/export?from=2026-10-19&to=2026-10-20&source=ig"))).text()).split("\r\n");
+    expect(both).toHaveLength(3);
+    // 잘못된 기간(역순·형식 오류)은 전체
+    const bad = (await (await GET(new Request("https://test.example/api/admin/inquiries/export?from=2026-10-21&to=2026-10-19"))).text()).split("\r\n");
+    expect(bad).toHaveLength(4);
+  });
   it("1000건이 넘어도 전체를 내려준다 (Supabase 1000행 제한을 범위로 넘김)", async () => {
     db.tables.inquiries = Array.from({ length: 2350 }, (_, i) => ({ id: `inq-${i}`, name: `회원${i}`, phone: "010-0000-0000", created_at: "2026-10-01T00:00:00.000Z", utm: i % 2 ? { utm_source: "ig" } : null }));
     const { GET } = await import("@/app/api/admin/inquiries/export/route");
@@ -138,5 +157,21 @@ describe("GET /api/admin/inquiries/export", () => {
     expect(all).toHaveLength(2351);
     const ig = (await (await GET(new Request("https://test.example/api/admin/inquiries/export?source=ig"))).text()).split("\r\n");
     expect(ig).toHaveLength(1176);
+  });
+});
+
+describe("CSV 기간 파싱", () => {
+  it("둘 다 있으면 그대로, 하나만 있으면 하루, 없거나 틀리면 전체(null)", () => {
+    expect(parseLeadRange({ from: "2026-10-01", to: "2026-10-07" })).toEqual({ from: "2026-10-01", to: "2026-10-07" });
+    expect(parseLeadRange({ from: "2026-10-05", to: null })).toEqual({ from: "2026-10-05", to: "2026-10-05" });
+    expect(parseLeadRange({ from: null, to: "2026-10-05" })).toEqual({ from: "2026-10-05", to: "2026-10-05" });
+    expect(parseLeadRange({})).toBeNull();
+    expect(parseLeadRange({ from: "2026-10-07", to: "2026-10-01" })).toBeNull();
+    expect(parseLeadRange({ from: "20261001", to: "2026-10-07" })).toEqual({ from: "2026-10-07", to: "2026-10-07" });
+    expect(parseLeadRange({ from: "2026-13-40", to: "2026-10-07" })).toEqual({ from: "2026-10-07", to: "2026-10-07" });
+  });
+  it("경계는 한국 자정 기준 UTC: from 00:00 KST 이상, to 다음날 00:00 KST 미만", () => {
+    expect(leadRangeBounds({ from: "2026-10-20", to: "2026-10-20" })).toEqual({ gte: "2026-10-19T15:00:00.000Z", lt: "2026-10-20T15:00:00.000Z" });
+    expect(leadRangeBounds({ from: "2026-10-31", to: "2026-10-31" }).lt).toBe("2026-10-31T15:00:00.000Z");
   });
 });

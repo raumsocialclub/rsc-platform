@@ -31,6 +31,31 @@ export const LEAD_FORM = { id: "rsc-website", name: "라움소셜클럽 웹사�
 export type LeadSource = Pick<InquiryRow, "id" | "name" | "phone" | "created_at" | "utm">;
 export type UtmFilter = { source: string; campaign: string };
 
+/** CSV 기간(한국 날짜 YYYY-MM-DD, 양 끝 포함). null 이면 전체. */
+export type LeadRange = { from: string; to: string };
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+const isDay = (v?: string | null): v is string => !!v && DAY_RE.test(v) && !Number.isNaN(new Date(`${v}T00:00:00+09:00`).getTime());
+
+/**
+ * 쿼리스트링 from/to → 기간. 둘 다 올바른 날짜이고 from ≤ to 일 때만 기간을 쓰고, 그 밖(비어 있음·형식 오류·역순)은 null(전체).
+ * 하나만 있으면 그 날 하루로 본다.
+ */
+export function parseLeadRange(sp: { from?: string | null; to?: string | null }): LeadRange | null {
+  const from = isDay(sp.from) ? sp.from : null;
+  const to = isDay(sp.to) ? sp.to : null;
+  if (from && to) return from <= to ? { from, to } : null;
+  if (from) return { from, to: from };
+  if (to) return { from: to, to };
+  return null;
+}
+
+/** 기간 → DB 비교용 UTC 경계. from 00:00 KST 이상, to 다음날 00:00 KST 미만. */
+export function leadRangeBounds(r: LeadRange): { gte: string; lt: string } {
+  const end = new Date(`${r.to}T00:00:00+09:00`);
+  end.setUTCDate(end.getUTCDate() + 1);
+  return { gte: new Date(`${r.from}T00:00:00+09:00`).toISOString(), lt: end.toISOString() };
+}
+
 /** 상담 목록 화면과 CSV 가 같은 유입 필터를 쓴다. source "-" 는 UTM 기록이 없는 신청. */
 export function matchesUtmFilter(r: Pick<InquiryRow, "utm">, f: UtmFilter): boolean {
   const okSource = !f.source || (f.source === "-" ? !r.utm?.utm_source : r.utm?.utm_source === f.source);
