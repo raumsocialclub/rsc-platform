@@ -17,8 +17,9 @@
  *     행 순서가 '들어온 순서'로 고정되므로 새 신청이 와도 기존 행이 밀리지 않는다(손 입력이 다른 사람 줄로 가는 사고 방지).
  *     처음 한 번, CRM관리가 수식으로 차 있으면 백업 탭(CRM관리_백업_날짜)을 만든 뒤 그 시점 값으로 굳힌다.
  *  v6 (2026-10-27): 백업을 탭 복사 대신 값 복사로 (5,000행 수식 탭 복사가 몇 분 걸리다 실패하던 것)
+ *  v7 (2026-10-27): syncCrmNow 도 잠금 사용(1분 자동 작업과 겹침 방지). 겹쳐서 두 번 들어간 신청은 손 입력 없는 복사본만 자동 제거
  */
-var VERSION = 6;
+var VERSION = 7;
 var SRC_TAB = "DB추출용";   // 홈페이지·메타 CSV 를 누적하는 원본 (A~N: id … phone_number)
 var CRM_TAB = "CRM관리";    // CRM 팀이 상태를 적는 한 장
 var CRM_HEAD = ["수집일", "수집 채널", "이름", "전화번호", "현재 상태", "1차 콜 · 입력", "2차 콜 · 입력", "3차 콜 · 입력", "상담 메모 · 입력", "방문경로", "신청폼", "중복 / 재신청", "추출용 행", "신청 ID"];
@@ -54,11 +55,17 @@ function refreshCache() {
   }
 }
 
-/** 지금 바로 CRM관리를 맞추고 캐시도 새로 채우고 싶을 때 편집기에서 실행 */
+/** 지금 바로 CRM관리를 맞추고 캐시도 새로 채우고 싶을 때 편집기에서 실행. 1분 자동 작업과 겹치지 않게 잠금을 건다 */
 function syncCrmNow() {
-  syncCrm();
-  writeCache_(buildJson_("cache"));
-  Logger.log("완료: CRM관리 동기화 + 캐시 갱신");
+  var lock = LockService.getScriptLock();
+  lock.waitLock(60000);
+  try {
+    syncCrm();
+    writeCache_(buildJson_("cache"));
+    Logger.log("완료: CRM관리 동기화 + 캐시 갱신");
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /**
@@ -73,6 +80,7 @@ function syncCrm() {
   var crm = ss.getSheetByName(CRM_TAB);
   if (!crm) { crm = ss.insertSheet(CRM_TAB); crm.getRange(1, 1, 1, CRM_HEAD.length).setValues([CRM_HEAD]).setFontWeight("bold"); crm.setFrozenRows(1); }
   takeOverCrm_(ss, crm);
+  dedupeCrm_(crm);
 
   var sv = src.getDataRange().getDisplayValues();
   if (sv.length < 2) return;
@@ -123,7 +131,30 @@ function syncCrm() {
   var f = [];
   for (var j = 0; j < add.length; j++) f.push(['=IF(RC[3]<>"",RC[3],IF(RC[2]<>"",RC[2],RC[1]))']);
   crm.getRange(start, CRM_COL.status + 1, add.length, 1).setFormulasR1C1(f);
-  console.log("CRM관리에 " + add.length + "행 추가");
+  console.log("CRM관리에 " + add.length + "행 추가 (DB추출용 " + (sv.length - 1) + "행 / CRM관리 " + (crmLast - 1 + add.length) + "행)");
+}
+
+/**
+ * 같은 신청(신청 ID, 없으면 전화)이 CRM관리에 두 번 이상 있으면 뒤의 것을 지운다 — 단, 손 입력(F~I)과 셀 노트가 모두 빈 행만.
+ * (실행이 겹쳐 같은 행이 두 번 들어간 경우를 정리. 사람이 적은 내용이 있는 행은 절대 지우지 않는다)
+ */
+function dedupeCrm_(crm) {
+  var cv = crm.getDataRange().getDisplayValues();
+  var seen = {};
+  var drop = [];
+  for (var i = 1; i < cv.length; i++) {
+    var row = cv[i];
+    var k = keyOf_(row[CRM_COL.id], row[CRM_COL.phone]);
+    if (!k) continue;
+    if (!seen[k]) { seen[k] = true; continue; }
+    var manual = [row[CRM_COL.c1], row[CRM_COL.c2], row[CRM_COL.c3], row[CRM_COL.memo]].some(function (x) { return String(x || "").trim() !== ""; });
+    if (manual) continue;
+    var notes = crm.getRange(i + 1, 1, 1, CRM_HEAD.length).getNotes()[0];
+    if (notes.some(function (n) { return n; })) continue;
+    drop.push(i + 1);
+  }
+  for (var d = drop.length - 1; d >= 0; d--) crm.deleteRow(drop[d]);
+  if (drop.length) console.log("CRM관리 중복 " + drop.length + "행 제거 (손 입력 없는 복사본만)");
 }
 
 /**
