@@ -16,7 +16,7 @@ export const STATUS_TABS = ["CRM관리"];
 export const DERIVED_TABS = ["DB관리", "일별현황", "자동정리", "사용안내"];
 const DERIVED_HEADER_MARKS = ["입력시트 행", "누적 신청수", "신규 / 재신청", "채널 중복"];
 export const isDerivedTab = (tab: { name: string; rows: string[][] }) =>
-  DERIVED_TABS.includes(tab.name.trim()) || (tab.rows[0] ?? []).some((h) => DERIVED_HEADER_MARKS.some((m) => String(h ?? "").includes(m)));
+  DERIVED_TABS.includes(tab.name.trim()) || /_백업_/.test(tab.name) || (tab.rows[0] ?? []).some((h) => DERIVED_HEADER_MARKS.some((m) => String(h ?? "").includes(m)));
 
 const HEADERS = {
   id: ["id"],

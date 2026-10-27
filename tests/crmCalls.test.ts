@@ -251,6 +251,7 @@ describe("중복 합치기 (전화번호 기준) · 파생 탭 제외 · 채널"
     expect(isDerivedTab({ name: "DB관리", rows: [["RAUM SOCIAL CLUB | DB 관리"]] })).toBe(true);
     expect(isDerivedTab({ name: "일별현황", rows: [["수집일", "전체 신청", "홈페이지", "메타", "신규 연락처"]] })).toBe(true);
     expect(isDerivedTab({ name: "뭔가", rows: [["수집일", "이름 · full_name", "전화번호 · phone_number", "입력시트 행", "신청 ID"]] })).toBe(true);
+    expect(isDerivedTab({ name: "CRM관리_백업_20261027_1200", rows: [HEAD] })).toBe(true);
     expect(isDerivedTab({ name: "웹사이트", rows: [HEAD] })).toBe(false);
     const r = buildLeads([
       { name: "자동정리", rows: [["수집일", "이름 · full_name", "전화번호 · phone_number", "1차 콜", "입력시트 행"], ["2026-10-25", "가상", "010-7000-0001", "통화완료", "2"]] },
