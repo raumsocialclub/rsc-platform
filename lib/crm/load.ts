@@ -30,7 +30,7 @@ export async function loadCallsData(): Promise<CallsData> {
 }
 
 async function buildCallsData(): Promise<CallsData> {
-  const { tabs, url, notesSupported, noteCount, scriptVersion } = await fetchSheetTabs();
+  const { tabs, url, notesSupported, noteCount, scriptVersion, updatedAt, source } = await fetchSheetTabs();
   const parsed = buildLeads(tabs);
   const { leads } = parsed;
   const { enabled, events } = await syncCallEvents(leads);
@@ -46,6 +46,6 @@ async function buildCallsData(): Promise<CallsData> {
     insights: analyzeInsights(leads),
     events: events.map((e) => ({ ...e, name: names.get(e.key) ?? "" })),
     eventsEnabled: enabled,
-    sheet: { notesSupported, noteCount, scriptVersion, masterTab: parsed.masterTab, statusTab: parsed.statusTab, ignoredTabs: parsed.ignoredTabs },
+    sheet: { notesSupported, noteCount, scriptVersion, updatedAt, source, masterTab: parsed.masterTab, statusTab: parsed.statusTab, ignoredTabs: parsed.ignoredTabs },
   };
 }

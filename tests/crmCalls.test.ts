@@ -215,6 +215,8 @@ describe("시트 읽기 (Apps Script 응답)", () => {
     expect(r.notesSupported).toBe(true);
     expect(r.noteCount).toBe(2);
     expect(r.scriptVersion).toBe(2);
+    expect(r.updatedAt).toBeNull();
+    expect(r.source).toBe("");
     expect(parseTabs(r.tabs)[0].note).toBe("1:1 관심\n평일 저녁");
     const u = new URL((vi.mocked(fetch).mock.calls[0][0] as URL).toString());
     expect(u.searchParams.get("token")).toBe("test-token");
@@ -227,6 +229,13 @@ describe("시트 읽기 (Apps Script 응답)", () => {
     expect(r.notesSupported).toBe(false);
     expect(r.noteCount).toBe(0);
     expect(r.scriptVersion).toBe(1);
+    vi.unstubAllGlobals();
+  });
+  it("v4 응답은 시트를 읽은 시각과 캐시 여부를 같이 준다", async () => {
+    vi.stubGlobal("fetch", ok({ ok: true, version: 4, source: "cache", updatedAt: "2026-10-27T02:00:00.000Z", tabs: [{ name: "DB추출용", rows: [HEAD], notes: [] }] }));
+    const { fetchSheetTabs } = await import("@/lib/crm/sheet");
+    const r = await fetchSheetTabs();
+    expect(r).toMatchObject({ scriptVersion: 4, source: "cache", updatedAt: "2026-10-27T02:00:00.000Z" });
     vi.unstubAllGlobals();
   });
 });
@@ -396,7 +405,7 @@ describe("시트가 느리거나 실패할 때 (loadCallsDataSafe)", () => {
     expect(second.stale).toBe(true);
     expect(second.data?.leads).toHaveLength(1);
     expect(second.error).toContain("25초");
-    expect(second.error).toContain("v3");
+    expect(second.error).toContain("v4");
     vi.unstubAllGlobals();
   });
 });

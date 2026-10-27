@@ -103,9 +103,15 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
           <label className="flex items-center gap-[6px] cursor-pointer"><input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} className="accent-brown" />30초마다 자동 갱신</label>
           <button type="button" onClick={() => void refresh()} disabled={busy} className={BTN_SECONDARY}>{busy ? "읽는 중…" : "지금 새로고침"}</button>
           {data?.sheetUrl && <a href={data.sheetUrl} target="_blank" rel="noreferrer" className={BTN_SECONDARY}>시트 열기 ↗</a>}
-          {data && <span className="text-[rgba(33,30,25,.55)]">{data.sheet.notesSupported ? `셀 노트 ${data.sheet.noteCount}개 수신` : "셀 노트 미수신"}</span>}
+          {data && <span className="text-[rgba(33,30,25,.55)]">{data.sheet.notesSupported ? `셀 노트 ${data.sheet.noteCount}개 수신` : "셀 노트 미수신"}{data.sheet.updatedAt ? ` · 시트 읽은 시각 ${fmtTime(data.sheet.updatedAt)}:${String(new Date(data.sheet.updatedAt).getSeconds()).padStart(2, "0")}${data.sheet.source === "cache" ? " (1분마다 미리 읽음)" : ""}` : ""}</span>}
         </div>
       </PageTitle>
+
+      {data && data.sheet.scriptVersion < 4 && (
+        <div className="mb-[18px] rounded-[10px] border border-[#e0b96a] bg-[#fff7e3] px-[16px] py-[12px] text-[13px] text-[#6b4a00]">
+          <b>Apps Script 가 v{data.sheet.scriptVersion} 입니다. v4 로 올리면 시트가 커져도 즉시 응답합니다.</b> 시트 → 확장 프로그램 → Apps Script 에 <code>deploy/crm-sheet-webapp.gs</code> 최신 내용을 붙여 넣고 저장 → 함수 「setup」 선택 후 ▶ 실행(권한 허용) → 배포 → 배포 관리 → 연필 → 「새 버전」 → 배포.
+        </div>
+      )}
 
       {data && !data.sheet.notesSupported && (
         <div className="mb-[18px] rounded-[10px] border border-[#e0b96a] bg-[#fff7e3] px-[16px] py-[12px] text-[13px] text-[#6b4a00]">

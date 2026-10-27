@@ -13,17 +13,17 @@ export function crmConfigured(): boolean {
 /** Apps Script 응답 대기 한도. 수식 탭을 건너뛰는 v3 스크립트면 보통 2~5초 */
 const FETCH_TIMEOUT_MS = 25_000;
 
-type WebAppJson = { ok?: boolean; message?: string; url?: unknown; tabs?: unknown; version?: unknown };
+type WebAppJson = { ok?: boolean; message?: string; url?: unknown; tabs?: unknown; version?: unknown; updatedAt?: unknown; source?: unknown };
 
 /** 시트 읽기 결과. notesSupported 는 Apps Script 가 셀 노트를 보내는 새 버전인지 (구버전이면 notes 칸 자체가 없다) */
-export type SheetFetch = { tabs: SheetTab[]; url: string | null; notesSupported: boolean; noteCount: number; scriptVersion: number };
+export type SheetFetch = { tabs: SheetTab[]; url: string | null; notesSupported: boolean; noteCount: number; scriptVersion: number; updatedAt: string | null; source: "cache" | "live" | "" };
 
 export async function fetchSheetTabs(): Promise<SheetFetch> {
   const u = new URL(requireEnv("CRM_SHEET_URL"));
   u.searchParams.set("token", requireEnv("CRM_SHEET_TOKEN"));
   const res = await fetch(u, { cache: "no-store", redirect: "follow", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }).catch((e: unknown) => {
     if (e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError")) {
-      throw new Error(`시트 응답이 ${FETCH_TIMEOUT_MS / 1000}초를 넘었습니다. Apps Script 를 최신 버전(v3, 수식 탭 건너뛰기)으로 다시 배포하면 빨라집니다 — 시트 → 확장 프로그램 → Apps Script 에 deploy/crm-sheet-webapp.gs 를 붙여 넣고 배포 → 배포 관리 → 새 버전.`);
+      throw new Error(`시트 응답이 ${FETCH_TIMEOUT_MS / 1000}초를 넘었습니다. Apps Script 를 최신 버전(v4, 1분마다 미리 읽어 캐시)으로 올려 주세요 — 시트 → 확장 프로그램 → Apps Script 에 deploy/crm-sheet-webapp.gs 를 붙여 넣고 저장 → 함수 「setup」 실행(권한 허용) → 배포 → 배포 관리 → 새 버전.`);
     }
     throw e;
   });
@@ -51,5 +51,7 @@ export async function fetchSheetTabs(): Promise<SheetFetch> {
       })
     : [];
   const scriptVersion = typeof json.version === "number" ? json.version : notesSupported ? 2 : 1;
-  return { tabs, url: typeof json.url === "string" ? json.url : null, notesSupported, noteCount, scriptVersion };
+  const updatedAt = typeof json.updatedAt === "string" && !Number.isNaN(new Date(json.updatedAt).getTime()) ? new Date(json.updatedAt).toISOString() : null;
+  const source = json.source === "cache" || json.source === "live" ? json.source : "";
+  return { tabs, url: typeof json.url === "string" ? json.url : null, notesSupported, noteCount, scriptVersion, updatedAt, source };
 }
