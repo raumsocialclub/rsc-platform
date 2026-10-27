@@ -16,8 +16,9 @@
  *     CRM관리 맨 아래에 값으로 덧붙인다. 손으로 적는 F~I열(1·2·3차 콜·상담 메모)과 셀 노트는 건드리지 않는다.
  *     행 순서가 '들어온 순서'로 고정되므로 새 신청이 와도 기존 행이 밀리지 않는다(손 입력이 다른 사람 줄로 가는 사고 방지).
  *     처음 한 번, CRM관리가 수식으로 차 있으면 백업 탭(CRM관리_백업_날짜)을 만든 뒤 그 시점 값으로 굳힌다.
+ *  v6 (2026-10-27): 백업을 탭 복사 대신 값 복사로 (5,000행 수식 탭 복사가 몇 분 걸리다 실패하던 것)
  */
-var VERSION = 5;
+var VERSION = 6;
 var SRC_TAB = "DB추출용";   // 홈페이지·메타 CSV 를 누적하는 원본 (A~N: id … phone_number)
 var CRM_TAB = "CRM관리";    // CRM 팀이 상태를 적는 한 장
 var CRM_HEAD = ["수집일", "수집 채널", "이름", "전화번호", "현재 상태", "1차 콜 · 입력", "2차 콜 · 입력", "3차 콜 · 입력", "상담 메모 · 입력", "방문경로", "신청폼", "중복 / 재신청", "추출용 행", "신청 ID"];
@@ -125,21 +126,30 @@ function syncCrm() {
   console.log("CRM관리에 " + add.length + "행 추가");
 }
 
-/** CRM관리가 수식(ARRAYFORMULA 등)으로 차 있으면 백업 탭을 만든 뒤 지금 보이는 값으로 굳힌다. 한 번만 일어난다 */
+/**
+ * CRM관리가 수식(ARRAYFORMULA 등)으로 차 있으면 지금 보이는 값으로 굳힌다. 한 번만 일어난다.
+ * 백업은 탭 복사(copyTo)가 아니라 값만 새 탭에 적는다 — 5,000행 수식 탭을 통째로 복사하면 재계산 때문에 몇 분씩 걸리다 실패한다.
+ */
 function takeOverCrm_(ss, crm) {
   var lastRow = Math.max(crm.getLastRow(), 1);
   var probe = crm.getRange(1, 1, Math.min(lastRow, 3), CRM_HEAD.length).getFormulas();
   var hasFormula = false;
   for (var i = 0; i < probe.length; i++) for (var c = 0; c < probe[i].length; c++) if (c !== CRM_COL.status && probe[i][c]) hasFormula = true;
   if (!hasFormula) return;
-  var stamp = Utilities.formatDate(new Date(), "Asia/Seoul", "yyyyMMdd_HHmm");
-  crm.copyTo(ss).setName(CRM_TAB + "_백업_" + stamp).hideSheet();
+  // 1) 지금 보이는 값을 먼저 읽는다 (수식 결과 그대로)
   var range = crm.getDataRange();
   var vals = range.getDisplayValues();
   var last = vals.length;
   while (last > 1 && vals[last - 1].every(function (x) { return x === ""; })) last--;
+  var snapshot = vals.slice(0, last);
+  // 2) 값만 담은 백업 탭 (숨김). 이름: CRM관리_백업_날짜_시각
+  var stamp = Utilities.formatDate(new Date(), "Asia/Seoul", "yyyyMMdd_HHmm");
+  var backup = ss.insertSheet(CRM_TAB + "_백업_" + stamp);
+  backup.getRange(1, 1, snapshot.length, snapshot[0].length).setValues(snapshot);
+  backup.hideSheet();
+  // 3) 원래 탭의 수식을 지우고 같은 값으로 채운다 (F~I 손 입력과 셀 노트는 그대로)
   range.clearContent();
-  crm.getRange(1, 1, last, vals[0].length).setValues(vals.slice(0, last));
+  crm.getRange(1, 1, last, vals[0].length).setValues(snapshot);
   if (last > 1) {
     var f = [];
     for (var j = 0; j < last - 1; j++) f.push(['=IF(RC[3]<>"",RC[3],IF(RC[2]<>"",RC[2],RC[1]))']);
