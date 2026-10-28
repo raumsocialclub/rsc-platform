@@ -132,7 +132,13 @@ create table inquiries (
   status inquiry_status not null default 'pending',
   memo text,
   utm jsonb,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  -- CRM 시트 연동 (lib/crm/inquiries.ts): 같은 전화번호의 CRM관리 콜 결과(crm_status: done·callback·…)·시도 횟수와, 연동이 마지막으로 적은 상태(crm_applied).
+  -- 지금 status 가 crm_applied 와 같거나 pending 일 때만 연동이 다시 적는다 — 관리자가 직접 바꾼 상태는 존중. invited 는 바꾸지 않는다
+  crm_status text,
+  crm_attempts smallint,
+  crm_applied inquiry_status,
+  crm_synced_at timestamptz
 );
 
 create table invite_codes (

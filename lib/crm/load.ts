@@ -1,4 +1,6 @@
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { syncCallEvents } from "./events";
+import { syncInquiriesFromSheet } from "./inquiries";
 import { analyzeInsights } from "./insights";
 import { buildLeads, memoGroups, summarize } from "./parse";
 import { fetchSheetTabs } from "./sheet";
@@ -34,6 +36,8 @@ async function buildCallsData(): Promise<CallsData> {
   const parsed = buildLeads(tabs);
   const { leads } = parsed;
   const { enabled, events } = await syncCallEvents(leads);
+  // 상담 신청(inquiries) 상태를 시트 콜 결과에 맞춘다 (service role 키가 있을 때. 없으면 /admin/inquiries 가 관리자 세션으로 한다)
+  if (hasServiceRoleKey()) await syncInquiriesFromSheet(createAdminClient(), leads);
   const names = new Map(leads.map((l) => [l.key, l.name]));
   return {
     ok: true,

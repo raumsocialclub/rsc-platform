@@ -52,9 +52,15 @@ const PHONE_RE = /^\+?\d{2,3}[-. ]?\d{3,4}[-. ]?\d{4}$/;
 const isPhone = (s: string) => PHONE_RE.test(s.trim());
 const cell = (row: string[], i: number) => (i >= 0 && i < row.length ? String(row[i] ?? "").trim() : "");
 
-/** 전화번호를 DB 키로 쓸 때는 해시만 (원문 저장 안 함) */
+/** 전화번호 → 숫자만. 국가번호(+82, 메타 CSV 의 p:+8210…)는 0 으로 바꿔 010-… 과 같은 번호로 본다 (deploy/crm-sheet-webapp.gs digits_ 와 같은 규칙) */
+export function phoneDigits(phone: string): string {
+  const d = phone.replace(/\D/g, "");
+  return /^82\d{9,10}$/.test(d) ? "0" + d.slice(2) : d;
+}
+
+/** 전화번호를 DB 키로 쓸 때는 해시만 (원문 저장 안 함). 표기가 달라도(010-…, +8210…, p:+8210…) 같은 번호면 같은 키 */
 export function phoneKey(phone: string): string {
-  return "p:" + createHash("sha256").update(phone.replace(/\D/g, "")).digest("hex").slice(0, 16);
+  return "p:" + createHash("sha256").update(phoneDigits(phone)).digest("hex").slice(0, 16);
 }
 
 function toIso(s: string): string | null {

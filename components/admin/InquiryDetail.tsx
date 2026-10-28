@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BTN_PRIMARY, BTN_SECONDARY, FIELD } from "./ui";
 import { IssuedCodeBox } from "./IssuedCodeBox";
-import { INQUIRY_STATUS, fmtDate } from "@/lib/admin/format";
+import { INQUIRY_STATUS, badgeStyle, fmtDate } from "@/lib/admin/format";
+import type { InquiryCrm } from "@/lib/crm/inquiries";
+import { STATUS_KO } from "@/lib/crm/types";
 
 export type InquiryRow = {
   id: string;
@@ -28,12 +30,16 @@ export type InquiryRow = {
   utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string } | null;
   /** 이미 발급된 코드 (있으면) */
   invite?: { code: string; expires_at: string | null; used_at: string | null } | null;
+  /** CRM 시트 연동이 마지막으로 본 콜 결과·시도 횟수·적은 상태 (lib/crm/inquiries.ts) */
+  crm_status?: string | null;
+  crm_attempts?: number | null;
+  crm_applied?: string | null;
 };
 
-type Props = { inquiry: InquiryRow; profileKo?: string; profileBody?: string };
+type Props = { inquiry: InquiryRow; profileKo?: string; profileBody?: string; crm?: InquiryCrm | null };
 
 /** design/RSC Admin.dc.html "신청 상세" 패널 재현 + 메모/상태 저장 + 초대코드 발급 */
-export function InquiryDetail({ inquiry, profileKo, profileBody }: Props) {
+export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: Props) {
   const router = useRouter();
   const [memo, setMemo] = useState(inquiry.memo ?? "");
   const [status, setStatus] = useState(inquiry.status);
@@ -124,6 +130,22 @@ export function InquiryDetail({ inquiry, profileKo, profileBody }: Props) {
         ))}
       </div>
 
+      {crm && (
+        <div className="bg-cream p-[16px] mb-[20px] text-[13px]">
+          <div className="flex items-center justify-between gap-[8px] mb-[8px]">
+            <span className="text-[11px] tracking-[.2em] text-brownHover">CRM 시트 콜 기록</span>
+            <span className="inline-block px-[8px] py-[2px] text-[11.5px] font-semibold" style={badgeStyle(crm.status === "done" ? "ok" : crm.status === "callback" ? "warn" : crm.status === "invalid" || crm.status === "declined" ? "bad" : "mute")}>{STATUS_KO[crm.status]}</span>
+          </div>
+          <div className="grid gap-[4px]">
+            {(["1차", "2차", "3차"] as const).map((k, i) => (
+              <div key={k} className="flex justify-between gap-[12px]"><span className="text-[rgba(33,30,25,.55)]">{k} 콜</span><b className="text-right">{crm.calls[i] || "—"}</b></div>
+            ))}
+            {crm.memo && <div className="mt-[6px] whitespace-pre-wrap leading-[1.6]"><span className="text-[rgba(33,30,25,.55)]">상담 메모 · </span>{crm.memo}</div>}
+            {crm.note && <div className="mt-[4px] whitespace-pre-wrap leading-[1.6] text-[rgba(33,30,25,.75)]"><span className="text-[rgba(33,30,25,.55)]">셀 노트 · </span>{crm.note}</div>}
+          </div>
+          <div className="mt-[8px] text-[11.5px] text-[rgba(33,30,25,.5)]">시트에 콜이 적히면 상태가 자동으로 바뀝니다. 여기서 직접 바꾸면 그 뒤로는 자동 변경하지 않습니다.</div>
+        </div>
+      )}
       {issued && <div className="mb-[16px]"><IssuedCodeBox code={issued.code} expiresAt={issued.expiresAt} notify={issued.notify} /></div>}
 
       <label className="block text-[11.5px] text-[rgba(33,30,25,.5)] mb-[6px]">상태</label>
