@@ -4,10 +4,41 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CallInsights } from "./CallInsights";
 import { BTN_SECONDARY, CARD, FIELD, TH, TD as TD0, Badge, EmptyRow, PageTitle } from "./ui";
 import { badgeStyle } from "@/lib/admin/format";
+import { EXPORT_KINDS } from "@/lib/crm/export";
 import { CHANNEL_KO, FIELD_KO, STATUS_KO, STATUS_ORDER, type CallLead, type CallStatus, type CallsData, type Channel, type TabSummary } from "@/lib/crm/types";
 import { fmtFull, fmtTime, kstParts } from "@/lib/programs/format";
 
 const TD = `${TD0} px-[10px]`;
+
+/** CSV 내려받기 (lib/crm/export.ts): 고객별 인터뷰(이름 가림) · 니즈 분석 집계. 전략 분석용이라 전화번호는 넣지 않는다 */
+function CsvMenu() {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => { if (box.current && !box.current.contains(e.target as Node)) setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+  }, [open]);
+  return (
+    <div className="relative" ref={box}>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`${BTN_SECONDARY} inline-flex items-center gap-[6px]`}>CSV 다운로드 <span aria-hidden className="text-[10px]">{open ? "▲" : "▼"}</span></button>
+      {open && (
+        <div className="absolute right-0 top-[calc(100%+6px)] z-20 w-[340px] bg-white border border-[rgba(33,30,25,.15)] shadow-[0_8px_24px_rgba(33,30,25,.12)] p-[8px]">
+          {EXPORT_KINDS.map((k) => (
+            <a key={k.kind} href={`/api/admin/crm-calls/export?kind=${k.kind}`} onClick={() => setOpen(false)} className="block px-[12px] py-[10px] hover:bg-[#faf7f1] no-underline text-[rgba(33,30,25,.9)]">
+              <b className="block text-[13px]">{k.label}</b>
+              <span className="block text-[12px] text-[rgba(33,30,25,.55)] mt-[2px]">{k.desc}</span>
+            </a>
+          ))}
+          <div className="px-[12px] pt-[8px] pb-[4px] text-[11.5px] text-[rgba(33,30,25,.5)]">이름은 가운데를 가리고(박x령) 전화번호는 넣지 않습니다. 엑셀에서 바로 열립니다.</div>
+        </div>
+      )}
+    </div>
+  );
+}
 const POLL_MS = 30_000;
 const STATUS_FILTER: ("all" | CallStatus)[] = ["all", ...STATUS_ORDER];
 const CHANNEL_FILTER: { k: "all" | Channel; l: string }[] = [{ k: "all", l: "모든 채널" }, { k: "web", l: "홈페이지" }, { k: "meta", l: "메타" }, { k: "", l: "채널 미상" }];
@@ -103,6 +134,7 @@ export function CallsDashboard({ initial, initialError }: { initial: CallsData |
           <label className="flex items-center gap-[6px] cursor-pointer"><input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} className="accent-brown" />30초마다 자동 갱신</label>
           <button type="button" onClick={() => void refresh()} disabled={busy} className={BTN_SECONDARY}>{busy ? "읽는 중…" : "지금 새로고침"}</button>
           {data?.sheetUrl && <a href={data.sheetUrl} target="_blank" rel="noreferrer" className={BTN_SECONDARY}>시트 열기 ↗</a>}
+          {data && <CsvMenu />}
           {data && <span className="text-[rgba(33,30,25,.55)]">{data.sheet.notesSupported ? `셀 노트 ${data.sheet.noteCount}개 수신` : "셀 노트 미수신"}{data.sheet.updatedAt ? ` · 시트 읽은 시각 ${fmtTime(data.sheet.updatedAt)}:${String(new Date(data.sheet.updatedAt).getSeconds()).padStart(2, "0")}${data.sheet.source === "cache" ? " (1분마다 미리 읽음)" : ""}` : ""}</span>}
         </div>
       </PageTitle>
