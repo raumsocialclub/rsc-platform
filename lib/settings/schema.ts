@@ -24,9 +24,14 @@ export const SETTINGS_DOCS: DocDef[] = [
     page: "settings",
     label: "상담 신청 · 광고 측정",
     description:
-      "상담 신청(/fit-check)은 기본으로 이름·휴대폰·개인정보 동의만 받는 한 화면입니다(상담 가능 시간 선택은 인터뷰 기간 동안 잠시 뺐습니다). '설문형 상담 신청'을 켜면 예전처럼 6문항 설문을 거쳐 성향 결과 유형(THE SETTLER 등)을 함께 저장합니다. 메타 픽셀 ID 를 넣으면 공개 페이지에 픽셀이 실리고 상담 신청 완료 시 Lead 이벤트를 보냅니다(비우면 실리지 않음).",
-    fields: [b("surveyMode", "설문형 상담 신청 켜기 (성향 결과 유형 저장)"), t("metaPixelId", "메타 픽셀 ID", "메타 이벤트 관리자 → 데이터 소스 → 픽셀 ID (숫자 15~16자리). 비우면 픽셀을 싣지 않습니다")],
-    defaults: { surveyMode: false, metaPixelId: "" },
+      "상담 신청(/fit-check)은 기본으로 이름·휴대폰·개인정보 동의만 받는 한 화면입니다(상담 가능 시간 선택은 인터뷰 기간 동안 잠시 뺐습니다). '설문형 상담 신청'을 켜면 예전처럼 6문항 설문을 거쳐 성향 결과 유형(THE SETTLER 등)을 함께 저장합니다. '상담 전 설문(/apply)'은 광고 랜딩·직접 전달용 8단계 설문(기본 정보·학력·직업·자산·가족·이상형·기피사항·연애성향)으로, 켜야만 열립니다. 응답은 「상담 신청」 목록에 설문 표시와 함께 들어옵니다. 메타 픽셀 ID 를 넣으면 공개 페이지에 픽셀이 실리고 상담 신청 완료 시 Lead 이벤트를 보냅니다(비우면 실리지 않음).",
+    fields: [
+      b("surveyMode", "설문형 상담 신청 켜기 (성향 결과 유형 저장)"),
+      t("metaPixelId", "메타 픽셀 ID", "메타 이벤트 관리자 → 데이터 소스 → 픽셀 ID (숫자 15~16자리). 비우면 픽셀을 싣지 않습니다"),
+      b("applyEnabled", "상담 전 설문(/apply) 열기"),
+      ta("applyClosedMessage", "상담 전 설문 닫힘 안내 문구", "/apply 가 닫혀 있을 때 방문자에게 보이는 글. 관리자가 로그인한 상태면 닫혀 있어도 미리 볼 수 있습니다"),
+    ],
+    defaults: { surveyMode: false, metaPixelId: "", applyEnabled: false, applyClosedMessage: "지금은 상담 전 설문을 받고 있지 않습니다.\n상담 신청은 홈의 「상담 신청」을 이용해 주세요." },
   },
   {
     id: "settings.security",

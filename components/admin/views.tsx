@@ -48,7 +48,7 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
                   return (
                     <tr key={r.id} className={active ? "bg-[rgba(226,180,120,.18)]" : "hover:bg-[#faf7f1]"}>
                       <td className={`${TD} text-[rgba(33,30,25,.6)]`}><Link href={`/admin/inquiries?id=${r.id}`} className="block">{fmtShortDate(r.created_at)}</Link></td>
-                      <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}</Link></td>
+                      <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}{r.answers?.form === "apply" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[10.5px] font-semibold align-middle" style={badgeStyle("brand")}>설문</span>}</Link></td>
                       <td className={TD}>{r.phone || "—"}</td>
                       <td className={TD}>{r.result_type || "—"}</td>
                       <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{r.answers?.slot || "—"}</td>

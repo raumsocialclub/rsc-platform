@@ -19,6 +19,7 @@ export type InquiryRow = {
   created_at: string;
   /** 저장 항목은 route·slot 뿐. answers 배열은 설문 원본을 저장하던 이전 신청에만 남아 있다. */
   answers: {
+    form?: string;          // "apply" = 상담 전 설문(/apply) 응답
     profile?: string;
     route?: string;
     slot?: string;
@@ -97,7 +98,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   const a = inquiry.answers ?? {};
   const rows: { q: string; a: string }[] = [
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
-    ...(a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
+    ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
     ...(a.consentAt ? [{ q: "개인정보 동의", a: `${fmtDate(a.consentAt, true)}${a.consentVersion ? ` · 동의문 ${a.consentVersion}` : ""}` }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),
@@ -108,7 +109,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
 
   return (
     <div className="bg-white border border-[rgba(33,30,25,.1)] p-[26px]">
-      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[16px]">신청 상세</div>
+      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : "신청 상세"}</div>
       <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}</div>
       <div className="text-[13px] text-[rgba(33,30,25,.55)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
 
