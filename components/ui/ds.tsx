@@ -50,7 +50,7 @@ export function Container({ className = "", children, wide = false }: { classNam
 export function SectionHead({ eyebrow, title, lead, align = "left", className = "", reveal }: { eyebrow?: ReactNode; title: ReactNode; lead?: ReactNode; align?: "left" | "center"; className?: string; reveal?: boolean }) {
   return (
     <div className={`${align === "center" ? "text-center mx-auto" : ""} max-w-[720px] ${className}`} data-reveal={reveal ? "" : undefined}>
-      {eyebrow && <div className="t-label-1 font-semibold text-primary mb-[10px]">{eyebrow}</div>}
+      {eyebrow && <div className="t-eyebrow text-primary mb-[10px]">{eyebrow}</div>}
       <h2 className="t-title-2 md:t-title-1 text-label text-pretty">{title}</h2>
       {lead && <p className="t-body-1-reading text-labelAlt mt-[14px] text-pretty">{lead}</p>}
     </div>
@@ -79,7 +79,7 @@ export const CHIP_ON = "border-primary bg-[rgba(0,102,255,.08)] text-primary";
 export const CHIP_OFF = "border-lineNeutral bg-white text-labelNeutral hover:border-primary hover:text-primary";
 
 /** 배지 */
-export function Badge({ tone = "neutral", children, className = "" }: { tone?: "neutral" | "primary" | "positive" | "cautionary" | "negative" | "inverse"; children: ReactNode; className?: string }) {
+export function Badge({ tone = "neutral", children, className = "", fit }: { tone?: "neutral" | "primary" | "positive" | "cautionary" | "negative" | "inverse"; children: ReactNode; className?: string; /** 긴 영어 문구: 줄을 바꾸지 않고 좁은 화면에서 글자를 줄인다 */ fit?: boolean }) {
   const t = {
     neutral: "bg-fill text-labelNeutral",
     primary: "bg-[rgba(0,102,255,.1)] text-primary",
@@ -88,7 +88,7 @@ export function Badge({ tone = "neutral", children, className = "" }: { tone?: "
     negative: "bg-[rgba(255,66,66,.12)] text-negativeFg",
     inverse: "bg-inverseBg text-inverseLabel",
   }[tone];
-  return <span className={`inline-flex items-center h-[24px] px-[8px] rounded-ds-sm t-caption-1 font-semibold ${t} ${className}`}>{children}</span>;
+  return <span className={`inline-flex items-center h-[24px] px-[8px] rounded-ds-sm ${fit ? "t-badge-fit" : "t-caption-1"} font-semibold whitespace-nowrap max-w-full ${t} ${className}`}>{children}</span>;
 }
 
 /** 구분선 */

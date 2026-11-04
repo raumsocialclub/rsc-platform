@@ -31,7 +31,7 @@ export async function LegalPage({ overline, title, updated, sections, current, p
       <Header />
       <main className="flex-1 py-[40px] md:py-[64px]">
         <Container className="!max-w-[860px]">
-          <div className="anim-up t-label-1 font-semibold text-primary mb-[8px]">{overline}</div>
+          <div className="anim-up t-eyebrow text-primary mb-[8px]">{overline}</div>
           <h1 className="anim-up t-title-2 md:t-title-1 text-label mb-[8px]">{title}</h1>
           <div className="t-label-1 text-labelAlt mb-[24px]">시행일 {updated}</div>
           <nav aria-label="약관 문서" className="flex gap-[24px] border-b border-lineAlt mb-[32px]">

@@ -103,6 +103,9 @@
 @utility t-label-2 { font-size: 13px; line-height: 1.385; letter-spacing: 0.0194em; font-weight: 500; }
 @utility t-caption-1 { font-size: 12px; line-height: 1.334; letter-spacing: 0.0252em; font-weight: 400; }
 @utility t-caption-2 { font-size: 11px; line-height: 1.273; letter-spacing: 0.0311em; font-weight: 400; }
+/* 영어 오버라인·배지: 줄을 바꾸지 않고 좁은 화면에서는 글자를 줄여 한 줄에 맞춘다 (모바일 3.4vw → 최대 14px) */
+@utility t-eyebrow { font-size: clamp(10px, 3.4vw, 14px); line-height: 1.429; letter-spacing: 0.0145em; font-weight: 600; white-space: nowrap; max-width: 100%; overflow: hidden; @media (min-width: 761px) { font-size: 14px; } }
+@utility t-badge-fit { font-size: clamp(9px, 2.9vw, 12px); white-space: nowrap; max-width: 100%; overflow: hidden; @media (min-width: 761px) { font-size: 12px; } }
 
 /* ---------- 움직임 (호버·누름·등장). prefers-reduced-motion 이면 위의 base 규칙이 모두 끈다 ---------- */
 @utility scrollbar-none { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }

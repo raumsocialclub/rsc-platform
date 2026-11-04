@@ -57,7 +57,7 @@ export default async function BenefitsPage() {
       <main className="flex-1 py-[48px] md:py-[80px]">
         <Container>
           <section className="text-center max-w-[640px] mx-auto mb-[40px] md:mb-[56px]">
-            <div className="anim-up t-label-1 font-semibold text-primary mb-[10px]">{s(hero, "label")}</div>
+            <div className="anim-up t-eyebrow text-primary mb-[10px]">{s(hero, "label")}</div>
             <h1 className="anim-up t-title-1 md:t-display-3 text-label mb-[14px] text-pretty">{s(hero, "title")}</h1>
             <p className="anim-up-2 t-body-1-reading text-labelAlt text-pretty"><Txt v={s(hero, "body")} breaks="hard" /></p>
           </section>

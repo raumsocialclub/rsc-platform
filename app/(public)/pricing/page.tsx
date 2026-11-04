@@ -48,7 +48,7 @@ export default async function PricingPage() {
       <main className="flex-1 py-[48px] md:py-[80px]">
         <Container>
           <section className={SEC}>
-            <div className="anim-up t-label-1 font-semibold text-primary mb-[10px]">{s(hero, "label")}</div>
+            <div className="anim-up t-eyebrow text-primary mb-[10px]">{s(hero, "label")}</div>
             <h1 className="anim-up t-title-1 md:t-display-2 text-label mb-[16px] text-pretty"><Txt v={s(hero, "title")} breaks="hard" /></h1>
             <p className="anim-up-2 t-body-1-reading text-labelAlt max-w-[600px] text-pretty"><Txt v={s(hero, "body")} breaks="hard" /></p>
           </section>
@@ -104,7 +104,7 @@ export default async function PricingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-[12px] md:gap-[16px] mt-[28px]">
               {list(path, "steps").map((c, i) => (
                 <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px]`}>
-                  <div className="t-label-1 font-semibold text-primary mb-[10px]">{c.s}</div>
+                  <div className="t-eyebrow text-primary mb-[10px]">{c.s}</div>
                   <div className="t-headline-1 text-label mb-[6px]">{c.t}</div>
                   <div className="t-body-2-reading text-labelAlt text-pretty"><Txt v={c.d} /></div>
                 </div>

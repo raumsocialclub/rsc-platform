@@ -44,7 +44,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
       <main className="flex-1 py-[40px] md:py-[72px]">
         <Container wide>
           <section className="mb-[28px] md:mb-[40px]">
-            <div className="anim-up t-label-1 font-semibold text-primary mb-[10px]">NEWS</div>
+            <div className="anim-up t-eyebrow text-primary mb-[10px]">NEWS</div>
             <h1 className="anim-up t-title-1 md:t-display-3 text-label mb-[12px] text-pretty">{seo.title || "소식"}</h1>
             <p className="anim-up-2 t-body-1-reading text-labelAlt max-w-[560px] text-pretty"><Txt v={seo.description} /></p>
           </section>

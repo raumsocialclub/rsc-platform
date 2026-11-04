@@ -46,7 +46,7 @@ export default async function HomePage() {
         <Container wide>
           <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:gap-[48px] lg:gap-[64px] items-center">
             <div className="order-2 md:order-1">
-              <Badge tone="primary" className="mb-[18px] anim-up">{s(hero, "overline")}</Badge>
+              <Badge tone="primary" fit className="mb-[18px] anim-up">{s(hero, "overline")}</Badge>
               <h1 className="anim-up t-title-1 md:t-display-2 lg:t-display-1 text-label text-pretty mb-[20px] md:mb-[24px]"><Txt v={s(hero, "title")} breaks="hard" /></h1>
               <p className={`anim-up-2 ${BODY} md:text-[18px] md:leading-[1.6] max-w-[520px] mb-[32px]`}><Txt v={s(hero, "body")} /></p>
               <div className="anim-up-3 flex gap-[10px] flex-wrap">
@@ -135,11 +135,11 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 05 MONTHLY & SEASON */}
+      {/* 05 QUARTERLY & COHORT (SOCIAL NIGHT · RAUM SOLO) */}
       {on(solo, "visible") && (
         <section id="solo" className={SECTION}>
           <Container>
-            <SectionHead eyebrow={eyebrow(s(solo, "label"))} title={list(solo, "cards").length ? "매달, 그리고 시즌마다" : ""} reveal />
+            <SectionHead eyebrow={eyebrow(s(solo, "label"))} title={list(solo, "cards").length ? "분기마다, 그리고 기수마다" : ""} reveal />
             <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[20px] mt-[40px]">
               {list(solo, "cards").map((c, i) => (
                 <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} overflow-hidden`}>

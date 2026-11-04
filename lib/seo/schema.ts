@@ -49,7 +49,7 @@ const DEFAULT_LLMS = `# 라움소셜클럽 (RAUM SOCIAL CLUB, RSC)
 - 운영: 주식회사 레벤스토리(대표 김기태) · 서울특별시 강남구 언주로 564, 비동 2층 (역삼동, 라움)
 - 가입: 만 19세 이상, 법률상 배우자가 없는 싱글. 사이트에서 상담을 신청하고 상담 후 초대코드로 가입
 - 멤버십: RSC PREVIEW 165,000원(가입 전 행사 1회, 생애 1회) · RSC ACCESS 연 3,300,000원 · RSC SIGNATURE 연 8,800,000원 (VAT 포함, 자동 갱신 없음)
-- 프로그램: ART WALK, SUNDAY RESET, TASTE TABLE, ONE QUESTION SALON, AFTER HOURS, RUN & BRUNCH 등 6개 카테고리 행사 · 매월 RAUM SOCIAL NIGHT · 6주 시즌 RAUM SOLO · 관계 프로그램 CONNECTION / RAUM MERRY
+- 프로그램: ART WALK, SUNDAY RESET, TASTE TABLE, ONE QUESTION SALON, AFTER HOURS, RUN & BRUNCH 등 6개 카테고리 행사 · 분기 RAUM SOCIAL NIGHT(연말 GRAND SOCIAL BALL) · 연 6기 기수제 RAUM SOLO · 관계 프로그램 CONNECTION / RAUM MERRY
 - 문의: 02-6925-4786 · theraumai@gmail.com · 인스타그램 @raum_socialclub
 `;
 

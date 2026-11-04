@@ -34,7 +34,6 @@ export async function SiteFooter() {
             <div className="t-label-1 font-semibold text-label mb-[14px]">메뉴</div>
             <nav className="flex flex-col gap-[10px]">
               <Link href="/#about" className={LINK}>소개</Link>
-              <Link href="/benefits" className={LINK}>혜택</Link>
               {!lead && <Link href="/pricing" className={LINK}>멤버십</Link>}
               <Link href="/news" className={LINK}>소식</Link>
               <Link href="/#faq" className={LINK}>자주 묻는 질문</Link>

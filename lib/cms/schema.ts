@@ -195,15 +195,15 @@ export const DOCS: DocDef[] = [
   {
     id: "home.solo",
     page: "home",
-    label: "05 MONTHLY & SEASON",
+    label: "05 QUARTERLY & COHORT",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨")],
     lists: [{ key: "cards", label: "카드", itemLabel: "카드", fields: [img("image", "사진"), t("label", "라벨"), t("title", "이름"), ta("body", "설명", "soft"), t("filter", "사진 보정(CSS filter)")], min: 1, max: 4 }],
     defaults: {
       visible: true,
-      label: "05  /  MONTHLY & SEASON",
+      label: "05  /  QUARTERLY & COHORT",
       cards: [
-        { image: "/images/social-night.jpg", label: "MONTHLY", title: "RAUM SOCIAL NIGHT", body: "매월 한 번 열리는 RSC 대표 싱글 소셜. 공연, 다이닝, 와인, 음악 안에서\n자연스럽게 사람을 만납니다.", filter: "brightness(1.1) saturate(0.94)" },
-        { image: "/images/raum-solo.jpg", label: "QUARTERLY · FLAGSHIP", title: "RAUM SOLO", body: "한 번의 소개팅이 아닌, 함께 보내는 한 시즌. 선별된 RSC 싱글 회원들이\n6주 동안 다양한 경험을 함께하며 서로를 발견하는 시즌형 프로그램입니다.", filter: "grayscale(1) brightness(1.05) contrast(1.05)" },
+        { image: "/images/social-night.jpg", label: "QUARTERLY", title: "RAUM SOCIAL NIGHT", body: "분기마다 열리는 RSC 대표 싱글 소셜. 공연, 다이닝, 와인, 음악 안에서 자연스럽게 사람을 만납니다.\n연말에는 RSC GRAND SOCIAL BALL 로 한 해를 마무리합니다.", filter: "brightness(1.1) saturate(0.94)" },
+        { image: "/images/raum-solo.jpg", label: "SIGNATURE · 6 COHORTS A YEAR", title: "RAUM SOLO", body: "한 번의 소개팅이 아닌, 함께 보내는 한 기수. 1·3·6·8·10·12월, 연 6기로 운영하는 기수제 로테이션 소개 프로그램입니다.\nSIGNATURE 회원은 1기 참여가 포함됩니다.", filter: "grayscale(1) brightness(1.05) contrast(1.05)" },
       ],
     },
   },
@@ -271,7 +271,7 @@ export const DOCS: DocDef[] = [
         { q: "초대제라는 게 무슨 뜻인가요? 바로 가입할 수는 없나요?", a: "네, 상담 없이 바로 가입할 수는 없습니다. 사이트의 'RSC 상담 신청'에서 이름과 연락처를 남기시면 운영팀이 연락드려 상담을 진행하고, 상담 후 초대코드를 보내드립니다. 그 코드로 가입 화면에 들어올 수 있습니다." },
         { q: "회비는 얼마인가요?", a: "RSC ACCESS 연 3,300,000원(월 환산 275,000원), RSC SIGNATURE 연 8,800,000원(월 환산 733,000원)이며 Founding Member 100명 한정으로 각각 2,400,000원 · 7,200,000원에 가입할 수 있습니다. 가입 전 행사 1회로 먼저 경험하는 RSC PREVIEW는 165,000원입니다. 모든 금액은 VAT 포함 총액이고 자동 갱신은 없으며, 분납은 ACCESS 최대 2회 · SIGNATURE 최대 3회까지 가능합니다." },
         { q: "PREVIEW는 무엇이고, 가입하면 비용은 어떻게 되나요?", a: "PREVIEW는 가입을 결정하기 전에 RSC의 공간·회원·프로그램을 실제 행사 1회로 먼저 경험하는 상품입니다(생애 최초 1회, 165,000원). RSC Basic Event 1회, 호스트 온보딩과 공간 안내, 행사 후 멤버십 상담, 행사 당일 주차 3시간이 포함됩니다. 행사 후 7일 이내에 ACCESS 또는 SIGNATURE에 가입하시면 165,000원이 전액 차감됩니다." },
-        { q: "어떤 프로그램이 있나요?", a: "일상적으로 참여하는 6개 카테고리 행사 — RAUM ART WALK(전시), SUNDAY RESET(웰니스), TASTE TABLE(와인·위스키), ONE QUESTION SALON(토크), RAUM AFTER HOURS(공연·음악), RUN & BRUNCH(러닝) — 와 매월 열리는 RAUM SOCIAL NIGHT, 6주 동안 한 시즌을 함께 보내는 RAUM SOLO가 있습니다. 여기에 관계 프로그램 CONNECTION(ESSENTIAL · SELECT · BESPOKE)과 결혼 목적의 RAUM MERRY를 선택할 수 있습니다." },
+        { q: "어떤 프로그램이 있나요?", a: "일상적으로 참여하는 6개 카테고리 행사 — RAUM ART WALK(전시), SUNDAY RESET(웰니스), TASTE TABLE(와인·위스키), ONE QUESTION SALON(토크), RAUM AFTER HOURS(공연·음악), RUN & BRUNCH(러닝) — 와 분기마다 열리는 RAUM SOCIAL NIGHT(연말에는 RSC GRAND SOCIAL BALL), 연 6기 기수제로 운영하는 로테이션 소개 프로그램 RAUM SOLO가 있습니다. 여기에 관계 프로그램 CONNECTION(ESSENTIAL · SELECT · BESPOKE)과 결혼 목적의 RAUM MERRY를 선택할 수 있습니다." },
         { q: "위치는 어디이고 주차는 가능한가요?", a: "서울특별시 강남구 언주로 564 라움아트센터(역삼동 680-1)입니다. 정회원은 평일 1일 1회, 3시간까지 무료로 주차할 수 있고 PREVIEW 참가자는 행사 당일 3시간 주차가 제공됩니다. 행사 전후에는 RSC 라운지를 자유롭게 이용하실 수 있습니다." },
         { q: "상담은 어떻게 신청하나요?", a: "사이트 상단의 'RSC 상담 신청' 버튼을 눌러 이름·연락처·상담 가능 시간만 남겨 주세요. 담당자가 직접 연락드립니다. 인스타그램 @raum_socialclub 프로필의 링크나 DM으로도 상담을 신청하실 수 있습니다." },
       ],
