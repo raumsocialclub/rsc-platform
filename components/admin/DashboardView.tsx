@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CARD, TH, TD, Badge, EmptyRow, PageTitle } from "./ui";
-import { orderBadge, won } from "@/lib/admin/format";
+import { INQUIRY_STATUS, badgeStyle, fmtShortDate, inquiryBadge, orderBadge, won } from "@/lib/admin/format";
 import type { DashboardStats, Range } from "@/lib/admin/stats";
 import { BOOKING_STATUS_KO } from "@/lib/bookings/types";
 import { fmtDay, fmtTime } from "@/lib/programs/format";
@@ -15,7 +15,7 @@ function delta(cur: number, prev: number, unit: string, prevLabel: string): { te
   return { text: `${pct > 0 ? "▲" : "▼"} ${Math.abs(pct)}% vs ${prevLabel}`, color: pct > 0 ? "#2e6b3e" : "#a3402c" };
 }
 
-/** design/RSC Admin.dc.html DASHBOARD 뷰: KPI 4 · 일별(월별) 매출 바 · 프로그램별 매출 · 최근 예약 + 마감 임박 (ToDo M7) */
+/** design/RSC Admin.dc.html DASHBOARD 뷰: KPI 4 · 일별(월별) 매출 바 · 프로그램별 매출 · 상담 신청 수집 현황(설문/홈, 최근 5건) · 최근 예약 + 마감 임박 (ToDo M7) */
 export function DashboardView({ s }: { s: DashboardStats }) {
   const prevLabel = s.range === "year" ? "작년" : "지난 달";
   const rev = delta(s.revenue, s.prevRevenue, "원", prevLabel);
@@ -24,7 +24,7 @@ export function DashboardView({ s }: { s: DashboardStats }) {
     { label: s.range === "year" ? "올해 매출" : "이번 달 매출", value: won(s.revenue), delta: s.refunds ? `${rev.text} · 환불 ${won(s.refunds)}` : rev.text, color: rev.color },
     { label: "예약 건수", value: `${s.bookings}건`, delta: bk.text, color: bk.color },
     { label: "활동 회원", value: `${s.activeMembers}명`, delta: `신규 ${s.newMembers}명`, color: "rgba(33,30,25,.55)" },
-    { label: "상담 대기", value: `${s.pendingInquiries}건`, delta: s.pendingInquiries ? "확인이 필요합니다" : "대기 없음", color: s.pendingInquiries ? "#7a5420" : "rgba(33,30,25,.55)" },
+    { label: "상담 대기", value: `${s.pendingInquiries}건`, delta: s.pendingInquiries ? (s.inquiries.applyPending ? `확인 필요 · 설문 ${s.inquiries.applyPending}건 포함` : "확인이 필요합니다") : "대기 없음", color: s.pendingInquiries ? "#7a5420" : "rgba(33,30,25,.55)" },
   ];
   const max = Math.max(1, ...s.bars.map((b) => b.value));
   const lastIdx = s.bars.length - 1;
@@ -77,6 +77,30 @@ export function DashboardView({ s }: { s: DashboardStats }) {
               ))}
             </div>
           )}
+        </div>
+      </div>
+
+      <div className={`${CARD} p-[24px] mb-[28px]`}>
+        <div className="flex justify-between items-baseline gap-[12px] flex-wrap mb-[14px]">
+          <b className="text-[14px]">상담 신청 수집 현황 <span className="font-normal text-[12.5px] text-[rgba(33,30,25,.55)] ml-[6px]">{s.label} {s.inquiries.total}건 · 상담 전 설문 {s.inquiries.applies}건 · 홈 상담 신청 {s.inquiries.total - s.inquiries.applies}건</span></b>
+          <span className="flex gap-[14px] text-[12.5px] font-semibold"><Link href="/admin/inquiries?kind=apply" className="text-brown">설문 응답만 보기 →</Link><Link href="/admin/inquiries" className="text-brown">전체 보기 →</Link></span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="border-collapse w-full">
+            <thead><tr>{["신청일", "이름", "종류", "요약", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
+            <tbody>
+              {s.inquiries.recent.length === 0 && <EmptyRow colSpan={5}>아직 상담 신청이 없습니다. 홈 상담 신청(/fit-check)이나 상담 전 설문(/apply)이 제출되면 여기에 표시됩니다.</EmptyRow>}
+              {s.inquiries.recent.map((r) => (
+                <tr key={r.id} className="hover:bg-[#faf7f1]">
+                  <td className={`${TD} text-[rgba(33,30,25,.6)]`}><Link href={`/admin/inquiries?id=${r.id}`} className="block">{fmtShortDate(r.created_at)}</Link></td>
+                  <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}</Link></td>
+                  <td className={TD}><Badge style={badgeStyle(r.apply ? "brand" : "mute")}>{r.apply ? "상담 전 설문" : "홈 상담 신청"}</Badge></td>
+                  <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{r.summary || "—"}</td>
+                  <td className={TD}><Badge style={inquiryBadge(r.status)}>{INQUIRY_STATUS[r.status] ?? r.status}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
