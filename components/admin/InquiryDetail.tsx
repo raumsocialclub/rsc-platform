@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BTN_PRIMARY, BTN_SECONDARY, FIELD } from "./ui";
 import { IssuedCodeBox } from "./IssuedCodeBox";
+import { IssuedLinkBox } from "./ApplyLinkForm";
+import Link from "next/link";
 import { INQUIRY_STATUS, badgeStyle, fmtDate } from "@/lib/admin/format";
 import type { InquiryCrm } from "@/lib/crm/inquiries";
 import { STATUS_KO } from "@/lib/crm/types";
@@ -20,6 +22,7 @@ export type InquiryRow = {
   /** 저장 항목은 route·slot 뿐. answers 배열은 설문 원본을 저장하던 이전 신청에만 남아 있다. */
   answers: {
     form?: string;          // "apply" = 상담 전 설문(/apply) 응답
+    linkId?: string;        // 응답이 들어온 설문 링크(apply_links.id)
     ref?: string;           // /apply?ref=코드 (추천인·직접 전달 링크)
     apply?: Record<string, string | string[]>;  // 상담 전 설문 응답 원본(키-값). CSV·목록 요약에 쓴다
     profile?: string;
@@ -33,6 +36,9 @@ export type InquiryRow = {
   utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string } | null;
   /** 이미 발급된 코드 (있으면) */
   invite?: { code: string; expires_at: string | null; used_at: string | null } | null;
+  /** 이 신청에 발급된 상담 전 설문 링크(최근 1개) · 이 행이 설문 응답이면 원 상담 신청 */
+  applyLink?: { id: string; url: string; status: "active" | "used" | "expired" | "revoked"; expires_at: string; response_id: string | null } | null;
+  applySource?: { inquiry_id: string | null; name: string } | null;
   /** CRM 시트 연동이 마지막으로 본 콜 결과·시도 횟수·적은 상태 (lib/crm/inquiries.ts) */
   crm_status?: string | null;
   crm_attempts?: number | null;
@@ -46,7 +52,8 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   const router = useRouter();
   const [memo, setMemo] = useState(inquiry.memo ?? "");
   const [status, setStatus] = useState(inquiry.status);
-  const [busy, setBusy] = useState<"save" | "issue" | null>(null);
+  const [busy, setBusy] = useState<"save" | "issue" | "link" | null>(null);
+  const [applyLink, setApplyLink] = useState(inquiry.applyLink ?? null);
   const [msg, setMsg] = useState<string | null>(null);
   const [issued, setIssued] = useState<{ code: string; expiresAt: string | null; notify?: { sent: boolean; reason?: string } } | null>(
     inquiry.invite ? { code: inquiry.invite.code, expiresAt: inquiry.invite.expires_at } : null,
@@ -95,6 +102,20 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
     } finally {
       setBusy(null);
     }
+  };
+
+  const issueLink = async () => {
+    if (applyLink?.status === "active" && !window.confirm("아직 응답하지 않은 설문 링크가 있습니다. 새 링크를 추가로 만들까요? (이전 링크도 계속 유효합니다)")) return;
+    setBusy("link"); setMsg(null);
+    try {
+      const res = await fetch("/api/admin/apply-links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ inquiryId: inquiry.id, name: inquiry.name ?? "", phone: inquiry.phone ?? "" }) });
+      const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string; link?: { id: string; url: string; expiresAt: string } } | null;
+      if (!j?.ok || !j.link) throw new Error(j?.message ?? "설문 링크를 만들지 못했습니다.");
+      setApplyLink({ id: j.link.id, url: j.link.url, status: "active", expires_at: j.link.expiresAt, response_id: null });
+      router.refresh();
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "설문 링크를 만들지 못했습니다.");
+    } finally { setBusy(null); }
   };
 
   const a = inquiry.answers ?? {};
@@ -150,6 +171,20 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
         </div>
       )}
       {issued && <div className="mb-[16px]"><IssuedCodeBox code={issued.code} expiresAt={issued.expiresAt} notify={issued.notify} /></div>}
+      {inquiry.applySource && (
+        <div className="bg-cream p-[14px] mb-[16px] text-[12.5px]">
+          <span className="text-[11px] tracking-[.2em] text-brownHover mr-[8px]">설문 링크 응답</span>
+          {inquiry.applySource.inquiry_id ? <Link href={`/admin/inquiries?id=${inquiry.applySource.inquiry_id}`} className="text-brown font-semibold">원 상담 신청 보기 →</Link> : <span className="text-[rgba(33,30,25,.6)]">직접 발급한 링크({inquiry.applySource.name || "이름 없음"})의 응답</span>}
+        </div>
+      )}
+      {applyLink && (
+        applyLink.status === "active" ? <div className="mb-[16px]"><IssuedLinkBox link={{ url: applyLink.url, expiresAt: applyLink.expires_at }} title="상담 전 설문 링크 (전달 가능)" /></div> : (
+          <div className="bg-cream p-[14px] mb-[16px] text-[12.5px]">
+            <span className="text-[11px] tracking-[.2em] text-brownHover mr-[8px]">상담 전 설문</span>
+            {applyLink.status === "used" && applyLink.response_id ? <Link href={`/admin/inquiries?id=${applyLink.response_id}`} className="text-brown font-semibold">응답 완료 · 설문 응답 보기 →</Link> : <span className="text-[rgba(33,30,25,.6)]">{applyLink.status === "expired" ? "링크 기간 만료 — 다시 발급할 수 있습니다" : applyLink.status === "revoked" ? "링크 취소됨 — 다시 발급할 수 있습니다" : "응답 완료"}</span>}
+          </div>
+        )
+      )}
 
       <label className="block text-[11.5px] text-[rgba(33,30,25,.5)] mb-[6px]">상태</label>
       <select value={status} onChange={(e) => setStatus(e.target.value)} className={`${FIELD} mb-[12px]`}>
@@ -161,6 +196,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
       {msg && <div className="text-[12.5px] text-[rgba(33,30,25,.6)] mb-[10px]">{msg}</div>}
       <div className="flex gap-[8px]">
         <button type="button" onClick={issue} disabled={busy !== null} className={`${BTN_PRIMARY} flex-1 py-[12px]`}>{busy === "issue" ? "발급 중…" : "초대코드 발급"}</button>
+        {inquiry.answers?.form !== "apply" && <button type="button" onClick={issueLink} disabled={busy !== null} className={`${BTN_SECONDARY} py-[12px]`} title="전화 상담 후 니즈가 확실한 분에게 대면 상담 전 설문 링크를 보냅니다">{busy === "link" ? "만드는 중…" : "설문 링크 발급"}</button>}
         <button type="button" onClick={() => save()} disabled={busy !== null} className={`${BTN_SECONDARY} py-[12px]`}>{busy === "save" ? "저장 중…" : "저장"}</button>
         <button type="button" onClick={() => save("closed")} disabled={busy !== null} className={`${BTN_SECONDARY} py-[12px]`}>보류</button>
       </div>

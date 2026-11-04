@@ -4,12 +4,13 @@ import { ALL_FIELDS, STEPS, displayAnswer, flattenAnswers, missingRequired, sani
 
 /** 상담 전 설문(/apply): 레퍼런스 8단계 문항 정의 · 서버 정제 · 저장. 전부 가상 데이터 */
 const db = fakeDb();
-let applyEnabled = true;
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => db.client }));
-vi.mock("@/lib/supabase/admin", () => ({ hasServiceRoleKey: () => false, createAdminClient: () => db.client }));
-vi.mock("@/lib/settings/get", () => ({ getSettings: async () => ({ applyEnabled, applyClosedMessage: "닫힘" }) }));
+vi.mock("@/lib/supabase/admin", () => ({ hasServiceRoleKey: () => true, createAdminClient: () => db.client }));
 
-const post = (body: unknown) => new Request("https://test.example/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+const TOKEN = "AbCdEfGhIjKlMnOpQrStUv";
+const post = (body: Record<string, unknown>) => new Request("https://test.example/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: TOKEN, ...body }) });
+const future = new Date(Date.now() + 86_400_000).toISOString();
+const link = (over: Record<string, unknown> = {}) => ({ id: "link-1", token: TOKEN, name: "홍길동", phone: "010-1234-5678", memo: null, inquiry_id: null, response_id: null, created_at: new Date().toISOString(), expires_at: future, used_at: null, revoked_at: null, ...over });
 const base = { name: "홍길동", gender: "남성", birth: "1989-01-06", phone: "01012345678" };
 
 describe("문항 정의", () => {
@@ -54,33 +55,44 @@ describe("정제·표시", () => {
   });
 });
 
-describe("POST /api/apply", () => {
-  beforeEach(() => { db.calls.length = 0; db.tables.inquiries = []; applyEnabled = true; });
-  it("닫혀 있으면 403", async () => {
-    applyEnabled = false;
+describe("POST /api/apply (비밀 링크)", () => {
+  beforeEach(() => { db.calls.length = 0; db.tables.inquiries = []; db.tables.apply_links = [link()]; });
+  it("토큰이 없거나 모르는 토큰이면 거부, DB 저장 없음", async () => {
     const { POST } = await import("@/app/api/apply/route");
-    const res = await POST(post({ answers: base, consent: true }));
-    expect(res.status).toBe(403);
-    expect(db.calls).toHaveLength(0);
+    expect((await POST(new Request("https://test.example/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answers: base, consent: true }) }))).status).toBe(400);
+    expect((await POST(post({ token: "zzzzzzzzzzzzzzzzzzzzzz", answers: base, consent: true }))).status).toBe(403);
+    expect(db.tables.inquiries).toHaveLength(0);
   });
-  it("동의 없으면 400, 필수 칸 없으면 400", async () => {
+  it("이미 제출된 링크는 409, 만료·취소는 403", async () => {
+    const { POST } = await import("@/app/api/apply/route");
+    db.tables.apply_links = [link({ used_at: new Date().toISOString() })];
+    expect((await POST(post({ answers: base, consent: true }))).status).toBe(409);
+    db.tables.apply_links = [link({ expires_at: new Date(Date.now() - 1000).toISOString() })];
+    expect((await POST(post({ answers: base, consent: true }))).status).toBe(403);
+    db.tables.apply_links = [link({ revoked_at: new Date().toISOString() })];
+    expect((await POST(post({ answers: base, consent: true }))).status).toBe(403);
+    expect(db.tables.inquiries).toHaveLength(0);
+  });
+  it("동의 없으면 400, 필수 칸 없으면 400 (링크는 그대로 열려 있음)", async () => {
     const { POST } = await import("@/app/api/apply/route");
     expect((await POST(post({ answers: base, consent: false }))).status).toBe(400);
     expect((await POST(post({ answers: { ...base, phone: "123" }, consent: true }))).status).toBe(400);
     expect((await POST(post({ answers: { ...base, gender: "" }, consent: true }))).status).toBe(400);
-    expect(db.calls).toHaveLength(0);
+    expect(db.tables.inquiries).toHaveLength(0);
+    expect(db.tables.apply_links[0].used_at).toBeNull();
   });
-  it("저장: 이름·전화(정규화)·이메일은 컬럼, 나머지는 answers (form=apply, 평탄화 + 원본), UTM 포함", async () => {
+  it("저장: 이름·전화(정규화)·이메일은 컬럼, 나머지는 answers (form=apply, linkId, 평탄화 + 원본), 링크는 제출됨으로 닫히고 응답 행을 가리킨다", async () => {
     const { POST } = await import("@/app/api/apply/route");
-    const res = await POST(post({ answers: { ...base, email: "x@y.z", joinRoute: "SNS 광고", refCode: "RSC01", salary: "90000000", idealRegions: ["서울"], t13: "한 명이어도 충분하다", hacked: "x" }, consent: true, utm: { utm_source: "ig", utm_campaign: "c1", utm_term: "" } }));
+    const res = await POST(post({ answers: { ...base, email: "x@y.z", joinRoute: "SNS 광고", refCode: "RSC01", salary: "90000000", idealRegions: ["서울"], t13: "한 명이어도 충분하다", hacked: "x" }, consent: true }));
     expect(res.status).toBe(200);
-    const row = db.calls[0].payload as { name: string; phone: string; email: string; result_type: unknown; utm: Record<string, string>; answers: { form: string; route: string; ref: string; consentVersion: string; answers: { key: string; answer: string }[]; apply: Record<string, unknown> } };
+    const row = db.tables.inquiries[0] as { id: string; name: string; phone: string; email: string; result_type: unknown; utm: unknown; answers: { form: string; linkId: string; route: string; ref: string; consentVersion: string; answers: { key: string; answer: string }[]; apply: Record<string, unknown> } };
     expect(row.name).toBe("홍길동");
     expect(row.phone).toBe("010-1234-5678");
     expect(row.email).toBe("x@y.z");
     expect(row.result_type).toBeNull();
-    expect(row.utm).toEqual({ utm_source: "ig", utm_campaign: "c1" });
+    expect(row.utm).toBeNull();
     expect(row.answers.form).toBe("apply");
+    expect(row.answers.linkId).toBe("link-1");
     expect(row.answers.route).toBe("SNS 광고");
     expect(row.answers.ref).toBe("RSC01");
     expect(row.answers.consentVersion).toBeTruthy();
@@ -88,5 +100,11 @@ describe("POST /api/apply", () => {
     expect(row.answers.apply.hacked).toBeUndefined();
     expect(row.answers.apply.name).toBeUndefined();
     expect(row.answers.apply.t13).toBe("한 명이어도 충분하다");
+    const l = db.tables.apply_links[0] as { used_at: string | null; response_id: string | null };
+    expect(l.used_at).toBeTruthy();
+    expect(l.response_id).toBe(row.id);
+    // 같은 링크로 다시 보내면 409
+    expect((await POST(post({ answers: base, consent: true }))).status).toBe(409);
+    expect(db.tables.inquiries).toHaveLength(1);
   });
 });

@@ -1,45 +1,43 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { TOKEN_RE, findLink, linkStatus, LINK_MESSAGE } from "@/lib/apply/links";
 import { flattenAnswers, sanitizeAnswers } from "@/lib/apply/schema";
 import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 import { normalizePhone } from "@/lib/phone";
 import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
-import { getSettings } from "@/lib/settings/get";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { UTM_KEYS } from "@/lib/utm/client";
 
 /**
- * POST /api/apply — 상담 전 고객 정보 설문(/apply) 제출. 일반 설정에서 「상담 전 설문 열기」가 켜져 있을 때만 받는다.
- * 저장은 기존 inquiries 테이블: 이름·휴대폰·이메일은 컬럼에, 나머지 답은 answers.answers[] (어드민 「상담 신청」 상세가 그대로 보여줌)
- * 와 answers.apply (원본 키-값) 에 넣는다. 보관 180일(purge 크론)·CRM 시트 연동(전화번호)·UTM 필터는 기존 그대로 적용된다.
- * 선택지 밖의 값·모르는 키·길이 초과는 서버에서 버린다 (lib/apply/schema.ts sanitizeAnswers).
- * 요청 제한: 같은 IP 10분에 5번 (lib/ratelimit.ts). 저장은 서버(service role)만 — inquiries 에 익명 insert 정책은 없다.
+ * POST /api/apply { token, answers, consent } — 상담 전 설문(/apply/<토큰>) 제출.
+ * 관리자가 발급한 비밀 링크(apply_links)의 토큰이 유효(미제출·기간 내·취소 안 됨)할 때만 받고, 받는 즉시 링크를 「제출됨」으로 닫는다(1회).
+ * 저장은 inquiries 테이블(서버 service role 전용): 이름·휴대폰·이메일은 컬럼에, 나머지 답은 answers.answers[] (어드민 상세가 그대로 보여줌)
+ * 와 answers.apply (원본 키-값) 에 넣고, answers.linkId 로 어느 링크의 응답인지 남긴다. 링크의 response_id 가 이 행을 가리킨다.
+ * 보관 180일(purge 크론)·CRM 시트 연동(전화번호)은 기존 그대로. 선택지 밖의 값·모르는 키·길이 초과는 서버에서 버린다.
+ * 요청 제한: 같은 IP 10분에 5번 (lib/ratelimit.ts).
  */
-const UtmSchema = z.object(Object.fromEntries(UTM_KEYS.map((k) => [k, z.string().trim().max(100).optional()])) as Record<(typeof UTM_KEYS)[number], z.ZodOptional<z.ZodString>>);
 const BodySchema = z.object({
+  token: z.string().regex(TOKEN_RE, "유효하지 않은 설문 링크입니다."),
   answers: z.record(z.string(), z.unknown()),
   consent: z.literal(true, { message: "개인정보 수집·이용에 동의해 주세요." }),
-  utm: UtmSchema.nullable().optional(),
 });
 
-function cleanUtm(utm: z.infer<typeof UtmSchema> | null | undefined): Record<string, string> | null {
-  if (!utm) return null;
-  const out: Record<string, string> = {};
-  for (const k of UTM_KEYS) if (utm[k]) out[k] = utm[k]!;
-  return Object.keys(out).length ? out : null;
-}
-
 export async function POST(req: Request) {
-  const { applyEnabled } = await getSettings();
-  if (!applyEnabled) return NextResponse.json({ ok: false, message: "지금은 상담 전 설문을 받고 있지 않습니다." }, { status: 403 });
   const limited = await limitByIp(req, "apply", 5, 600);
   if (!limited.ok) return tooManyResponse(limited);
+  if (!hasServiceRoleKey()) {
+    console.error("[apply] SUPABASE_SERVICE_ROLE_KEY 없음 — 설문 링크 확인·저장 불가");
+    return NextResponse.json({ ok: false, message: "서버 설정 오류입니다. 관리자에게 문의해 주세요." }, { status: 500 });
+  }
 
   let json: unknown;
   try { json = await req.json(); } catch { return NextResponse.json({ ok: false, message: "요청 형식이 올바르지 않습니다." }, { status: 400 }); }
   const parsed = BodySchema.safeParse(json);
   if (!parsed.success) return NextResponse.json({ ok: false, message: parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요." }, { status: 400 });
+
+  const admin = createAdminClient();
+  const link = await findLink(admin, parsed.data.token);
+  const status = link ? linkStatus(link) : "invalid";
+  if (!link || status !== "active") return NextResponse.json({ ok: false, message: LINK_MESSAGE[status === "active" ? "invalid" : status] }, { status: status === "used" ? 409 : 403 });
 
   const a = sanitizeAnswers(parsed.data.answers);
   const name = String(a.name ?? "").trim();
@@ -58,6 +56,7 @@ export async function POST(req: Request) {
     email: email || null,
     answers: {
       form: "apply",
+      linkId: link.id,
       route: String(a.joinRoute ?? ""),
       slot: "",
       ref: String(a.refCode ?? ""),
@@ -67,17 +66,23 @@ export async function POST(req: Request) {
       apply: rest,
     },
     result_type: null,
-    utm: cleanUtm(parsed.data.utm),
+    utm: null,
   };
 
   try {
-    if (!hasServiceRoleKey()) console.warn("[apply] SUPABASE_SERVICE_ROLE_KEY 없음 — inquiries 는 익명 insert 정책이 없어 저장이 거부될 수 있습니다");
-    const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient();
-    const { error } = await supabase.from("inquiries").insert(row);
-    if (error) {
+    // 1) 링크를 먼저 닫는다(같은 링크로 동시에 두 번 제출 방지). 이미 닫혔으면 409
+    const usedAt = new Date().toISOString();
+    const closed = await admin.from("apply_links").update({ used_at: usedAt }).eq("id", link.id).is("used_at", null).select("id");
+    if (closed.error || !closed.data?.length) return NextResponse.json({ ok: false, message: LINK_MESSAGE.used }, { status: 409 });
+    // 2) 응답 저장
+    const { data: inserted, error } = await admin.from("inquiries").insert(row).select("id").single();
+    if (error || !inserted) {
       console.error("[apply] insert failed:", error);
+      await admin.from("apply_links").update({ used_at: null }).eq("id", link.id); // 다시 열어 둔다
       return NextResponse.json({ ok: false, message: "설문을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });
     }
+    // 3) 링크 ↔ 응답 연결
+    await admin.from("apply_links").update({ response_id: (inserted as { id: string }).id }).eq("id", link.id);
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[apply] error:", e);

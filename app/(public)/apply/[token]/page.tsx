@@ -1,0 +1,37 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ApplyForm } from "@/components/apply/ApplyForm";
+import { ClosedNotice } from "@/components/apply/ClosedNotice";
+import { Logo } from "@/components/site/Logo";
+import { LINK_MESSAGE, findLink, linkStatus } from "@/lib/apply/links";
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
+
+export const metadata: Metadata = { title: "RSC 상담 전 설문", description: "대면 상담 전에 기본 정보와 선호를 미리 알려 주시면 담당자가 더 잘 준비해서 뵙겠습니다.", robots: { index: false, follow: false } };
+export const dynamic = "force-dynamic";
+
+/**
+ * /apply/<토큰> — 관리자가 발급한 비밀 링크로만 열리는 상담 전 설문. 전화 상담 후 니즈가 확실한 분에게 대면 상담 전 받는다.
+ * 사이트 어디에도 링크가 없고(robots 도 제외), 토큰이 유효(미제출·기간 내·취소 안 됨)할 때만 설문이 보인다. 제출은 1회.
+ * 발급·전달·응답 확인: 어드민 → 상담 전 설문(/admin/apply)
+ */
+export default async function ApplyTokenPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  const link = hasServiceRoleKey() ? await findLink(createAdminClient(), token) : null;
+  const status = link ? linkStatus(link) : "invalid";
+  return (
+    <div className="min-h-screen flex flex-col bg-cream">
+      <header className="flex items-center justify-between gap-[24px] px-[20px] py-[16px] md:px-[40px] md:py-[22px]">
+        <Logo href="/" emblemClass="h-[39px]" textClass="h-[23px]" textSrc="/images/logo-text-fitcheck.png" />
+        <Link href="/" className="text-[12.5px] tracking-[.04em] text-[rgba(33,30,25,.5)]">닫기 ✕</Link>
+      </header>
+      <main className="flex-1 flex flex-col px-[20px] pt-[16px] pb-[64px] md:px-[40px] md:pt-[28px] md:pb-[96px]">
+        {link && status === "active" ? (
+          <ApplyForm token={token} prefill={{ name: link.name, phone: link.phone ?? "" }} />
+        ) : (
+          <ClosedNotice message={LINK_MESSAGE[status === "active" ? "invalid" : status]} />
+        )}
+      </main>
+    </div>
+  );
+}
+

@@ -652,3 +652,24 @@ create or replace function purge_expired_logs() returns void language sql securi
 $$;
 -- inquiries 익명 insert 정책 제거: 공개 anon 키로 REST 에 직접 insert 하던 길을 막는다. 저장은 /api/inquiries·/api/apply (service role) 만.
 drop policy if exists "anyone can submit inquiry" on inquiries;
+
+-- ---------- 2026-11-04: 상담 전 설문(/apply/<토큰>) 비밀 링크. 관리자가 발급해 직접 전달, 1회 제출, 기본 30일. 응답은 inquiries 행(response_id)
+create table apply_links (
+  id uuid primary key default gen_random_uuid(),
+  token text not null unique,                 -- /apply/<token> (22자 base64url 난수)
+  name text not null default '',              -- 받는 분 이름 (설문 첫 칸에 미리 채움)
+  phone text,
+  memo text,
+  inquiry_id uuid references inquiries(id) on delete set null,   -- 발급 근거가 된 상담 신청 (있으면)
+  response_id uuid references inquiries(id) on delete set null,  -- 응답으로 생긴 상담 신청 행 (answers.form = 'apply')
+  created_by uuid references members(id),
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default now() + interval '30 days',
+  used_at timestamptz,                        -- 제출 시각 (1회)
+  revoked_at timestamptz                      -- 관리자 취소
+);
+create index apply_links_inquiry_idx on apply_links(inquiry_id);
+create index apply_links_response_idx on apply_links(response_id);
+alter table apply_links enable row level security;
+create policy "admin apply links" on apply_links for all using (is_admin()) with check (is_admin());
+-- 방문자 쪽 토큰 확인·제출 처리는 서버(service role)만 한다 (app/api/apply, app/(public)/apply/[token])

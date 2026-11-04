@@ -3,14 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { InstagramButton } from "@/components/site/InstagramButton";
-import { trackLead } from "@/components/site/MetaPixel";
 import { STEPS, missingRequired, otherKey, type Answers, type Field } from "@/lib/apply/schema";
 import { formatPhoneInput } from "@/lib/phone";
-import { readUtm } from "@/lib/utm/client";
 
 /**
- * 상담 전 고객 정보 설문 (/apply). lib/apply/schema.ts 의 STEPS 를 단계별로 그린다 — 레퍼런스처럼 「이전 / 다음」, 마지막 단계에 개인정보 동의 + 「완료」.
- * 주소의 ?ref= 는 추천인 코드에, utm_* 는 제출 시 함께 보낸다. 작성 중인 답은 브라우저(sessionStorage)에만 두고 제출 전에는 서버로 보내지 않는다.
+ * 상담 전 고객 정보 설문 (/apply/<토큰>). lib/apply/schema.ts 의 STEPS 를 단계별로 그린다 — 레퍼런스처럼 「이전 / 다음」, 마지막 단계에 개인정보 동의 + 「완료」.
+ * 관리자가 발급한 비밀 링크(token)로만 열리고 이름·휴대폰은 링크에 적힌 값으로 미리 채운다(수정 가능). 작성 중인 답은 브라우저(sessionStorage)에만 두고 제출 전에는 서버로 보내지 않는다.
  *
  * 모바일 입력 최적화:
  *  - 선택지는 44px 이상 터치 버튼(칩). 좁은 화면은 2열, 넓은 화면은 흐름 배치. 글자 16px 이상이라 iOS 에서 확대되지 않는다
@@ -26,13 +24,14 @@ const CHIP_ON = "border-brown bg-brown text-cream";
 const CHIP_OFF = "border-[rgba(33,30,25,.22)] bg-white text-ink hover:border-brown";
 const NEXT = "border-0 cursor-pointer px-[28px] py-[14px] min-h-[48px] bg-brown text-cream text-[15px] tracking-[.04em] rounded-[8px] hover:bg-brownHover disabled:opacity-50 disabled:cursor-not-allowed";
 const PREV = "border border-[rgba(33,30,25,.3)] bg-white cursor-pointer px-[22px] py-[14px] min-h-[48px] text-[15px] tracking-[.04em] rounded-[8px] hover:border-brown disabled:opacity-40 disabled:cursor-not-allowed";
-const STORE = "rsc_apply_draft";
+const STORE = "rsc_apply_draft";  // + 토큰 앞 8자 — 링크마다 따로 임시 저장
 const OTHER = "기타";
 /** 선택지 + 「기타」(other) — 선택지에 이미 「기타」가 있으면 중복 추가하지 않는다 */
 const optionsOf = (f: Field) => (f.other && !(f.options ?? []).includes(OTHER) ? [...(f.options ?? []), OTHER] : f.options ?? []);
 const fid = (key: string) => `apply-f-${key}`;
 
-export function ApplyForm({ preview = false }: { preview?: boolean }) {
+export function ApplyForm({ token, prefill }: { token: string; prefill?: { name?: string; phone?: string } }) {
+  const store = `${STORE}:${token.slice(0, 8)}`;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [agreed, setAgreed] = useState(false);
@@ -45,16 +44,20 @@ export function ApplyForm({ preview = false }: { preview?: boolean }) {
   useEffect(() => {
     // 서버 렌더와 첫 화면을 맞춘 뒤(하이드레이션 후) 복원한다
     const t = setTimeout(() => {
+      let restored: Answers = {};
       try {
-        const raw = sessionStorage.getItem(STORE);
-        if (raw) { const j = JSON.parse(raw) as { step?: number; answers?: Answers }; if (j.answers) setAnswers(j.answers); if (typeof j.step === "number") setStep(Math.min(j.step, STEPS.length - 1)); }
+        const raw = sessionStorage.getItem(store);
+        if (raw) { const j = JSON.parse(raw) as { step?: number; answers?: Answers }; if (j.answers) restored = j.answers; if (typeof j.step === "number") setStep(Math.min(j.step, STEPS.length - 1)); }
       } catch {}
-      const ref = new URLSearchParams(window.location.search).get("ref")?.trim().slice(0, 40);
-      if (ref) setAnswers((a) => (a.refCode ? a : { ...a, refCode: ref }));
+      // 링크에 적힌 이름·휴대폰을 미리 채운다 (이미 입력한 값이 있으면 그대로)
+      const pre: Answers = {};
+      if (prefill?.name) pre.name = prefill.name;
+      if (prefill?.phone) pre.phone = formatPhoneInput(prefill.phone);
+      setAnswers({ ...pre, ...restored });
     }, 0);
     return () => clearTimeout(t);
-  }, []);
-  useEffect(() => { try { sessionStorage.setItem(STORE, JSON.stringify({ step, answers })); } catch {} }, [step, answers]);
+  }, [store, prefill?.name, prefill?.phone]);
+  useEffect(() => { try { sessionStorage.setItem(store, JSON.stringify({ step, answers })); } catch {} }, [store, step, answers]);
 
   const cur = STEPS[step];
   const last = step === STEPS.length - 1;
@@ -83,11 +86,10 @@ export function ApplyForm({ preview = false }: { preview?: boolean }) {
     if (!agreed) { setError("개인정보 수집 및 이용에 동의해 주세요."); document.getElementById("apply-consent")?.scrollIntoView({ block: "center", behavior: "smooth" }); return; }
     setSubmitting(true); setError(null);
     try {
-      const res = await fetch("/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answers, consent: true, utm: readUtm() }) });
+      const res = await fetch("/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, answers, consent: true }) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !j?.ok) throw new Error(j?.message ?? "설문을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
-      try { sessionStorage.removeItem(STORE); } catch {}
-      trackLead();
+      try { sessionStorage.removeItem(store); } catch {}
       setDone(true);
       window.scrollTo({ top: 0 });
     } catch (e) {
@@ -102,7 +104,7 @@ export function ApplyForm({ preview = false }: { preview?: boolean }) {
       <div className="w-full max-w-[640px] mx-auto py-[40px]">
         <div className="text-[11px] tracking-[.34em] text-brown mb-[36px]">THANK YOU</div>
         <h2 className="font-medium text-[clamp(30px,3.6vw,48px)] leading-[1.36] mb-[28px] text-pretty">설문이 접수되었습니다</h2>
-        <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">담당자가 남겨주신 연락처로 순차적으로 상담 연락을 드립니다. 취소나 문의는 아래 이메일 또는 전화(02-538-3366)로 알려 주세요.</p>
+        <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">답변해 주셔서 감사합니다. 담당자가 내용을 확인한 뒤 대면 상담 일정을 안내드립니다. 문의는 전화(02-538-3366)로 알려 주세요.</p>
         <div className="flex gap-[12px] flex-wrap">
           <Link href="/" className="inline-flex items-center px-[34px] py-[16px] bg-brown text-cream text-[13.5px] hover:text-cream">홈으로 돌아가기</Link>
           <InstagramButton shape="square" />
@@ -113,7 +115,6 @@ export function ApplyForm({ preview = false }: { preview?: boolean }) {
 
   return (
     <div ref={top} className="w-full max-w-[640px] mx-auto scroll-mt-[12px] pb-[96px] md:pb-0">
-      {preview && <div className="mb-[16px] px-[14px] py-[10px] bg-[#fff7e3] border border-[#e0b96a] text-[13px] leading-[1.6] text-[#6b4a00]">관리자 미리보기 — 지금은 설문이 닫혀 있어 방문자에게는 안내 문구만 보입니다. 일반 설정 → 상담 신청 · 광고 측정 → 「상담 전 설문(/apply) 열기」로 엽니다.</div>}
       <div className="flex items-baseline justify-between gap-[12px] mb-[12px]">
         <div className="text-[11px] tracking-[.34em] text-[rgba(33,30,25,.5)]">RSC PRE-CONSULTATION</div>
         <div className="text-[12.5px] text-[rgba(33,30,25,.55)]"><b className="text-ink">{step + 1}</b> / {STEPS.length} 단계</div>
@@ -136,8 +137,8 @@ export function ApplyForm({ preview = false }: { preview?: boolean }) {
               <span className="text-[15px] leading-[1.6] text-ink font-medium">개인정보 수집 및 이용에 동의합니다. <span className="text-brown">(필수)</span></span>
             </label>
             <dl className="mt-[10px] ml-[32px] grid gap-[4px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.68)]">
-              <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름·성별·생년월일·휴대폰(필수), 이메일·추천인 코드·가입 경로·MBTI·키·체중·결혼여부·거주지역·본가·주량, 학력, 직업·소득·직장, 자산·차량, 가족관계, 이상형 조건·기피사항, 연애성향 답변(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)</dd></div>
-              <div><dt className="inline font-medium text-ink">이용 목적: </dt><dd className="inline">가입 상담의 진행과 일정 조율, 상담 전 프로필 확인, 문의 응대</dd></div>
+              <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름·성별·생년월일·휴대폰(필수), 이메일·추천인 코드·가입 경로·MBTI·키·체중·결혼여부·거주지역·본가·주량, 학력, 직업·소득·직장, 자산·차량, 가족관계, 이상형 조건·기피사항, 연애성향 답변(선택)</dd></div>
+              <div><dt className="inline font-medium text-ink">이용 목적: </dt><dd className="inline">대면 상담의 준비와 일정 조율, 상담 전 프로필 확인, 문의 응대</dd></div>
               <div><dt className="inline font-medium text-ink">보관 기간: </dt><dd className="inline">접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)</dd></div>
               <div><dt className="inline font-medium text-ink">거부 시: </dt><dd className="inline">필수 항목 동의를 거부하면 설문이 접수되지 않습니다. 선택 항목은 비워 두어도 됩니다.</dd></div>
             </dl>

@@ -3,6 +3,7 @@ import { InquiriesView } from "@/components/admin/views";
 import type { InquiryRow } from "@/components/admin/InquiryDetail";
 import { matchesUtmFilter } from "@/lib/admin/leads";
 import { matchesKind, parseKind } from "@/lib/apply/export";
+import { applyLinkUrl, linkStatus, type ApplyLink } from "@/lib/apply/links";
 import { getCurrentMember, isOwnerRole } from "@/lib/auth/session";
 import { matchInquiries, syncInquiriesFromSheet, type InquiryCrm } from "@/lib/crm/inquiries";
 import { loadCallsDataSafe } from "@/lib/crm/load";
@@ -55,7 +56,18 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    selected = { ...selectedBase, invite: inv ?? null };
+    // 이 신청에 발급된 상담 전 설문 링크(최근 1개) · 이 행이 설문 응답이면 어느 링크(원 상담 신청)에서 왔는지
+    const [{ data: lk }, { data: src }] = await Promise.all([
+      supabase.from("apply_links").select("id, token, name, phone, memo, inquiry_id, response_id, created_at, expires_at, used_at, revoked_at").eq("inquiry_id", selectedBase.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      selectedBase.answers?.form === "apply" ? supabase.from("apply_links").select("inquiry_id, name").eq("response_id", selectedBase.id).limit(1).maybeSingle() : Promise.resolve({ data: null }),
+    ]);
+    const link = (lk as ApplyLink | null) ?? null;
+    selected = {
+      ...selectedBase,
+      invite: inv ?? null,
+      applyLink: link ? { id: link.id, url: applyLinkUrl(link.token), status: linkStatus(link), expires_at: link.expires_at, response_id: link.response_id } : null,
+      applySource: (src as { inquiry_id: string | null; name: string } | null) ?? null,
+    };
   }
 
   return (

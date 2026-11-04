@@ -26,6 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/orders", label: "예약 · 결제" },
     { href: "/admin/inquiries", label: "상담 신청", badge: pendingInquiries ?? 0 },
     { href: "/admin/calls", label: "콜 현황" },
+    { href: "/admin/apply", label: "상담 전 설문" },
     { href: "/admin/coupons", label: "쿠폰 · 초대권" },
     { href: "/admin/stats", label: "통계 · 리포트" },
     { href: "/admin/posts", label: "소식 게시판" },
