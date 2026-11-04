@@ -63,27 +63,27 @@ export function AdminRowActions({ id, email, status, isSelf, isOwner }: Props) {
   return (
     <div className="grid gap-[8px]">
       <div className="flex gap-[10px] flex-wrap items-center">
-        {canReset && <button type="button" disabled={busy} onClick={issueReset} className={`${LINK} text-brown hover:text-brownHover`}>비밀번호 재설정 링크</button>}
+        {canReset && <button type="button" disabled={busy} onClick={issueReset} className={`${LINK} text-primary hover:text-primaryStrong`}>비밀번호 재설정 링크</button>}
         {isSelf || isOwner ? (
-          <span className="text-[11.5px] text-[rgba(33,30,25,.4)]">{isSelf ? "본인" : "주관리자"}</span>
+          <span className="text-[12px] text-[rgba(55,56,60,.28)]">{isSelf ? "본인" : "주관리자"}</span>
         ) : (
           <>
             {status === "paused" ? (
-              <button type="button" disabled={busy} onClick={() => patch({ status: "active" }, `${who} 의 정지를 해제할까요?`)} className={`${LINK} text-brown hover:text-brownHover`}>정지 해제</button>
+              <button type="button" disabled={busy} onClick={() => patch({ status: "active" }, `${who} 의 정지를 해제할까요?`)} className={`${LINK} text-primary hover:text-primaryStrong`}>정지 해제</button>
             ) : (
-              <button type="button" disabled={busy} onClick={() => patch({ status: "paused" }, `${who} 를 정지할까요?\n정지 즉시 관리자 화면에 들어올 수 없습니다.`)} className={`${LINK} text-[rgba(33,30,25,.55)] hover:text-brownHover`}>정지</button>
+              <button type="button" disabled={busy} onClick={() => patch({ status: "paused" }, `${who} 를 정지할까요?\n정지 즉시 관리자 화면에 들어올 수 없습니다.`)} className={`${LINK} text-[rgba(55,56,60,.61)] hover:text-primaryStrong`}>정지</button>
             )}
-            <button type="button" disabled={busy} onClick={() => patch({ role: "member", status: "active" }, `${who} 의 관리자 권한을 해제할까요?\n일반 회원 계정으로 남습니다.`)} className={`${LINK} text-error hover:opacity-80`}>권한 해제</button>
+            <button type="button" disabled={busy} onClick={() => patch({ role: "member", status: "active" }, `${who} 의 관리자 권한을 해제할까요?\n일반 회원 계정으로 남습니다.`)} className={`${LINK} text-negativeFg hover:opacity-80`}>권한 해제</button>
           </>
         )}
       </div>
       {reset && (
-        <div className="border border-[rgba(33,30,25,.14)] bg-[#faf7f1] p-[10px] grid gap-[6px] min-w-[300px]">
+        <div className="border border-[rgba(112,115,124,.16)] bg-[rgba(112,115,124,.05)] p-[10px] grid gap-[6px] min-w-[300px]">
           <div className="flex gap-[6px] items-center">
-            <input readOnly value={reset.link} onFocus={(e) => e.currentTarget.select()} className={`${FIELD} font-mono text-[11.5px] py-[7px]`} />
+            <input readOnly value={reset.link} onFocus={(e) => e.currentTarget.select()} className={`${FIELD} font-mono text-[12px] py-[7px]`} />
             <button type="button" onClick={copy} className={`${BTN_SECONDARY} px-[10px] py-[7px] text-[12px] whitespace-nowrap`}>{copied ? "복사됨" : "복사"}</button>
           </div>
-          <div className="text-[11.5px] text-[rgba(33,30,25,.6)] whitespace-normal">
+          <div className="text-[12px] text-[rgba(55,56,60,.61)] whitespace-normal">
             {reset.mailed ? "재설정 메일을 보냈습니다." : `메일은 보내지 않았습니다${reset.mailReason === "NOT_CONFIGURED" ? " (이메일 발송 키 없음)" : reset.mailReason ? ` (${reset.mailReason})` : ""}. 위 링크를 복사해 본인에게만 전달해 주세요.`}
             {" "}유효기간: {new Date(reset.expiresAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })} 까지
           </div>

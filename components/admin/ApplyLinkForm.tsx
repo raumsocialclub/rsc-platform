@@ -10,13 +10,13 @@ export type IssuedLink = { id: string; token: string; url: string; expiresAt: st
 /** 만든 설문 링크 표시 + 복사 */
 export function IssuedLinkBox({ link, title = "설문 링크를 만들었습니다" }: { link: { url: string; expiresAt: string | null }; title?: string }) {
   return (
-    <div className="bg-cream border border-[rgba(33,30,25,.14)] p-[16px]">
-      <div className="text-[11px] tracking-[.2em] text-brownHover mb-[8px]">{title}</div>
+    <div className="bg-white border border-[rgba(112,115,124,.16)] p-[16px]">
+      <div className="text-[11px] tracking-[.02em] text-primaryStrong mb-[8px]">{title}</div>
       <div className="flex items-center justify-between gap-[10px]">
         <span className="text-[13px] break-all">{link.url}</span>
         <CopyButton text={link.url} label="링크 복사" />
       </div>
-      <div className="text-[12px] text-[rgba(33,30,25,.55)] mt-[8px]">이 주소를 문자·카카오톡으로 전달하세요. 받은 분은 로그인 없이 바로 작성하고, 링크는 다른 분에게 다시 전달해도 됩니다. 유효기간 {link.expiresAt ? link.expiresAt.slice(0, 10) : "발급 후 90일"} 까지.</div>
+      <div className="text-[12px] text-[rgba(55,56,60,.61)] mt-[8px]">이 주소를 문자·카카오톡으로 전달하세요. 받은 분은 로그인 없이 바로 작성하고, 링크는 다른 분에게 다시 전달해도 됩니다. 유효기간 {link.expiresAt ? link.expiresAt.slice(0, 10) : "발급 후 90일"} 까지.</div>
     </div>
   );
 }
@@ -49,14 +49,14 @@ export function ApplyLinkForm() {
 
   if (!open) return <button type="button" onClick={() => setOpen(true)} className={BTN_PRIMARY}>+ 설문 링크 만들기</button>;
   return (
-    <form onSubmit={submit} className="bg-white border border-[rgba(33,30,25,.1)] p-[20px] w-full max-w-[640px]">
-      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[14px]">새 설문 링크</div>
+    <form onSubmit={submit} className="bg-white border border-[rgba(112,115,124,.08)] p-[20px] w-full max-w-[640px]">
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[14px]">새 설문 링크</div>
       <div className="grid gap-[10px] md:grid-cols-[2fr_2fr_1fr] mb-[12px]">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="링크 이름 (예: 11월 전화상담 완료자)" required className={FIELD} />
         <input value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="메모 (선택)" className={FIELD} />
         <input value={days} onChange={(e) => setDays(e.target.value)} inputMode="numeric" aria-label="유효기간(일)" placeholder="유효기간(일)" className={FIELD} />
       </div>
-      {err && <div className="text-[12.5px] text-error mb-[10px]">{err}</div>}
+      {err && <div className="text-[13px] text-negativeFg mb-[10px]">{err}</div>}
       {issued && <div className="mb-[12px]"><IssuedLinkBox link={issued} /></div>}
       <div className="flex gap-[8px]">
         <button type="submit" disabled={busy} className={BTN_PRIMARY}>{busy ? "만드는 중…" : "링크 만들기"}</button>
@@ -82,5 +82,5 @@ export function RevokeLinkButton({ id }: { id: string }) {
       window.alert(e instanceof Error ? e.message : "취소하지 못했습니다.");
     } finally { setBusy(false); }
   };
-  return <button type="button" onClick={revoke} disabled={busy} className="border border-[rgba(33,30,25,.2)] bg-transparent px-[10px] py-[5px] text-[12px] cursor-pointer hover:border-error hover:text-error disabled:opacity-60">취소</button>;
+  return <button type="button" onClick={revoke} disabled={busy} className="border border-[rgba(112,115,124,.22)] bg-transparent px-[10px] py-[5px] text-[12px] cursor-pointer hover:border-negative hover:text-negativeFg disabled:opacity-60">취소</button>;
 }

@@ -10,9 +10,9 @@ import { POST_CATEGORIES, slugify, type Post } from "@/lib/posts/types";
 
 type FormState = { title: string; slug: string; slugTouched: boolean; category: string; summary: string; body: string; cover_image: string; published: boolean; published_at: string; event_date: string };
 
-const LABEL = "grid gap-[6px] text-[12.5px] text-[rgba(33,30,25,.6)]";
-const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(33,30,25,.2)] outline-none text-ink bg-white rounded-none focus:border-brown w-full min-w-0";
-const SECTION = "text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)]";
+const LABEL = "grid gap-[6px] text-[13px] text-[rgba(55,56,60,.61)]";
+const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(112,115,124,.22)] outline-none text-label bg-white rounded-ds-sm focus:border-primary w-full min-w-0";
+const SECTION = "text-[15px] font-semibold text-label";
 const MAX_SIDE = 2000;
 
 const HELP = [
@@ -107,18 +107,18 @@ export function PostForm({ post }: { post?: Post }) {
     <>
       <div className="flex items-end justify-between gap-[20px] flex-wrap mb-[28px]">
         <div>
-          <div className="text-[11px] tracking-[.3em] text-[rgba(33,30,25,.5)] mb-[10px]"><Link href="/admin/posts" className="hover:text-brownHover">NEWS</Link> / {post ? "EDIT" : "NEW"}</div>
-          <h1 className="font-medium text-[30px] m-0">{post ? "소식 편집" : "새 글 쓰기"}</h1>
+          <div className="text-[11px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[10px]"><Link href="/admin/posts" className="hover:text-primaryStrong">NEWS</Link> / {post ? "EDIT" : "NEW"}</div>
+          <h1 className="font-medium t-title-2 m-0">{post ? "소식 편집" : "새 글 쓰기"}</h1>
         </div>
         <div className="flex gap-[8px] items-center flex-wrap">
-          {post?.published && <Link href={`/news/${encodeURIComponent(post.slug)}`} target="_blank" className="text-[12.5px] text-[rgba(33,30,25,.55)] underline mr-[6px]">공개 화면 보기 ↗</Link>}
-          {post && <button type="button" onClick={remove} disabled={busy} className={`${BTN_SECONDARY} text-error border-[rgba(163,64,44,.4)]`}>삭제</button>}
+          {post?.published && <Link href={`/news/${encodeURIComponent(post.slug)}`} target="_blank" className="text-[13px] text-[rgba(55,56,60,.61)] underline mr-[6px]">공개 화면 보기 ↗</Link>}
+          {post && <button type="button" onClick={remove} disabled={busy} className={`${BTN_SECONDARY} text-negativeFg border-[rgba(255,66,66,.4)]`}>삭제</button>}
           <button type="button" onClick={() => submit(false)} disabled={busy} className={BTN_SECONDARY}>{busy ? "저장 중…" : "임시 저장"}</button>
           <button type="button" onClick={() => submit(true)} disabled={busy} className={BTN_PRIMARY}>{busy ? "저장 중…" : f.published ? "저장 (발행 유지)" : "발행하기"}</button>
         </div>
       </div>
-      {err && <div className="mb-[16px] px-[16px] py-[12px] bg-[rgba(163,64,44,.08)] text-error text-[13px]">{err}</div>}
-      {msg && <div className="mb-[16px] px-[16px] py-[12px] bg-[rgba(46,107,62,.08)] text-[#2e6b3e] text-[13px]">{msg}</div>}
+      {err && <div className="mb-[16px] px-[16px] py-[12px] bg-[rgba(255,66,66,.08)] text-negativeFg text-[13px]">{err}</div>}
+      {msg && <div className="mb-[16px] px-[16px] py-[12px] bg-[rgba(0,191,64,.08)] text-[#009632] text-[13px]">{msg}</div>}
 
       <div className="grid grid-cols-1 min-[1101px]:grid-cols-[minmax(0,1fr)_320px] gap-[20px] items-start">
         <div className="grid gap-[20px]">
@@ -137,9 +137,9 @@ export function PostForm({ post }: { post?: Post }) {
                   <button type="button" onClick={() => bodyFileRef.current?.click()} disabled={uploading === "body"} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>{uploading === "body" ? "업로드 중…" : "본문에 사진 넣기"}</button>
                 </div>
               </div>
-              <textarea ref={bodyRef} value={f.body} onChange={(e) => set("body", e.target.value)} rows={22} className={`${INPUT} font-mono text-[13.5px] leading-[1.7]`} placeholder={"빈 줄로 문단을 나눕니다.\n\n## 소제목\n본문 내용…"} />
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-[6px] text-[11.5px] text-[rgba(33,30,25,.5)]">
-                {HELP.map(([a, b], i) => <div key={i}><code className="text-ink">{a}</code><br /><code className="text-ink">{b}</code></div>)}
+              <textarea ref={bodyRef} value={f.body} onChange={(e) => set("body", e.target.value)} rows={22} className={`${INPUT} font-mono text-[14px] leading-[1.7]`} placeholder={"빈 줄로 문단을 나눕니다.\n\n## 소제목\n본문 내용…"} />
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-[6px] text-[12px] text-[rgba(55,56,60,.61)]">
+                {HELP.map(([a, b], i) => <div key={i}><code className="text-label">{a}</code><br /><code className="text-label">{b}</code></div>)}
               </div>
             </div>
           </div>
@@ -148,7 +148,7 @@ export function PostForm({ post }: { post?: Post }) {
         <div className="grid gap-[20px]">
           <div className={`${CARD} p-[22px] grid gap-[16px]`}>
             <div className={SECTION}>발행</div>
-            <label className="flex items-center gap-[10px] text-[13.5px]">
+            <label className="flex items-center gap-[10px] text-[14px]">
               <input type="checkbox" checked={f.published} onChange={(e) => set("published", e.target.checked)} /> 공개 화면에 표시
             </label>
             <label className={LABEL}>행사 일자 <span className="text-[11px]">(소식 목록의 연도·월 탭에 들어갈 달. 비우면 발행일로 분류)</span>
@@ -168,15 +168,15 @@ export function PostForm({ post }: { post?: Post }) {
           </div>
           <div className={`${CARD} p-[22px] grid gap-[12px]`}>
             <div className={SECTION}>대표 사진</div>
-            <div className="relative w-full aspect-[4/5] bg-[#e7e0d3] overflow-hidden border border-[rgba(33,30,25,.1)]">
+            <div className="relative w-full aspect-[4/5] bg-[#f4f4f5] overflow-hidden border border-[rgba(112,115,124,.08)]">
               {f.cover_image && <Image src={f.cover_image} alt="" fill sizes="320px" className="object-cover" unoptimized={f.cover_image.startsWith("http")} />}
             </div>
             <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const x = e.target.files?.[0]; if (x) void onCover(x); }} />
             <div className="flex gap-[6px]">
               <button type="button" onClick={() => coverRef.current?.click()} disabled={uploading === "cover"} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>{uploading === "cover" ? "업로드 중…" : "사진 업로드"}</button>
-              {f.cover_image && <button type="button" onClick={() => set("cover_image", "")} className="bg-transparent border-0 text-[12px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error">비우기</button>}
+              {f.cover_image && <button type="button" onClick={() => set("cover_image", "")} className="bg-transparent border-0 text-[12px] text-[rgba(55,56,60,.61)] cursor-pointer hover:text-negativeFg">비우기</button>}
             </div>
-            <div className="text-[11.5px] text-[rgba(33,30,25,.5)]">인스타그램 피드 이미지(1080×1350, 4:5) 권장. 목록에서는 모든 카드가 4:5 상자로 같은 크기로 정렬되며, 비율이 다른 사진은 가운데 기준으로 상자에 맞춰집니다. 상세와 공유 미리보기는 원본 비율입니다.</div>
+            <div className="text-[12px] text-[rgba(55,56,60,.61)]">인스타그램 피드 이미지(1080×1350, 4:5) 권장. 목록에서는 모든 카드가 4:5 상자로 같은 크기로 정렬되며, 비율이 다른 사진은 가운데 기준으로 상자에 맞춰집니다. 상세와 공유 미리보기는 원본 비율입니다.</div>
           </div>
         </div>
       </div>

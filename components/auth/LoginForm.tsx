@@ -75,21 +75,21 @@ export function LoginForm({ enabled, next, initialError = null, canEmailReset = 
         {error && <div className={`${ERROR} mb-[14px]`}>{error}</div>}
         <button type="submit" disabled={busy} className={SUBMIT}>{busy ? "로그인 중…" : "로그인"}</button>
       </form>
-      <div className="flex justify-between mt-[22px] text-[13px] text-[rgba(33,30,25,.5)]">
-        <Link href="/join" className="text-brown font-semibold">초대코드로 가입</Link>
-        <button type="button" onClick={() => setHelp((v) => !v)} className="bg-transparent border-0 p-0 cursor-pointer text-[13px] text-[rgba(33,30,25,.5)] hover:text-brown" aria-expanded={help}>비밀번호 찾기</button>
+      <div className="flex justify-between mt-[22px] text-[13px] text-[rgba(55,56,60,.61)]">
+        <Link href="/join" className="text-primary font-semibold">초대코드로 가입</Link>
+        <button type="button" onClick={() => setHelp((v) => !v)} className="bg-transparent border-0 p-0 cursor-pointer text-[13px] text-[rgba(55,56,60,.61)] hover:text-primary" aria-expanded={help}>비밀번호 찾기</button>
       </div>
       {help && (
-        <div className="mt-[14px] border border-[rgba(33,30,25,.14)] bg-[#faf7f1] p-[14px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.7)]">
+        <div className="mt-[14px] border border-[rgba(112,115,124,.16)] bg-[rgba(112,115,124,.05)] p-[14px] text-[13px] leading-[1.7] text-[rgba(46,47,51,.88)]">
           <p className="mb-[8px]"><b>관리자 계정</b>은 주관리자(대표)에게 <b>비밀번호 재설정 링크</b>를 요청해 주세요. 링크를 열어 새 비밀번호를 정하면 바로 로그인됩니다.</p>
           {canEmailReset ? (
             <div className="grid gap-[8px]">
               <p>또는 위 이메일 칸에 관리자 이메일을 넣고 아래 버튼을 누르면 재설정 링크를 메일로 보내 드립니다.</p>
-              <button type="button" onClick={requestReset} disabled={resetBusy} className="justify-self-start border border-brown text-brown bg-transparent px-[14px] py-[8px] text-[12.5px] font-semibold cursor-pointer hover:border-brownHover hover:text-brownHover disabled:opacity-60">{resetBusy ? "보내는 중…" : "재설정 링크 메일 받기"}</button>
-              {resetMsg && <p className="text-[12.5px]">{resetMsg}</p>}
+              <button type="button" onClick={requestReset} disabled={resetBusy} className="justify-self-start border border-primary text-primary bg-transparent px-[14px] py-[8px] text-[13px] font-semibold cursor-pointer hover:border-primary hover:text-primaryStrong disabled:opacity-60">{resetBusy ? "보내는 중…" : "재설정 링크 메일 받기"}</button>
+              {resetMsg && <p className="text-[13px]">{resetMsg}</p>}
             </div>
           ) : (
-            <p className="text-[12.5px] text-[rgba(33,30,25,.55)]">소셜 로그인(카카오·네이버) 회원은 비밀번호가 없으니 해당 버튼으로 로그인하세요.</p>
+            <p className="text-[13px] text-[rgba(55,56,60,.61)]">소셜 로그인(카카오·네이버) 회원은 비밀번호가 없으니 해당 버튼으로 로그인하세요.</p>
           )}
         </div>
       )}

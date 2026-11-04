@@ -46,8 +46,8 @@ export function AcceptInviteForm({ token, email, name: initialName, existingMemb
     return (
       <div className="max-w-[440px] mx-auto my-[40px]">
         <div className={`${OVERLINE} mb-[24px]`}>ADMIN INVITE</div>
-        <h1 className="font-medium text-[28px] leading-[1.36] mb-[20px]">관리자 권한이 부여되었습니다</h1>
-        <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.7)] mb-[28px]">{notice}</p>
+        <h1 className="font-medium t-title-3 leading-[1.36] mb-[20px]">관리자 권한이 부여되었습니다</h1>
+        <p className="text-[15px] leading-[1.7] text-[rgba(46,47,51,.88)] mb-[28px]">{notice}</p>
         <Link href="/login?next=/admin" className={`${SUBMIT} inline-block text-center`}>로그인하러 가기</Link>
       </div>
     );
@@ -56,8 +56,8 @@ export function AcceptInviteForm({ token, email, name: initialName, existingMemb
   return (
     <form onSubmit={submit} className="max-w-[440px] mx-auto my-[40px]">
       <div className={`${OVERLINE} mb-[24px]`}>ADMIN INVITE</div>
-      <h1 className="font-medium text-[28px] md:text-[clamp(28px,3.4vw,40px)] leading-[1.36] mb-[12px]">관리자 계정 만들기</h1>
-      <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.7)] mb-[32px]">
+      <h1 className="font-medium t-title-3 md:text-[clamp(28px,3.4vw,40px)] leading-[1.36] mb-[12px]">관리자 계정 만들기</h1>
+      <p className="text-[15px] leading-[1.7] text-[rgba(46,47,51,.88)] mb-[32px]">
         <b>{email}</b> 로 부관리자 초대를 받으셨습니다.{existingMember ? " 이미 가입된 회원이므로 권한만 부여되며, 기존 비밀번호로 로그인합니다." : " 이름과 비밀번호를 정하면 바로 관리자 화면에 들어갈 수 있습니다."}
       </p>
       <div className="grid gap-[12px] mb-[20px]">
@@ -67,7 +67,7 @@ export function AcceptInviteForm({ token, email, name: initialName, existingMemb
       </div>
       {error && <p className={`${ERROR} mb-[16px]`}>{error}</p>}
       <button type="submit" disabled={busy} className={SUBMIT}>{busy ? "처리 중…" : existingMember ? "권한 받고 로그인" : "계정 만들고 시작하기"}</button>
-      <p className="mt-[16px] text-[12px] text-[rgba(33,30,25,.5)] leading-[1.6]">이 링크는 48시간 동안, 한 번만 쓸 수 있습니다.</p>
+      <p className="mt-[16px] text-[12px] text-[rgba(55,56,60,.61)] leading-[1.6]">이 링크는 48시간 동안, 한 번만 쓸 수 있습니다.</p>
     </form>
   );
 }

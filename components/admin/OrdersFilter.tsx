@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { BTN_SECONDARY } from "./ui";
 import { BOOKING_STATUS_KO } from "@/lib/bookings/types";
 
-const SELECT = "px-[14px] py-[10px] text-[13px] border border-[rgba(33,30,25,.2)] bg-white rounded-none outline-none";
+const SELECT = "px-[14px] py-[10px] text-[13px] border border-[rgba(112,115,124,.22)] bg-white rounded-ds-sm outline-none";
 
 export function OrdersFilter({ programs, filter }: { programs: { id: string; name: string }[]; filter: { program: string; status: string } }) {
   const router = useRouter();
@@ -26,7 +26,7 @@ export function OrdersFilter({ programs, filter }: { programs: { id: string; nam
         <option value="">전체 상태</option>
         {Object.entries(BOOKING_STATUS_KO).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
       </select>
-      <a href={exportHref} className={`${BTN_SECONDARY} px-[16px] py-[10px] text-[12.5px] inline-flex items-center`}>엑셀 다운로드</a>
+      <a href={exportHref} className={`${BTN_SECONDARY} px-[16px] py-[10px] text-[13px] inline-flex items-center`}>엑셀 다운로드</a>
     </div>
   );
 }

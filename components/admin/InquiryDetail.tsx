@@ -113,61 +113,61 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   ];
 
   return (
-    <div className="bg-white border border-[rgba(33,30,25,.1)] p-[26px]">
-      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : "신청 상세"}</div>
+    <div className="bg-white border border-[rgba(112,115,124,.08)] p-[26px]">
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : "신청 상세"}</div>
       <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}</div>
-      <div className="text-[13px] text-[rgba(33,30,25,.55)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
+      <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
 
       {inquiry.result_type && (
-        <div className="bg-cream p-[16px] mb-[20px]">
-          <div className="text-[11px] tracking-[.2em] text-brownHover mb-[6px]">성향 결과 (설문형 신청)</div>
+        <div className="bg-white p-[16px] mb-[20px]">
+          <div className="text-[11px] tracking-[.02em] text-primaryStrong mb-[6px]">성향 결과 (설문형 신청)</div>
           <b className="text-[15px]">{inquiry.result_type}{profileKo ? ` · ${profileKo}` : ""}</b>
-          {profileBody && <div className="text-[12.5px] text-[rgba(33,30,25,.6)] mt-[6px] leading-[1.6]">{profileBody}</div>}
+          {profileBody && <div className="text-[13px] text-[rgba(55,56,60,.61)] mt-[6px] leading-[1.6]">{profileBody}</div>}
         </div>
       )}
 
       <div className="grid gap-[10px] text-[13px] mb-[24px]">
-        {rows.length === 0 && <div className="text-[rgba(33,30,25,.5)]">답변 정보가 없습니다.</div>}
+        {rows.length === 0 && <div className="text-[rgba(55,56,60,.61)]">답변 정보가 없습니다.</div>}
         {rows.map((r, i) => (
-          <div key={i} className="flex justify-between gap-[12px] border-b border-[rgba(33,30,25,.08)] pb-[8px]">
-            <span className="text-[rgba(33,30,25,.55)] flex-none">{r.q}</span>
+          <div key={i} className="flex justify-between gap-[12px] border-b border-[rgba(112,115,124,.08)] pb-[8px]">
+            <span className="text-[rgba(55,56,60,.61)] flex-none">{r.q}</span>
             <b className="text-right">{r.a}</b>
           </div>
         ))}
       </div>
 
       {crm && (
-        <div className="bg-cream p-[16px] mb-[20px] text-[13px]">
+        <div className="bg-white p-[16px] mb-[20px] text-[13px]">
           <div className="flex items-center justify-between gap-[8px] mb-[8px]">
-            <span className="text-[11px] tracking-[.2em] text-brownHover">CRM 시트 콜 기록</span>
-            <span className="inline-block px-[8px] py-[2px] text-[11.5px] font-semibold" style={badgeStyle(crm.status === "done" ? "ok" : crm.status === "callback" ? "warn" : crm.status === "invalid" || crm.status === "declined" ? "bad" : "mute")}>{STATUS_KO[crm.status]}</span>
+            <span className="text-[11px] tracking-[.02em] text-primaryStrong">CRM 시트 콜 기록</span>
+            <span className="inline-block px-[8px] py-[2px] text-[12px] font-semibold" style={badgeStyle(crm.status === "done" ? "ok" : crm.status === "callback" ? "warn" : crm.status === "invalid" || crm.status === "declined" ? "bad" : "mute")}>{STATUS_KO[crm.status]}</span>
           </div>
           <div className="grid gap-[4px]">
             {(["1차", "2차", "3차"] as const).map((k, i) => (
-              <div key={k} className="flex justify-between gap-[12px]"><span className="text-[rgba(33,30,25,.55)]">{k} 콜</span><b className="text-right">{crm.calls[i] || "—"}</b></div>
+              <div key={k} className="flex justify-between gap-[12px]"><span className="text-[rgba(55,56,60,.61)]">{k} 콜</span><b className="text-right">{crm.calls[i] || "—"}</b></div>
             ))}
-            {crm.memo && <div className="mt-[6px] whitespace-pre-wrap leading-[1.6]"><span className="text-[rgba(33,30,25,.55)]">상담 메모 · </span>{crm.memo}</div>}
-            {crm.note && <div className="mt-[4px] whitespace-pre-wrap leading-[1.6] text-[rgba(33,30,25,.75)]"><span className="text-[rgba(33,30,25,.55)]">셀 노트 · </span>{crm.note}</div>}
+            {crm.memo && <div className="mt-[6px] whitespace-pre-wrap leading-[1.6]"><span className="text-[rgba(55,56,60,.61)]">상담 메모 · </span>{crm.memo}</div>}
+            {crm.note && <div className="mt-[4px] whitespace-pre-wrap leading-[1.6] text-[rgba(46,47,51,.88)]"><span className="text-[rgba(55,56,60,.61)]">셀 노트 · </span>{crm.note}</div>}
           </div>
-          <div className="mt-[8px] text-[11.5px] text-[rgba(33,30,25,.5)]">시트에 콜이 적히면 상태가 자동으로 바뀝니다. 여기서 직접 바꾸면 그 뒤로는 자동 변경하지 않습니다.</div>
+          <div className="mt-[8px] text-[12px] text-[rgba(55,56,60,.61)]">시트에 콜이 적히면 상태가 자동으로 바뀝니다. 여기서 직접 바꾸면 그 뒤로는 자동 변경하지 않습니다.</div>
         </div>
       )}
       {issued && <div className="mb-[16px]"><IssuedCodeBox code={issued.code} expiresAt={issued.expiresAt} notify={issued.notify} /></div>}
       {inquiry.answers?.form === "apply" && (
-        <div className="bg-cream p-[14px] mb-[16px] text-[12.5px]">
-          <span className="text-[11px] tracking-[.2em] text-brownHover mr-[8px]">설문 링크</span>
-          <span className="text-[rgba(33,30,25,.7)]">{inquiry.applyLinkName ? `「${inquiry.applyLinkName}」 링크로 들어온 응답` : "링크 정보 없음"}</span>
+        <div className="bg-white p-[14px] mb-[16px] text-[13px]">
+          <span className="text-[11px] tracking-[.02em] text-primaryStrong mr-[8px]">설문 링크</span>
+          <span className="text-[rgba(46,47,51,.88)]">{inquiry.applyLinkName ? `「${inquiry.applyLinkName}」 링크로 들어온 응답` : "링크 정보 없음"}</span>
         </div>
       )}
 
-      <label className="block text-[11.5px] text-[rgba(33,30,25,.5)] mb-[6px]">상태</label>
+      <label className="block text-[12px] text-[rgba(55,56,60,.61)] mb-[6px]">상태</label>
       <select value={status} onChange={(e) => setStatus(e.target.value)} className={`${FIELD} mb-[12px]`}>
         {Object.entries(INQUIRY_STATUS).map(([k, v]) => (
           <option key={k} value={k}>{v}</option>
         ))}
       </select>
       <textarea rows={3} value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="상담 메모" className={`${FIELD} resize-y mb-[12px]`} />
-      {msg && <div className="text-[12.5px] text-[rgba(33,30,25,.6)] mb-[10px]">{msg}</div>}
+      {msg && <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[10px]">{msg}</div>}
       <div className="flex gap-[8px]">
         <button type="button" onClick={issue} disabled={busy !== null} className={`${BTN_PRIMARY} flex-1 py-[12px]`}>{busy === "issue" ? "발급 중…" : "초대코드 발급"}</button>
         <button type="button" onClick={() => save()} disabled={busy !== null} className={`${BTN_SECONDARY} py-[12px]`}>{busy === "save" ? "저장 중…" : "저장"}</button>

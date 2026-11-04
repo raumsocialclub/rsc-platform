@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: { default: "RSC ADMIN", template: "%s
 
 /**
  * 어드민 셸. proxy.ts 가 비로그인은 /login 으로 보내고, 여기서 members.role ∈ {admin, owner} · 활동 상태를 검사한다. (FLOWS.md 6, M12)
- * design/RSC Admin.dc.html: 240px 다크 사이드바 + 본문. 900px 이하는 사이드바가 상단 가로 바.
+ * Wanted DS: 240px 흰 사이드바 + 연회색(sand) 본문. 900px 이하는 사이드바가 상단 가로 바.
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const me = await getCurrentMember();
@@ -38,9 +38,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ];
 
   return (
-    <div className="min-h-screen bg-cream grid grid-cols-1 min-[901px]:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-sand grid grid-cols-1 min-[901px]:grid-cols-[240px_minmax(0,1fr)]">
       <AdminSidebar items={items} user={{ name: me.name, email: me.email ?? "", initial: initialOf(me), roleLabel: ROLE_KO[me.role] }} />
-      <main className="min-w-0 px-[18px] py-[24px] min-[901px]:px-[44px] min-[901px]:pt-[40px] min-[901px]:pb-[100px]">{children}</main>
+      <main className="min-w-0 px-[16px] py-[20px] min-[901px]:px-[40px] min-[901px]:pt-[32px] min-[901px]:pb-[96px] max-w-[1440px]">{children}</main>
     </div>
   );
 }

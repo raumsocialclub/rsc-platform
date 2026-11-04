@@ -28,11 +28,11 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
   const matched = rows.filter((r) => crm[r.id]).length;
   return (
     <>
-      <PageTitle overline="FIT CHECK" title="상담 신청" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">대기 {pending}건{applies > 0 && <> · 설문 {applies}건</>}</span>}>
+      <PageTitle overline="FIT CHECK" title="상담 신청" aside={<span className="text-[16px] text-[rgba(55,56,60,.61)]">대기 {pending}건{applies > 0 && <> · 설문 {applies}건</>}</span>}>
         <InquiriesFilter filter={filter} options={options} canExport={canExport} />
       </PageTitle>
       {crmInfo && (
-        <div className={`text-[12.5px] mb-[12px] ${crmInfo.error ? "text-[#a3402c]" : "text-[rgba(33,30,25,.55)]"}`}>
+        <div className={`text-[13px] mb-[12px] ${crmInfo.error ? "text-[#e52222]" : "text-[rgba(55,56,60,.61)]"}`}>
           {crmInfo.error
             ? `CRM 시트를 읽지 못해 콜 결과·상태 연동을 건너뛰었습니다 (${crmInfo.error})`
             : `CRM관리 시트 콜 결과 연동 중 · 시트 ${fmtDate(crmInfo.at, true)} 기준 · 이 목록에서 시트에 있는 신청 ${matched}건. 시트에 콜이 적히면 상태가 「상담 진행」(거절·없는 번호는 「보류」)으로 자동 변경되고, 직접 바꾼 상태는 그대로 둡니다.`}
@@ -48,14 +48,14 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
                 {rows.map((r) => {
                   const active = selected?.id === r.id;
                   return (
-                    <tr key={r.id} className={active ? "bg-[rgba(226,180,120,.18)]" : "hover:bg-[#faf7f1]"}>
-                      <td className={`${TD} text-[rgba(33,30,25,.6)]`}><Link href={`/admin/inquiries?id=${r.id}`} className="block">{fmtShortDate(r.created_at)}</Link></td>
-                      <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}{r.answers?.form === "apply" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[10.5px] font-semibold align-middle" style={badgeStyle("brand")}>설문</span>}</Link></td>
+                    <tr key={r.id} className={active ? "bg-[rgba(0,102,255,.06)]" : "hover:bg-[rgba(112,115,124,.05)]"}>
+                      <td className={`${TD} text-[rgba(55,56,60,.61)]`}><Link href={`/admin/inquiries?id=${r.id}`} className="block">{fmtShortDate(r.created_at)}</Link></td>
+                      <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}{r.answers?.form === "apply" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[11px] font-semibold align-middle" style={badgeStyle("brand")}>설문</span>}</Link></td>
                       <td className={TD}>{r.phone || "—"}</td>
-                      <td className={TD}>{r.result_type || (isApply(r) ? <span className="text-[rgba(33,30,25,.6)]">{applySummary(r) || "설문"}</span> : "—")}</td>
-                      <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{r.answers?.slot || "—"}</td>
-                      <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{utmLabel(r.utm)}</td>
-                      <td className={TD}>{crm[r.id] ? <Badge style={callBadge(crm[r.id].status)}>{callLabel(crm[r.id])}</Badge> : <span className="text-[rgba(33,30,25,.35)]" title={crmInfo ? "CRM 시트에 같은 전화번호가 없습니다" : undefined}>—</span>}</td>
+                      <td className={TD}>{r.result_type || (isApply(r) ? <span className="text-[rgba(55,56,60,.61)]">{applySummary(r) || "설문"}</span> : "—")}</td>
+                      <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{r.answers?.slot || "—"}</td>
+                      <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{utmLabel(r.utm)}</td>
+                      <td className={TD}>{crm[r.id] ? <Badge style={callBadge(crm[r.id].status)}>{callLabel(crm[r.id])}</Badge> : <span className="text-[rgba(55,56,60,.28)]" title={crmInfo ? "CRM 시트에 같은 전화번호가 없습니다" : undefined}>—</span>}</td>
                       <td className={TD}><Badge style={inquiryBadge(r.status)}>{INQUIRY_STATUS[r.status] ?? r.status}</Badge></td>
                     </tr>
                   );
@@ -67,7 +67,7 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
         {selected ? (
           <InquiryDetail key={selected.id} inquiry={selected} profileKo={profile?.ko} profileBody={profile?.body} crm={crm[selected.id] ?? null} />
         ) : (
-          <div className={`${CARD} p-[26px] text-[13px] text-[rgba(33,30,25,.5)]`}>목록에서 신청을 선택하면 상세가 표시됩니다.</div>
+          <div className={`${CARD} p-[26px] text-[13px] text-[rgba(55,56,60,.61)]`}>목록에서 신청을 선택하면 상세가 표시됩니다.</div>
         )}
       </div>
     </>
@@ -98,7 +98,7 @@ export function CouponsView({ invites }: { invites: InviteRow[] }) {
       <PageTitle overline="COUPONS & INVITES" title="쿠폰 · 초대권">
         <IssueInviteForm />
       </PageTitle>
-      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[10px]">초대코드</div>
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[10px]">초대코드</div>
       <div className={`${CARD} mb-[28px]`}>
         <div className="overflow-x-auto">
           <table className="border-collapse w-full">
@@ -108,14 +108,14 @@ export function CouponsView({ invites }: { invites: InviteRow[] }) {
               {invites.map((r) => {
                 const st = stateOf(r);
                 return (
-                  <tr key={r.id} className="hover:bg-[#faf7f1]">
+                  <tr key={r.id} className="hover:bg-[rgba(112,115,124,.05)]">
                     <td className={TD}><b className="tracking-[.06em]">{r.code}</b></td>
                     <td className={TD}>{r.issued_to_name || "—"}</td>
-                    <td className={`${TD} text-[rgba(33,30,25,.65)]`}>{r.issued_to_phone || "—"}</td>
-                    <td className={`${TD} text-[rgba(33,30,25,.65)]`}>{r.inquiry_name || "—"}</td>
-                    <td className={`${TD} text-[rgba(33,30,25,.65)]`}>{fmtDate(r.created_at)}</td>
-                    <td className={`${TD} text-[rgba(33,30,25,.65)]`}>{fmtDate(r.expires_at)}</td>
-                    <td className={`${TD} text-[rgba(33,30,25,.65)]`}>{r.used_at ? `${fmtDate(r.used_at)}${r.used_by_name ? ` · ${r.used_by_name}` : ""}` : "—"}</td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{r.issued_to_phone || "—"}</td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{r.inquiry_name || "—"}</td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{fmtDate(r.created_at)}</td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{fmtDate(r.expires_at)}</td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{r.used_at ? `${fmtDate(r.used_at)}${r.used_by_name ? ` · ${r.used_by_name}` : ""}` : "—"}</td>
                     <td className={TD}><Badge style={st.style}>{st.label}</Badge></td>
                     <td className={TD}>{!r.used_at && <CopyButton text={r.code} />}</td>
                   </tr>
@@ -125,8 +125,8 @@ export function CouponsView({ invites }: { invites: InviteRow[] }) {
           </table>
         </div>
       </div>
-      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[10px]">지인 초대권 · 할인 쿠폰</div>
-      <div className={`${CARD} p-[24px] text-[13px] text-[rgba(33,30,25,.5)]`}>지인 초대권(회원별 연 8/12매)과 할인 쿠폰은 멤버십 결제(2차)와 함께 붙습니다.</div>
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[10px]">지인 초대권 · 할인 쿠폰</div>
+      <div className={`${CARD} p-[24px] text-[13px] text-[rgba(55,56,60,.61)]`}>지인 초대권(회원별 연 8/12매)과 할인 쿠폰은 멤버십 결제(2차)와 함께 붙습니다.</div>
     </>
   );
 }

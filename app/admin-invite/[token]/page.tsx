@@ -13,7 +13,7 @@ function Notice({ title, body }: { title: string; body: string }) {
     <div className="max-w-[440px] mx-auto my-[40px]">
       <div className={`${OVERLINE} mb-[24px]`}>ADMIN INVITE</div>
       <h1 className="font-medium text-[28px] leading-[1.36] mb-[16px]">{title}</h1>
-      <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.7)] mb-[28px]">{body}</p>
+      <p className="text-[15px] leading-[1.7] text-[rgba(46,47,51,.88)] mb-[28px]">{body}</p>
       <Link href="/login?next=/admin" className={`${SUBMIT} inline-block text-center`}>로그인 화면으로</Link>
     </div>
   );

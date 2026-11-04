@@ -51,7 +51,7 @@ export function OrderDetail({ order }: { order: OrderRow }) {
     <div className={`${CARD} p-[26px]`}>
       <div className="flex justify-between items-start gap-[12px] mb-[18px]">
         <div>
-          <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[8px]">예약 상세</div>
+          <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[8px]">예약 상세</div>
           <b className="text-[15px]">{order.order_id}</b>
         </div>
         <Badge style={orderBadge(order.status)}>{BOOKING_STATUS_KO[order.status]}</Badge>
@@ -67,7 +67,7 @@ export function OrderDetail({ order }: { order: OrderRow }) {
         {order.cancelled_at && <Row k="취소 일시" v={fmtFull(order.cancelled_at)} />}
       </div>
 
-      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[10px]">결제</div>
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[10px]">결제</div>
       {pay ? (
         <div className="grid gap-[10px] mb-[20px]">
           <Row k="결제수단" v={pay.method ?? "—"} />
@@ -75,16 +75,16 @@ export function OrderDetail({ order }: { order: OrderRow }) {
           <Row k="남은 금액" v={won(pay.balance)} />
           <Row k="상태" v={{ paid: "결제 완료", cancelled: "전액 환불", partial_cancelled: "부분 환불", ready: "대기", failed: "실패" }[pay.status]} />
           <Row k="승인 일시" v={pay.approved_at ? fmtFull(pay.approved_at) : "—"} />
-          <Row k="paymentKey" v={<span className="text-[11.5px] font-normal">{pay.payment_key ?? "—"}</span>} />
-          {pay.receipt_url && <Row k="영수증" v={<a href={pay.receipt_url} target="_blank" rel="noreferrer" className="text-brown">토스 영수증 열기 ↗</a>} />}
+          <Row k="paymentKey" v={<span className="text-[12px] font-normal">{pay.payment_key ?? "—"}</span>} />
+          {pay.receipt_url && <Row k="영수증" v={<a href={pay.receipt_url} target="_blank" rel="noreferrer" className="text-primary">토스 영수증 열기 ↗</a>} />}
         </div>
       ) : (
-        <div className="text-[13px] text-[rgba(33,30,25,.5)] mb-[20px]">{order.status === "pending" ? "아직 결제되지 않았습니다 (15분 후 자동 만료)." : "결제 기록이 없습니다."}</div>
+        <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[20px]">{order.status === "pending" ? "아직 결제되지 않았습니다 (15분 후 자동 만료)." : "결제 기록이 없습니다."}</div>
       )}
 
       {refundable && (
-        <div className="border-t border-[rgba(33,30,25,.1)] pt-[18px]">
-          <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[10px]">{pay && balance > 0 ? "환불 · 취소" : "예약 취소"}</div>
+        <div className="border-t border-[rgba(112,115,124,.08)] pt-[18px]">
+          <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[10px]">{pay && balance > 0 ? "환불 · 취소" : "예약 취소"}</div>
           {pay && balance > 0 && (
             <div className="grid grid-cols-[1fr_auto] gap-[8px] mb-[8px]">
               <input type="number" min={0} max={balance} step={1000} value={amount} onChange={(e) => setAmount(e.target.value)} className={FIELD} />
@@ -92,17 +92,17 @@ export function OrderDetail({ order }: { order: OrderRow }) {
             </div>
           )}
           <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="사유 (필수 · 활동 로그와 토스 취소 사유에 기록)" className={`${FIELD} mb-[8px]`} required />
-          <button type="button" onClick={refund} disabled={busy} className="w-full border border-[rgba(163,64,44,.5)] bg-transparent text-error px-[14px] py-[10px] text-[13px] font-semibold cursor-pointer hover:bg-[rgba(163,64,44,.06)] disabled:opacity-50">
+          <button type="button" onClick={refund} disabled={busy} className="w-full border border-[rgba(255,66,66,.5)] bg-transparent text-negativeFg px-[14px] py-[10px] text-[13px] font-semibold cursor-pointer hover:bg-[rgba(255,66,66,.06)] disabled:opacity-50">
             {busy ? "처리 중…" : pay && balance > 0 ? (Number(amount) > 0 ? `${won(Number(amount) || 0)} 환불하고 취소` : "환불 없이 취소") : "예약 취소"}
           </button>
-          <div className="mt-[8px] text-[11.5px] text-[rgba(33,30,25,.45)]">관리자 환불은 환불 정책과 무관하게 금액을 지정합니다. 사유는 필수이며 처리자·금액과 함께 활동 로그에 남습니다. 토스 취소 API 가 호출되며 되돌릴 수 없습니다.</div>
+          <div className="mt-[8px] text-[12px] text-[rgba(55,56,60,.61)]">관리자 환불은 환불 정책과 무관하게 금액을 지정합니다. 사유는 필수이며 처리자·금액과 함께 활동 로그에 남습니다. 토스 취소 API 가 호출되며 되돌릴 수 없습니다.</div>
         </div>
       )}
-      {msg && <div className="mt-[12px] text-[12.5px] text-brown">{msg}</div>}
+      {msg && <div className="mt-[12px] text-[13px] text-primary">{msg}</div>}
     </div>
   );
 }
 
 function Row({ k, v }: { k: string; v: React.ReactNode }) {
-  return <div className="flex justify-between gap-[12px] text-[13.5px]"><span className="text-[rgba(33,30,25,.55)] flex-none">{k}</span><span className="text-right font-semibold break-all">{v}</span></div>;
+  return <div className="flex justify-between gap-[12px] text-[14px]"><span className="text-[rgba(55,56,60,.61)] flex-none">{k}</span><span className="text-right font-semibold break-all">{v}</span></div>;
 }

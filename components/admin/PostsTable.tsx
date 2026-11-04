@@ -14,8 +14,8 @@ export function PostsTable({ posts }: { posts: Post[] }) {
     <>
       <PageTitle overline="NEWS" title="소식 게시판">
         <div className="flex gap-[8px] items-center">
-          <Link href="/news" target="_blank" className="text-[12.5px] text-[rgba(33,30,25,.55)] underline">공개 화면 보기 ↗</Link>
-          <Link href="/admin/posts/new" className="border-0 bg-brown text-cream px-[20px] py-[11px] text-[13px] font-semibold hover:bg-brownHover hover:text-cream">+ 새 글 쓰기</Link>
+          <Link href="/news" target="_blank" className="text-[13px] text-[rgba(55,56,60,.61)] underline">공개 화면 보기 ↗</Link>
+          <Link href="/admin/posts/new" className="border-0 bg-primary text-white px-[20px] py-[11px] text-[13px] font-semibold hover:bg-primaryStrong hover:text-white">+ 새 글 쓰기</Link>
         </div>
       </PageTitle>
       <div className={CARD}>
@@ -25,25 +25,25 @@ export function PostsTable({ posts }: { posts: Post[] }) {
             <tbody>
               {posts.length === 0 && <EmptyRow colSpan={8}>아직 글이 없습니다. 오른쪽 위 &quot;+ 새 글 쓰기&quot; 로 첫 소식을 올려 보세요.</EmptyRow>}
               {posts.map((p) => (
-                <tr key={p.id} className="hover:bg-[#faf7f1]">
+                <tr key={p.id} className="hover:bg-[rgba(112,115,124,.05)]">
                   <td className={TD}>
-                    <div className="relative w-[48px] h-[60px] bg-[#e7e0d3] overflow-hidden">
+                    <div className="relative w-[48px] h-[60px] bg-[#f4f4f5] overflow-hidden">
                       {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="48px" className="object-cover" unoptimized={p.cover_image.startsWith("http")} />}
                     </div>
                   </td>
                   <td className={`${TD} whitespace-normal min-w-[240px]`}>
-                    <Link href={`/admin/posts/${p.id}`} className="font-semibold hover:text-brownHover">{p.title}</Link>
-                    <div className="text-[11.5px] text-[rgba(33,30,25,.45)] mt-[2px]">/news/{p.slug}</div>
+                    <Link href={`/admin/posts/${p.id}`} className="font-semibold hover:text-primaryStrong">{p.title}</Link>
+                    <div className="text-[12px] text-[rgba(55,56,60,.61)] mt-[2px]">/news/{p.slug}</div>
                   </td>
                   <td className={TD}>{p.category}</td>
                   <td className={TD}>{p.event_date ? p.event_date.slice(0, 10).replace(/-/g, ".") : "—"}</td>
                   <td className={TD}>{fmtDate(p.published_at) || "—"}</td>
-                  <td className={`${TD} text-[rgba(33,30,25,.55)]`}>{fmtDate(p.updated_at)}</td>
+                  <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{fmtDate(p.updated_at)}</td>
                   <td className={TD}>
                     <PostRowActions id={p.id} published={p.published} badge={<Badge style={badgeStyle(p.published ? "ok" : "mute")}>{p.published ? "발행" : "임시 저장"}</Badge>} />
                   </td>
                   <td className={TD}>
-                    {p.published && <Link href={`/news/${encodeURIComponent(p.slug)}`} target="_blank" className="text-[12px] text-[rgba(33,30,25,.55)] underline">보기 ↗</Link>}
+                    {p.published && <Link href={`/news/${encodeURIComponent(p.slug)}`} target="_blank" className="text-[12px] text-[rgba(55,56,60,.61)] underline">보기 ↗</Link>}
                   </td>
                 </tr>
               ))}

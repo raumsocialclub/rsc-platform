@@ -44,8 +44,8 @@ export function ResetPasswordForm({ token, email }: { token: string; email: stri
     return (
       <div className="max-w-[440px] mx-auto my-[40px]">
         <div className={`${OVERLINE} mb-[24px]`}>PASSWORD RESET</div>
-        <h1 className="font-medium text-[28px] leading-[1.36] mb-[20px]">비밀번호를 바꿨습니다</h1>
-        <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.7)] mb-[28px]">새 비밀번호로 로그인해 주세요.</p>
+        <h1 className="font-medium t-title-3 leading-[1.36] mb-[20px]">비밀번호를 바꿨습니다</h1>
+        <p className="text-[15px] leading-[1.7] text-[rgba(46,47,51,.88)] mb-[28px]">새 비밀번호로 로그인해 주세요.</p>
         <Link href="/login?next=/admin" className={`${SUBMIT} inline-block text-center`}>로그인하러 가기</Link>
       </div>
     );
@@ -54,15 +54,15 @@ export function ResetPasswordForm({ token, email }: { token: string; email: stri
   return (
     <form onSubmit={submit} className="max-w-[440px] mx-auto my-[40px]">
       <div className={`${OVERLINE} mb-[24px]`}>PASSWORD RESET</div>
-      <h1 className="font-medium text-[28px] md:text-[clamp(28px,3.4vw,40px)] leading-[1.36] mb-[12px]">새 비밀번호 정하기</h1>
-      <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.7)] mb-[32px]"><b>{email}</b> 관리자 계정의 비밀번호를 새로 정합니다. 정하면 바로 관리자 화면에 들어갑니다.</p>
+      <h1 className="font-medium t-title-3 md:text-[clamp(28px,3.4vw,40px)] leading-[1.36] mb-[12px]">새 비밀번호 정하기</h1>
+      <p className="text-[15px] leading-[1.7] text-[rgba(46,47,51,.88)] mb-[32px]"><b>{email}</b> 관리자 계정의 비밀번호를 새로 정합니다. 정하면 바로 관리자 화면에 들어갑니다.</p>
       <div className="grid gap-[12px] mb-[20px]">
         <input value={pw} onChange={(e) => setPw(e.target.value)} placeholder="새 비밀번호 (8자 이상)" type="password" autoComplete="new-password" className={INPUT} />
         <input value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder="새 비밀번호 확인" type="password" autoComplete="new-password" className={INPUT} />
       </div>
       {error && <p className={`${ERROR} mb-[16px]`}>{error}</p>}
       <button type="submit" disabled={busy} className={SUBMIT}>{busy ? "처리 중…" : "비밀번호 바꾸고 로그인"}</button>
-      <p className="mt-[16px] text-[12px] text-[rgba(33,30,25,.5)] leading-[1.6]">이 링크는 24시간 동안, 한 번만 쓸 수 있습니다.</p>
+      <p className="mt-[16px] text-[12px] text-[rgba(55,56,60,.61)] leading-[1.6]">이 링크는 24시간 동안, 한 번만 쓸 수 있습니다.</p>
     </form>
   );
 }

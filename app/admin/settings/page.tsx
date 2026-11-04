@@ -37,11 +37,11 @@ export default async function AdminSettingsPage() {
   return (
     <>
       <PageTitle overline="SETTINGS" title="일반 설정" />
-      {readOnly && <div className="mb-[20px] px-[16px] py-[12px] bg-[rgba(226,180,120,.25)] text-[13px] text-[#7a5420]">부관리자는 일반 설정을 볼 수만 있습니다. 변경은 주관리자에게 요청해 주세요.</div>}
+      {readOnly && <div className="mb-[20px] px-[16px] py-[12px] bg-[rgba(255,146,0,.14)] text-[13px] text-[#d17600]">부관리자는 일반 설정을 볼 수만 있습니다. 변경은 주관리자에게 요청해 주세요.</div>}
       <div className={`${CARD} p-[22px] mb-[20px]`}>
-        <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[12px]">현재 상태</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[24px] gap-y-[8px] text-[13.5px]">
-          {status.map(([k, v]) => <div key={k} className="flex justify-between gap-[12px] border-b border-[rgba(33,30,25,.08)] pb-[6px]"><span className="text-[rgba(33,30,25,.55)]">{k}</span><b className="text-right">{v}</b></div>)}
+        <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[12px]">현재 상태</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[24px] gap-y-[8px] text-[14px]">
+          {status.map(([k, v]) => <div key={k} className="flex justify-between gap-[12px] border-b border-[rgba(112,115,124,.08)] pb-[6px]"><span className="text-[rgba(55,56,60,.61)]">{k}</span><b className="text-right">{v}</b></div>)}
         </div>
         <div className="mt-[14px]"><PurgeCacheButton /></div>
       </div>
@@ -50,7 +50,7 @@ export default async function AdminSettingsPage() {
         {SETTINGS_DOCS.map((def) => {
           const row = byId.get(def.id);
           return (
-            <div key={def.id} id={def.id} className="border-t border-[rgba(33,30,25,.12)] pt-[20px]">
+            <div key={def.id} id={def.id} className="border-t border-[rgba(112,115,124,.16)] pt-[20px]">
               <SiteEditor key={`${def.id}-${row?.updated_at ?? "default"}`} def={def} initial={mergeDoc(def, (row?.data ?? null) as Record<string, unknown> | null)} previewHref="/" updatedAt={(row?.updated_at as string | undefined) ?? null} readOnly={readOnly} />
             </div>
           );
@@ -58,10 +58,10 @@ export default async function AdminSettingsPage() {
       </div>
 
       <div className={`${CARD} p-[22px] mt-[28px]`}>
-        <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[6px]">VERCEL 방화벽 (어드민에서 대체할 수 없는 항목)</div>
-        <div className="text-[12.5px] text-[rgba(33,30,25,.55)] mb-[14px]">아래는 Vercel 대시보드에서 직접 설정합니다: <a href="https://vercel.com/theraumai-5200/rsc-platform/firewall" target="_blank" rel="noreferrer" className="text-brown font-semibold underline">vercel.com → rsc-platform → Firewall ↗</a></div>
+        <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[6px]">VERCEL 방화벽 (어드민에서 대체할 수 없는 항목)</div>
+        <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[14px]">아래는 Vercel 대시보드에서 직접 설정합니다: <a href="https://vercel.com/theraumai-5200/rsc-platform/firewall" target="_blank" rel="noreferrer" className="text-primary font-semibold underline">vercel.com → rsc-platform → Firewall ↗</a></div>
         <div className="grid gap-[12px]">
-          {FIREWALL_GUIDE.map(([k, v]) => <div key={k} className="grid md:grid-cols-[180px_1fr] gap-[6px] md:gap-[16px] text-[13.5px] leading-[1.7]"><b>{k}</b><span className="text-[rgba(33,30,25,.75)]">{v}</span></div>)}
+          {FIREWALL_GUIDE.map(([k, v]) => <div key={k} className="grid md:grid-cols-[180px_1fr] gap-[6px] md:gap-[16px] text-[14px] leading-[1.7]"><b>{k}</b><span className="text-[rgba(46,47,51,.88)]">{v}</span></div>)}
         </div>
       </div>
     </>

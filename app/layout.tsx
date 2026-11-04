@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <style dangerouslySetInnerHTML={{ __html: css }} />
       </head>
-      <body className="min-h-full flex flex-col bg-cream text-ink font-sans font-medium">
+      <body className="min-h-full flex flex-col bg-white text-label font-sans">
         <EnvBanner />
         {children}
         <JsonLd data={org} />

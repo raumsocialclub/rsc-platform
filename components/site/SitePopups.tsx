@@ -65,7 +65,7 @@ export function SitePopups({ popups, preview = false, onClose }: { popups: Popup
   const card = (p: Popup, mobile: boolean) => {
     const r = POPUP_RATIOS[p.ratio] ?? POPUP_RATIOS["1:1"];
     const img = (
-      <div className="relative w-full bg-[#e7e0d3]" style={{ aspectRatio: `${r.w} / ${r.h}` }}>
+      <div className="relative w-full bg-[#f4f4f5]" style={{ aspectRatio: `${r.w} / ${r.h}` }}>
         <Image src={p.image_url} alt={p.title} fill sizes="(max-width: 767px) 92vw, 440px" className="object-cover" unoptimized={p.image_url.startsWith("http")} priority />
       </div>
     );
@@ -85,24 +85,24 @@ export function SitePopups({ popups, preview = false, onClose }: { popups: Popup
           {linked}
           {mobile && list.length > 1 && (
             <>
-              <button type="button" aria-label="이전" onClick={() => setI((x) => (x - 1 + list.length) % list.length)} className="absolute left-[8px] top-1/2 -translate-y-1/2 w-[34px] h-[34px] rounded-full bg-[rgba(255,255,255,.85)] text-ink border-0 cursor-pointer text-[18px] leading-none">‹</button>
-              <button type="button" aria-label="다음" onClick={() => setI((x) => (x + 1) % list.length)} className="absolute right-[8px] top-1/2 -translate-y-1/2 w-[34px] h-[34px] rounded-full bg-[rgba(255,255,255,.85)] text-ink border-0 cursor-pointer text-[18px] leading-none">›</button>
+              <button type="button" aria-label="이전" onClick={() => setI((x) => (x - 1 + list.length) % list.length)} className="absolute left-[8px] top-1/2 -translate-y-1/2 w-[34px] h-[34px] rounded-full bg-[rgba(255,255,255,.85)] text-label border-0 cursor-pointer text-[18px] leading-none">‹</button>
+              <button type="button" aria-label="다음" onClick={() => setI((x) => (x + 1) % list.length)} className="absolute right-[8px] top-1/2 -translate-y-1/2 w-[34px] h-[34px] rounded-full bg-[rgba(255,255,255,.85)] text-label border-0 cursor-pointer text-[18px] leading-none">›</button>
               <div className="absolute bottom-[10px] left-0 right-0 flex justify-center gap-[6px]">
-                {list.map((q, k) => <span key={q.id} className="w-[7px] h-[7px] rounded-full" style={{ background: k === Math.min(i, list.length - 1) ? "#f7f3ec" : "rgba(247,243,236,.45)" }} />)}
+                {list.map((q, k) => <span key={q.id} className="w-[7px] h-[7px] rounded-full" style={{ background: k === Math.min(i, list.length - 1) ? "#ffffff" : "rgba(255,255,255,.45)" }} />)}
               </div>
             </>
           )}
         </div>
-        <div className="flex items-center justify-between gap-[10px] px-[14px] py-[11px] text-[12.5px] border-t border-[rgba(33,30,25,.1)]">
-          <button type="button" onClick={() => dismiss(p.id, true)} className="bg-transparent border-0 p-0 cursor-pointer text-[rgba(33,30,25,.6)] hover:text-brown">오늘 하루 보지 않음</button>
-          <button type="button" onClick={() => dismiss(p.id, false)} aria-label="닫기" className="bg-transparent border-0 p-0 cursor-pointer font-semibold text-ink hover:text-brown text-[16px] leading-none">✕</button>
+        <div className="flex items-center justify-between gap-[10px] px-[14px] py-[11px] text-[13px] border-t border-[rgba(112,115,124,.08)]">
+          <button type="button" onClick={() => dismiss(p.id, true)} className="bg-transparent border-0 p-0 cursor-pointer text-[rgba(55,56,60,.61)] hover:text-primary">오늘 하루 보지 않음</button>
+          <button type="button" onClick={() => dismiss(p.id, false)} aria-label="닫기" className="bg-transparent border-0 p-0 cursor-pointer font-semibold text-label hover:text-primary text-[16px] leading-none">✕</button>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-[rgba(33,30,25,.55)]" role="dialog" aria-modal="true" aria-label="안내 팝업" onClick={() => setClosed(true)}>
+    <div className="fixed inset-0 z-[1000] bg-[rgba(55,56,60,.61)]" role="dialog" aria-modal="true" aria-label="안내 팝업" onClick={() => setClosed(true)}>
       {/* 데스크톱: 왼쪽 위에 가로로 나란히 */}
       <div className="hidden md:flex absolute top-0 left-[16px] right-[16px] gap-[12px] items-start overflow-x-auto pb-[12px]">
         {list.map((p) => card(p, false))}

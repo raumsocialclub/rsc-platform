@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { INQUIRY_KINDS, type InquiryKind } from "@/lib/apply/export";
 import { BTN_PRIMARY, BTN_SECONDARY } from "./ui";
 
-const SELECT = "px-[14px] py-[10px] text-[13px] border border-[rgba(33,30,25,.2)] bg-white rounded-none outline-none";
-const DATE = "px-[10px] py-[8px] text-[12.5px] border border-[rgba(33,30,25,.2)] bg-white rounded-none outline-none";
+const SELECT = "px-[14px] py-[10px] text-[13px] border border-[rgba(112,115,124,.22)] bg-white rounded-ds-sm outline-none";
+const DATE = "px-[10px] py-[8px] text-[13px] border border-[rgba(112,115,124,.22)] bg-white rounded-ds-sm outline-none";
 
 /** 한국 날짜 YYYY-MM-DD (브라우저 시간대와 무관하게 서울 기준) */
 function kstDay(d = new Date()): string {
@@ -88,28 +88,28 @@ export function InquiriesFilter({ filter, options, canExport = false }: { filter
       </select>
       {canExport && (
         <div className="relative" ref={panel}>
-          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`${BTN_SECONDARY} px-[16px] py-[10px] text-[12.5px] inline-flex items-center gap-[6px]`} title={filter.kind === "apply" ? "설문 전 문항이 열로 들어간 응답 파일 (주관리자만)" : "메타 광고 관리자 리드 파일과 같은 열 (주관리자만)"}>
+          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`${BTN_SECONDARY} px-[16px] py-[10px] text-[13px] inline-flex items-center gap-[6px]`} title={filter.kind === "apply" ? "설문 전 문항이 열로 들어간 응답 파일 (주관리자만)" : "메타 광고 관리자 리드 파일과 같은 열 (주관리자만)"}>
             {filter.kind === "apply" ? "설문 응답 CSV" : "CSV 다운로드"} <span aria-hidden className="text-[10px]">{open ? "▲" : "▼"}</span>
           </button>
           {open && (
-            <div className="absolute right-0 top-[calc(100%+6px)] z-20 w-[320px] bg-white border border-[rgba(33,30,25,.15)] shadow-[0_8px_24px_rgba(33,30,25,.12)] p-[16px]">
-              <div className="text-[11.5px] tracking-[.08em] text-[rgba(33,30,25,.5)] font-semibold mb-[10px]">내려받을 기간 (신청일, 한국 시간)</div>
+            <div className="absolute right-0 top-[calc(100%+6px)] z-20 w-[320px] bg-white border border-[rgba(112,115,124,.16)] shadow-[0_8px_24px_rgba(112,115,124,.16)] p-[16px]">
+              <div className="text-[12px] tracking-[.01em] text-[rgba(55,56,60,.61)] font-semibold mb-[10px]">내려받을 기간 (신청일, 한국 시간)</div>
               <div className="flex flex-wrap gap-[6px] mb-[12px]">
                 {PRESETS.map((p) => (
-                  <button key={p.k} type="button" onClick={() => pick(p)} className="border border-[rgba(33,30,25,.2)] px-[10px] py-[6px] text-[12px] cursor-pointer hover:border-brownHover" style={{ background: preset === p.k ? "#fff7e3" : "transparent", fontWeight: preset === p.k ? 600 : 400 }}>{p.l}</button>
+                  <button key={p.k} type="button" onClick={() => pick(p)} className="border border-[rgba(112,115,124,.22)] px-[10px] py-[6px] text-[12px] cursor-pointer hover:border-primary" style={{ background: preset === p.k ? "rgba(255,146,0,.1)" : "transparent", fontWeight: preset === p.k ? 600 : 400 }}>{p.l}</button>
                 ))}
               </div>
               <div className="flex items-center gap-[6px] mb-[12px]">
                 <input type="date" value={all ? "" : range.from} max={all ? undefined : range.to || undefined} onChange={(e) => setDay("from", e.target.value)} className={`${DATE} flex-1 min-w-0`} aria-label="시작일" />
-                <span className="text-[12px] text-[rgba(33,30,25,.5)]">~</span>
+                <span className="text-[12px] text-[rgba(55,56,60,.61)]">~</span>
                 <input type="date" value={all ? "" : range.to} min={all ? undefined : range.from || undefined} onChange={(e) => setDay("to", e.target.value)} className={`${DATE} flex-1 min-w-0`} aria-label="종료일" />
               </div>
               <div className="flex items-center justify-between gap-[10px]">
-                <span className="text-[12px] text-[rgba(33,30,25,.6)]">{invalid ? "시작일이 종료일보다 늦습니다" : label}{filter.source || filter.campaign || filter.kind ? " · 현재 필터 적용" : ""}</span>
+                <span className="text-[12px] text-[rgba(55,56,60,.61)]">{invalid ? "시작일이 종료일보다 늦습니다" : label}{filter.source || filter.campaign || filter.kind ? " · 현재 필터 적용" : ""}</span>
                 {invalid ? (
-                  <span className={`${BTN_PRIMARY} px-[14px] py-[9px] text-[12.5px] opacity-60 cursor-not-allowed`}>내려받기</span>
+                  <span className={`${BTN_PRIMARY} px-[14px] py-[9px] text-[13px] opacity-60 cursor-not-allowed`}>내려받기</span>
                 ) : (
-                  <a href={exportHref} onClick={() => setOpen(false)} className={`${BTN_PRIMARY} px-[14px] py-[9px] text-[12.5px] inline-flex items-center hover:text-cream`}>내려받기</a>
+                  <a href={exportHref} onClick={() => setOpen(false)} className={`${BTN_PRIMARY} px-[14px] py-[9px] text-[13px] inline-flex items-center hover:text-white`}>내려받기</a>
                 )}
               </div>
             </div>

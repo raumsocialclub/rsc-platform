@@ -30,24 +30,24 @@ export default async function AdminAdminsPage() {
 
   return (
     <>
-      <PageTitle overline="ADMINS" title="관리자 관리" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">{admins.length}명</span>} />
+      <PageTitle overline="ADMINS" title="관리자 관리" aside={<span className="text-[16px] text-[rgba(55,56,60,.61)]">{admins.length}명</span>} />
       <div className="grid gap-[20px]">
         <AdminInviteForm />
 
         <div className={CARD}>
-          <div className="px-[14px] py-[12px] border-b border-[rgba(33,30,25,.12)] text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)]">관리자 목록</div>
+          <div className="px-[14px] py-[12px] border-b border-[rgba(112,115,124,.16)] text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)]">관리자 목록</div>
           <div className="overflow-x-auto">
             <table className="border-collapse w-full">
               <thead><tr>{["이름", "이메일", "역할", "상태", "마지막 로그인", "등록일", ""].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>
                 {admins.map((a) => (
-                  <tr key={a.id} className="hover:bg-[#faf7f1]">
+                  <tr key={a.id} className="hover:bg-[rgba(112,115,124,.05)]">
                     <td className={TD}><b>{a.name || "이름 없음"}</b></td>
                     <td className={TD}>{a.email ?? "—"}</td>
                     <td className={TD}><Badge style={badgeStyle(a.role === "owner" ? "brand" : "ok")}>{ROLE_KO[a.role]}</Badge></td>
                     <td className={TD}><Badge style={badgeStyle(a.status === "active" ? "ok" : "bad")}>{a.status === "active" ? "활동" : "정지"}</Badge></td>
-                    <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{a.last_login_at ? fmtFull(a.last_login_at) : "—"}</td>
-                    <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{fmtFull(a.created_at)}</td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{a.last_login_at ? fmtFull(a.last_login_at) : "—"}</td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{fmtFull(a.created_at)}</td>
                     <td className={TD}><AdminRowActions id={a.id} email={a.email} status={a.status} isSelf={a.id === me!.id} isOwner={a.role === "owner"} /></td>
                   </tr>
                 ))}
@@ -57,7 +57,7 @@ export default async function AdminAdminsPage() {
         </div>
 
         <div className={CARD}>
-          <div className="px-[14px] py-[12px] border-b border-[rgba(33,30,25,.12)] text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)]">초대 · 비밀번호 재설정 이력</div>
+          <div className="px-[14px] py-[12px] border-b border-[rgba(112,115,124,.16)] text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)]">초대 · 비밀번호 재설정 이력</div>
           <div className="overflow-x-auto">
             <table className="border-collapse w-full">
               <thead><tr>{["종류", "이메일", "이름", "상태", "만료", "보낸 날짜", ""].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
@@ -66,13 +66,13 @@ export default async function AdminAdminsPage() {
                 {invites.map((i) => {
                   const st = inviteState(i);
                   return (
-                    <tr key={i.id} className="hover:bg-[#faf7f1]">
+                    <tr key={i.id} className="hover:bg-[rgba(112,115,124,.05)]">
                       <td className={TD}>{INVITE_KIND_KO[i.kind] ?? i.kind}</td>
                       <td className={TD}>{i.email}</td>
                       <td className={TD}>{i.name || "—"}</td>
                       <td className={TD}><Badge style={badgeStyle(st === "pending" ? "warn" : st === "used" ? "ok" : "mute")}>{INVITE_STATE_KO[st]}</Badge></td>
-                      <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{fmtFull(i.expires_at)}</td>
-                      <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{fmtFull(i.created_at)}</td>
+                      <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{fmtFull(i.expires_at)}</td>
+                      <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{fmtFull(i.created_at)}</td>
                       <td className={TD}>{st === "pending" && <InviteRowActions id={i.id} />}</td>
                     </tr>
                   );
@@ -83,14 +83,14 @@ export default async function AdminAdminsPage() {
         </div>
 
         <div className={`${CARD} p-[22px]`}>
-          <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[12px]">권한표</div>
+          <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[12px]">권한표</div>
           <div className="overflow-x-auto">
             <table className="border-collapse w-full">
               <thead><tr>{["항목", "부관리자", "주관리자"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>{PERMS.map(([k, a, o]) => <tr key={k}><td className={`${TD} whitespace-normal`}>{k}</td><td className={`${TD} whitespace-normal`}>{a}</td><td className={`${TD} whitespace-normal`}>{o}</td></tr>)}</tbody>
             </table>
           </div>
-          <div className="mt-[10px] text-[11.5px] text-[rgba(33,30,25,.5)]">주관리자 본인 계정은 강등·정지·삭제할 수 없습니다. 초대 링크 유효기간 48시간, 비밀번호 재설정 링크 24시간, 모두 1회 사용. 비밀번호를 잊은 관리자에게는 목록의 「비밀번호 재설정 링크」를 만들어 본인에게만 전달해 주세요.</div>
+          <div className="mt-[10px] text-[12px] text-[rgba(55,56,60,.61)]">주관리자 본인 계정은 강등·정지·삭제할 수 없습니다. 초대 링크 유효기간 48시간, 비밀번호 재설정 링크 24시간, 모두 1회 사용. 비밀번호를 잊은 관리자에게는 목록의 「비밀번호 재설정 링크」를 만들어 본인에게만 전달해 주세요.</div>
         </div>
       </div>
     </>

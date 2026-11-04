@@ -25,8 +25,8 @@ export type CheckoutProps = {
   refundPolicy: string;
 };
 
-const SECTION = "text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[18px]";
-const CARD = "bg-white border border-[rgba(33,30,25,.12)] p-[20px] md:p-[28px]";
+const SECTION = "text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[18px]";
+const CARD = "bg-white border border-[rgba(112,115,124,.16)] p-[20px] md:p-[28px]";
 
 function useCountdown(expiresAt: string) {
   // 서버 렌더와 첫 클라이언트 렌더를 맞추기 위해 초기값은 15분, 마운트 후 실제 남은 시간으로 갱신
@@ -105,7 +105,7 @@ export function CheckoutClient(p: CheckoutProps) {
 
   return (
     <>
-      <Link href={p.backHref} className="inline-block text-[13px] text-[rgba(33,30,25,.55)] mb-[24px]">← 프로그램 상세</Link>
+      <Link href={p.backHref} className="inline-block text-[13px] text-[rgba(55,56,60,.61)] mb-[24px]">← 프로그램 상세</Link>
       <h1 className="font-medium text-[26px] md:text-[clamp(26px,3vw,36px)] leading-[1.3] mb-[36px]">결제</h1>
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.3fr)_minmax(320px,1fr)] gap-[28px] md:gap-[40px] items-start">
         <div className="grid gap-[24px] md:gap-[32px] min-w-0">
@@ -116,35 +116,35 @@ export function CheckoutClient(p: CheckoutProps) {
               <Row k="휴대폰" v={p.member.phone || "—"} />
               <Row k="이메일" v={p.member.email || "—"} />
             </div>
-            <div className="mt-[14px] text-[12px] text-[rgba(33,30,25,.45)]">프로그램은 회원 본인만 예약할 수 있습니다. 정보 수정은 고객센터로 문의해 주세요.</div>
+            <div className="mt-[14px] text-[12px] text-[rgba(55,56,60,.61)]">프로그램은 회원 본인만 예약할 수 있습니다. 정보 수정은 고객센터로 문의해 주세요.</div>
           </div>
           <div className={`${CARD} !p-[8px] md:!p-[20px]`}>
             <div className={`${SECTION} px-[12px] pt-[12px] md:px-0 md:pt-0 !mb-[6px]`}>결제 수단</div>
             <div id="toss-method" className="min-h-[140px]" />
             <div id="toss-agreement" />
-            {!ready && !err && p.clientKey && <div className="px-[12px] pb-[12px] text-[12.5px] text-[rgba(33,30,25,.5)]">결제창을 불러오는 중…</div>}
+            {!ready && !err && p.clientKey && <div className="px-[12px] pb-[12px] text-[13px] text-[rgba(55,56,60,.61)]">결제창을 불러오는 중…</div>}
           </div>
         </div>
 
-        <div className="md:sticky md:top-[120px] bg-ink text-cream p-[24px] md:p-[30px]">
-          <div className="text-[11px] tracking-[.3em] text-gold mb-[18px]">ORDER SUMMARY</div>
+        <div className="md:sticky md:top-[120px] bg-inverseBg text-white p-[24px] md:p-[30px]">
+          <div className="text-[11px] tracking-[.02em] text-primary mb-[18px]">ORDER SUMMARY</div>
           <div className="text-[17px] font-semibold mb-[6px]">{p.programName}</div>
-          <div className="text-[13px] text-[rgba(247,243,236,.65)] mb-[24px]">{p.when} · {p.place}</div>
-          <div className="grid gap-[12px] text-[14px] border-t border-[rgba(247,243,236,.15)] pt-[20px]">
-            <div className="flex justify-between"><span className="text-[rgba(247,243,236,.65)]">{won(p.unitPrice)} × 1</span><span>{won(p.unitPrice)}</span></div>
-            <div className="flex justify-between"><span className="text-[rgba(247,243,236,.65)]">할인</span><span className="text-gold">− {won(Math.max(0, p.unitPrice - p.amount))}</span></div>
-            <div className="flex justify-between border-t border-[rgba(247,243,236,.15)] pt-[14px] text-[18px] font-semibold"><span>총 결제금액</span><span>{won(p.amount)}</span></div>
+          <div className="text-[13px] text-[rgba(255,255,255,.65)] mb-[24px]">{p.when} · {p.place}</div>
+          <div className="grid gap-[12px] text-[14px] border-t border-[rgba(255,255,255,.15)] pt-[20px]">
+            <div className="flex justify-between"><span className="text-[rgba(255,255,255,.65)]">{won(p.unitPrice)} × 1</span><span>{won(p.unitPrice)}</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(255,255,255,.65)]">할인</span><span className="text-primary">− {won(Math.max(0, p.unitPrice - p.amount))}</span></div>
+            <div className="flex justify-between border-t border-[rgba(255,255,255,.15)] pt-[14px] text-[18px] font-semibold"><span>총 결제금액</span><span>{won(p.amount)}</span></div>
           </div>
-          <div className="flex justify-between items-center mt-[18px] text-[12.5px] text-[rgba(247,243,236,.7)]">
+          <div className="flex justify-between items-center mt-[18px] text-[13px] text-[rgba(255,255,255,.7)]">
             <span>결제 가능 시간</span>
-            <b className={expired ? "text-[#f0c98e]" : "text-cream"}>{expired ? "만료됨" : `${mm}:${ss}`}</b>
+            <b className={expired ? "text-[#f0c98e]" : "text-white"}>{expired ? "만료됨" : `${mm}:${ss}`}</b>
           </div>
-          <div className="mt-[16px] mb-[18px] text-[12px] leading-[1.6] text-[rgba(247,243,236,.55)]">{p.refundPolicy}. 주문 내용과 환불 규정을 확인했으며 결제에 동의합니다.</div>
-          {(err ?? configErr) && <div className="mb-[14px] text-[12.5px] leading-[1.6] text-[#f0c98e]">{err ?? configErr}</div>}
+          <div className="mt-[16px] mb-[18px] text-[12px] leading-[1.6] text-[rgba(255,255,255,.55)]">{p.refundPolicy}. 주문 내용과 환불 규정을 확인했으며 결제에 동의합니다.</div>
+          {(err ?? configErr) && <div className="mb-[14px] text-[13px] leading-[1.6] text-[#f0c98e]">{err ?? configErr}</div>}
           {expired ? (
-            <Link href={p.backHref} className="block text-center w-full px-[18px] py-[18px] bg-[rgba(247,243,236,.15)] text-cream text-[14px] font-semibold hover:text-cream">시간이 지났습니다 · 다시 예약하기</Link>
+            <Link href={p.backHref} className="block text-center w-full px-[18px] py-[18px] bg-[rgba(255,255,255,.15)] text-white text-[14px] font-semibold hover:text-white">시간이 지났습니다 · 다시 예약하기</Link>
           ) : (
-            <button type="button" onClick={pay} disabled={!canPay} className="w-full border-0 cursor-pointer px-[18px] py-[18px] bg-gold text-ink text-[14px] tracking-[.06em] font-bold hover:bg-goldHover disabled:opacity-60 disabled:cursor-not-allowed rounded-none">
+            <button type="button" onClick={pay} disabled={!canPay} className="w-full border-0 cursor-pointer px-[18px] py-[18px] bg-primary text-label text-[14px] tracking-[.06em] font-bold hover:bg-goldHover disabled:opacity-60 disabled:cursor-not-allowed rounded-ds-sm">
               {busy ? "결제창 여는 중…" : `${won(p.amount)} 결제하기`}
             </button>
           )}
@@ -155,5 +155,5 @@ export function CheckoutClient(p: CheckoutProps) {
 }
 
 function Row({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between gap-[12px]"><span className="text-[rgba(33,30,25,.55)]">{k}</span><b className="text-right">{v}</b></div>;
+  return <div className="flex justify-between gap-[12px]"><span className="text-[rgba(55,56,60,.61)]">{k}</span><b className="text-right">{v}</b></div>;
 }

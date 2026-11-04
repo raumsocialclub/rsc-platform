@@ -26,10 +26,10 @@ type FormState = {
   is_published: boolean;
 };
 
-const LABEL = "grid gap-[6px] text-[12.5px] text-[rgba(33,30,25,.6)]";
-const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(33,30,25,.2)] outline-none text-ink bg-white rounded-none focus:border-brown w-full min-w-0";
-const INPUT_SM = "px-[12px] py-[12px] text-[13.5px] border border-[rgba(33,30,25,.2)] outline-none text-ink bg-white rounded-none focus:border-brown w-full min-w-0";
-const SECTION = "text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)]";
+const LABEL = "grid gap-[6px] text-[13px] text-[rgba(55,56,60,.61)]";
+const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(112,115,124,.22)] outline-none text-label bg-white rounded-ds-sm focus:border-primary w-full min-w-0";
+const INPUT_SM = "px-[12px] py-[12px] text-[14px] border border-[rgba(112,115,124,.22)] outline-none text-label bg-white rounded-ds-sm focus:border-primary w-full min-w-0";
+const SECTION = "text-[15px] font-semibold text-label";
 const MAX_SIDE = 2000;
 
 function emptyFlow(kind: ProgramKind): FlowItem[] {
@@ -213,16 +213,16 @@ export function ProgramForm({ kind, program }: { kind: ProgramKind; program?: Pr
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); void save(true); }}>
-      <Link href="/admin/programs" className="inline-block text-[13px] text-[rgba(33,30,25,.55)] mb-[20px]">← 프로그램 목록</Link>
+      <Link href="/admin/programs" className="inline-block text-[13px] text-[rgba(55,56,60,.61)] mb-[20px]">← 프로그램 목록</Link>
       <div className="flex items-end justify-between gap-[20px] flex-wrap mb-[28px]">
-        <h1 className="font-medium text-[30px] m-0">{title}</h1>
+        <h1 className="font-medium t-title-2 m-0">{title}</h1>
         <div className="flex gap-[8px] items-center">
-          {program && <button type="button" onClick={remove} disabled={!!busy} className="bg-transparent border-0 text-[12.5px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error px-[8px]">삭제</button>}
+          {program && <button type="button" onClick={remove} disabled={!!busy} className="bg-transparent border-0 text-[13px] text-[rgba(55,56,60,.61)] cursor-pointer hover:text-negativeFg px-[8px]">삭제</button>}
           <button type="button" onClick={() => save(false)} disabled={!!busy} className={`${BTN_SECONDARY} px-[20px]`}>{busy === "save" ? "저장 중…" : "임시 저장"}</button>
           <button type="submit" disabled={!!busy} className={`${BTN_PRIMARY} px-[22px]`}>{busy === "publish" ? "게시 중…" : "게시"}</button>
         </div>
       </div>
-      {err && <div className="mb-[16px] px-[16px] py-[12px] text-[13px] bg-[rgba(163,64,44,.08)] text-error border border-[rgba(163,64,44,.25)]">{err}</div>}
+      {err && <div className="mb-[16px] px-[16px] py-[12px] text-[13px] bg-[rgba(255,66,66,.08)] text-negativeFg border border-[rgba(255,66,66,.25)]">{err}</div>}
 
       <div className="grid grid-cols-1 min-[1101px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-[20px] items-start">
         <div className="grid gap-[20px]">
@@ -246,13 +246,13 @@ export function ProgramForm({ kind, program }: { kind: ProgramKind; program?: Pr
           <div className={`${CARD} p-[26px] grid gap-[16px]`}>
             <div className="flex justify-between items-center">
               <div className={SECTION}>{flowLabel}</div>
-              {!isSeason && <button type="button" onClick={() => set("flow", [...f.flow, { t: "", d: "" }])} className="border border-[rgba(33,30,25,.2)] bg-transparent px-[12px] py-[6px] text-[12px] cursor-pointer hover:border-brownHover">+ 항목</button>}
+              {!isSeason && <button type="button" onClick={() => set("flow", [...f.flow, { t: "", d: "" }])} className="border border-[rgba(112,115,124,.22)] bg-transparent px-[12px] py-[6px] text-[12px] cursor-pointer hover:border-primary">+ 항목</button>}
             </div>
             {f.flow.map((row, i) => (
               <div key={i} className="grid grid-cols-[100px_1fr_32px] gap-[10px] items-center">
                 <input value={row.t} onChange={(e) => set("flow", f.flow.map((x, j) => (j === i ? { ...x, t: e.target.value } : x)))} placeholder={isSeason ? `${i + 1}주` : "10:00"} className={INPUT_SM} />
                 <input value={row.d} onChange={(e) => set("flow", f.flow.map((x, j) => (j === i ? { ...x, d: e.target.value } : x)))} placeholder={isSeason ? "웰컴 디너" : "체크인 · 웰컴 드링크"} className={INPUT_SM} />
-                {isSeason ? <span /> : <button type="button" aria-label="삭제" onClick={() => set("flow", f.flow.filter((_, j) => j !== i))} className="border-0 bg-transparent cursor-pointer text-[rgba(33,30,25,.4)] text-[16px] hover:text-error">✕</button>}
+                {isSeason ? <span /> : <button type="button" aria-label="삭제" onClick={() => set("flow", f.flow.filter((_, j) => j !== i))} className="border-0 bg-transparent cursor-pointer text-[rgba(55,56,60,.28)] text-[16px] hover:text-negativeFg">✕</button>}
               </div>
             ))}
           </div>
@@ -265,12 +265,12 @@ export function ProgramForm({ kind, program }: { kind: ProgramKind; program?: Pr
               <div className="grid gap-[10px]">
                 {f.sessions.map((s, i) => (
                   <div key={i} className="grid grid-cols-[44px_1fr_1fr] gap-[8px] items-center">
-                    <span className="text-[12.5px] text-[rgba(33,30,25,.6)]">{i + 1}주차</span>
+                    <span className="text-[13px] text-[rgba(55,56,60,.61)]">{i + 1}주차</span>
                     <input type="date" value={s.date} onChange={(e) => setSession(i, { date: e.target.value })} className={INPUT_SM} />
                     <input type="time" value={s.time} onChange={(e) => setSession(i, { time: e.target.value })} className={INPUT_SM} />
                   </div>
                 ))}
-                <div className="text-[11.5px] text-[rgba(33,30,25,.45)]">1주차 날짜를 고르면 나머지 주차가 7일 간격으로 채워집니다. 필요하면 수정하세요.</div>
+                <div className="text-[12px] text-[rgba(55,56,60,.61)]">1주차 날짜를 고르면 나머지 주차가 7일 간격으로 채워집니다. 필요하면 수정하세요.</div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px]">
@@ -280,26 +280,26 @@ export function ProgramForm({ kind, program }: { kind: ProgramKind; program?: Pr
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px]">
               <label className={LABEL}>정원<input type="number" min={1} value={f.capacity} onChange={(e) => set("capacity", e.target.value)} className={INPUT_SM} /></label>
-              <label className={LABEL}>1인 최대 예약<input type="number" value={1} readOnly className={`${INPUT_SM} text-[rgba(33,30,25,.5)]`} title="회원 본인만 예약할 수 있습니다 (FLOWS.md)" /></label>
+              <label className={LABEL}>1인 최대 예약<input type="number" value={1} readOnly className={`${INPUT_SM} text-[rgba(55,56,60,.61)]`} title="회원 본인만 예약할 수 있습니다 (FLOWS.md)" /></label>
             </div>
             <label className={LABEL}>판매가 (원)<input type="number" min={0} step={1000} value={f.price} onChange={(e) => set("price", e.target.value)} placeholder="79000" className={`${INPUT} text-[16px] font-semibold`} /></label>
             <label className={LABEL}>회원가 (원, 비우면 판매가와 동일)<input type="number" min={0} step={1000} value={f.member_price} onChange={(e) => set("member_price", e.target.value)} placeholder="" className={INPUT_SM} /></label>
             <label className={`${LABEL} !grid-flow-col !justify-start items-center gap-[10px]`}>
-              <input type="checkbox" checked={f.is_published} onChange={(e) => set("is_published", e.target.checked)} className="accent-brown w-[16px] h-[16px]" />
+              <input type="checkbox" checked={f.is_published} onChange={(e) => set("is_published", e.target.checked)} className="accent-primary w-[16px] h-[16px]" />
               <span>회원에게 공개 (게시 버튼을 누르면 자동으로 켜집니다)</span>
             </label>
           </div>
 
           <div className={`${CARD} p-[26px]`}>
             <div className={`${SECTION} mb-[14px]`}>대표 사진</div>
-            <div className="relative h-[180px] bg-[#e7e0d3] overflow-hidden mb-[10px]">
-              {f.image_url ? <Image src={f.image_url} alt="" fill sizes="480px" className="object-cover" unoptimized={f.image_url.startsWith("blob:")} /> : <div className="absolute inset-0 flex items-center justify-center text-[12px] text-[rgba(33,30,25,.45)]">아직 사진이 없습니다</div>}
+            <div className="relative h-[180px] bg-[#f4f4f5] overflow-hidden mb-[10px]">
+              {f.image_url ? <Image src={f.image_url} alt="" fill sizes="480px" className="object-cover" unoptimized={f.image_url.startsWith("blob:")} /> : <div className="absolute inset-0 flex items-center justify-center text-[12px] text-[rgba(55,56,60,.61)]">아직 사진이 없습니다</div>}
             </div>
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void upload(file); }} />
-            <button type="button" onClick={() => fileRef.current?.click()} disabled={busy === "upload"} className="w-full border border-dashed border-[rgba(33,30,25,.3)] bg-transparent px-[12px] py-[12px] text-[12.5px] cursor-pointer text-[rgba(33,30,25,.6)] hover:border-brown hover:text-brown disabled:opacity-60">
+            <button type="button" onClick={() => fileRef.current?.click()} disabled={busy === "upload"} className="w-full border border-dashed border-[rgba(55,56,60,.28)] bg-transparent px-[12px] py-[12px] text-[13px] cursor-pointer text-[rgba(55,56,60,.61)] hover:border-primary hover:text-primary disabled:opacity-60">
               {busy === "upload" ? "업로드 중…" : "사진 업로드 · 권장 1600×1000"}
             </button>
-            {f.image_url && <button type="button" onClick={() => set("image_url", "")} className="mt-[8px] bg-transparent border-0 text-[12px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error">사진 제거</button>}
+            {f.image_url && <button type="button" onClick={() => set("image_url", "")} className="mt-[8px] bg-transparent border-0 text-[12px] text-[rgba(55,56,60,.61)] cursor-pointer hover:text-negativeFg">사진 제거</button>}
           </div>
         </div>
       </div>

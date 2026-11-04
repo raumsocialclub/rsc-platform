@@ -11,7 +11,7 @@ const INQ: Record<string, string> = { pending: "대기", contacted: "상담 진�
 const ACTION: Record<string, string> = { "site.save": "사이트 저장", "site.reset": "사이트 기본값", "order.refund": "환불/취소", "member.update": "회원 수정", "program.create": "프로그램 등록", "program.update": "프로그램 수정", "program.publish": "프로그램 공개 변경", "program.delete": "프로그램 삭제", "invite.issue": "초대코드 발급", "settings.save": "일반 설정 저장", "seo.save": "SEO 설정 저장", "cache.purge": "캐시 비우기", "post.create": "소식 등록", "post.update": "소식 수정", "post.publish": "소식 발행 변경", "post.delete": "소식 삭제", "admin.invite": "관리자 초대", "admin.invite.revoke": "관리자 초대 취소", "admin.role": "관리자 권한 변경", "admin.status": "관리자 정지/해제" };
 
 function Csv({ type, range }: { type: string; range: Stats["range"] }) {
-  return <a href={`/api/admin/stats/export?type=${type}&from=${range.from}&to=${range.to}`} className="text-[12px] text-brown font-semibold whitespace-nowrap">CSV ↓</a>;
+  return <a href={`/api/admin/stats/export?type=${type}&from=${range.from}&to=${range.to}`} className="text-[12px] text-primary font-semibold whitespace-nowrap">CSV ↓</a>;
 }
 function Card({ title, csv, range, children, className = "" }: { title: string; csv?: string; range: Stats["range"]; children: React.ReactNode; className?: string }) {
   return (
@@ -21,14 +21,14 @@ function Card({ title, csv, range, children, className = "" }: { title: string; 
     </div>
   );
 }
-function Bars({ data, color = "#c9b79a", fmt }: { data: { label: string; value: number }[]; color?: string; fmt: (v: number) => string }) {
+function Bars({ data, color = "#99c2ff", fmt }: { data: { label: string; value: number }[]; color?: string; fmt: (v: number) => string }) {
   const max = Math.max(1, ...data.map((d) => d.value));
   return (
     <>
       <div className="flex items-end gap-[3px] h-[120px]">
-        {data.map((d, i) => <div key={i} title={`${d.label} · ${fmt(d.value)}`} className="flex-1 min-w-0" style={{ height: `${Math.max(2, Math.round((d.value / max) * 100))}%`, background: d.value ? (i === data.length - 1 ? "#5a3d24" : color) : "rgba(33,30,25,.06)" }} />)}
+        {data.map((d, i) => <div key={i} title={`${d.label} · ${fmt(d.value)}`} className="flex-1 min-w-0" style={{ height: `${Math.max(2, Math.round((d.value / max) * 100))}%`, background: d.value ? (i === data.length - 1 ? "#0066ff" : color) : "rgba(112,115,124,.08)" }} />)}
       </div>
-      <div className="flex justify-between text-[11px] text-[rgba(33,30,25,.45)] mt-[6px]"><span>{data[0]?.label}</span><span>{data[data.length - 1]?.label}</span></div>
+      <div className="flex justify-between text-[11px] text-[rgba(55,56,60,.61)] mt-[6px]"><span>{data[0]?.label}</span><span>{data[data.length - 1]?.label}</span></div>
     </>
   );
 }
@@ -60,25 +60,25 @@ export function StatsView({ s, preset, owner = true }: { s: Stats; preset: strin
   const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "—");
   return (
     <>
-      <PageTitle overline="ANALYTICS" title="통계 · 리포트" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">{r.from} ~ {r.to}</span>}>
+      <PageTitle overline="ANALYTICS" title="통계 · 리포트" aside={<span className="text-[16px] text-[rgba(55,56,60,.61)]">{r.from} ~ {r.to}</span>}>
         <form method="get" action="/admin/stats" className="flex gap-[8px] flex-wrap items-center">
           {PRESETS.map((p) => (
-            <Link key={p.k} href={`/admin/stats?preset=${p.k}`} className="border border-[rgba(33,30,25,.2)] px-[12px] py-[8px] text-[12.5px]" style={{ background: preset === p.k ? "#fff" : "transparent", fontWeight: preset === p.k ? 600 : 400 }}>{p.l}</Link>
+            <Link key={p.k} href={`/admin/stats?preset=${p.k}`} className="border border-[rgba(112,115,124,.22)] px-[12px] py-[8px] text-[13px]" style={{ background: preset === p.k ? "#fff" : "transparent", fontWeight: preset === p.k ? 600 : 400 }}>{p.l}</Link>
           ))}
-          <input type="date" name="from" defaultValue={r.from} className="px-[10px] py-[7px] text-[12.5px] border border-[rgba(33,30,25,.2)] bg-white" />
+          <input type="date" name="from" defaultValue={r.from} className="px-[10px] py-[7px] text-[13px] border border-[rgba(112,115,124,.22)] bg-white" />
           <span className="text-[12px]">~</span>
-          <input type="date" name="to" defaultValue={r.to} className="px-[10px] py-[7px] text-[12.5px] border border-[rgba(33,30,25,.2)] bg-white" />
-          <button type="submit" className="border border-brown bg-transparent text-brown px-[12px] py-[8px] text-[12.5px] font-semibold cursor-pointer">적용</button>
-          <a href={`/api/admin/stats/export?type=all&from=${r.from}&to=${r.to}`} className="border-0 bg-brown text-cream hover:text-cream px-[16px] py-[9px] text-[12.5px] font-semibold">전체 리포트 CSV ↓</a>
+          <input type="date" name="to" defaultValue={r.to} className="px-[10px] py-[7px] text-[13px] border border-[rgba(112,115,124,.22)] bg-white" />
+          <button type="submit" className="border border-primary bg-transparent text-primary px-[12px] py-[8px] text-[13px] font-semibold cursor-pointer">적용</button>
+          <a href={`/api/admin/stats/export?type=all&from=${r.from}&to=${r.to}`} className="border-0 bg-primary text-white hover:text-white px-[16px] py-[9px] text-[13px] font-semibold">전체 리포트 CSV ↓</a>
         </form>
       </PageTitle>
 
       <div className="grid grid-cols-2 min-[1201px]:grid-cols-4 gap-[16px] mb-[20px]">
         {kpi.map((k) => (
           <div key={k.l} className={`${CARD} px-[22px] py-[20px]`}>
-            <div className="text-[11.5px] tracking-[.08em] text-[rgba(33,30,25,.5)] mb-[10px]">{k.l}</div>
+            <div className="text-[12px] tracking-[.01em] text-[rgba(55,56,60,.61)] mb-[10px]">{k.l}</div>
             <div className="text-[clamp(18px,1.6vw,24px)] font-semibold whitespace-nowrap">{k.v}</div>
-            <div className="text-[12px] text-[rgba(33,30,25,.55)] mt-[6px]">{k.d}</div>
+            <div className="text-[12px] text-[rgba(55,56,60,.61)] mt-[6px]">{k.d}</div>
           </div>
         ))}
       </div>
@@ -102,13 +102,13 @@ export function StatsView({ s, preset, owner = true }: { s: Stats; preset: strin
         </Card>
       </div>
 
-      <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[10px] mt-[8px]">접속 통계</div>
-      {!tr ? <div className={`${CARD} p-[22px] text-[13px] text-[rgba(33,30,25,.5)] mb-[16px]`}>접속 통계를 불러오지 못했습니다.</div> : (
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[10px] mt-[8px]">접속 통계</div>
+      {!tr ? <div className={`${CARD} p-[22px] text-[13px] text-[rgba(55,56,60,.61)] mb-[16px]`}>접속 통계를 불러오지 못했습니다.</div> : (
         <>
           <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-[16px] mb-[16px]">
             <Card title="일별 페이지뷰 · 방문자" csv="traffic-daily" range={r}>
               <Bars data={s.revenue.daily.map((d) => ({ label: shortDay(d.day), value: tr.daily.find((x) => x.day === d.day)?.pv ?? 0 }))} fmt={(v) => `${v} PV`} />
-              <div className="text-[11.5px] text-[rgba(33,30,25,.5)] mt-[8px]">방문자는 브라우저 쿠키 기준(1년). 어드민·API 경로는 집계하지 않습니다.</div>
+              <div className="text-[12px] text-[rgba(55,56,60,.61)] mt-[8px]">방문자는 브라우저 쿠키 기준(1년). 어드민·API 경로는 집계하지 않습니다.</div>
             </Card>
             <Card title="전환 퍼널" csv="funnel" range={r}>
               <Table head={["단계", "수", "전환"]} rows={[["방문자", s.funnel.visitors, "—"], ["상담 신청", s.funnel.inquiries, pct(s.funnel.inquiries, s.funnel.visitors)], ["가입", s.funnel.signups, pct(s.funnel.signups, s.funnel.inquiries)], ["결제 회원", s.funnel.payers, pct(s.funnel.payers, s.funnel.signups)]]} empty="" />
@@ -123,7 +123,7 @@ export function StatsView({ s, preset, owner = true }: { s: Stats; preset: strin
       )}
 
       <Card title="관리자 활동 로그 (최근 50)" csv="logs" range={r}>
-        <Table head={["일시", "관리자", "작업", "대상"]} rows={s.logs.map((l) => [fmtFull(l.ts), l.admin, ACTION[l.action] ?? l.action, <span key="t" className="text-[12px] text-[rgba(33,30,25,.6)]">{l.target ?? ""}{l.detail && "label" in l.detail ? ` · ${String(l.detail.label)}` : ""}{l.detail && "refunded" in l.detail ? ` · ${won(Number(l.detail.refunded))}` : ""}{l.detail && "reason" in l.detail && l.detail.reason ? ` · 사유: ${String(l.detail.reason)}` : ""}{l.detail && "email" in l.detail && l.detail.email ? ` · ${String(l.detail.email)}` : ""}</span>])} empty="아직 활동 기록이 없습니다." />
+        <Table head={["일시", "관리자", "작업", "대상"]} rows={s.logs.map((l) => [fmtFull(l.ts), l.admin, ACTION[l.action] ?? l.action, <span key="t" className="text-[12px] text-[rgba(55,56,60,.61)]">{l.target ?? ""}{l.detail && "label" in l.detail ? ` · ${String(l.detail.label)}` : ""}{l.detail && "refunded" in l.detail ? ` · ${won(Number(l.detail.refunded))}` : ""}{l.detail && "reason" in l.detail && l.detail.reason ? ` · 사유: ${String(l.detail.reason)}` : ""}{l.detail && "email" in l.detail && l.detail.email ? ` · ${String(l.detail.email)}` : ""}</span>])} empty="아직 활동 기록이 없습니다." />
       </Card>
     </>
   );

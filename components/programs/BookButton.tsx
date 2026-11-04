@@ -30,7 +30,7 @@ export function BookButton({ sessionId, label, className, busyLabel = "예약 �
   return (
     <>
       <button type="button" onClick={go} disabled={busy} className={`${className} disabled:opacity-70 disabled:cursor-wait`}>{busy ? busyLabel : label}</button>
-      {err && <div className="mt-[10px] text-[12.5px] text-error text-center">{err}</div>}
+      {err && <div className="mt-[10px] text-[13px] text-negativeFg text-center">{err}</div>}
     </>
   );
 }

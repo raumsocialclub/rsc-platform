@@ -9,7 +9,7 @@ import type { DocDef, Field } from "@/lib/cms/schema";
 type Data = Record<string, unknown>;
 type Item = Record<string, unknown>;
 
-const LABEL = "grid gap-[6px] text-[12.5px] text-[rgba(33,30,25,.6)]";
+const LABEL = "grid gap-[6px] text-[13px] text-[rgba(55,56,60,.61)]";
 const MAX_SIDE = 2000;
 
 async function shrink(file: File): Promise<Blob> {
@@ -48,7 +48,7 @@ function ImageField({ value, onChange }: { value: string; onChange: (v: string) 
   };
   return (
     <div className="grid grid-cols-[96px_1fr] gap-[10px] items-start">
-      <div className="relative w-[96px] h-[64px] bg-[#e7e0d3] overflow-hidden border border-[rgba(33,30,25,.1)]">
+      <div className="relative w-[96px] h-[64px] bg-[#f4f4f5] overflow-hidden border border-[rgba(112,115,124,.08)]">
         {value && <Image src={value} alt="" fill sizes="96px" className="object-cover" unoptimized={value.startsWith("http")} />}
       </div>
       <div className="grid gap-[6px]">
@@ -56,9 +56,9 @@ function ImageField({ value, onChange }: { value: string; onChange: (v: string) 
         <div className="flex gap-[6px]">
           <input ref={ref} type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload(f); }} />
           <button type="button" onClick={() => ref.current?.click()} disabled={busy} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>{busy ? "업로드 중…" : "사진 업로드"}</button>
-          {value && <button type="button" onClick={() => onChange("")} className="bg-transparent border-0 text-[12px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error">비우기</button>}
+          {value && <button type="button" onClick={() => onChange("")} className="bg-transparent border-0 text-[12px] text-[rgba(55,56,60,.61)] cursor-pointer hover:text-negativeFg">비우기</button>}
         </div>
-        {err && <div className="text-[12px] text-error">{err}</div>}
+        {err && <div className="text-[12px] text-negativeFg">{err}</div>}
       </div>
     </div>
   );
@@ -69,7 +69,7 @@ function FieldInput({ f, value, onChange }: { f: Field; value: unknown; onChange
   if (f.type === "boolean") {
     return (
       <label className="flex items-center gap-[10px] text-[13px]">
-        <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} className="accent-brown w-[16px] h-[16px]" />
+        <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} className="accent-primary w-[16px] h-[16px]" />
         {f.label}
       </label>
     );
@@ -77,15 +77,15 @@ function FieldInput({ f, value, onChange }: { f: Field; value: unknown; onChange
   const hint = f.hint ?? (f.breaks === "soft" ? "줄바꿈은 PC 화면에서만 적용됩니다" : f.breaks === "hard" ? "줄바꿈이 그대로 적용됩니다" : undefined);
   return (
     <label className={LABEL}>
-      <span>{f.label}{hint && <span className="ml-[8px] text-[11px] text-[rgba(33,30,25,.4)]">{hint}</span>}</span>
+      <span>{f.label}{hint && <span className="ml-[8px] text-[11px] text-[rgba(55,56,60,.28)]">{hint}</span>}</span>
       {f.type === "textarea" ? (
         <textarea rows={Math.min(8, Math.max(2, str.split("\n").length + 1))} value={str} onChange={(e) => onChange(e.target.value)} className={`${FIELD} resize-y leading-[1.6]`} />
       ) : f.type === "image" ? (
         <ImageField value={str} onChange={onChange} />
       ) : f.type === "color" ? (
         <div className="flex gap-[8px] items-center">
-          <input type="color" value={/^#[0-9a-f]{6}$/i.test(str) ? str : "#000000"} onChange={(e) => onChange(e.target.value)} className="w-[40px] h-[36px] p-0 border border-[rgba(33,30,25,.2)] bg-white cursor-pointer" />
-          <input value={str} onChange={(e) => onChange(e.target.value)} className={`${FIELD} font-mono`} placeholder="#5a3d24" />
+          <input type="color" value={/^#[0-9a-f]{6}$/i.test(str) ? str : "#000000"} onChange={(e) => onChange(e.target.value)} className="w-[40px] h-[36px] p-0 border border-[rgba(112,115,124,.22)] bg-white cursor-pointer" />
+          <input value={str} onChange={(e) => onChange(e.target.value)} className={`${FIELD} font-mono`} placeholder="#0066ff" />
         </div>
       ) : f.type === "number" ? (
         <input type="number" value={str} onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))} className={FIELD} />
@@ -155,29 +155,29 @@ export function SiteEditor({ def, initial, previewHref, updatedAt, readOnly = fa
       <fieldset disabled={readOnly} className="contents min-w-0 border-0 p-0 m-0">
       <div className="flex items-end justify-between gap-[12px] flex-wrap">
         <div>
-          <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)] mb-[6px]">{def.id}</div>
+          <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[6px]">{def.id}</div>
           <h2 className="font-medium text-[22px] m-0">{def.label}</h2>
-          {def.description && <div className="text-[12.5px] text-[rgba(33,30,25,.55)] mt-[6px]">{def.description}</div>}
-          <div className="text-[11.5px] text-[rgba(33,30,25,.45)] mt-[6px]">{updatedAt ? `마지막 저장 ${new Date(updatedAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}` : "아직 수정하지 않음 (기본값)"}</div>
+          {def.description && <div className="text-[13px] text-[rgba(55,56,60,.61)] mt-[6px]">{def.description}</div>}
+          <div className="text-[12px] text-[rgba(55,56,60,.61)] mt-[6px]">{updatedAt ? `마지막 저장 ${new Date(updatedAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}` : "아직 수정하지 않음 (기본값)"}</div>
         </div>
         <div className="flex gap-[8px] items-center flex-wrap">
-          <a href={previewHref} target="_blank" rel="noreferrer" className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[12.5px]`}>사이트에서 보기 ↗</a>
-          <button type="button" onClick={loadHistory} disabled={!!busy} className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[12.5px]`}>이력</button>
-          {updatedAt && !readOnly && <button type="button" onClick={reset} disabled={!!busy} className="bg-transparent border-0 text-[12.5px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-error px-[6px]">기본값으로</button>}
-          {readOnly ? <span className="text-[12px] text-[rgba(33,30,25,.5)] px-[6px]">읽기 전용 · 주관리자만 저장</span> : <button type="submit" disabled={!!busy || !dirty} className={BTN_PRIMARY}>{busy === "save" ? "저장 중…" : "저장 · 게시"}</button>}
+          <a href={previewHref} target="_blank" rel="noreferrer" className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[13px]`}>사이트에서 보기 ↗</a>
+          <button type="button" onClick={loadHistory} disabled={!!busy} className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[13px]`}>이력</button>
+          {updatedAt && !readOnly && <button type="button" onClick={reset} disabled={!!busy} className="bg-transparent border-0 text-[13px] text-[rgba(55,56,60,.61)] cursor-pointer hover:text-negativeFg px-[6px]">기본값으로</button>}
+          {readOnly ? <span className="text-[12px] text-[rgba(55,56,60,.61)] px-[6px]">읽기 전용 · 주관리자만 저장</span> : <button type="submit" disabled={!!busy || !dirty} className={BTN_PRIMARY}>{busy === "save" ? "저장 중…" : "저장 · 게시"}</button>}
         </div>
       </div>
-      {msg && <div className="text-[13px] text-brown">{msg}</div>}
+      {msg && <div className="text-[13px] text-primary">{msg}</div>}
 
       {history && (
         <div className={`${CARD} p-[16px]`}>
-          <div className="flex justify-between items-center mb-[10px]"><b className="text-[13px]">저장 이력 (최근 20)</b><button type="button" onClick={() => setHistory(null)} className="bg-transparent border-0 text-[12px] cursor-pointer text-[rgba(33,30,25,.5)]">닫기</button></div>
-          {history.length === 0 ? <div className="text-[12.5px] text-[rgba(33,30,25,.5)]">이력이 없습니다.</div> : (
+          <div className="flex justify-between items-center mb-[10px]"><b className="text-[13px]">저장 이력 (최근 20)</b><button type="button" onClick={() => setHistory(null)} className="bg-transparent border-0 text-[12px] cursor-pointer text-[rgba(55,56,60,.61)]">닫기</button></div>
+          {history.length === 0 ? <div className="text-[13px] text-[rgba(55,56,60,.61)]">이력이 없습니다.</div> : (
             <div className="grid gap-[6px]">
               {history.map((h) => (
-                <div key={h.id} className="flex justify-between items-center text-[12.5px] border-b border-[rgba(33,30,25,.08)] pb-[6px]">
+                <div key={h.id} className="flex justify-between items-center text-[13px] border-b border-[rgba(112,115,124,.08)] pb-[6px]">
                   <span>{new Date(h.saved_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</span>
-                  <button type="button" onClick={() => { setData(h.data); setHistory(null); setMsg("이 버전을 불러왔습니다. '저장 · 게시'를 누르면 적용됩니다."); }} className={`${BTN_SECONDARY} px-[10px] py-[4px] text-[11.5px]`}>불러오기</button>
+                  <button type="button" onClick={() => { setData(h.data); setHistory(null); setMsg("이 버전을 불러왔습니다. '저장 · 게시'를 누르면 적용됩니다."); }} className={`${BTN_SECONDARY} px-[10px] py-[4px] text-[12px]`}>불러오기</button>
                 </div>
               ))}
             </div>
@@ -197,17 +197,17 @@ export function SiteEditor({ def, initial, previewHref, updatedAt, readOnly = fa
         return (
           <div key={l.key} className={`${CARD} p-[22px] grid gap-[14px]`}>
             <div className="flex justify-between items-center">
-              <div className="text-[12px] tracking-[.2em] text-[rgba(33,30,25,.5)]">{l.label} · {arr.length}개</div>
+              <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)]">{l.label} · {arr.length}개</div>
               {arr.length < (l.max ?? 50) && <button type="button" onClick={() => setItems(l.key, [...arr, blank()])} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>+ {l.itemLabel} 추가</button>}
             </div>
             {arr.map((it, i) => (
-              <div key={i} className="border border-[rgba(33,30,25,.12)] p-[16px] grid gap-[12px]">
+              <div key={i} className="border border-[rgba(112,115,124,.16)] p-[16px] grid gap-[12px]">
                 <div className="flex justify-between items-center">
                   <b className="text-[13px]">{l.itemLabel} {i + 1}</b>
                   <div className="flex gap-[4px]">
                     <button type="button" disabled={i === 0} onClick={() => { const a = [...arr]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; setItems(l.key, a); }} className={`${BTN_SECONDARY} px-[8px] py-[3px] text-[11px]`} aria-label="위로">↑</button>
                     <button type="button" disabled={i === arr.length - 1} onClick={() => { const a = [...arr]; [a[i + 1], a[i]] = [a[i], a[i + 1]]; setItems(l.key, a); }} className={`${BTN_SECONDARY} px-[8px] py-[3px] text-[11px]`} aria-label="아래로">↓</button>
-                    <button type="button" disabled={arr.length <= (l.min ?? 0)} onClick={() => setItems(l.key, arr.filter((_, j) => j !== i))} className="bg-transparent border-0 text-[12px] text-[rgba(33,30,25,.45)] cursor-pointer hover:text-error px-[6px] disabled:opacity-40">삭제</button>
+                    <button type="button" disabled={arr.length <= (l.min ?? 0)} onClick={() => setItems(l.key, arr.filter((_, j) => j !== i))} className="bg-transparent border-0 text-[12px] text-[rgba(55,56,60,.61)] cursor-pointer hover:text-negativeFg px-[6px] disabled:opacity-40">삭제</button>
                   </div>
                 </div>
                 <div className="grid gap-[10px] md:grid-cols-2">

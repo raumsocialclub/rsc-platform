@@ -15,7 +15,7 @@ export function CopyButton({ text, label = "복사" }: { text: string; label?: s
     }
   };
   return (
-    <button type="button" onClick={copy} className="border border-[rgba(33,30,25,.2)] bg-transparent px-[10px] py-[5px] text-[12px] cursor-pointer hover:border-brownHover hover:text-brownHover whitespace-nowrap">
+    <button type="button" onClick={copy} className="border border-[rgba(112,115,124,.22)] bg-transparent px-[10px] py-[5px] text-[12px] cursor-pointer hover:border-primary hover:text-primaryStrong whitespace-nowrap">
       {done ? "복사됨" : label}
     </button>
   );

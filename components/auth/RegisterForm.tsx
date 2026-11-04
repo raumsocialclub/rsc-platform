@@ -76,8 +76,8 @@ export function RegisterForm({ code, enabled }: Props) {
     <div className="max-w-[520px] mx-auto my-[20px]">
       <div className={`${OVERLINE} mb-[24px]`}>JOIN RSC</div>
       <h1 className="font-medium text-[28px] md:text-[clamp(28px,3.4vw,40px)] leading-[1.36] mb-[12px]">회원가입</h1>
-      <p className="mb-[36px] text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.6)]">
-        초대코드 <b className="text-brown">{code}</b> 확인 완료. 가입 즉시 프로그램을 예약할 수 있습니다.
+      <p className="mb-[36px] text-[15px] leading-[1.7] text-[rgba(55,56,60,.61)]">
+        초대코드 <b className="text-primary">{code}</b> 확인 완료. 가입 즉시 프로그램을 예약할 수 있습니다.
       </p>
 
       <SocialButtons mode="join" inviteCode={code} enabled={enabled} />
@@ -90,17 +90,17 @@ export function RegisterForm({ code, enabled }: Props) {
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" type="email" autoComplete="email" className={INPUT} />
           <input value={pw} onChange={(e) => setPw(e.target.value)} placeholder="비밀번호 (8자 이상)" type="password" autoComplete="new-password" className={INPUT} />
         </div>
-        <div className="grid gap-[10px] mt-[22px] mb-[28px] text-[13px] text-[rgba(33,30,25,.65)]">
+        <div className="grid gap-[10px] mt-[22px] mb-[28px] text-[13px] text-[rgba(55,56,60,.61)]">
           <label className="flex gap-[10px] items-start cursor-pointer">
-            <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-[2px] accent-brown" />
+            <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-[2px] accent-primary" />
             <span>[필수] <Link href="/terms" className="underline">이용약관</Link> 및 <Link href="/privacy" className="underline">개인정보 처리방침</Link> 동의</span>
           </label>
           <label className="flex gap-[10px] items-start cursor-pointer">
-            <input type="checkbox" checked={adult} onChange={(e) => setAdult(e.target.checked)} className="mt-[2px] accent-brown" />
+            <input type="checkbox" checked={adult} onChange={(e) => setAdult(e.target.checked)} className="mt-[2px] accent-primary" />
             <span>[필수] 만 19세 이상, 미혼 확인</span>
           </label>
           <label className="flex gap-[10px] items-start cursor-pointer">
-            <input type="checkbox" checked={news} onChange={(e) => setNews(e.target.checked)} className="mt-[2px] accent-brown" />
+            <input type="checkbox" checked={news} onChange={(e) => setNews(e.target.checked)} className="mt-[2px] accent-primary" />
             <span>[선택] 프로그램 소식 알림 수신</span>
           </label>
         </div>

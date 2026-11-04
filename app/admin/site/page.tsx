@@ -28,7 +28,7 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Pr
       <PageTitle overline="SITE" title="사이트 관리">
         <div className="flex gap-[6px] flex-wrap">
           {PAGES.map((p) => (
-            <Link key={p.key} href={`/admin/site?page=${p.key}`} className="border border-[rgba(33,30,25,.2)] px-[16px] py-[8px] rounded-pill text-[12.5px] font-semibold" style={{ background: p.key === page ? "#5a3d24" : "transparent", color: p.key === page ? "#f7f3ec" : "#5a3d24" }}>
+            <Link key={p.key} href={`/admin/site?page=${p.key}`} className="border border-[rgba(112,115,124,.22)] px-[16px] py-[8px] rounded-pill text-[13px] font-semibold" style={{ background: p.key === page ? "#0066ff" : "transparent", color: p.key === page ? "#ffffff" : "#0066ff" }}>
               {p.label}
             </Link>
           ))}
@@ -40,9 +40,9 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Pr
             const active = d.id === def.id;
             const u = updated.get(d.id);
             return (
-              <Link key={d.id} href={`/admin/site?page=${page}&doc=${d.id}`} className="px-[12px] py-[10px] text-[13px] rounded-[4px]" style={{ background: active ? "rgba(226,180,120,.25)" : "transparent", fontWeight: active ? 600 : 500 }}>
+              <Link key={d.id} href={`/admin/site?page=${page}&doc=${d.id}`} className="px-[12px] py-[10px] text-[13px] rounded-[4px]" style={{ background: active ? "rgba(255,146,0,.14)" : "transparent", fontWeight: active ? 600 : 500 }}>
                 {d.label}
-                <span className="block text-[11px] text-[rgba(33,30,25,.45)]">{u ? "수정됨" : "기본값"}</span>
+                <span className="block text-[11px] text-[rgba(55,56,60,.61)]">{u ? "수정됨" : "기본값"}</span>
               </Link>
             );
           })}

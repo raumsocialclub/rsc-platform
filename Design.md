@@ -20,7 +20,7 @@ white #FFFFFF (페이지)   sand #F7F7F8 (대체 배경·푸터)   sandDeep #F4F
 inverseBg #1B1C1E   inverseLabel #F7F7F8   inversePrimary #3385FF   (다크 CTA 밴드)
 positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative #FF4242 / #E52222
 ```
-- 레거시 이름(cream·ink·brown·gold·sand·success·warn·error 등)은 같은 변수에 매핑되어 있어 어드민 화면이 그대로 동작한다. 새 코드에서는 쓰지 않는다 (2단계에서 제거).
+- 레거시 이름(cream·ink·brown·gold·success·warn·error 등)은 같은 변수에 매핑된 호환용이며 코드에서는 더 쓰지 않는다 (sand·sandDeep 은 그대로 사용).
 - CMS 테마 문서는 `global.theme2` 를 읽는다. 옛 `global.theme` 는 구버전 배포본용으로 그대로 둔다.
 
 ## 타이포그래피
@@ -100,4 +100,4 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 
 ## 적용 범위
 - 1단계(완료): 공개 사이트 전체 — 홈, 상담 신청(/fit-check), 상담 전 설문(/apply), 혜택, 멤버십, 소식, 약관·개인정보·환불, 404·에러.
-- 2단계(예정): 어드민·회원 화면을 같은 프리미티브로 교체하고 레거시 색 이름 제거.
+- 2단계(완료, 2026-11): 어드민(흰 사이드바 + sand 본문, `components/admin/ui.tsx` 의 CARD·TH·TD·FIELD·BTN_*·PageTitle·Badge)·회원·로그인·결제 화면을 같은 토큰으로 교체. 레거시 색 이름(cream·ink·brown·gold 등)은 코드에서 더 쓰지 않으며 tailwind 매핑만 호환용으로 남겨 둔다.

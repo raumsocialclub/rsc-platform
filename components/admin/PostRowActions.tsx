@@ -23,7 +23,7 @@ export function PostRowActions({ id, published, badge }: { id: string; published
   return (
     <div className="grid gap-[4px] justify-items-start">
       {badge}
-      <button type="button" onClick={toggle} disabled={busy} className="bg-transparent border-0 p-0 text-[11px] text-[rgba(33,30,25,.5)] cursor-pointer hover:text-brownHover disabled:opacity-50 whitespace-nowrap">
+      <button type="button" onClick={toggle} disabled={busy} className="bg-transparent border-0 p-0 text-[11px] text-[rgba(55,56,60,.61)] cursor-pointer hover:text-primaryStrong disabled:opacity-50 whitespace-nowrap">
         {busy ? "변경 중…" : published ? "숨기기" : "발행하기"}
       </button>
     </div>

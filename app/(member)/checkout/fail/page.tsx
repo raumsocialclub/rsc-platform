@@ -10,13 +10,13 @@ export default async function CheckoutFailPage({ searchParams }: { searchParams:
   const text = describeTossError(code, message || "결제가 완료되지 않았습니다.");
   return (
     <div className="max-w-[560px] mx-auto text-center py-[24px]">
-      <div className="text-[11px] tracking-[.3em] text-[rgba(33,30,25,.5)] mb-[18px]">PAYMENT</div>
+      <div className="text-[11px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[18px]">PAYMENT</div>
       <h1 className="font-medium text-[26px] md:text-[32px] leading-[1.36] mb-[14px]">결제가 완료되지 않았습니다</h1>
-      <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.65)] mb-[8px]">{text}</p>
-      {code && <p className="text-[12px] text-[rgba(33,30,25,.45)] mb-[28px]">오류 코드: {code}</p>}
+      <p className="text-[15px] leading-[1.7] text-[rgba(55,56,60,.61)] mb-[8px]">{text}</p>
+      {code && <p className="text-[12px] text-[rgba(55,56,60,.61)] mb-[28px]">오류 코드: {code}</p>}
       <div className="flex gap-[10px] justify-center flex-wrap">
-        {bookingId && <Link href={`/checkout/${bookingId}`} className="px-[28px] py-[16px] bg-brown text-cream hover:text-cream text-[13.5px] font-semibold">다시 결제하기</Link>}
-        <Link href="/programs" className="px-[28px] py-[16px] border border-brown text-brown text-[13.5px] font-semibold">프로그램 목록</Link>
+        {bookingId && <Link href={`/checkout/${bookingId}`} className="px-[28px] py-[16px] bg-primary text-white hover:text-white text-[14px] font-semibold">다시 결제하기</Link>}
+        <Link href="/programs" className="px-[28px] py-[16px] border border-primary text-primary text-[14px] font-semibold">프로그램 목록</Link>
       </div>
     </div>
   );

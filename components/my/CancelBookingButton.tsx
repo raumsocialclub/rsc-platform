@@ -23,13 +23,13 @@ export function CancelBookingButton({ bookingId, refundText, disabledReason }: {
     }
   };
 
-  if (disabledReason) return <span className="text-[12px] text-[rgba(33,30,25,.45)]">{disabledReason}</span>;
+  if (disabledReason) return <span className="text-[12px] text-[rgba(55,56,60,.61)]">{disabledReason}</span>;
   return (
     <div className="grid gap-[6px] justify-items-end">
-      <button type="button" onClick={cancel} disabled={busy} className="border border-[rgba(33,30,25,.25)] bg-transparent px-[14px] py-[8px] text-[12.5px] cursor-pointer hover:border-error hover:text-error disabled:opacity-50">
+      <button type="button" onClick={cancel} disabled={busy} className="border border-[rgba(55,56,60,.28)] bg-transparent px-[14px] py-[8px] text-[13px] cursor-pointer hover:border-negative hover:text-negativeFg disabled:opacity-50">
         {busy ? "취소 중…" : "예약 취소"}
       </button>
-      {err && <div className="text-[12px] text-error">{err}</div>}
+      {err && <div className="text-[12px] text-negativeFg">{err}</div>}
     </div>
   );
 }

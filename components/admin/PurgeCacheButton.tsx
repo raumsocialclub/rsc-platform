@@ -22,8 +22,8 @@ export function PurgeCacheButton() {
   };
   return (
     <div className="flex items-center gap-[10px] flex-wrap">
-      <button type="button" onClick={run} disabled={busy} className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[12.5px]`}>{busy ? "비우는 중…" : "캐시 지금 비우기"}</button>
-      {msg && <span className="text-[12.5px] text-brown">{msg}</span>}
+      <button type="button" onClick={run} disabled={busy} className={`${BTN_SECONDARY} px-[14px] py-[9px] text-[13px]`}>{busy ? "비우는 중…" : "캐시 지금 비우기"}</button>
+      {msg && <span className="text-[13px] text-primary">{msg}</span>}
     </div>
   );
 }

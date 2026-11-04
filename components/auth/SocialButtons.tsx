@@ -73,7 +73,7 @@ export function SocialButtons({ mode, inviteCode, enabled, next }: Props) {
           </button>
         );
       })}
-      {notice && <div className="text-[13px] text-[rgba(33,30,25,.6)]">{notice}</div>}
+      {notice && <div className="text-[13px] text-[rgba(55,56,60,.61)]">{notice}</div>}
     </div>
   );
 }

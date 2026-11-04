@@ -21,5 +21,5 @@ export function InviteRowActions({ id }: { id: string }) {
       setBusy(false);
     }
   };
-  return <button type="button" onClick={revoke} disabled={busy} className="bg-transparent border-0 p-0 text-[12px] text-error cursor-pointer hover:opacity-80 disabled:opacity-50">초대 취소</button>;
+  return <button type="button" onClick={revoke} disabled={busy} className="bg-transparent border-0 p-0 text-[12px] text-negativeFg cursor-pointer hover:opacity-80 disabled:opacity-50">초대 취소</button>;
 }

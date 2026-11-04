@@ -37,7 +37,7 @@ export function noticeHtml(title: string, message: string, status: number): Resp
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
 <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f3ec;color:#211e19;font-family:Arial,sans-serif;padding:24px}
-.b{max-width:520px;text-align:center}.o{font-size:11px;letter-spacing:.3em;color:rgba(33,30,25,.5);margin-bottom:18px}h1{font-weight:500;font-size:26px;margin:0 0 14px}p{font-size:14.5px;line-height:1.75;color:rgba(33,30,25,.65);white-space:pre-line;margin:0}</style></head>
+.b{max-width:520px;text-align:center}.o{font-size:11px;letter-spacing:.3em;color:rgba(55,56,60,.61);margin-bottom:18px}h1{font-weight:500;font-size:26px;margin:0 0 14px}p{font-size:14.5px;line-height:1.75;color:rgba(55,56,60,.61);white-space:pre-line;margin:0}</style></head>
 <body><div class="b"><div class="o">RAUM SOCIAL CLUB</div><h1>${esc(title)}</h1><p>${esc(message)}</p></div></body></html>`;
   return new Response(html, { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
 }

@@ -27,14 +27,14 @@ export const INQUIRY_STATUS: Record<string, string> = {
   closed: "보류",
 };
 
-/** 상태 배지 색 (Design.md 배지 규칙 + 프로토타입 statusStyle) */
+/** 상태 배지 색 (Wanted DS 상태색: positive · cautionary · negative · primary · 중립) */
 export function badgeStyle(kind: "ok" | "warn" | "mute" | "bad" | "brand"): { background: string; color: string } {
   switch (kind) {
-    case "ok": return { background: "rgba(46,107,62,.12)", color: "#2e6b3e" };
-    case "warn": return { background: "rgba(226,180,120,.25)", color: "#7a5420" };
-    case "bad": return { background: "rgba(163,64,44,.12)", color: "#a3402c" };
-    case "brand": return { background: "#5a3d24", color: "#f7f3ec" };
-    default: return { background: "rgba(33,30,25,.07)", color: "rgba(33,30,25,.6)" };
+    case "ok": return { background: "rgba(0,191,64,.12)", color: "#009632" };
+    case "warn": return { background: "rgba(255,146,0,.14)", color: "#d17600" };
+    case "bad": return { background: "rgba(255,66,66,.12)", color: "#e52222" };
+    case "brand": return { background: "rgba(0,102,255,.1)", color: "#0066ff" };
+    default: return { background: "rgba(112,115,124,.08)", color: "rgba(55,56,60,.61)" };
   }
 }
 

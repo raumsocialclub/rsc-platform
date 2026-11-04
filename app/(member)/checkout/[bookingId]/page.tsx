@@ -50,10 +50,10 @@ export default async function CheckoutPage({ params }: { params: Promise<{ booki
 function Notice({ title, body, href, cta }: { title: string; body: string; href: string; cta: string }) {
   return (
     <div className="max-w-[560px] mx-auto text-center py-[24px]">
-      <div className="text-[11px] tracking-[.3em] text-[rgba(33,30,25,.5)] mb-[18px]">CHECKOUT</div>
+      <div className="text-[11px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[18px]">CHECKOUT</div>
       <h1 className="font-medium text-[26px] md:text-[32px] leading-[1.36] mb-[14px]">{title}</h1>
-      <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.65)] mb-[28px]">{body}</p>
-      <Link href={href} className="inline-block px-[28px] py-[16px] bg-brown text-cream hover:text-cream text-[13.5px] font-semibold">{cta}</Link>
+      <p className="text-[15px] leading-[1.7] text-[rgba(55,56,60,.61)] mb-[28px]">{body}</p>
+      <Link href={href} className="inline-block px-[28px] py-[16px] bg-primary text-white hover:text-white text-[14px] font-semibold">{cta}</Link>
     </div>
   );
 }

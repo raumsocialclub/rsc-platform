@@ -35,8 +35,8 @@ export function ProgramsTable({ programs, tab }: { programs: ProgramWithSessions
     <>
       <PageTitle overline="PROGRAMS" title="프로그램 관리">
         <div className="flex gap-[8px]">
-          <Link href="/admin/programs/new?kind=season" className="border border-brown bg-transparent text-brown px-[18px] py-[11px] text-[13px] font-semibold hover:text-brownHover hover:border-brownHover">+ RAUM SOLO 시즌</Link>
-          <Link href="/admin/programs/new" className="border-0 bg-brown text-cream px-[20px] py-[11px] text-[13px] font-semibold hover:bg-brownHover hover:text-cream">+ 새 프로그램 등록</Link>
+          <Link href="/admin/programs/new?kind=season" className="border border-primary bg-transparent text-primary px-[18px] py-[11px] text-[13px] font-semibold hover:text-primaryStrong hover:border-primary">+ RAUM SOLO 시즌</Link>
+          <Link href="/admin/programs/new" className="border-0 bg-primary text-white px-[20px] py-[11px] text-[13px] font-semibold hover:bg-primaryStrong hover:text-white">+ 새 프로그램 등록</Link>
         </div>
       </PageTitle>
       <div className="flex gap-[6px] mb-[16px]">
@@ -46,8 +46,8 @@ export function ProgramsTable({ programs, tab }: { programs: ProgramWithSessions
             <Link
               key={t.key}
               href={t.key === "all" ? "/admin/programs" : `/admin/programs?tab=${t.key}`}
-              className="border border-[rgba(33,30,25,.2)] px-[16px] py-[8px] rounded-pill text-[12.5px] font-semibold"
-              style={{ background: active ? "#5a3d24" : "transparent", color: active ? "#f7f3ec" : "#5a3d24" }}
+              className="border border-[rgba(112,115,124,.22)] px-[16px] py-[8px] rounded-pill text-[13px] font-semibold"
+              style={{ background: active ? "#0066ff" : "transparent", color: active ? "#ffffff" : "#0066ff" }}
             >
               {t.label}
             </Link>
@@ -67,28 +67,28 @@ export function ProgramsTable({ programs, tab }: { programs: ProgramWithSessions
                 const booked = Math.max(0, cap - remaining);
                 const st = programStatus(p);
                 return (
-                  <tr key={p.id} className="hover:bg-[#faf7f1]">
+                  <tr key={p.id} className="hover:bg-[rgba(112,115,124,.05)]">
                     <td className={`${TD} whitespace-normal min-w-[200px]`}>
                       <Link href={`/admin/programs/${p.id}`} className="flex items-center gap-[12px]">
-                        <div className="w-[52px] h-[38px] bg-[#e7e0d3] relative overflow-hidden flex-none">
+                        <div className="w-[52px] h-[38px] bg-[#f4f4f5] relative overflow-hidden flex-none">
                           {p.image_url && <Image src={p.image_url} alt="" fill sizes="52px" className="object-cover" />}
                         </div>
                         <b>{p.name}</b>
                       </Link>
                     </td>
-                    <td className={`${TD} text-[12.5px] text-[rgba(33,30,25,.65)]`}>{p.kind === "season" ? "시즌권" : "단일 회차"}</td>
-                    <td className={TD}><span className="text-[11px] tracking-[.1em] px-[8px] py-[3px] bg-[rgba(33,30,25,.06)]">{categoryLabel(p.category)}</span></td>
-                    <td className={TD}>{sch.date}<span className="block text-[12px] text-[rgba(33,30,25,.6)]">{sch.time}</span></td>
-                    <td className={`${TD} text-[rgba(33,30,25,.65)] whitespace-normal min-w-[110px]`}>{p.place || "—"}</td>
-                    <td className={TD}><b>{won(p.price)}</b>{p.member_price != null && p.member_price !== p.price && <span className="block text-[11.5px] text-[rgba(33,30,25,.5)]">회원 {won(p.member_price)}</span>}</td>
+                    <td className={`${TD} text-[13px] text-[rgba(55,56,60,.61)]`}>{p.kind === "season" ? "시즌권" : "단일 회차"}</td>
+                    <td className={TD}><span className="text-[11px] tracking-[.1em] px-[8px] py-[3px] bg-[rgba(112,115,124,.08)]">{categoryLabel(p.category)}</span></td>
+                    <td className={TD}>{sch.date}<span className="block text-[12px] text-[rgba(55,56,60,.61)]">{sch.time}</span></td>
+                    <td className={`${TD} text-[rgba(55,56,60,.61)] whitespace-normal min-w-[110px]`}>{p.place || "—"}</td>
+                    <td className={TD}><b>{won(p.price)}</b>{p.member_price != null && p.member_price !== p.price && <span className="block text-[12px] text-[rgba(55,56,60,.61)]">회원 {won(p.member_price)}</span>}</td>
                     <td className={TD}>
                       <div className="flex items-center gap-[8px]">
                         <span>{booked}/{cap}</span>
-                        <div className="w-[60px] h-[5px] bg-[rgba(33,30,25,.08)]"><div className="h-full bg-brown" style={{ width: `${cap ? Math.round((booked / cap) * 100) : 0}%` }} /></div>
+                        <div className="w-[60px] h-[5px] bg-[rgba(112,115,124,.08)]"><div className="h-full bg-primary" style={{ width: `${cap ? Math.round((booked / cap) * 100) : 0}%` }} /></div>
                       </div>
                     </td>
                     <td className={TD}><ProgramRowActions id={p.id} published={p.is_published} badge={<Badge style={st.style}>{st.label}</Badge>} /></td>
-                    <td className={`${TD} pl-0`}><Link href={`/admin/programs/${p.id}`} className="border border-[rgba(33,30,25,.2)] px-[12px] py-[6px] text-[12px] hover:border-brownHover hover:text-brownHover">편집</Link></td>
+                    <td className={`${TD} pl-0`}><Link href={`/admin/programs/${p.id}`} className="border border-[rgba(112,115,124,.22)] px-[12px] py-[6px] text-[12px] hover:border-primary hover:text-primaryStrong">편집</Link></td>
                   </tr>
                 );
               })}

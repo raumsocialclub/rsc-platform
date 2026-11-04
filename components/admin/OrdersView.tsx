@@ -23,7 +23,7 @@ export function OrdersView({ rows, selected, programs, filter }: Props) {
   const total = paid.reduce((s, r) => s + (r.payment?.balance ?? r.amount), 0);
   return (
     <>
-      <PageTitle overline="ORDERS" title="예약 · 결제 내역" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">{rows.length}건 · {won(total)}</span>}>
+      <PageTitle overline="ORDERS" title="예약 · 결제 내역" aside={<span className="text-[16px] text-[rgba(55,56,60,.61)]">{rows.length}건 · {won(total)}</span>}>
         <OrdersFilter programs={programs} filter={filter} />
       </PageTitle>
       <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-[20px] items-start">
@@ -36,14 +36,14 @@ export function OrdersView({ rows, selected, programs, filter }: Props) {
                 {rows.map((r) => {
                   const active = selected?.id === r.id;
                   return (
-                    <tr key={r.id} className={active ? "bg-[rgba(226,180,120,.18)]" : "hover:bg-[#faf7f1]"}>
-                      <td className={`${TD} text-[12.5px] text-[rgba(33,30,25,.6)]`}><Link href={qs(r.id)} className="block">{r.order_id}</Link></td>
-                      <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{fmtDay(r.created_at)} {fmtTime(r.created_at)}</td>
+                    <tr key={r.id} className={active ? "bg-[rgba(0,102,255,.06)]" : "hover:bg-[rgba(112,115,124,.05)]"}>
+                      <td className={`${TD} text-[13px] text-[rgba(55,56,60,.61)]`}><Link href={qs(r.id)} className="block">{r.order_id}</Link></td>
+                      <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{fmtDay(r.created_at)} {fmtTime(r.created_at)}</td>
                       <td className={TD}><Link href={qs(r.id)} className="block font-bold">{r.member?.name ?? "—"}</Link></td>
-                      <td className={TD}>{r.program?.name ?? "—"}<span className="block text-[11.5px] text-[rgba(33,30,25,.5)]">{r.session ? `${fmtDay(r.session.starts_at)} ${fmtTime(r.session.starts_at)}` : ""}</span></td>
+                      <td className={TD}>{r.program?.name ?? "—"}<span className="block text-[12px] text-[rgba(55,56,60,.61)]">{r.session ? `${fmtDay(r.session.starts_at)} ${fmtTime(r.session.starts_at)}` : ""}</span></td>
                       <td className={TD}>{r.qty}</td>
                       <td className={TD}>{r.payment?.method ?? "—"}</td>
-                      <td className={TD}><b>{won(r.amount)}</b>{r.payment && r.payment.balance !== r.amount && <span className="block text-[11.5px] text-error">환불 {won(r.amount - r.payment.balance)}</span>}</td>
+                      <td className={TD}><b>{won(r.amount)}</b>{r.payment && r.payment.balance !== r.amount && <span className="block text-[12px] text-negativeFg">환불 {won(r.amount - r.payment.balance)}</span>}</td>
                       <td className={TD}><Badge style={orderBadge(r.status)}>{BOOKING_STATUS_KO[r.status]}</Badge></td>
                     </tr>
                   );
@@ -52,7 +52,7 @@ export function OrdersView({ rows, selected, programs, filter }: Props) {
             </table>
           </div>
         </div>
-        {selected ? <OrderDetail key={`${selected.id}-${selected.status}-${selected.payment?.status ?? ""}`} order={selected} /> : <div className={`${CARD} p-[26px] text-[13px] text-[rgba(33,30,25,.5)]`}>목록에서 예약을 선택하면 상세와 환불 버튼이 표시됩니다.</div>}
+        {selected ? <OrderDetail key={`${selected.id}-${selected.status}-${selected.payment?.status ?? ""}`} order={selected} /> : <div className={`${CARD} p-[26px] text-[13px] text-[rgba(55,56,60,.61)]`}>목록에서 예약을 선택하면 상세와 환불 버튼이 표시됩니다.</div>}
       </div>
     </>
   );
