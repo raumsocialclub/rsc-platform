@@ -31,7 +31,7 @@ const region = (prefix: string, label: string): Field[] => [
   { key: `${prefix}Detail`, label: `${label} · 상세입력`, type: "text", placeholder: `${label}을(를) 입력해 주세요`, indent: true },
 ];
 
-const HEIGHT_HINT = "* 솔직한 키 작성을 부탁드립니다. 거짓된 키 작성 시 환불 없이 영구적으로 이용이 제한될 수 있습니다.";
+const HEIGHT_HINT = "* 솔직한 키 작성을 부탁드립니다.";
 
 export const JOB_CATEGORIES = ["대기업", "중견기업", "중소기업", "스타트업", "공기업", "공공기관", "외국계기업", "미용", "미디어", "예술", "레저/스포츠", "외식/식음료", "공인중개사", "문과전문직", "이과전문직", "간호사", "의료직", "유치원교사", "초등학교교사", "중,고등학교교사", "학원강사", "교육직", "공무원", "경찰", "소방관", "직업군인", "사업가", "자영업", "금융직", "프리랜서"];
 export const EMPLOYMENT = ["정규직", "계약직", "프리랜서", "가업승계", "개인사업자", "법인사업자"];

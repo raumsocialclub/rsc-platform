@@ -268,7 +268,7 @@ export function FitCheck({ onSubmit }: Props) {
         <div className="py-[60px]">
           <div className="text-[11px] tracking-[.34em] text-brown mb-[36px]">THANK YOU</div>
           <h2 className="font-medium text-[clamp(30px,3.6vw,48px)] leading-[1.36] mb-[28px] text-pretty">신청이 접수되었습니다</h2>
-          <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 아래 이메일 또는 전화(02-538-3366)로 알려 주세요.</p>
+          <p className="mb-[52px] text-[16px] leading-[1.9] text-[rgba(33,30,25,.66)] max-w-[560px] text-pretty">담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 아래 이메일 또는 전화(02-6925-4786)로 알려 주세요.</p>
           <div className="flex gap-[12px] flex-wrap">
             <Link href="/" className="inline-flex items-center px-[34px] py-[16px] bg-brown text-cream text-[13.5px] hover:text-cream">홈으로 돌아가기</Link>
             <InstagramButton shape="square" />

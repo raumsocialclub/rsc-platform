@@ -25,7 +25,7 @@ export async function LegalPage({ overline, title, updated, sections, current, p
   const [{ leadMode }, brand] = await Promise.all([getSettings(), getBrand()]);
   const nav = NAV.filter((n) => !(leadMode && isLeadHiddenHref(n.href)));
   const biz = businessInfo(brand);
-  const phone = brand.phone || "02-538-3366";
+  const phone = brand.phone || "02-6925-4786";
   const email = brand.email || "theraumai@gmail.com";
   return (
     <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">

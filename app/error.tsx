@@ -15,7 +15,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       <div className="max-w-[560px] w-full text-center">
         <div className="text-[11px] tracking-[.3em] text-[rgba(33,30,25,.5)] mb-[18px]">ERROR</div>
         <h1 className="font-medium text-[28px] md:text-[36px] leading-[1.3] mb-[14px]">문제가 생겼습니다</h1>
-        <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.65)] mb-[8px]">일시적인 오류일 수 있습니다. 다시 시도해도 반복되면 고객센터(02-538-3366)로 알려 주세요.</p>
+        <p className="text-[14.5px] leading-[1.7] text-[rgba(33,30,25,.65)] mb-[8px]">일시적인 오류일 수 있습니다. 다시 시도해도 반복되면 고객센터(02-6925-4786)로 알려 주세요.</p>
         {error.digest && <p className="text-[12px] text-[rgba(33,30,25,.45)] mb-[28px]">오류 코드: {error.digest}</p>}
         <div className="flex gap-[10px] justify-center flex-wrap mt-[20px]">
           <button type="button" onClick={reset} className="px-[28px] py-[16px] bg-brown text-cream hover:bg-brownHover text-[13.5px] font-semibold border-0 cursor-pointer">다시 시도</button>

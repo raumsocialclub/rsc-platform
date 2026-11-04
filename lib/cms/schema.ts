@@ -75,7 +75,7 @@ export const DOCS: DocDef[] = [
       ctaHref: "/fit-check",
       footerHeadline: "아름다운 공간에서,\n서로의 특별함을 발견하는 곳.",
       address: "서울특별시 강남구 언주로 564, 비동 2층\n(역삼동, 라움)",
-      phone: "02-538-3366",
+      phone: "02-6925-4786",
       email: "theraumai@gmail.com",
       instagramHandle: "raum_socialclub",
       instagramUrl: "https://www.instagram.com/raum_socialclub/",
