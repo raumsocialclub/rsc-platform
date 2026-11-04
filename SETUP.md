@@ -138,6 +138,22 @@ CRM_SHEET_TOKEN=                   # 서버 전용. Apps Script 스크립트 속
 - 그 전까지 스테이징 화면은 **운영 DB 를 함께 쓴다**. 스테이징에서 결제·회원 테스트를 하면 운영 데이터에 남으니 주의
 - 스테이징 DB 가 생기면 Vercel Preview 의 `SUPABASE_SERVICE_ROLE_KEY` 는 대표가 스테이징 프로젝트의 service_role 키로 직접 바꿔 넣는다(Claude 는 그 키를 다루지 않는다)
 
+## 4-9. 보안 점검 — 바이브코딩으로 만든 서비스의 흔한 사고 3가지 (2026-11-04 점검)
+**코드·DB 에 이미 적용돼 있는 것 (Claude 가 확인·적용)**
+- 비밀키는 서버 환경변수에만 있다. 브라우저로 나가는 `NEXT_PUBLIC_` 값은 공개돼도 되는 3개뿐(Supabase anon 키, 토스 클라이언트 키, Sentry DSN). git 기록에도 비밀키가 올라간 적 없음(확인함). `.env*` 는 git 제외.
+- Supabase RLS: public 테이블 전부(24개) 켜져 있음. 2026-11-04 에 상담 신청(inquiries)의 「누구나 insert」 정책을 없애 저장은 서버(/api/inquiries·/api/apply)만 한다. 보안 어드바이저의 SECURITY DEFINER 경고는 함수 안에서 관리자·로그인 검사를 하므로 의도된 것.
+- 공개 API 요청 제한(같은 IP 기준, IP 는 해시로만 저장): 상담 신청·상담 전 설문 10분에 5번, 초대코드 확인 20번, 비밀번호 재설정 5번. 넘으면 "요청이 너무 많습니다". 로그인은 기존 연속 실패 잠금(일반 설정 → 보안).
+- 개인정보 보관 기간 자동 삭제(상담 신청 180일 등)는 기존대로.
+
+**대표가 대시보드에서 직접 해야 하는 것 (코드로는 불가) — 키 털려도 요금이 무한히 나가지 않게**
+1. Supabase: 조직 → **Organization settings → Billing → Spend Cap** 이 **켜짐**인지 확인(Pro 전환 후. Free 플랜은 한도를 넘으면 멈추고 과금은 없음). 같은 화면에서 결제 알림 이메일 확인.
+   - 추가(Pro 플랜): 프로젝트 → **Authentication → Providers → Email → "Prevent use of leaked passwords"** 켜기(유출된 비밀번호 사용 차단).
+2. Vercel: 팀 → **Settings → Billing → Spend Management** → 월 한도 금액 입력 + 알림 이메일 켜기(Pro 전환 후. Hobby 는 무료 한도 초과 시 자동 정지).
+3. Resend(메일): 무료 플랜은 하루 100통·월 3,000통이 곧 한도라 과금 없음. 유료로 올리면 **Settings → Usage** 알림 확인.
+4. 토스페이먼츠: 지금은 문서 공용 테스트 키라 실제 결제 없음. 가맹점 키로 바꾸면 토스 개발자센터에서 결제 알림·웹훅을 확인.
+5. (선택, Pro) Vercel **Firewall** 에서 `/api` 경로 Rate Limit 규칙 — 4-1 참고. 광고 집행 중 트래픽 폭주 시 Attack Challenge Mode.
+6. 월 1회: "보안 점검해" 라고 하면 Claude 가 Supabase 보안 어드바이저·RLS 목록·키 노출을 다시 확인해 보고한다.
+
 ## 4-8. 월 1회 점검
 - `MAINTENANCE.md` 순서대로. 대표가 "이번 달 점검해" 라고 하면 Claude 가 문서대로 확인하고 보고한다
 

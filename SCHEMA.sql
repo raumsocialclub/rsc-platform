@@ -235,7 +235,8 @@ create policy "own payments" on payments for select using (member_id = auth.uid(
 create policy "own memberships" on memberships for select using (member_id = auth.uid() or is_admin());
 create policy "own passes" on guest_passes for select using (member_id = auth.uid() or is_admin());
 
-create policy "anyone can submit inquiry" on inquiries for insert with check (true);
+-- (2026-11-04 삭제) create policy "anyone can submit inquiry" on inquiries for insert with check (true);
+--   상담 신청·설문 저장은 서버 Route Handler(service role)만 한다. 공개 anon 키로 DB 에 직접 넣는 스팸을 막기 위함 (아래 "공개 API 요청 제한" 참고)
 create policy "admin inquiries" on inquiries for all using (is_admin());
 create policy "admin invites" on invite_codes for all using (is_admin());
 -- invite code validation & booking/payment writes go through server Route Handlers using the service role key.
@@ -616,3 +617,38 @@ create or replace function purge_expired_inquiries() returns void language sql s
 $$;
 revoke all on function purge_expired_inquiries() from public, anon, authenticated;
 select cron.schedule('purge-expired-inquiries', '23 3 * * *', $$select public.purge_expired_inquiries()$$);
+
+-- ---------- 2026-11-04: 공개 API 요청 제한 + 익명 insert 정책 제거 (바이브코딩 보안 점검)
+-- rate_limits: 같은 IP(해시) 가 짧은 시간에 공개 API 를 너무 많이 부르면 429 (lib/ratelimit.ts). 서버 service role 전용, 정책 없음.
+create table if not exists rate_limits (
+  key text primary key,                       -- 용도:IP해시 (원본 IP 는 저장하지 않음)
+  hits int not null default 0,
+  window_start timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table rate_limits enable row level security;
+-- 한 번 호출 = 1회 기록. 창이 지났으면 1부터 다시 센다. 반환 {allowed, hits, retry_after(초)}
+create or replace function rate_limit_hit(p_key text, p_limit int, p_window_sec int)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare r rate_limits; v_now timestamptz := now(); v_win interval := make_interval(secs => p_window_sec);
+begin
+  insert into rate_limits(key, hits, window_start, updated_at) values (p_key, 1, v_now, v_now)
+  on conflict (key) do update set
+    hits = case when rate_limits.window_start + v_win <= v_now then 1 else rate_limits.hits + 1 end,
+    window_start = case when rate_limits.window_start + v_win <= v_now then v_now else rate_limits.window_start end,
+    updated_at = v_now
+  returning * into r;
+  return jsonb_build_object('allowed', r.hits <= p_limit, 'hits', r.hits,
+    'retry_after', greatest(1, ceil(extract(epoch from (r.window_start + v_win - v_now)))::int));
+end $$;
+revoke all on function rate_limit_hit(text, int, int) from public, anon, authenticated;
+-- 하루 지난 제한 기록은 매일 purge_expired_logs 가 지운다
+create or replace function purge_expired_logs() returns void language sql security definer set search_path = public as $$
+  delete from login_attempts where updated_at < now() - interval '30 days';
+  delete from rate_limits where updated_at < now() - interval '1 day';
+  delete from page_views where ts < now() - interval '1 year';
+  delete from admin_logs where ts < now() - interval '1 year' and action not like 'admin.%';
+  delete from admin_logs where ts < now() - interval '3 years';
+$$;
+-- inquiries 익명 insert 정책 제거: 공개 anon 키로 REST 에 직접 insert 하던 길을 막는다. 저장은 /api/inquiries·/api/apply (service role) 만.
+drop policy if exists "anyone can submit inquiry" on inquiries;

@@ -20,6 +20,8 @@ export type InquiryRow = {
   /** 저장 항목은 route·slot 뿐. answers 배열은 설문 원본을 저장하던 이전 신청에만 남아 있다. */
   answers: {
     form?: string;          // "apply" = 상담 전 설문(/apply) 응답
+    ref?: string;           // /apply?ref=코드 (추천인·직접 전달 링크)
+    apply?: Record<string, string | string[]>;  // 상담 전 설문 응답 원본(키-값). CSV·목록 요약에 쓴다
     profile?: string;
     route?: string;
     slot?: string;

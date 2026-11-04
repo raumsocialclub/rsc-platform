@@ -3,13 +3,14 @@ import { z } from "zod";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { normalizePhone } from "@/lib/phone";
+import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
 import { UTM_KEYS } from "@/lib/utm/client";
 import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 
 /**
  * POST /api/inquiries — Fit Check 설문 완료 시 inquiries 에 저장한다. (FLOWS.md 1-1)
- * 로그인 불필요. service role key 가 있으면 관리자 클라이언트로, 없으면
- * "anyone can submit inquiry" RLS 정책에 따라 anon 클라이언트로 insert 한다.
+ * 로그인 불필요. 저장은 서버(service role)만 한다 — inquiries 의 익명 insert 정책("anyone can submit inquiry")은 2026-11-04 에 없앴다
+ * (공개 anon 키로 DB 에 직접 넣는 스팸 차단). 요청 제한: 같은 IP 10분에 5번 (lib/ratelimit.ts).
  *
  * 개인정보 최소화: 이름·휴대폰·상담 가능 시간·광고 UTM·동의 시각만 저장한다. (설문형 모드일 때만 결과 유형·유입 경로가 추가됨)
  * 설문 답변 원본(picks/answers)은 받더라도 버린다 (zod 가 정의되지 않은 키를 제거).
@@ -37,6 +38,8 @@ function cleanUtm(utm: z.infer<typeof UtmSchema> | null | undefined): Record<str
 }
 
 export async function POST(req: Request) {
+  const limited = await limitByIp(req, "inquiries", 5, 600);
+  if (!limited.ok) return tooManyResponse(limited);
   let json: unknown;
   try {
     json = await req.json();
@@ -66,7 +69,7 @@ export async function POST(req: Request) {
   };
 
   try {
-    // anon 경로는 insert 정책만 있고 select 정책이 없으므로 RETURNING(.select) 을 쓰지 않는다.
+    if (!hasServiceRoleKey()) console.warn("[inquiries] SUPABASE_SERVICE_ROLE_KEY 없음 — inquiries 는 익명 insert 정책이 없어 저장이 거부될 수 있습니다");
     const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient();
     const { error } = await supabase.from("inquiries").insert(row);
     if (error) {

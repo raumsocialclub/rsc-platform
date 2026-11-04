@@ -3,6 +3,7 @@ import { z } from "zod";
 import { flattenAnswers, sanitizeAnswers } from "@/lib/apply/schema";
 import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 import { normalizePhone } from "@/lib/phone";
+import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
 import { getSettings } from "@/lib/settings/get";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -13,6 +14,7 @@ import { UTM_KEYS } from "@/lib/utm/client";
  * 저장은 기존 inquiries 테이블: 이름·휴대폰·이메일은 컬럼에, 나머지 답은 answers.answers[] (어드민 「상담 신청」 상세가 그대로 보여줌)
  * 와 answers.apply (원본 키-값) 에 넣는다. 보관 180일(purge 크론)·CRM 시트 연동(전화번호)·UTM 필터는 기존 그대로 적용된다.
  * 선택지 밖의 값·모르는 키·길이 초과는 서버에서 버린다 (lib/apply/schema.ts sanitizeAnswers).
+ * 요청 제한: 같은 IP 10분에 5번 (lib/ratelimit.ts). 저장은 서버(service role)만 — inquiries 에 익명 insert 정책은 없다.
  */
 const UtmSchema = z.object(Object.fromEntries(UTM_KEYS.map((k) => [k, z.string().trim().max(100).optional()])) as Record<(typeof UTM_KEYS)[number], z.ZodOptional<z.ZodString>>);
 const BodySchema = z.object({
@@ -31,6 +33,8 @@ function cleanUtm(utm: z.infer<typeof UtmSchema> | null | undefined): Record<str
 export async function POST(req: Request) {
   const { applyEnabled } = await getSettings();
   if (!applyEnabled) return NextResponse.json({ ok: false, message: "지금은 상담 전 설문을 받고 있지 않습니다." }, { status: 403 });
+  const limited = await limitByIp(req, "apply", 5, 600);
+  if (!limited.ok) return tooManyResponse(limited);
 
   let json: unknown;
   try { json = await req.json(); } catch { return NextResponse.json({ ok: false, message: "요청 형식이 올바르지 않습니다." }, { status: 400 }); }
@@ -67,6 +71,7 @@ export async function POST(req: Request) {
   };
 
   try {
+    if (!hasServiceRoleKey()) console.warn("[apply] SUPABASE_SERVICE_ROLE_KEY 없음 — inquiries 는 익명 insert 정책이 없어 저장이 거부될 수 있습니다");
     const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient();
     const { error } = await supabase.from("inquiries").insert(row);
     if (error) {

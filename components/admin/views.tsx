@@ -5,6 +5,7 @@ import { IssueInviteForm } from "./IssueInviteForm";
 import { InquiriesFilter } from "./InquiriesFilter";
 import { CopyButton } from "./CopyButton";
 import { INQUIRY_STATUS, badgeStyle, fmtDate, fmtShortDate, inquiryBadge } from "@/lib/admin/format";
+import { applySummary, isApply, type InquiryKind } from "@/lib/apply/export";
 import type { InquiryCrm } from "@/lib/crm/inquiries";
 import { STATUS_KO, type CallStatus } from "@/lib/crm/types";
 import { PROFILES } from "@/lib/fit-check/questions";
@@ -19,14 +20,15 @@ export const callLabel = (c: Pick<InquiryCrm, "status" | "attempts">) => (c.atte
 
 export type CrmInfo = { at: string | null; error: string | null } | null;
 
-export function InquiriesView({ rows, selected, filter, options, canExport = false, crm = {}, crmInfo = null }: { rows: InquiryRow[]; selected: InquiryRow | null; filter: { source: string; campaign: string }; options: { sources: string[]; campaigns: string[] }; canExport?: boolean; crm?: Record<string, InquiryCrm>; crmInfo?: CrmInfo }) {
+export function InquiriesView({ rows, selected, filter, options, canExport = false, crm = {}, crmInfo = null }: { rows: InquiryRow[]; selected: InquiryRow | null; filter: { source: string; campaign: string; kind: InquiryKind }; options: { sources: string[]; campaigns: string[] }; canExport?: boolean; crm?: Record<string, InquiryCrm>; crmInfo?: CrmInfo }) {
   const pending = rows.filter((r) => r.status === "pending").length;
+  const applies = rows.filter(isApply).length;
   const profile = selected?.result_type ? Object.values(PROFILES).find((p) => p.en === selected.result_type) : undefined;
-  const filtered = !!(filter.source || filter.campaign);
+  const filtered = !!(filter.source || filter.campaign || filter.kind);
   const matched = rows.filter((r) => crm[r.id]).length;
   return (
     <>
-      <PageTitle overline="FIT CHECK" title="상담 신청" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">대기 {pending}건</span>}>
+      <PageTitle overline="FIT CHECK" title="상담 신청" aside={<span className="text-[16px] text-[rgba(33,30,25,.5)]">대기 {pending}건{applies > 0 && <> · 설문 {applies}건</>}</span>}>
         <InquiriesFilter filter={filter} options={options} canExport={canExport} />
       </PageTitle>
       {crmInfo && (
@@ -42,7 +44,7 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
             <table className="border-collapse w-full">
               <thead><tr>{["신청일", "이름", "연락처", "성향 결과", "가능 시간", "유입 광고", "콜 결과", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>
-                {rows.length === 0 && <EmptyRow colSpan={8}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. /fit-check 에서 설문을 제출하면 여기에 표시됩니다."}</EmptyRow>}
+                {rows.length === 0 && <EmptyRow colSpan={8}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. 홈 상담 신청(/fit-check)이나 상담 전 설문(/apply)이 제출되면 여기에 표시됩니다."}</EmptyRow>}
                 {rows.map((r) => {
                   const active = selected?.id === r.id;
                   return (
@@ -50,7 +52,7 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
                       <td className={`${TD} text-[rgba(33,30,25,.6)]`}><Link href={`/admin/inquiries?id=${r.id}`} className="block">{fmtShortDate(r.created_at)}</Link></td>
                       <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}{r.answers?.form === "apply" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[10.5px] font-semibold align-middle" style={badgeStyle("brand")}>설문</span>}</Link></td>
                       <td className={TD}>{r.phone || "—"}</td>
-                      <td className={TD}>{r.result_type || "—"}</td>
+                      <td className={TD}>{r.result_type || (isApply(r) ? <span className="text-[rgba(33,30,25,.6)]">{applySummary(r) || "설문"}</span> : "—")}</td>
                       <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{r.answers?.slot || "—"}</td>
                       <td className={`${TD} text-[rgba(33,30,25,.6)]`}>{utmLabel(r.utm)}</td>
                       <td className={TD}>{crm[r.id] ? <Badge style={callBadge(crm[r.id].status)}>{callLabel(crm[r.id])}</Badge> : <span className="text-[rgba(33,30,25,.35)]" title={crmInfo ? "CRM 시트에 같은 전화번호가 없습니다" : undefined}>—</span>}</td>

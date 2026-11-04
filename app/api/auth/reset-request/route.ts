@@ -4,18 +4,21 @@ import { logAdmin } from "@/lib/admin/log";
 import { createPasswordReset } from "@/lib/admins/reset";
 import { sendAdminPasswordReset } from "@/lib/notify";
 import { fmtFull } from "@/lib/programs/format";
+import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 
 /**
  * POST /api/auth/reset-request { email } — 로그인 화면 "비밀번호 찾기" (M16). 로그인 불필요.
  * 이메일이 활동 중인 관리자 계정이고 메일 발송이 설정돼 있으면 재설정 링크를 메일로 보낸다. 링크는 응답에 절대 담지 않는다.
- * 계정 유무와 관계없이 같은 응답을 돌려 이메일 존재를 추측할 수 없게 하고, 같은 이메일은 5분에 한 번만 만든다.
+ * 계정 유무와 관계없이 같은 응답을 돌려 이메일 존재를 추측할 수 없게 하고, 같은 이메일은 5분에 한 번만 만든다. 같은 IP 는 10분에 5번(메일 폭탄 방지).
  */
 const Body = z.object({ email: z.string().trim().email().transform((v) => v.toLowerCase()) });
 const GENERIC = "등록된 관리자 이메일이면 재설정 링크를 보냈습니다. 메일이 오지 않으면 주관리자에게 링크를 요청해 주세요.";
 const COOLDOWN_MS = 5 * 60_000;
 
 export async function POST(req: Request) {
+  const limited = await limitByIp(req, "reset-request", 5, 600);
+  if (!limited.ok) return tooManyResponse(limited);
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, message: "이메일 형식을 확인해 주세요." }, { status: 400 });
   const { email } = parsed.data;

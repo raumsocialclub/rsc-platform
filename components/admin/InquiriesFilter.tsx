@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { INQUIRY_KINDS, type InquiryKind } from "@/lib/apply/export";
 import { BTN_PRIMARY, BTN_SECONDARY } from "./ui";
 
 const SELECT = "px-[14px] py-[10px] text-[13px] border border-[rgba(33,30,25,.2)] bg-white rounded-none outline-none";
@@ -27,16 +28,18 @@ const PRESETS: Preset[] = [
 ];
 
 /**
- * 상담 신청 목록의 유입 광고(UTM) 필터 + 메타 리드 양식 CSV 내려받기(주관리자만). 선택지는 실제 신청에 있는 값만.
+ * 상담 신청 목록의 종류(홈 상담 신청/상담 전 설문)·유입 광고(UTM) 필터 + CSV 내려받기(주관리자만). 선택지는 실제 신청에 있는 값만.
+ * CSV: 종류가 「상담 전 설문」이면 설문 전 문항이 열로 들어간 응답 파일, 아니면 메타 리드 양식.
  * CSV 는 버튼을 누르면 기간 패널이 열리고(기본 최근 7일), 빠른 선택이나 날짜 입력으로 범위를 정한 뒤 내려받는다. 기간은 한국 날짜, 양 끝 포함.
  */
-export function InquiriesFilter({ filter, options, canExport = false }: { filter: { source: string; campaign: string }; options: { sources: string[]; campaigns: string[] }; canExport?: boolean }) {
+export function InquiriesFilter({ filter, options, canExport = false }: { filter: { source: string; campaign: string; kind: InquiryKind }; options: { sources: string[]; campaigns: string[] }; canExport?: boolean }) {
   const router = useRouter();
   const go = (next: Partial<typeof filter>) => {
     const f = { ...filter, ...next };
     const p = new URLSearchParams();
     if (f.source) p.set("source", f.source);
     if (f.campaign) p.set("campaign", f.campaign);
+    if (f.kind) p.set("kind", f.kind);
     router.push(`/admin/inquiries${p.toString() ? `?${p}` : ""}`);
   };
 
@@ -64,12 +67,16 @@ export function InquiriesFilter({ filter, options, canExport = false }: { filter
   const exportHref = `/api/admin/inquiries/export?${new URLSearchParams({
     ...(filter.source ? { source: filter.source } : {}),
     ...(filter.campaign ? { campaign: filter.campaign } : {}),
+    ...(filter.kind ? { kind: filter.kind } : {}),
     ...(all ? {} : { from: range.from, to: range.to }),
   })}`;
   const label = all ? "전체 기간" : range.from === range.to ? range.from : `${range.from} ~ ${range.to}`;
 
   return (
     <div className="flex gap-[8px] flex-wrap">
+      <select value={filter.kind} onChange={(e) => go({ kind: e.target.value as InquiryKind })} className={SELECT} aria-label="신청 종류">
+        {INQUIRY_KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
+      </select>
       <select value={filter.source} onChange={(e) => go({ source: e.target.value })} className={SELECT} aria-label="유입 매체">
         <option value="">전체 유입</option>
         <option value="-">UTM 기록 없음</option>
@@ -81,8 +88,8 @@ export function InquiriesFilter({ filter, options, canExport = false }: { filter
       </select>
       {canExport && (
         <div className="relative" ref={panel}>
-          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`${BTN_SECONDARY} px-[16px] py-[10px] text-[12.5px] inline-flex items-center gap-[6px]`} title="메타 광고 관리자 리드 파일과 같은 열 (주관리자만)">
-            CSV 다운로드 <span aria-hidden className="text-[10px]">{open ? "▲" : "▼"}</span>
+          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`${BTN_SECONDARY} px-[16px] py-[10px] text-[12.5px] inline-flex items-center gap-[6px]`} title={filter.kind === "apply" ? "설문 전 문항이 열로 들어간 응답 파일 (주관리자만)" : "메타 광고 관리자 리드 파일과 같은 열 (주관리자만)"}>
+            {filter.kind === "apply" ? "설문 응답 CSV" : "CSV 다운로드"} <span aria-hidden className="text-[10px]">{open ? "▲" : "▼"}</span>
           </button>
           {open && (
             <div className="absolute right-0 top-[calc(100%+6px)] z-20 w-[320px] bg-white border border-[rgba(33,30,25,.15)] shadow-[0_8px_24px_rgba(33,30,25,.12)] p-[16px]">
@@ -98,7 +105,7 @@ export function InquiriesFilter({ filter, options, canExport = false }: { filter
                 <input type="date" value={all ? "" : range.to} min={all ? undefined : range.from || undefined} onChange={(e) => setDay("to", e.target.value)} className={`${DATE} flex-1 min-w-0`} aria-label="종료일" />
               </div>
               <div className="flex items-center justify-between gap-[10px]">
-                <span className="text-[12px] text-[rgba(33,30,25,.6)]">{invalid ? "시작일이 종료일보다 늦습니다" : label}{filter.source || filter.campaign ? " · 현재 유입 필터 적용" : ""}</span>
+                <span className="text-[12px] text-[rgba(33,30,25,.6)]">{invalid ? "시작일이 종료일보다 늦습니다" : label}{filter.source || filter.campaign || filter.kind ? " · 현재 필터 적용" : ""}</span>
                 {invalid ? (
                   <span className={`${BTN_PRIMARY} px-[14px] py-[9px] text-[12.5px] opacity-60 cursor-not-allowed`}>내려받기</span>
                 ) : (
