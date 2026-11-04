@@ -9,9 +9,9 @@ import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 
 /**
  * POST /api/apply { token, answers, consent } — 상담 전 설문(/apply/<토큰>) 제출.
- * 관리자가 발급한 비밀 링크(apply_links)의 토큰이 유효(미제출·기간 내·취소 안 됨)할 때만 받고, 받는 즉시 링크를 「제출됨」으로 닫는다(1회).
+ * 관리자가 만든 공용 비밀 링크(apply_links)의 토큰이 유효(기간 내·취소 안 됨)하면 로그인 없이 누구나, 몇 번이든 받는다.
  * 저장은 inquiries 테이블(서버 service role 전용): 이름·휴대폰·이메일은 컬럼에, 나머지 답은 answers.answers[] (어드민 상세가 그대로 보여줌)
- * 와 answers.apply (원본 키-값) 에 넣고, answers.linkId 로 어느 링크의 응답인지 남긴다. 링크의 response_id 가 이 행을 가리킨다.
+ * 와 answers.apply (원본 키-값) 에 넣고, answers.linkId 로 어느 링크의 응답인지 남긴다. 링크의 uses·last_used_at 을 올린다.
  * 보관 180일(purge 크론)·CRM 시트 연동(전화번호)은 기존 그대로. 선택지 밖의 값·모르는 키·길이 초과는 서버에서 버린다.
  * 요청 제한: 같은 IP 10분에 5번 (lib/ratelimit.ts).
  */
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const admin = createAdminClient();
   const link = await findLink(admin, parsed.data.token);
   const status = link ? linkStatus(link) : "invalid";
-  if (!link || status !== "active") return NextResponse.json({ ok: false, message: LINK_MESSAGE[status === "active" ? "invalid" : status] }, { status: status === "used" ? 409 : 403 });
+  if (!link || status !== "active") return NextResponse.json({ ok: false, message: LINK_MESSAGE[status === "active" ? "invalid" : status] }, { status: 403 });
 
   const a = sanitizeAnswers(parsed.data.answers);
   const name = String(a.name ?? "").trim();
@@ -70,19 +70,13 @@ export async function POST(req: Request) {
   };
 
   try {
-    // 1) 링크를 먼저 닫는다(같은 링크로 동시에 두 번 제출 방지). 이미 닫혔으면 409
-    const usedAt = new Date().toISOString();
-    const closed = await admin.from("apply_links").update({ used_at: usedAt }).eq("id", link.id).is("used_at", null).select("id");
-    if (closed.error || !closed.data?.length) return NextResponse.json({ ok: false, message: LINK_MESSAGE.used }, { status: 409 });
-    // 2) 응답 저장
-    const { data: inserted, error } = await admin.from("inquiries").insert(row).select("id").single();
-    if (error || !inserted) {
+    const { error } = await admin.from("inquiries").insert(row);
+    if (error) {
       console.error("[apply] insert failed:", error);
-      await admin.from("apply_links").update({ used_at: null }).eq("id", link.id); // 다시 열어 둔다
       return NextResponse.json({ ok: false, message: "설문을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });
     }
-    // 3) 링크 ↔ 응답 연결
-    await admin.from("apply_links").update({ response_id: (inserted as { id: string }).id }).eq("id", link.id);
+    // 링크 응답 수·마지막 응답 시각 (어드민 목록 표시용. 정확한 수는 상담 신청 목록이 기준)
+    await admin.from("apply_links").update({ uses: (link.uses ?? 0) + 1, last_used_at: new Date().toISOString() }).eq("id", link.id);
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[apply] error:", e);

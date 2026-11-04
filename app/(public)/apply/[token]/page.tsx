@@ -10,8 +10,8 @@ export const metadata: Metadata = { title: "RSC 상담 전 설문", description:
 export const dynamic = "force-dynamic";
 
 /**
- * /apply/<토큰> — 관리자가 발급한 비밀 링크로만 열리는 상담 전 설문. 전화 상담 후 니즈가 확실한 분에게 대면 상담 전 받는다.
- * 사이트 어디에도 링크가 없고(robots 도 제외), 토큰이 유효(미제출·기간 내·취소 안 됨)할 때만 설문이 보인다. 제출은 1회.
+ * /apply/<토큰> — 관리자가 만든 공용 비밀 링크로만 열리는 상담 전 설문. 전화 상담 후 니즈가 확실한 분들에게 대면 상담 전 받는다.
+ * 로그인 없이 누구나 바로 작성할 수 있고 링크는 자유롭게 전달해도 된다. 사이트 어디에도 링크가 없고(robots 도 제외), 토큰이 유효(기간 내·취소 안 됨)할 때만 설문이 보인다.
  * 발급·전달·응답 확인: 어드민 → 상담 전 설문(/admin/apply)
  */
 export default async function ApplyTokenPage({ params }: { params: Promise<{ token: string }> }) {
@@ -26,7 +26,7 @@ export default async function ApplyTokenPage({ params }: { params: Promise<{ tok
       </header>
       <main className="flex-1 flex flex-col px-[20px] pt-[16px] pb-[64px] md:px-[40px] md:pt-[28px] md:pb-[96px]">
         {link && status === "active" ? (
-          <ApplyForm token={token} prefill={{ name: link.name, phone: link.phone ?? "" }} />
+          <ApplyForm token={token} />
         ) : (
           <ClosedNotice message={LINK_MESSAGE[status === "active" ? "invalid" : status]} />
         )}

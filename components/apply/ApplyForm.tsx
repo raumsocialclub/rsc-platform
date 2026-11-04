@@ -8,7 +8,7 @@ import { formatPhoneInput } from "@/lib/phone";
 
 /**
  * 상담 전 고객 정보 설문 (/apply/<토큰>). lib/apply/schema.ts 의 STEPS 를 단계별로 그린다 — 레퍼런스처럼 「이전 / 다음」, 마지막 단계에 개인정보 동의 + 「완료」.
- * 관리자가 발급한 비밀 링크(token)로만 열리고 이름·휴대폰은 링크에 적힌 값으로 미리 채운다(수정 가능). 작성 중인 답은 브라우저(sessionStorage)에만 두고 제출 전에는 서버로 보내지 않는다.
+ * 관리자가 만든 공용 비밀 링크(token)로만 열린다. 로그인 없이 누구나 작성. 작성 중인 답은 브라우저(sessionStorage)에만 두고 제출 전에는 서버로 보내지 않는다.
  *
  * 모바일 입력 최적화:
  *  - 선택지는 44px 이상 터치 버튼(칩). 좁은 화면은 2열, 넓은 화면은 흐름 배치. 글자 16px 이상이라 iOS 에서 확대되지 않는다
@@ -30,7 +30,7 @@ const OTHER = "기타";
 const optionsOf = (f: Field) => (f.other && !(f.options ?? []).includes(OTHER) ? [...(f.options ?? []), OTHER] : f.options ?? []);
 const fid = (key: string) => `apply-f-${key}`;
 
-export function ApplyForm({ token, prefill }: { token: string; prefill?: { name?: string; phone?: string } }) {
+export function ApplyForm({ token }: { token: string }) {
   const store = `${STORE}:${token.slice(0, 8)}`;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -44,19 +44,13 @@ export function ApplyForm({ token, prefill }: { token: string; prefill?: { name?
   useEffect(() => {
     // 서버 렌더와 첫 화면을 맞춘 뒤(하이드레이션 후) 복원한다
     const t = setTimeout(() => {
-      let restored: Answers = {};
       try {
         const raw = sessionStorage.getItem(store);
-        if (raw) { const j = JSON.parse(raw) as { step?: number; answers?: Answers }; if (j.answers) restored = j.answers; if (typeof j.step === "number") setStep(Math.min(j.step, STEPS.length - 1)); }
+        if (raw) { const j = JSON.parse(raw) as { step?: number; answers?: Answers }; if (j.answers) setAnswers(j.answers); if (typeof j.step === "number") setStep(Math.min(j.step, STEPS.length - 1)); }
       } catch {}
-      // 링크에 적힌 이름·휴대폰을 미리 채운다 (이미 입력한 값이 있으면 그대로)
-      const pre: Answers = {};
-      if (prefill?.name) pre.name = prefill.name;
-      if (prefill?.phone) pre.phone = formatPhoneInput(prefill.phone);
-      setAnswers({ ...pre, ...restored });
     }, 0);
     return () => clearTimeout(t);
-  }, [store, prefill?.name, prefill?.phone]);
+  }, [store]);
   useEffect(() => { try { sessionStorage.setItem(store, JSON.stringify({ step, answers })); } catch {} }, [store, step, answers]);
 
   const cur = STEPS[step];

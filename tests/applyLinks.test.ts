@@ -16,14 +16,13 @@ describe("링크 토큰·상태·주소", () => {
     expect(a).toMatch(TOKEN_RE); expect(a).toHaveLength(22); expect(a).not.toBe(b);
     expect(TOKEN_RE.test("short")).toBe(false); expect(TOKEN_RE.test("has space in it 12345")).toBe(false);
   });
-  it("상태: 제출됨 > 취소 > 만료 > 전달 가능", () => {
+  it("상태: 취소 > 만료 > 사용 중", () => {
     const now = new Date("2026-11-04T00:00:00Z");
-    const base = { used_at: null, revoked_at: null, expires_at: "2026-12-01T00:00:00Z" };
+    const base = { revoked_at: null, expires_at: "2026-12-01T00:00:00Z" };
     expect(linkStatus(base, now)).toBe("active");
     expect(linkStatus({ ...base, expires_at: "2026-11-03T00:00:00Z" }, now)).toBe("expired");
-    expect(linkStatus({ ...base, revoked_at: "2026-11-02T00:00:00Z" }, now)).toBe("revoked");
-    expect(linkStatus({ ...base, revoked_at: "2026-11-02T00:00:00Z", used_at: "2026-11-01T00:00:00Z" }, now)).toBe("used");
-    expect(APPLY_LINK_STATUS_KO.active).toBe("전달 가능");
+    expect(linkStatus({ ...base, revoked_at: "2026-11-02T00:00:00Z", expires_at: "2026-11-03T00:00:00Z" }, now)).toBe("revoked");
+    expect(APPLY_LINK_STATUS_KO.active).toBe("사용 중");
   });
   it("전달용 주소는 사이트 주소 + /apply/<토큰>", () => {
     expect(applyLinkUrl("abc", "https://rsc-platform.vercel.app/")).toBe("https://rsc-platform.vercel.app/apply/abc");
@@ -40,31 +39,31 @@ describe("관리자 발급·취소 API", () => {
     expect((await POST(post({ name: "홍길동" }))).status).toBe(403);
     expect(db.tables.apply_links).toHaveLength(0);
   });
-  it("발급: 토큰·30일 만료·전화 정규화·발급자 기록, 응답에 전달용 주소", async () => {
+  it("만들기: 이름 필수, 토큰·기본 90일 만료·만든 관리자 기록, 응답에 전달용 주소", async () => {
     const { POST } = await import("@/app/api/admin/apply-links/route");
-    const res = await POST(post({ name: "홍길동", phone: "01012345678", memo: "11/4 전화상담", inquiryId: "22222222-2222-4222-8222-222222222222" }));
+    expect((await POST(post({ name: "" }))).status).toBe(400);
+    const res = await POST(post({ name: "11월 전화상담 완료자", memo: "11/4 전화상담" }));
     expect(res.status).toBe(200);
     const j = (await res.json()) as { ok: boolean; link: { id: string; token: string; url: string; expiresAt: string } };
     expect(j.ok).toBe(true);
     expect(j.link.token).toMatch(TOKEN_RE);
     expect(j.link.url.endsWith(`/apply/${j.link.token}`)).toBe(true);
     const row = db.tables.apply_links[0] as Record<string, unknown>;
-    expect(row.phone).toBe("010-1234-5678");
-    expect(row.inquiry_id).toBe("22222222-2222-4222-8222-222222222222");
+    expect(row.name).toBe("11월 전화상담 완료자");
     expect(row.created_by).toBe(admin.id);
     const days = (new Date(row.expires_at as string).getTime() - Date.now()) / 86_400_000;
-    expect(days).toBeGreaterThan(29.9); expect(days).toBeLessThan(30.1);
+    expect(days).toBeGreaterThan(89.9); expect(days).toBeLessThan(90.1);
+    const res2 = await POST(post({ name: "단기", days: 7 }));
+    const row2 = (db.tables.apply_links[1] ?? db.tables.apply_links[0]) as Record<string, unknown>;
+    expect(res2.status).toBe(200);
+    expect((new Date(row2.expires_at as string).getTime() - Date.now()) / 86_400_000).toBeLessThan(7.1);
   });
-  it("취소: 아직 응답 없는 링크만, 응답한 링크는 409", async () => {
+  it("취소: 한 번만, 이미 취소된 링크는 409", async () => {
     const { DELETE } = await import("@/app/api/admin/apply-links/[id]/route");
-    db.tables.apply_links = [
-      { id: "l1", token: "a".repeat(22), used_at: null, revoked_at: null },
-      { id: "l2", token: "b".repeat(22), used_at: "2026-11-04T00:00:00Z", revoked_at: null },
-    ];
+    db.tables.apply_links = [{ id: "l1", token: "a".repeat(22), revoked_at: null }];
     const del = (id: string) => DELETE(new Request(`https://test.example/api/admin/apply-links/${id}`, { method: "DELETE" }), { params: Promise.resolve({ id }) });
     expect((await del("l1")).status).toBe(200);
     expect((db.tables.apply_links[0] as { revoked_at: string | null }).revoked_at).toBeTruthy();
-    expect((await del("l2")).status).toBe(409);
-    expect((await del("l1")).status).toBe(409); // 이미 취소됨
+    expect((await del("l1")).status).toBe(409);
   });
 });

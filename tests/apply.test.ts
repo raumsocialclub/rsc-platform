@@ -10,7 +10,7 @@ vi.mock("@/lib/supabase/admin", () => ({ hasServiceRoleKey: () => true, createAd
 const TOKEN = "AbCdEfGhIjKlMnOpQrStUv";
 const post = (body: Record<string, unknown>) => new Request("https://test.example/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: TOKEN, ...body }) });
 const future = new Date(Date.now() + 86_400_000).toISOString();
-const link = (over: Record<string, unknown> = {}) => ({ id: "link-1", token: TOKEN, name: "홍길동", phone: "010-1234-5678", memo: null, inquiry_id: null, response_id: null, created_at: new Date().toISOString(), expires_at: future, used_at: null, revoked_at: null, ...over });
+const link = (over: Record<string, unknown> = {}) => ({ id: "link-1", token: TOKEN, name: "11월 전화상담", memo: null, uses: 0, last_used_at: null, created_at: new Date().toISOString(), expires_at: future, revoked_at: null, ...over });
 const base = { name: "홍길동", gender: "남성", birth: "1989-01-06", phone: "01012345678" };
 
 describe("문항 정의", () => {
@@ -63,25 +63,23 @@ describe("POST /api/apply (비밀 링크)", () => {
     expect((await POST(post({ token: "zzzzzzzzzzzzzzzzzzzzzz", answers: base, consent: true }))).status).toBe(403);
     expect(db.tables.inquiries).toHaveLength(0);
   });
-  it("이미 제출된 링크는 409, 만료·취소는 403", async () => {
+  it("만료·취소된 링크는 403", async () => {
     const { POST } = await import("@/app/api/apply/route");
-    db.tables.apply_links = [link({ used_at: new Date().toISOString() })];
-    expect((await POST(post({ answers: base, consent: true }))).status).toBe(409);
     db.tables.apply_links = [link({ expires_at: new Date(Date.now() - 1000).toISOString() })];
     expect((await POST(post({ answers: base, consent: true }))).status).toBe(403);
     db.tables.apply_links = [link({ revoked_at: new Date().toISOString() })];
     expect((await POST(post({ answers: base, consent: true }))).status).toBe(403);
     expect(db.tables.inquiries).toHaveLength(0);
   });
-  it("동의 없으면 400, 필수 칸 없으면 400 (링크는 그대로 열려 있음)", async () => {
+  it("동의 없으면 400, 필수 칸 없으면 400 (응답 수 그대로)", async () => {
     const { POST } = await import("@/app/api/apply/route");
     expect((await POST(post({ answers: base, consent: false }))).status).toBe(400);
     expect((await POST(post({ answers: { ...base, phone: "123" }, consent: true }))).status).toBe(400);
     expect((await POST(post({ answers: { ...base, gender: "" }, consent: true }))).status).toBe(400);
     expect(db.tables.inquiries).toHaveLength(0);
-    expect(db.tables.apply_links[0].used_at).toBeNull();
+    expect(db.tables.apply_links[0].uses).toBe(0);
   });
-  it("저장: 이름·전화(정규화)·이메일은 컬럼, 나머지는 answers (form=apply, linkId, 평탄화 + 원본), 링크는 제출됨으로 닫히고 응답 행을 가리킨다", async () => {
+  it("저장: 이름·전화(정규화)·이메일은 컬럼, 나머지는 answers (form=apply, linkId, 평탄화 + 원본), 같은 링크로 여러 명이 제출할 수 있고 응답 수가 올라간다", async () => {
     const { POST } = await import("@/app/api/apply/route");
     const res = await POST(post({ answers: { ...base, email: "x@y.z", joinRoute: "SNS 광고", refCode: "RSC01", salary: "90000000", idealRegions: ["서울"], t13: "한 명이어도 충분하다", hacked: "x" }, consent: true }));
     expect(res.status).toBe(200);
@@ -100,11 +98,12 @@ describe("POST /api/apply (비밀 링크)", () => {
     expect(row.answers.apply.hacked).toBeUndefined();
     expect(row.answers.apply.name).toBeUndefined();
     expect(row.answers.apply.t13).toBe("한 명이어도 충분하다");
-    const l = db.tables.apply_links[0] as { used_at: string | null; response_id: string | null };
-    expect(l.used_at).toBeTruthy();
-    expect(l.response_id).toBe(row.id);
-    // 같은 링크로 다시 보내면 409
-    expect((await POST(post({ answers: base, consent: true }))).status).toBe(409);
-    expect(db.tables.inquiries).toHaveLength(1);
+    const l = db.tables.apply_links[0] as { uses: number; last_used_at: string | null };
+    expect(l.uses).toBe(1);
+    expect(l.last_used_at).toBeTruthy();
+    // 같은 링크로 다른 사람이 또 보내도 된다 (로그인 없이, 횟수 제한 없음)
+    expect((await POST(post({ answers: { ...base, name: "김영희", phone: "01099998888" }, consent: true }))).status).toBe(200);
+    expect(db.tables.inquiries).toHaveLength(2);
+    expect((db.tables.apply_links[0] as { uses: number }).uses).toBe(2);
   });
 });

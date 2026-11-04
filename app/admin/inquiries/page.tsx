@@ -3,7 +3,6 @@ import { InquiriesView } from "@/components/admin/views";
 import type { InquiryRow } from "@/components/admin/InquiryDetail";
 import { matchesUtmFilter } from "@/lib/admin/leads";
 import { matchesKind, parseKind } from "@/lib/apply/export";
-import { applyLinkUrl, linkStatus, type ApplyLink } from "@/lib/apply/links";
 import { getCurrentMember, isOwnerRole } from "@/lib/auth/session";
 import { matchInquiries, syncInquiriesFromSheet, type InquiryCrm } from "@/lib/crm/inquiries";
 import { loadCallsDataSafe } from "@/lib/crm/load";
@@ -16,12 +15,12 @@ export const maxDuration = 30;
 
 /**
  * /admin/inquiries?id=&source=&campaign=&kind= — 좌 목록 / 우 상세. RLS "admin inquiries" 정책으로 조회.
- * kind 는 종류(apply=상담 전 설문 응답, fit=홈 상담 신청), source·campaign 은 광고 유입(UTM) 필터. 선택지는 최근 200건에 실제로 있는 값으로 만든다.
+ * kind 는 종류(apply=상담 전 설문 응답, fit=홈 상담 신청), link 는 설문 링크 id(그 링크로 들어온 응답만), source·campaign 은 광고 유입(UTM) 필터. 선택지는 최근 200건에 실제로 있는 값으로 만든다.
  * CSV 내려받기(주관리자만)는 같은 필터 + 기간(from/to, 한국 날짜)으로 /api/admin/inquiries/export — 화면의 200건 제한 없음.
  * CRM 시트 연동: 화면을 열 때 CRM관리 탭의 콜 결과를 읽어 같은 전화번호 신청의 상태를 맞추고(lib/crm/inquiries.ts), 콜 결과·메모를 목록·상세에 보여준다.
  */
-export default async function AdminInquiriesPage({ searchParams }: { searchParams: Promise<{ id?: string; source?: string; campaign?: string; kind?: string }> }) {
-  const { id, source = "", campaign = "" } = await searchParams;
+export default async function AdminInquiriesPage({ searchParams }: { searchParams: Promise<{ id?: string; source?: string; campaign?: string; kind?: string; link?: string }> }) {
+  const { id, source = "", campaign = "", link = "" } = await searchParams;
   const kind = parseKind((await searchParams).kind);
   const supabase = await createClient();
 
@@ -43,7 +42,7 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
   const all = (data ?? []) as InquiryRow[];
   const uniq = (k: "utm_source" | "utm_campaign") => Array.from(new Set(all.map((r) => r.utm?.[k]).filter((v): v is string => !!v))).sort();
   const options = { sources: uniq("utm_source"), campaigns: uniq("utm_campaign") };
-  const rows = all.filter((r) => matchesUtmFilter(r, { source, campaign }) && matchesKind(r, kind));
+  const rows = all.filter((r) => matchesUtmFilter(r, { source, campaign }) && matchesKind(r, link ? "apply" : kind) && (!link || r.answers?.linkId === link));
   const crmById: Record<string, InquiryCrm> = Object.fromEntries(matchInquiries(rows, crm.leads));
   const selectedBase = (id && rows.find((r) => r.id === id)) || rows[0] || null;
 
@@ -56,25 +55,20 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    // 이 신청에 발급된 상담 전 설문 링크(최근 1개) · 이 행이 설문 응답이면 어느 링크(원 상담 신청)에서 왔는지
-    const [{ data: lk }, { data: src }] = await Promise.all([
-      supabase.from("apply_links").select("id, token, name, phone, memo, inquiry_id, response_id, created_at, expires_at, used_at, revoked_at").eq("inquiry_id", selectedBase.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      selectedBase.answers?.form === "apply" ? supabase.from("apply_links").select("inquiry_id, name").eq("response_id", selectedBase.id).limit(1).maybeSingle() : Promise.resolve({ data: null }),
-    ]);
-    const link = (lk as ApplyLink | null) ?? null;
-    selected = {
-      ...selectedBase,
-      invite: inv ?? null,
-      applyLink: link ? { id: link.id, url: applyLinkUrl(link.token), status: linkStatus(link), expires_at: link.expires_at, response_id: link.response_id } : null,
-      applySource: (src as { inquiry_id: string | null; name: string } | null) ?? null,
-    };
+    // 설문 응답이면 어느 공용 링크로 들어왔는지(링크 이름)
+    let applyLinkName: string | null = null;
+    if (selectedBase.answers?.form === "apply" && selectedBase.answers.linkId) {
+      const { data: lk } = await supabase.from("apply_links").select("name").eq("id", selectedBase.answers.linkId).maybeSingle();
+      applyLinkName = (lk as { name: string } | null)?.name ?? null;
+    }
+    selected = { ...selectedBase, invite: inv ?? null, applyLinkName };
   }
 
   return (
     <InquiriesView
       rows={rows}
       selected={selected}
-      filter={{ source, campaign, kind }}
+      filter={{ source, campaign, kind: link ? "apply" : kind }}
       options={options}
       canExport={isOwnerRole(await getCurrentMember())}
       crm={crmById}
