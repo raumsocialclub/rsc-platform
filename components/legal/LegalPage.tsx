@@ -62,7 +62,7 @@ export async function LegalPage({ overline, title, updated, sections, current, p
               </dl>
             </section>
           )}
-          <article className="grid gap-[32px]">
+          <article data-fold className="grid gap-[32px]">
             {sections.map((s, i) => {
               const heading = /^(제\s*\d+\s*조|부칙|개정 이력)/.test(s.title) || (i === 0 && /처리방침$/.test(s.title)) ? s.title : `제${i + 1}조 (${s.title})`;
               const autoNumber = s.body.length > 1 && !s.body.some((l) => /^\d+\.\s/.test(l));

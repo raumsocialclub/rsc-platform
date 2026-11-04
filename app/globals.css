@@ -147,3 +147,31 @@ details[open] > .faq-body { animation: rsc-fade-up .35s cubic-bezier(.22,1,.36,1
 .link-grow { position: relative; }
 .link-grow::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; background: var(--ds-primary); transform: scaleX(0); transform-origin: left; transition: transform .25s cubic-bezier(.22,1,.36,1); border-radius: 2px; }
 .link-grow:hover::after, .link-grow[aria-current="page"]::after { transform: scaleX(1); }
+
+/* ---------- 종이 접기(폴드) 효과: 스크롤로 섹션이 들어올 때 위쪽 모서리를 축으로 펼쳐진다 ----------
+ * 스크롤 연동 애니메이션(animation-timeline: view)을 지원하면 스크롤 위치에 정확히 따라가고(내리면 펴지고 올리면 다시 접힘),
+ * 지원하지 않으면 RevealObserver 가 is-in 을 붙여 한 번 펼친다. */
+@keyframes rsc-unfold {
+  from { transform: perspective(1200px) rotateX(-18deg) translateY(32px); opacity: .45; }
+  to { transform: perspective(1200px) rotateX(0deg) translateY(0); opacity: 1; }
+}
+@keyframes rsc-crease { from { opacity: 1; } to { opacity: 0; } }
+[data-fold] { position: relative; transform-origin: 50% 0%; backface-visibility: hidden; }
+[data-fold]::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit; opacity: 0;
+  background: linear-gradient(to bottom, rgba(23, 23, 25, .22), rgba(23, 23, 25, 0) 40%);
+}
+@supports (animation-timeline: view()) {
+  [data-fold] { animation: rsc-unfold linear both; animation-timeline: view(); animation-range: entry 0% entry 42vh; }
+  [data-fold]::before { animation: rsc-crease linear both; animation-timeline: view(); animation-range: entry 0% entry 42vh; }
+}
+@supports not (animation-timeline: view()) {
+  html.js [data-fold] { transform: perspective(1200px) rotateX(-18deg) translateY(32px); opacity: .45; transition: transform .9s cubic-bezier(.22,1,.36,1), opacity .9s cubic-bezier(.22,1,.36,1); }
+  html.js [data-fold]::before { opacity: 1; transition: opacity .9s cubic-bezier(.22,1,.36,1); }
+  html.js [data-fold].is-in { transform: none; opacity: 1; }
+  html.js [data-fold].is-in::before { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-fold], [data-fold]::before { animation: none !important; transform: none !important; opacity: 1 !important; transition: none !important; }
+  [data-fold]::before { opacity: 0 !important; }
+}

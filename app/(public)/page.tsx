@@ -61,7 +61,7 @@ export default async function HomePage() {
 
       {/* 01 NEW DEFINITION */}
       {on(about, "visible") && (
-        <section id="about" className={`${SECTION} border-t border-lineAlt`}>
+        <section id="about" data-fold className={`${SECTION} border-t border-lineAlt`}>
           <Container>
             <div className="grid grid-cols-1 gap-[32px] md:grid-cols-2 md:gap-[64px] items-center">
               <div data-reveal>
@@ -78,7 +78,7 @@ export default async function HomePage() {
 
       {/* 02 POSITIONING */}
       {on(why, "visible") && (
-        <section id="why" className={`${SECTION} bg-sand`}>
+        <section id="why" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(why, "label"))} title={<Txt v={s(why, "title")} breaks="hard" />} lead={<Txt v={s(why, "lead")} />} reveal />
             <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
@@ -96,7 +96,7 @@ export default async function HomePage() {
 
       {/* 03 BRAND PROMISE */}
       {on(promise, "visible") && (
-        <section id="promise" className={SECTION}>
+        <section id="promise" data-fold className={SECTION}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(promise, "label"))} title={<Txt v={s(promise, "title")} breaks="hard" />} reveal />
             <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
@@ -115,7 +115,7 @@ export default async function HomePage() {
 
       {/* 04 RSC SOCIAL */}
       {on(social, "visible") && (
-        <section id="social" className={`${SECTION} bg-sand`}>
+        <section id="social" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(social, "label"))} title={<Txt v={s(social, "title")} breaks="hard" />} lead={<Txt v={s(social, "lead")} />} reveal />
             <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">옆으로 밀어서 보기 →</div>
@@ -137,7 +137,7 @@ export default async function HomePage() {
 
       {/* 05 QUARTERLY & COHORT (SOCIAL NIGHT · RAUM SOLO) */}
       {on(solo, "visible") && (
-        <section id="solo" className={SECTION}>
+        <section id="solo" data-fold className={SECTION}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(solo, "label"))} title={list(solo, "cards").length ? "분기마다, 그리고 기수마다" : ""} reveal />
             <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[20px] mt-[40px]">
@@ -158,7 +158,7 @@ export default async function HomePage() {
 
       {/* 06 MOMENTS */}
       {on(spaces, "visible") && (
-        <section id="spaces" className={`${SECTION} bg-sand`}>
+        <section id="spaces" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(spaces, "label"))} title={s(spaces, "title")} lead={<Txt v={s(spaces, "lead")} breaks="hard" />} reveal />
             <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">옆으로 밀어서 보기 →</div>
@@ -188,7 +188,7 @@ export default async function HomePage() {
 
       {/* 07 MEMBERSHIP (리드 모드면 숨김) */}
       {showMembership && (
-        <section id="membership" className={SECTION}>
+        <section id="membership" data-fold className={SECTION}>
           <Container>
             <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-[64px] items-center mb-[48px]">
               <ImageBlock src={s(mem, "image")} alt="RAUM" className="aspect-[4/3] rounded-ds" sizes="(min-width: 761px) 55vw, 100vw" reveal />
@@ -222,7 +222,7 @@ export default async function HomePage() {
 
       {/* 08 FAQ */}
       {showFaq && (
-        <section id="faq" className={`${SECTION} bg-sand`}>
+        <section id="faq" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-[64px] items-start">
               <SectionHead eyebrow={eyebrow(s(faq, "label"))} title={<Txt v={s(faq, "title")} breaks="hard" />} lead={<Txt v={s(faq, "lead")} />} reveal />
@@ -244,7 +244,7 @@ export default async function HomePage() {
       )}
 
       {/* CTA 띠 */}
-      <section className="py-[64px] md:py-[96px]">
+      <section data-fold className="py-[64px] md:py-[96px]">
         <Container>
           <div data-reveal className="bg-inverseBg rounded-ds px-[24px] py-[40px] md:px-[56px] md:py-[64px] text-center">
             <h2 className="t-title-3 md:t-title-1 text-inverseLabel text-pretty mb-[12px]">상담으로 시작해 보세요</h2>

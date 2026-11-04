@@ -61,7 +61,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
               {ym.y}년 {ym.m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 lg:grid-cols-3 md:gap-[24px]">
+            <div data-fold className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 lg:grid-cols-3 md:gap-[24px]">
               {posts.map((p, i) => (
                 <article key={p.id} data-reveal style={{ "--d": `${(i % 3) * 80}ms` } as React.CSSProperties} className={`min-w-0 ${CARD} ${CARD_HOVER} overflow-hidden`}>
                   <Link href={`/news/${encodeURIComponent(p.slug)}`} className="block group">

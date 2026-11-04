@@ -53,7 +53,7 @@ export default async function PricingPage() {
             <p className="anim-up-2 t-body-1-reading text-labelAlt max-w-[600px] text-pretty"><Txt v={s(hero, "body")} breaks="hard" /></p>
           </section>
 
-          <section className={SEC}>
+          <section data-fold className={SEC}>
             <div className="t-label-1 font-semibold text-labelAlt mb-[16px]" data-reveal>{s(plans, "label")}</div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-[16px] items-stretch">
               {list<Plan>(plans, "items").map((p, i) => (
@@ -70,7 +70,7 @@ export default async function PricingPage() {
             </div>
           </section>
 
-          <section className={SEC}>
+          <section data-fold className={SEC}>
             <SectionHead eyebrow={s(programs, "label")} title={s(programs, "title")} lead={s(programs, "lead")} reveal />
             <div className="md:hidden grid gap-[12px] mt-[24px]">
               {list<Row>(programs, "rows").map((r, i) => (
@@ -99,7 +99,7 @@ export default async function PricingPage() {
             </Scroll>
           </section>
 
-          <section className={SEC}>
+          <section data-fold className={SEC}>
             <SectionHead eyebrow={s(path, "label")} title={s(path, "title")} reveal />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-[12px] md:gap-[16px] mt-[28px]">
               {list(path, "steps").map((c, i) => (
@@ -139,7 +139,7 @@ export default async function PricingPage() {
             </Scroll>
           </section>
 
-          <section className={SEC}>
+          <section data-fold className={SEC}>
             <SectionHead eyebrow={s(policy, "label")} title={s(policy, "title")} reveal />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px] items-start mt-[28px]">
               {(["conversions", "rules"] as const).map((key, ki) => {
@@ -161,7 +161,7 @@ export default async function PricingPage() {
             {s(policy, "note") && <p className="mt-[16px] t-caption-1 text-labelAlt text-pretty"><Txt v={s(policy, "note")} /></p>}
           </section>
 
-          <section data-reveal className="bg-inverseBg rounded-ds px-[24px] py-[40px] md:px-[48px] md:py-[56px] text-center">
+          <section data-fold className="bg-inverseBg rounded-ds px-[24px] py-[40px] md:px-[48px] md:py-[56px] text-center">
             <div className="t-label-1 font-semibold text-inversePrimary mb-[10px]">{s(cta, "label")}</div>
             <h2 className="t-title-3 md:t-title-2 text-inverseLabel mb-[12px] text-pretty">{s(cta, "title")}</h2>
             <p className="mx-auto mb-[28px] t-body-1-reading text-[rgba(247,247,248,.7)] max-w-[520px]"><Txt v={s(cta, "body")} breaks="hard" /></p>
