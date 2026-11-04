@@ -74,7 +74,7 @@ export const DOCS: DocDef[] = [
       ctaLabel: "RSC 상담 신청",
       ctaHref: "/fit-check",
       footerHeadline: "아름다운 공간에서,\n서로의 특별함을 발견하는 곳.",
-      address: "서울특별시 강남구 언주로 564\n(역삼동 680-1)",
+      address: "서울특별시 강남구 언주로 564, 비동 2층\n(역삼동, 라움)",
       phone: "02-538-3366",
       email: "theraumai@gmail.com",
       instagramHandle: "raum_socialclub",
@@ -82,7 +82,7 @@ export const DOCS: DocDef[] = [
       familySite1Label: "라움아트센터", familySite1Url: "https://www.theraum.co.kr",
       familySite2Label: "하우스오브더라움", familySite2Url: "https://houseoftheraum.co.kr",
       copyright: "© 2026 RAUM SOCIAL CLUB",
-      bizName: "", bizRep: "", bizNumber: "", bizMailOrder: "", bizAddress: "",
+      bizName: "주식회사 레벤스토리", bizRep: "김기태", bizNumber: "629-87-01795", bizMailOrder: "", bizAddress: "서울특별시 강남구 언주로 564, 비동 2층 (역삼동, 라움)",
     },
   },
   {

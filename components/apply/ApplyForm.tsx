@@ -8,7 +8,7 @@ import { formatPhoneInput } from "@/lib/phone";
 
 /**
  * 상담 전 고객 정보 설문 (/apply/<토큰>). lib/apply/schema.ts 의 STEPS 를 단계별로 그린다 — 레퍼런스처럼 「이전 / 다음」, 마지막 단계에 개인정보 동의 + 「완료」.
- * 관리자가 만든 공용 비밀 링크(token)로만 열린다. 로그인 없이 누구나 작성. 작성 중인 답은 브라우저(sessionStorage)에만 두고 제출 전에는 서버로 보내지 않는다.
+ * 관리자가 만든 공용 비밀 링크(token)로만 열린다. 로그인 없이 누구나 작성. 첫 단계 맨 위에서 개인정보 수집·이용 동의(상담 신청 화면과 같은 모양)를 받아야 다음으로 넘어간다. 작성 중인 답은 브라우저(sessionStorage)에만 두고 제출 전에는 서버로 보내지 않는다.
  *
  * 모바일 입력 최적화:
  *  - 선택지는 44px 이상 터치 버튼(칩). 좁은 화면은 2열, 넓은 화면은 흐름 배치. 글자 16px 이상이라 iOS 에서 확대되지 않는다
@@ -66,7 +66,14 @@ export function ApplyForm({ token }: { token: string }) {
     });
   };
 
+  const requireConsent = () => {
+    if (agreed) return true;
+    setError("개인정보 수집·이용에 동의해 주세요."); setInvalid("consent");
+    document.getElementById("apply-consent")?.scrollIntoView({ block: "center", behavior: "smooth" });
+    return false;
+  };
   const next = () => {
+    if (step === 0 && !requireConsent()) return;
     const miss = missingRequired(cur, answers);
     if (miss) { setError(`「${miss.label}」을(를) 입력해 주세요.`); focusField(miss.key); return; }
     go(step + 1);
@@ -77,7 +84,7 @@ export function ApplyForm({ token }: { token: string }) {
       const miss = missingRequired(s, answers);
       if (miss) { setStep(STEPS.indexOf(s)); setError(`「${s.title} · ${miss.label}」을(를) 입력해 주세요.`); focusField(miss.key); return; }
     }
-    if (!agreed) { setError("개인정보 수집 및 이용에 동의해 주세요."); document.getElementById("apply-consent")?.scrollIntoView({ block: "center", behavior: "smooth" }); return; }
+    if (!agreed) { setStep(0); requireConsent(); return; }
     setSubmitting(true); setError(null);
     try {
       const res = await fetch("/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, answers, consent: true }) });
@@ -119,26 +126,30 @@ export function ApplyForm({ token }: { token: string }) {
       <div className="bg-white border border-[rgba(33,30,25,.1)] rounded-[12px] px-[18px] py-[22px] sm:px-[26px] md:px-[34px] md:py-[34px]">
         <h1 className="font-medium text-[22px] md:text-[24px] leading-[1.3] mb-[18px] pb-[12px] border-b border-[rgba(33,30,25,.12)]">{cur.title}</h1>
         {cur.note && <p className="mb-[20px] px-[14px] py-[12px] bg-[#f4f6fa] rounded-[8px] text-[13.5px] leading-[1.7] text-[rgba(33,30,25,.75)] text-pretty">{cur.note}</p>}
-        {step === 0 && <p className="mb-[20px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.55)]"><span className="text-brown">*</span> 표시만 필수입니다. 나머지는 비워 두어도 됩니다.</p>}
+        {step === 0 && (
+          <>
+            <div id="apply-consent" className={`mb-[24px] border bg-[rgba(255,255,255,.35)] p-[18px] rounded-[8px] ${invalid === "consent" ? "border-[#b3261e] bg-[#fff6f5]" : "border-[rgba(33,30,25,.16)]"}`}>
+              <label className="flex items-start gap-[14px] cursor-pointer min-h-[44px]">
+                <input type="checkbox" checked={agreed} onChange={(e) => { setAgreed(e.target.checked); if (e.target.checked && invalid === "consent") { setInvalid(null); setError(null); } }} className="w-[20px] h-[20px] mt-[2px] accent-brown cursor-pointer flex-none" />
+                <span className="text-[15px] leading-[1.6] text-ink font-medium">개인정보 수집·이용 동의 <span className="text-brown">(필수)</span></span>
+              </label>
+              <dl className="mt-[12px] ml-[34px] grid gap-[4px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.68)]">
+                <div><dt className="inline font-medium text-ink">처리하는 회사: </dt><dd className="inline">주식회사 레벤스토리 (라움소셜클럽 운영)</dd></div>
+                <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름, 성별, 생년월일, 휴대폰 번호(필수) · 이메일, 추천인 코드, 가입 경로, MBTI, 키·체중, 결혼 여부, 거주지역·본가, 주량, 학력, 직업·소득·직장, 자산·차량, 가족관계, 이상형 조건·우선순위·기피사항, 연애성향 답변(선택)</dd></div>
+                <div><dt className="inline font-medium text-ink">이용 목적: </dt><dd className="inline">대면 상담의 준비와 일정 조율, 상담 전 기본 정보·희망 조건 확인, 문의 응대</dd></div>
+                <div><dt className="inline font-medium text-ink">보관 기간: </dt><dd className="inline">접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)</dd></div>
+                <div><dt className="inline font-medium text-ink">거부 시: </dt><dd className="inline">필수 항목 동의를 거부하면 설문이 접수되지 않습니다. 선택 항목은 비워 두어도 됩니다.</dd></div>
+              </dl>
+              <p className="mt-[10px] ml-[34px] text-[12.5px] leading-[1.7] text-[rgba(33,30,25,.55)]">
+                자세한 내용은 <Link href="/privacy" target="_blank" className="underline text-brown">개인정보처리방침</Link>에서 확인하실 수 있습니다. 사이트 이용 조건은 <Link href="/terms" target="_blank" className="underline text-brown">이용약관</Link>을 참고해 주세요. 개인정보 및 상담 내용은 철저히 보안이 유지됩니다.
+              </p>
+            </div>
+            <p className="mb-[20px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.55)]"><span className="text-brown">*</span> 표시만 필수입니다. 나머지는 비워 두어도 됩니다.</p>
+          </>
+        )}
         <div className="grid gap-[22px]">
           {cur.fields.map((f) => <FieldView key={f.key} f={f} answers={answers} set={set} invalid={invalid === f.key} />)}
         </div>
-
-        {last && (
-          <div id="apply-consent" className="mt-[28px] border border-[rgba(33,30,25,.16)] rounded-[8px] bg-[rgba(255,255,255,.35)] p-[16px]">
-            <label className="flex items-start gap-[12px] cursor-pointer min-h-[44px]">
-              <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="w-[20px] h-[20px] mt-[2px] accent-brown cursor-pointer flex-none" />
-              <span className="text-[15px] leading-[1.6] text-ink font-medium">개인정보 수집 및 이용에 동의합니다. <span className="text-brown">(필수)</span></span>
-            </label>
-            <dl className="mt-[10px] ml-[32px] grid gap-[4px] text-[13px] leading-[1.7] text-[rgba(33,30,25,.68)]">
-              <div><dt className="inline font-medium text-ink">수집 항목: </dt><dd className="inline">이름·성별·생년월일·휴대폰(필수), 이메일·추천인 코드·가입 경로·MBTI·키·체중·결혼여부·거주지역·본가·주량, 학력, 직업·소득·직장, 자산·차량, 가족관계, 이상형 조건·기피사항, 연애성향 답변(선택)</dd></div>
-              <div><dt className="inline font-medium text-ink">이용 목적: </dt><dd className="inline">대면 상담의 준비와 일정 조율, 상담 전 프로필 확인, 문의 응대</dd></div>
-              <div><dt className="inline font-medium text-ink">보관 기간: </dt><dd className="inline">접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)</dd></div>
-              <div><dt className="inline font-medium text-ink">거부 시: </dt><dd className="inline">필수 항목 동의를 거부하면 설문이 접수되지 않습니다. 선택 항목은 비워 두어도 됩니다.</dd></div>
-            </dl>
-            <p className="mt-[10px] ml-[32px] text-[12.5px] leading-[1.7] text-[rgba(33,30,25,.55)]">* 개인정보 및 상담내용은 철저히 보안이 유지됩니다. 자세한 내용은 <Link href="/privacy" target="_blank" className="underline text-brown">개인정보처리방침</Link>을 확인해 주세요.</p>
-          </div>
-        )}
 
         {error && <p role="alert" className="mt-[18px] px-[12px] py-[10px] bg-[#fff6f5] border border-[#f1c7c3] rounded-[8px] text-[13.5px] leading-[1.6] text-[#b3261e]">{error}</p>}
 

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeDb } from "./helpers/fakeDb";
+import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 
 /** 상담 신청 저장(/api/inquiries): 개인정보 최소화(설문 원본 미저장) + 광고 UTM 저장 */
 const db = fakeDb();
@@ -25,7 +26,7 @@ describe("상담 신청 POST /api/inquiries", () => {
     expect(row.answers.slot).toBe("오후 2–4시, 저녁 6–8시");
     expect(row.answers.route).toBe("");
     expect(row.answers.consentAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
-    expect(row.answers.consentVersion).toBe("2026-10-01");
+    expect(row.answers.consentVersion).toBe(PRIVACY_CONSENT_VERSION);
   });
   it("상담 가능 시간을 비워도 접수된다 (선택 항목)", async () => {
     const { POST } = await import("@/app/api/inquiries/route");
@@ -38,7 +39,7 @@ describe("상담 신청 POST /api/inquiries", () => {
     const { POST } = await import("@/app/api/inquiries/route");
     await POST(post({ ...base, consentVersion: "9999-01-01" }));
     const row = db.calls[0].payload as { answers: Record<string, string> };
-    expect(row.answers.consentVersion).toBe("2026-10-01");
+    expect(row.answers.consentVersion).toBe(PRIVACY_CONSENT_VERSION);
   });
   it("설문형 신청: 결과 유형·경로는 저장하되 설문 답변 원본은 버린다", async () => {
     const { POST } = await import("@/app/api/inquiries/route");
