@@ -7,6 +7,7 @@ import { Button, ButtonLink, CARD, FIELD_HELP, FIELD_LABEL, INPUT } from "@/comp
 import { formatPhoneInput } from "@/lib/phone";
 import { readUtm } from "@/lib/utm/client";
 import { trackLead } from "@/components/site/MetaPixel";
+import { Txt } from "@/components/cms/Txt";
 
 /**
  * 간단 상담 신청 (기본). 이름·휴대폰·개인정보 동의만 받는다 (Wanted DS 텍스트 필드 · 체크박스 · 큰 버튼).
@@ -43,12 +44,12 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
 
   if (done) {
     return (
-      <div className="w-full max-w-[560px] mx-auto text-center py-[24px]">
+      <div className="w-full max-w-[560px] mx-auto text-center py-[24px] anim-up">
         <div className="w-[56px] h-[56px] rounded-full bg-[rgba(0,191,64,.12)] text-positiveFg flex items-center justify-center mx-auto mb-[20px]">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg>
         </div>
         <h2 className="t-title-2 text-label mb-[12px]">신청이 접수되었습니다</h2>
-        <p className="t-body-1-reading text-labelAlt mb-[28px] text-pretty">담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 전화(02-6925-4786) 또는 이메일로 알려 주세요.</p>
+        <p className="t-body-1-reading text-labelAlt mb-[28px] text-pretty"><Txt v="담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 전화(02-6925-4786) 또는 이메일로 알려 주세요." /></p>
         <div className="flex gap-[10px] justify-center flex-wrap">
           <ButtonLink href="/" size="lg">홈으로 돌아가기</ButtonLink>
           <InstagramButton />
@@ -58,9 +59,9 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
   }
 
   return (
-    <form className="w-full max-w-[520px] mx-auto" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
+    <form className="w-full max-w-[520px] mx-auto anim-up" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
       <h1 className="t-title-2 md:t-title-1 text-label mb-[10px] text-pretty">{title}</h1>
-      <p className="t-body-1-reading text-labelAlt mb-[32px] text-pretty">{note}</p>
+      <p className="t-body-1-reading text-labelAlt mb-[32px] text-pretty"><Txt v={note} /></p>
 
       <div className="grid gap-[20px]">
         <label className="block">
@@ -92,7 +93,7 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
       {error && <p role="alert" className="mt-[16px] t-label-1 text-negativeFg">{error}</p>}
 
       <Button type="submit" disabled={!canSubmit || submitting} size="lg" className="mt-[28px] w-full">{submitting ? "접수 중…" : "상담 신청하기"}</Button>
-      <p className="mt-[12px] text-center t-caption-1 text-labelAlt">신청은 회원 가입이 아니며, 담당자가 연락드린 뒤 상담이 진행됩니다.</p>
+      <p className="mt-[12px] text-center t-caption-1 text-labelAlt text-pretty"><Txt v="신청은 회원 가입이 아니며, 담당자가 연락드린 뒤 상담이 진행됩니다." /></p>
     </form>
   );
 }

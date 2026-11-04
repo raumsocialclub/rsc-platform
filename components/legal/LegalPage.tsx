@@ -31,14 +31,14 @@ export async function LegalPage({ overline, title, updated, sections, current, p
       <Header />
       <main className="flex-1 py-[40px] md:py-[64px]">
         <Container className="!max-w-[860px]">
-          <div className="t-label-1 font-semibold text-primary mb-[8px]">{overline}</div>
-          <h1 className="t-title-2 md:t-title-1 text-label mb-[8px]">{title}</h1>
+          <div className="anim-up t-label-1 font-semibold text-primary mb-[8px]">{overline}</div>
+          <h1 className="anim-up t-title-2 md:t-title-1 text-label mb-[8px]">{title}</h1>
           <div className="t-label-1 text-labelAlt mb-[24px]">시행일 {updated}</div>
           <nav aria-label="약관 문서" className="flex gap-[24px] border-b border-lineAlt mb-[32px]">
             {nav.map((n) => {
               const on = n.href === current;
               return (
-                <Link key={n.href} href={n.href} aria-current={on ? "page" : undefined} className={`t-headline-2 py-[12px] -mb-px border-b-2 ${on ? "border-label text-label" : "border-transparent text-labelAssist hover:text-labelAlt"}`}>
+                <Link key={n.href} href={n.href} aria-current={on ? "page" : undefined} className={`t-headline-2 py-[12px] -mb-px border-b-2 transition-colors ${on ? "border-label text-label" : "border-transparent text-labelAssist hover:text-label hover:border-lineNeutral"}`}>
                   {n.label}
                 </Link>
               );

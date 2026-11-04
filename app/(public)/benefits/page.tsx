@@ -57,24 +57,24 @@ export default async function BenefitsPage() {
       <main className="flex-1 py-[48px] md:py-[80px]">
         <Container>
           <section className="text-center max-w-[640px] mx-auto mb-[40px] md:mb-[56px]">
-            <div className="t-label-1 font-semibold text-primary mb-[10px]">{s(hero, "label")}</div>
-            <h1 className="t-title-1 md:t-display-3 text-label mb-[14px] text-pretty">{s(hero, "title")}</h1>
-            <p className="t-body-1-reading text-labelAlt text-pretty"><Txt v={s(hero, "body")} breaks="hard" /></p>
+            <div className="anim-up t-label-1 font-semibold text-primary mb-[10px]">{s(hero, "label")}</div>
+            <h1 className="anim-up t-title-1 md:t-display-3 text-label mb-[14px] text-pretty">{s(hero, "title")}</h1>
+            <p className="anim-up-2 t-body-1-reading text-labelAlt text-pretty"><Txt v={s(hero, "body")} breaks="hard" /></p>
           </section>
 
           <section className="mb-[48px] md:mb-[64px]">
-            <div className="flex justify-between items-center gap-[12px] mb-[16px]">
+            <div className="flex justify-between items-center gap-[12px] mb-[16px]" data-reveal>
               <h2 className="t-heading-1 text-label">{s(hero, "tableTitle")}</h2>
               <span className="t-caption-1 text-labelAlt">{items.length}개 혜택 · {groups.length}개 분류</span>
             </div>
             <div className="grid gap-[16px]">
-              {groups.map((g) => (
-                <div key={g.name} className={`${CARD} overflow-hidden`}>
+              {groups.map((g, gi) => (
+                <div key={g.name} data-reveal style={{ "--d": `${gi * 80}ms` } as React.CSSProperties} className={`${CARD} overflow-hidden`}>
                   <div className="px-[20px] py-[12px] bg-sand t-label-1 font-semibold text-labelNeutral">{g.name}</div>
                   {g.rows.map((r, ri) => {
                     const ls = lines(r.lines);
                     return (
-                      <div key={r.n} className={`grid grid-cols-1 gap-[10px] px-[20px] py-[18px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.5fr)_minmax(0,.8fr)] md:gap-[24px] md:py-[20px] items-start ${ri < g.rows.length - 1 ? "border-b border-lineAlt" : ""}`}>
+                      <div key={r.n} className={`grid grid-cols-1 gap-[10px] px-[20px] py-[18px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.5fr)_minmax(0,.8fr)] md:gap-[24px] md:py-[20px] items-start transition-colors hover:bg-[rgba(0,102,255,.03)] ${ri < g.rows.length - 1 ? "border-b border-lineAlt" : ""}`}>
                         <div>
                           <div className="t-caption-1 text-labelAssist mb-[4px]">{r.n}</div>
                           <div className="t-headline-2 text-label mb-[8px]">{r.title}</div>
@@ -90,7 +90,7 @@ export default async function BenefitsPage() {
             </div>
           </section>
 
-          <section className="bg-inverseBg rounded-ds px-[24px] py-[40px] md:px-[48px] md:py-[56px] text-center">
+          <section data-reveal className="bg-inverseBg rounded-ds px-[24px] py-[40px] md:px-[48px] md:py-[56px] text-center">
             <div className="t-label-1 font-semibold text-inversePrimary mb-[10px]">{s(cta, "label")}</div>
             <h2 className="t-title-3 md:t-title-2 text-inverseLabel mb-[24px] text-pretty">{ctaTitle}</h2>
             <div className="flex gap-[10px] justify-center flex-wrap">

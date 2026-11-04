@@ -74,6 +74,21 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 - **플로팅 UP 버튼** 우하단 44px 흰 원 + lineNeutral + shadow-md, 뷰포트 60% 스크롤 후 표시.
 - **탭(법적 고지 등)** 하단 2px 언더라인, 선택 `text-label`/미선택 `text-labelAlt`.
 
+## 움직임 (생동감)
+- **버튼**: 호버 시 색이 진해지고 파란 그림자(solid), 누르면 `scale(.97)`. 모든 변화 200ms ease-out.
+- **카드** `CARD_HOVER`: 호버 시 4px 떠오름 + `shadow-md` + 테두리 진하게, 안의 사진은 `ImageBlock zoom` 으로 700ms 동안 5% 확대 (`group`).
+- **스크롤 등장** `data-reveal` (+ `--d` 로 지연): 화면에 들어오면 아래에서 22px 떠오르며 나타난다. `RevealObserver`(루트 레이아웃)가 `html.js` 를 붙인 뒤에만 숨기므로 JS 가 없으면 그대로 보인다. `SectionHead`·`ImageBlock` 은 `reveal` prop.
+- **첫 화면**: `anim-up` / `anim-up-2` / `anim-up-3` 순서 등장, 사진은 `anim-zoom`.
+- **GNB**: 메뉴 밑줄이 왼쪽에서 자라남(`link-grow`), 스크롤하면 그림자. 모바일 메뉴는 `anim-pop` + 항목 순차 등장.
+- **모바일 가로 스와이프** `SWIPE` + `SWIPE_ITEM`: 프로그램·순간 카드는 모바일에서 82% 폭 카드로 옆으로 밀어 보고(스냅), 데스크톱은 그리드. 위에 "옆으로 밀어서 보기 →" 안내.
+- **FAQ**: 열리면 답이 떠오르고(`faq-body`) 질문이 파란색. **표 행**은 호버 시 연파랑.
+- `prefers-reduced-motion` 이면 모든 효과를 끈다.
+
+## 문장 줄바꿈
+- `Txt` 는 마침표·물음표·느낌표 뒤에서 항상 줄을 바꾼다 (PC·모바일 공통, 문장이 중간에 잘려 보이지 않게). 숫자 뒤 점은 제외.
+- CMS 의 `\n` 은 기본(soft) 데스크톱에서만 줄바꿈, 모바일은 띄어쓰기로 이어 붙임. `breaks="hard"` 는 항상 줄바꿈.
+- 안내 문단은 전부 `Txt` 로 렌더하고 `text-pretty` 를 붙인다. 표 셀은 예외.
+
 ## 이미지
 - 모두 `rounded-ds`(12px) 모서리. 히어로 4:3(모바일) / 4:5(데스크톱), 프로그램 카드 4:3, 상세 3:2.
 - 색 보정 없이 원본 톤 유지. 어두운 사진 위 텍스트는 `inverseLabel`.

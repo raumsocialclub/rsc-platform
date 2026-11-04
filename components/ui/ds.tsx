@@ -8,18 +8,18 @@ import type { ReactNode } from "react";
 export type BtnVariant = "solid" | "outlined" | "assistive" | "text" | "inverse";
 export type BtnSize = "lg" | "md" | "sm";
 
-const BASE = "inline-flex items-center justify-center gap-[6px] whitespace-nowrap rounded-ds font-semibold transition-colors cursor-pointer select-none border disabled:cursor-not-allowed";
+const BASE = "inline-flex items-center justify-center gap-[6px] whitespace-nowrap rounded-ds font-semibold transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out cursor-pointer select-none border active:scale-[.97] disabled:cursor-not-allowed disabled:active:scale-100 disabled:hover:shadow-none";
 const SIZE: Record<BtnSize, string> = {
   lg: "h-[48px] px-[28px] text-[16px] leading-[1.5] tracking-[0.0057em]",
   md: "h-[40px] px-[20px] text-[15px] leading-[1.467] tracking-[0.0096em]",
   sm: "h-[32px] px-[14px] text-[13px] leading-[1.385] tracking-[0.0194em]",
 };
 const VARIANT: Record<BtnVariant, string> = {
-  solid: "bg-primary border-primary text-white hover:bg-primaryStrong hover:border-primaryStrong hover:text-white active:bg-primaryHeavy disabled:bg-disable disabled:border-disable disabled:text-labelDisable",
+  solid: "bg-primary border-primary text-white hover:bg-primaryStrong hover:border-primaryStrong hover:text-white hover:shadow-[0_6px_16px_rgba(0,102,255,.28)] active:bg-primaryHeavy active:shadow-none disabled:bg-disable disabled:border-disable disabled:text-labelDisable",
   outlined: "bg-transparent border-line text-primary hover:bg-[rgba(0,102,255,.05)] hover:text-primary disabled:text-labelDisable disabled:border-lineAlt",
   assistive: "bg-transparent border-line text-labelNeutral hover:bg-fillAlt hover:text-label disabled:text-labelDisable disabled:border-lineAlt",
   text: "bg-transparent border-transparent text-primary px-[8px] hover:bg-[rgba(0,102,255,.05)] hover:text-primary",
-  inverse: "bg-white border-white text-label hover:bg-[#f4f4f5] hover:border-[#f4f4f5] hover:text-label",
+  inverse: "bg-white border-white text-label hover:bg-[#f4f4f5] hover:border-[#f4f4f5] hover:text-label hover:shadow-[0_6px_16px_rgba(0,0,0,.25)] active:shadow-none",
 };
 
 export function btn(variant: BtnVariant = "solid", size: BtnSize = "md", extra = ""): string {
@@ -47,9 +47,9 @@ export function Container({ className = "", children, wide = false }: { classNam
 }
 
 /** 섹션 머리: 작은 라벨(선택) + 제목 + 설명(선택) */
-export function SectionHead({ eyebrow, title, lead, align = "left", className = "" }: { eyebrow?: ReactNode; title: ReactNode; lead?: ReactNode; align?: "left" | "center"; className?: string }) {
+export function SectionHead({ eyebrow, title, lead, align = "left", className = "", reveal }: { eyebrow?: ReactNode; title: ReactNode; lead?: ReactNode; align?: "left" | "center"; className?: string; reveal?: boolean }) {
   return (
-    <div className={`${align === "center" ? "text-center mx-auto" : ""} max-w-[720px] ${className}`}>
+    <div className={`${align === "center" ? "text-center mx-auto" : ""} max-w-[720px] ${className}`} data-reveal={reveal ? "" : undefined}>
       {eyebrow && <div className="t-label-1 font-semibold text-primary mb-[10px]">{eyebrow}</div>}
       <h2 className="t-title-2 md:t-title-1 text-label text-pretty">{title}</h2>
       {lead && <p className="t-body-1-reading text-labelAlt mt-[14px] text-pretty">{lead}</p>}
@@ -60,20 +60,23 @@ export function SectionHead({ eyebrow, title, lead, align = "left", className = 
 /** 카드: 흰 배경 · 1px 선 · 12px 모서리. tone="alt" 는 연회색 배경 */
 export const CARD = "bg-white border border-lineAlt rounded-ds";
 export const CARD_ALT = "bg-sand border border-transparent rounded-ds";
-export const CARD_HOVER = "transition-shadow hover:shadow-md";
+export const CARD_HOVER = "group transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-[4px] hover:shadow-md hover:border-lineNeutral";
+/** 모바일 가로 스와이프 줄 (드래그로 넘김, 데스크톱은 그리드) */
+export const SWIPE = "flex gap-[16px] overflow-x-auto snap-x snap-mandatory -mx-[20px] px-[20px] pb-[8px] scrollbar-none [-webkit-overflow-scrolling:touch] md:grid md:overflow-visible md:mx-0 md:px-0 md:pb-0 md:snap-none";
+export const SWIPE_ITEM = "flex-none w-[82%] snap-start md:w-auto";
 
 /** 입력칸 (Text Field): 48px, 12px 모서리, 포커스 시 파란 테두리 */
-export const INPUT = "w-full h-[48px] rounded-ds border border-lineNeutral bg-white px-[16px] text-[16px] leading-[1.5] text-label outline-none shadow-xs placeholder:text-labelAssist focus:border-primary focus:ring-2 focus:ring-[rgba(0,102,255,.2)] disabled:bg-disable disabled:text-labelDisable appearance-none";
-export const TEXTAREA = "w-full min-h-[120px] rounded-ds border border-lineNeutral bg-white px-[16px] py-[12px] text-[16px] leading-[1.5] text-label outline-none shadow-xs placeholder:text-labelAssist focus:border-primary focus:ring-2 focus:ring-[rgba(0,102,255,.2)] resize-y";
+export const INPUT = "w-full h-[48px] rounded-ds border border-lineNeutral bg-white px-[16px] text-[16px] leading-[1.5] text-label outline-none shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-labelAssist hover:border-line focus:border-primary focus:ring-2 focus:ring-[rgba(0,102,255,.2)] disabled:bg-disable disabled:text-labelDisable appearance-none";
+export const TEXTAREA = "w-full min-h-[120px] rounded-ds border border-lineNeutral bg-white px-[16px] py-[12px] text-[16px] leading-[1.5] text-label outline-none shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-labelAssist hover:border-line focus:border-primary focus:ring-2 focus:ring-[rgba(0,102,255,.2)] resize-y";
 export const INPUT_ERR = "!border-negative focus:!ring-[rgba(255,66,66,.2)]";
 export const FIELD_LABEL = "block t-label-1 font-semibold text-labelNeutral mb-[8px]";
 export const FIELD_HELP = "block mt-[8px] t-caption-1 text-labelAlt";
 export const FIELD_ERROR = "block mt-[8px] t-caption-1 text-negativeFg";
 
 /** 칩(선택 버튼): 선택 안 됨 흰색 / 선택됨 파란 테두리·연파랑 */
-export const CHIP = "min-h-[44px] inline-flex items-center justify-center text-center px-[16px] py-[10px] t-body-2 font-medium rounded-ds border cursor-pointer select-none transition-colors active:scale-[.98]";
+export const CHIP = "min-h-[44px] inline-flex items-center justify-center text-center px-[16px] py-[10px] t-body-2 font-medium rounded-ds border cursor-pointer select-none transition-[color,background-color,border-color,transform] duration-200 active:scale-[.97]";
 export const CHIP_ON = "border-primary bg-[rgba(0,102,255,.08)] text-primary";
-export const CHIP_OFF = "border-lineNeutral bg-white text-labelNeutral hover:border-line";
+export const CHIP_OFF = "border-lineNeutral bg-white text-labelNeutral hover:border-primary hover:text-primary";
 
 /** 배지 */
 export function Badge({ tone = "neutral", children, className = "" }: { tone?: "neutral" | "primary" | "positive" | "cautionary" | "negative" | "inverse"; children: ReactNode; className?: string }) {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 import { ButtonLink, btn } from "@/components/ui/ds";
 
@@ -11,7 +11,7 @@ const INK_FILTER = "invert(1) brightness(0.15)";
 export type HeaderUser = { name: string; initial: string };
 export type HeaderBrand = { ctaLabel: string; ctaHref: string; logoEmblem: string; logoText: string };
 const DEFAULT_BRAND: HeaderBrand = { ctaLabel: "RSC 상담 신청", ctaHref: "/fit-check", logoEmblem: "/images/logo-emblem.png", logoText: "/images/logo-text-nav.png" };
-const NAV = "t-label-1 font-semibold text-labelNeutral hover:text-primary";
+const NAV = "link-grow t-label-1 font-semibold text-labelNeutral hover:text-primary py-[4px]";
 
 /**
  * 공통 GNB (Wanted DS). 흰 배경 64px(모바일 56px) 고정 바 · 로고 · 메뉴 · 주요 버튼. 모바일은 햄버거 → 전체 화면 메뉴.
@@ -19,12 +19,23 @@ const NAV = "t-label-1 font-semibold text-labelNeutral hover:text-primary";
  */
 export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = false }: { user?: HeaderUser | null; brand?: HeaderBrand; leadMode?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const close = () => setOpen(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
   const loggedIn = !!user && !leadMode;
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[60] h-[56px] md:h-[64px] bg-white/95 backdrop-blur-[12px] border-b border-lineAlt">
+      <header className={`fixed top-0 left-0 right-0 z-[60] h-[56px] md:h-[64px] bg-white/95 backdrop-blur-[12px] border-b transition-[box-shadow,border-color] duration-300 ${scrolled ? "border-lineNeutral shadow-sm" : "border-lineAlt"}`}>
         <div className="h-full max-w-[1200px] mx-auto px-[20px] md:px-[32px] flex items-center justify-between gap-[16px]">
           <Logo href="/" emblemClass="h-[26px] md:h-[32px]" textClass="h-[14px] md:h-[16px]" textSrc={brand.logoText} emblemSrc={brand.logoEmblem} className="gap-[10px]" />
           <nav className="hidden md:flex items-center gap-[28px] ml-[40px] mr-auto">
@@ -65,7 +76,7 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
       </header>
 
       {open && (
-        <div className="fixed inset-0 z-[90] bg-white flex flex-col px-[20px] py-[12px]">
+        <div className="fixed inset-0 z-[90] bg-white flex flex-col px-[20px] py-[12px] anim-pop overflow-y-auto">
           <div className="h-[44px] flex items-center justify-between mb-[24px]">
             <Image src={brand.logoEmblem} alt="RAUM SOCIAL CLUB" width={529} height={638} className="h-[26px] w-auto" style={{ filter: INK_FILTER }} unoptimized={brand.logoEmblem.startsWith("http")} />
             <button type="button" aria-label="메뉴 닫기" onClick={close} className="w-[36px] h-[36px] rounded-ds-sm flex items-center justify-center cursor-pointer text-label bg-transparent border-0 hover:bg-fillAlt">
@@ -81,8 +92,8 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
               { href: "/news", label: "소식" },
               { href: "/#faq", label: "FAQ" },
               ...(loggedIn ? [{ href: "/my", label: "내 예약" }] : []),
-            ].map((n) => (
-              <Link key={n.href} href={n.href} onClick={close} className="t-heading-2 text-label py-[14px] border-b border-lineAlt">{n.label}</Link>
+            ].map((n, i) => (
+              <Link key={n.href} href={n.href} onClick={close} style={{ animationDelay: `${60 + i * 40}ms` }} className="anim-up t-heading-2 text-label py-[14px] border-b border-lineAlt flex items-center justify-between active:text-primary">{n.label}<span className="text-labelAssist" aria-hidden>→</span></Link>
             ))}
             {!leadMode && !loggedIn && <Link href="/login" onClick={close} className="t-heading-2 text-labelAlt py-[14px] border-b border-lineAlt">로그인</Link>}
             {(loggedIn || (leadMode && user)) && (

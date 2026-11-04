@@ -3,6 +3,7 @@ import { pretendard } from "@/lib/fonts";
 import { PageTracker } from "@/components/site/PageTracker";
 import { EnvBanner } from "@/components/site/EnvBanner";
 import { MetaPixel } from "@/components/site/MetaPixel";
+import { RevealObserver } from "@/components/site/RevealObserver";
 import { getSettings } from "@/lib/settings/get";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getBrand, getTheme } from "@/lib/cms/get";
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {children}
         <JsonLd data={org} />
         <PageTracker />
+        <RevealObserver />
         <MetaPixel pixelId={settings.metaPixelId} />
       </body>
     </html>

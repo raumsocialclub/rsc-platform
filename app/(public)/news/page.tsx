@@ -13,6 +13,7 @@ import { plainText } from "@/lib/posts/types";
 import { getPageSeo, pageMetadata } from "@/lib/seo/get";
 import { breadcrumbJsonLd } from "@/lib/seo/jsonld";
 import { Badge, CARD, CARD_HOVER, Container } from "@/components/ui/ds";
+import { Txt } from "@/components/cms/Txt";
 
 type Search = Promise<{ y?: string; m?: string }>;
 
@@ -43,9 +44,9 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
       <main className="flex-1 py-[40px] md:py-[72px]">
         <Container wide>
           <section className="mb-[28px] md:mb-[40px]">
-            <div className="t-label-1 font-semibold text-primary mb-[10px]">NEWS</div>
-            <h1 className="t-title-1 md:t-display-3 text-label mb-[12px] text-pretty">{seo.title || "소식"}</h1>
-            <p className="t-body-1-reading text-labelAlt max-w-[560px] text-pretty">{seo.description}</p>
+            <div className="anim-up t-label-1 font-semibold text-primary mb-[10px]">NEWS</div>
+            <h1 className="anim-up t-title-1 md:t-display-3 text-label mb-[12px] text-pretty">{seo.title || "소식"}</h1>
+            <p className="anim-up-2 t-body-1-reading text-labelAlt max-w-[560px] text-pretty"><Txt v={seo.description} /></p>
           </section>
 
           <section className="mb-[32px] md:mb-[48px]" aria-label="월별 보기">
@@ -61,19 +62,19 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 lg:grid-cols-3 md:gap-[24px]">
-              {posts.map((p) => (
-                <article key={p.id} className={`min-w-0 ${CARD} ${CARD_HOVER} overflow-hidden`}>
+              {posts.map((p, i) => (
+                <article key={p.id} data-reveal style={{ "--d": `${(i % 3) * 80}ms` } as React.CSSProperties} className={`min-w-0 ${CARD} ${CARD_HOVER} overflow-hidden`}>
                   <Link href={`/news/${encodeURIComponent(p.slug)}`} className="block group">
                     {/* 모든 카드를 인스타 피드 비율(4:5) 상자로 통일 */}
                     <div className="relative aspect-[4/5] overflow-hidden bg-fill">
-                      {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]" unoptimized={p.cover_image.startsWith("http")} />}
+                      {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.05]" unoptimized={p.cover_image.startsWith("http")} />}
                     </div>
                     <div className="p-[18px] md:p-[20px]">
                       <div className="flex items-center gap-[8px] mb-[10px]">
                         <Badge tone="primary">{p.category}</Badge>
                         <span className="t-caption-1 text-labelAlt">{fmtPostDate(p)}</span>
                       </div>
-                      <h2 className="t-heading-2 text-label mb-[6px] text-pretty group-hover:text-primary">{p.title}</h2>
+                      <h2 className="t-heading-2 text-label mb-[6px] text-pretty transition-colors group-hover:text-primary">{p.title}</h2>
                       {(p.summary || p.body) && <p className="t-body-2-reading text-labelAlt text-pretty m-0">{p.summary || plainText(p.body, 120)}</p>}
                     </div>
                   </Link>

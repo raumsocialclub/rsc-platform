@@ -7,7 +7,7 @@ import { InstagramButton } from "./InstagramButton";
 import { businessInfo } from "@/lib/site/business";
 
 const INK_FILTER = "invert(1) brightness(0.15)";
-const LINK = "t-label-1 text-labelAlt hover:text-label";
+const LINK = "t-label-1 text-labelAlt hover:text-label hover:translate-x-[2px] inline-block transition-[color,transform] duration-200";
 
 /**
  * 푸터 (Wanted DS): 연회색 배경, 브랜드 한 줄 + 메뉴·연락처·패밀리 사이트 열, 맨 아래 약관 링크·사업자 정보.
