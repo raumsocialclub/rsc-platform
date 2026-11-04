@@ -13,6 +13,7 @@ import { fmtDate, plainText } from "@/lib/posts/types";
 import { fmtPostDate } from "@/lib/posts/calendar";
 import { pageMetadata } from "@/lib/seo/get";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
+import { Badge, ButtonLink } from "@/components/ui/ds";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -34,30 +35,30 @@ export default async function NewsDetailPage({ params }: Params) {
   if (!p || !p.published) notFound();
 
   return (
-    <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">
+    <div className="min-h-screen flex flex-col pt-[56px] md:pt-[64px]">
       <Header />
-      <main className="flex-1 px-[18px] pt-[40px] pb-[96px] md:px-[40px] md:pt-[72px] md:pb-[140px]">
+      <main className="flex-1 px-[20px] py-[40px] md:px-[32px] md:py-[72px]">
         <article className="w-full max-w-[760px] mx-auto">
-          <div className="flex items-center gap-[12px] text-[10.5px] tracking-[.28em] text-brownHover mb-[22px]">
-            <Link href="/news" className="hover:text-brown">NEWS</Link>
-            <span className="text-[rgba(33,30,25,.3)]">/</span>
-            <span>{p.category.toUpperCase()}</span>
+          <div className="flex items-center gap-[8px] mb-[16px]">
+            <Link href="/news" className="t-label-1 text-labelAlt hover:text-label">소식</Link>
+            <span className="text-labelAssist">/</span>
+            <Badge tone="primary">{p.category}</Badge>
           </div>
-          <h1 className="font-semibold text-[28px] md:text-[clamp(30px,3.4vw,42px)] leading-[1.3] mb-[18px] text-pretty">{p.title}</h1>
-          <div className="text-[12.5px] tracking-[.1em] text-[rgba(33,30,25,.5)] mb-[40px]">
-            {p.event_date ? <>행사일 {fmtPostDate(p)}<span className="mx-[10px] text-[rgba(33,30,25,.25)]">|</span>{fmtDate(p.published_at)} 게시</> : fmtDate(p.published_at)}
+          <h1 className="t-title-2 md:t-title-1 text-label mb-[12px] text-pretty">{p.title}</h1>
+          <div className="t-label-1 text-labelAlt mb-[32px]">
+            {p.event_date ? <>행사일 {fmtPostDate(p)}<span className="mx-[10px] text-labelAssist">|</span>{fmtDate(p.published_at)} 게시</> : fmtDate(p.published_at)}
           </div>
           {p.cover_image && (
-            <div className="w-full overflow-hidden bg-[#e7e0d3] mb-[44px]">
+            <div className="w-full overflow-hidden rounded-ds bg-fill mb-[36px]">
               {/* 인스타그램 피드 비율(1080×1350) 원본 그대로 — 잘라내지 않는다 */}
               <Image src={p.cover_image} alt="" width={1080} height={1350} priority sizes="(min-width: 761px) 760px, 100vw" className="block w-full h-auto" unoptimized={p.cover_image.startsWith("http")} />
             </div>
           )}
-          {p.summary && <p className="text-[17px] md:text-[18px] leading-[1.7] text-ink font-semibold mb-[36px] text-pretty">{p.summary}</p>}
+          {p.summary && <p className="t-headline-1 text-label mb-[28px] text-pretty">{p.summary}</p>}
           <Markdown source={p.body} />
-          <div className="mt-[64px] pt-[28px] border-t border-[rgba(33,30,25,.14)] flex justify-between items-center gap-[16px] flex-wrap">
-            <Link href="/news" className="text-[13.5px] font-semibold text-brown hover:text-brownHover">← 소식 목록</Link>
-            <Link href="/fit-check" className="inline-flex items-center px-[24px] py-[13px] rounded-pill bg-ink text-cream text-[13px] hover:bg-brownHover hover:text-cream">RSC 상담 신청하기</Link>
+          <div className="mt-[48px] pt-[24px] border-t border-lineAlt flex justify-between items-center gap-[16px] flex-wrap">
+            <ButtonLink href="/news" variant="text" size="md">← 소식 목록</ButtonLink>
+            <ButtonLink href="/fit-check" size="md">RSC 상담 신청하기</ButtonLink>
           </div>
         </article>
         <JsonLd data={[articleJsonLd(p, s(org, "name") || "라움소셜클럽"), breadcrumbJsonLd([{ name: "홈", path: "/" }, { name: "소식", path: "/news" }, { name: p.title, path: `/news/${encodeURIComponent(p.slug)}` }])]} />

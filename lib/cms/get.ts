@@ -51,8 +51,8 @@ export const on = (d: DocData, k: string): boolean => d[k] !== false;
 
 export type Theme = { cream: string; ink: string; brown: string; brownHover: string; gold: string; goldHover: string; sand: string; sandDeep: string };
 export async function getTheme(): Promise<Theme> {
-  const d = await getDoc("global.theme");
-  const def = DOC_BY_ID.get("global.theme")!.defaults as Theme;
+  const d = await getDoc("global.theme2"); // 2026-11-04 새 디자인 토큰 문서 (옛 global.theme 은 이전 디자인 전용)
+  const def = DOC_BY_ID.get("global.theme2")!.defaults as Theme;
   const pick = (k: keyof Theme) => (/^#[0-9a-f]{6}$/i.test(s(d, k)) ? s(d, k) : def[k]);
   return { cream: pick("cream"), ink: pick("ink"), brown: pick("brown"), brownHover: pick("brownHover"), gold: pick("gold"), goldHover: pick("goldHover"), sand: pick("sand"), sandDeep: pick("sandDeep") };
 }

@@ -13,32 +13,17 @@ import { pageMetadata } from "@/lib/seo/get";
 import { faqJsonLd } from "@/lib/seo/jsonld";
 import { getSettings } from "@/lib/settings/get";
 import { hasPrice } from "@/lib/settings/leadMode";
+import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("home");
 }
 
-/* ---------- 공통 조각 (deploy/index.html 인라인 스타일을 그대로 옮김) ---------- */
-
-const SECTION = "px-[20px] py-[72px] md:px-[40px] md:py-[140px] border-t border-[rgba(33,30,25,.09)]";
-const INNER = "max-w-[1240px] mx-auto";
-const H2 = "font-semibold text-[25px] leading-[1.36] md:text-[clamp(28px,2.8vw,44px)] text-pretty";
-const BODY_M = "text-[15px] leading-[1.6]";
-const LINE_GRID = "bg-[rgba(33,30,25,.14)] border border-[rgba(33,30,25,.14)]";
-/** 06 MOMENTS 카드 사진 상자: 정사각형(1:1). 네 장 모두 같은 크기 */
-const MOMENT_IMG = "aspect-square w-full";
-
-function SectionLabel({ children, className = "mb-[40px]" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`text-[11px] tracking-[.34em] text-brownHover ${className}`}>{children}</div>;
-}
-/** "01  /  NEW DEFINITION" 형태의 라벨: 슬래시 양쪽에 &nbsp; */
-function Label({ v }: { v: string }) {
-  const [a, b] = v.split("/").map((x) => x.trim());
-  return b ? <>{a} &nbsp;/&nbsp; {b}</> : <>{v}</>;
-}
-function Cta({ href, className, children }: { href: string; className: string; children: React.ReactNode }) {
-  return href.startsWith("/") ? <Link href={href} className={className}>{children}</Link> : <a href={href} className={className} {...(href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}>{children}</a>;
-}
+/* ---------- 공통 조각 (Design.md: Wanted DS) ---------- */
+const SECTION = "py-[64px] md:py-[112px]";
+const BODY = "t-body-1-reading text-labelAlt text-pretty";
+/** "01  /  NEW DEFINITION" 형태의 CMS 라벨 → "NEW DEFINITION" 만 쓴다 (번호는 디자인에서 뺌) */
+const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/").trim() : v.trim());
 
 /**
  * 메인 페이지. 모든 문구·사진은 CMS(site_content home.*) — 기본값은 lib/cms/schema.ts
@@ -51,243 +36,225 @@ export default async function HomePage() {
   const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
   const showFaq = on(faq, "visible") && faqItems.length > 0;
   const showMembership = on(mem, "visible") && !lead;
-  const promiseSize = (i: number) => (i === 1 ? "text-[22px]" : "text-[23px]");
 
   return (
-    <>
+    <div className="pt-[56px] md:pt-[64px]">
       <Header />
 
-      {/* HERO */}
-      <section id="top" className="relative h-screen min-h-[640px] md:min-h-[660px] w-full">
-        <ImageBlock src={s(hero, "image")} alt="" className="absolute inset-0" filter="brightness(0.55)" priority />
-        <div className="absolute left-[20px] right-[20px] bottom-[28px] md:left-[40px] md:right-[40px] md:bottom-[64px] flex flex-col items-start gap-[22px] md:flex-row md:items-end md:justify-between md:gap-[48px] md:flex-wrap pointer-events-none">
-          <div className="max-w-[820px]">
-            <div className="text-[11px] tracking-[.3em] text-gold mb-[28px]">{s(hero, "overline")}</div>
-            <h1 className="font-medium text-[30px] leading-[1.32] md:text-[clamp(32px,4.1vw,64px)] md:leading-[1.24] tracking-[-.01em] mb-[26px] text-pretty text-cream">
-              <Txt v={s(hero, "title")} breaks="hard" />
-            </h1>
-            <p className={`${BODY_M} md:text-[16.5px] md:leading-[1.7] text-[rgba(247,243,236,.9)] max-w-[560px] text-pretty`}>
-              <Txt v={s(hero, "body")} />
-            </p>
+      {/* HERO: 흰 배경, 왼쪽 글 + 오른쪽 사진 카드 */}
+      <section id="top" className="pt-[40px] pb-[56px] md:pt-[80px] md:pb-[96px]">
+        <Container wide>
+          <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:gap-[48px] lg:gap-[64px] items-center">
+            <div className="order-2 md:order-1">
+              <Badge tone="primary" className="mb-[18px]">{s(hero, "overline")}</Badge>
+              <h1 className="t-title-1 md:t-display-2 lg:t-display-1 text-label text-pretty mb-[20px] md:mb-[24px]"><Txt v={s(hero, "title")} breaks="hard" /></h1>
+              <p className={`${BODY} md:text-[18px] md:leading-[1.6] max-w-[520px] mb-[32px]`}><Txt v={s(hero, "body")} /></p>
+              <div className="flex gap-[10px] flex-wrap">
+                {s(hero, "cta1Label") && <ButtonLink href={s(hero, "cta1Href")} size="lg">{s(hero, "cta1Label")}</ButtonLink>}
+                {s(hero, "cta2Label") && <ButtonLink href={s(hero, "cta2Href")} variant="assistive" size="lg">{s(hero, "cta2Label")}</ButtonLink>}
+              </div>
+            </div>
+            <ImageBlock src={s(hero, "image")} alt="" className="order-1 md:order-2 aspect-[4/3] md:aspect-[4/5] rounded-ds" priority sizes="(min-width: 761px) 50vw, 100vw" />
           </div>
-          <div className="flex gap-[12px] pointer-events-auto">
-            {s(hero, "cta1Label") && <Cta href={s(hero, "cta1Href")} className="inline-flex items-center px-[28px] py-[15px] rounded-pill bg-ink text-cream text-[13.5px] whitespace-nowrap hover:bg-brownHover hover:text-cream">{s(hero, "cta1Label")}</Cta>}
-            {s(hero, "cta2Label") && <Cta href={s(hero, "cta2Href")} className="inline-flex items-center px-[28px] py-[15px] rounded-pill border border-[#FFFFFF4D] text-[13.5px] text-white whitespace-nowrap hover:border-brownHover hover:text-brownHover">{s(hero, "cta2Label")}</Cta>}
-          </div>
-        </div>
+        </Container>
       </section>
 
       {/* 01 NEW DEFINITION */}
       {on(about, "visible") && (
-        <section id="about" className={SECTION}>
-          <div className={INNER}>
-            <SectionLabel className="mb-[56px]"><Label v={s(about, "label")} /></SectionLabel>
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-[repeat(auto-fit,minmax(320px,1fr))] md:gap-[80px] items-start">
+        <section id="about" className={`${SECTION} border-t border-lineAlt`}>
+          <Container>
+            <div className="grid grid-cols-1 gap-[32px] md:grid-cols-2 md:gap-[64px] items-center">
               <div>
-                <h2 className={`${H2} md:leading-[1.3] mb-[34px]`}>{s(about, "title")}</h2>
-                <p className={`${BODY_M} md:text-[16px] md:leading-[1.28] mb-[22px] text-[rgba(33,30,25,.7)] text-pretty w-full md:w-[619px] md:h-[61px] font-semibold`}>
-                  <Txt v={s(about, "p1")} breaks="hard" />
-                </p>
-                <p className={`${BODY_M} md:text-[16px] md:leading-[1.28] mb-[22px] text-[rgba(33,30,25,.7)] text-pretty font-semibold`}>
-                  <br /><Txt v={s(about, "p2")} />
-                </p>
-                <div className="border-l-2 border-brownHover pl-[24px] py-[4px] mt-[44px]">
-                  <p className={`${BODY_M} md:text-[17px] md:leading-[1.28] text-pretty`}><Txt v={s(about, "quote")} /></p>
-                </div>
+                <SectionHead eyebrow={eyebrow(s(about, "label"))} title={s(about, "title")} />
+                <p className={`${BODY} mt-[24px]`}><Txt v={s(about, "p1")} breaks="hard" /></p>
+                <p className={`${BODY} mt-[14px]`}><Txt v={s(about, "p2")} /></p>
+                <blockquote className="mt-[28px] border-l-[3px] border-primary pl-[18px] t-headline-2 text-label text-pretty"><Txt v={s(about, "quote")} /></blockquote>
               </div>
-              <ImageBlock src={s(about, "image")} alt="라움의 공간" className="h-[260px] md:h-[600px] min-w-0" filter="brightness(0.97) saturate(0.94)" sizes="(min-width: 761px) 50vw, 100vw" />
+              <ImageBlock src={s(about, "image")} alt="라움의 공간" className="aspect-[4/3] md:aspect-[4/5] rounded-ds" sizes="(min-width: 761px) 50vw, 100vw" />
             </div>
-          </div>
+          </Container>
         </section>
       )}
 
       {/* 02 POSITIONING */}
       {on(why, "visible") && (
         <section id="why" className={`${SECTION} bg-sand`}>
-          <div className={INNER}>
-            <SectionLabel><Label v={s(why, "label")} /></SectionLabel>
-            <h2 className={`${H2} md:leading-[1.28] mb-[26px] max-w-[760px]`}><Txt v={s(why, "title")} breaks="hard" /></h2>
-            <p className={`${BODY_M} md:text-[16px] md:leading-[1.28] mb-[72px] text-[rgba(33,30,25,.68)] max-w-[680px] text-pretty`}><Txt v={s(why, "lead")} /></p>
-            <div className={`grid grid-cols-1 gap-[20px] md:grid-cols-[repeat(auto-fit,minmax(260px,1fr))] md:gap-px ${LINE_GRID} mb-[56px]`}>
+          <Container>
+            <SectionHead eyebrow={eyebrow(s(why, "label"))} title={<Txt v={s(why, "title")} breaks="hard" />} lead={<Txt v={s(why, "lead")} />} />
+            <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
               {list(why, "items").map((c, i) => (
-                <div key={i} className="bg-sand px-[22px] py-[26px] md:px-[30px] md:py-[36px]">
-                  <div className="text-[10.5px] tracking-[.28em] text-brownHover mb-[16px]">{c.label}</div>
-                  <div className={`${BODY_M} md:text-[15px] md:leading-[1.28] text-[rgba(33,30,25,.74)] text-pretty`}><Txt v={c.text} /></div>
+                <div key={i} className={`${CARD} p-[24px] md:p-[28px]`}>
+                  <div className="t-label-1 font-semibold text-primary mb-[12px]">{c.label}</div>
+                  <div className="t-body-2-reading text-labelNeutral text-pretty"><Txt v={c.text} /></div>
                 </div>
               ))}
             </div>
-            <p className={`${BODY_M} md:text-[18px] md:leading-[1.35] max-w-[700px] text-pretty`}><Txt v={s(why, "closing")} /></p>
-          </div>
+            <p className="t-headline-1 text-label max-w-[720px] mt-[40px] text-pretty"><Txt v={s(why, "closing")} /></p>
+          </Container>
         </section>
       )}
 
       {/* 03 BRAND PROMISE */}
       {on(promise, "visible") && (
         <section id="promise" className={SECTION}>
-          <div className={INNER}>
-            <SectionLabel><Label v={s(promise, "label")} /></SectionLabel>
-            <h2 className={`${H2} md:leading-[1.28] mb-[64px] max-w-[700px]`}><Txt v={s(promise, "title")} breaks="hard" /></h2>
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:gap-[28px]">
+          <Container>
+            <SectionHead eyebrow={eyebrow(s(promise, "label"))} title={<Txt v={s(promise, "title")} breaks="hard" />} />
+            <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
               {list(promise, "items").map((c, i) => (
-                <div key={i} className="min-w-0 px-[22px] py-[26px] md:px-[32px] md:py-[36px] border border-[rgba(33,30,25,.16)]">
-                  <div className="text-[11px] tracking-[.24em] text-brownHover mb-[18px]">{c.label}</div>
-                  <div className={`${promiseSize(i)} mb-[16px]`}>{c.title}</div>
-                  <div className={`${BODY_M} md:text-[14.5px] md:leading-[1.32] text-[rgba(33,30,25,.64)] text-pretty`}><Txt v={c.body} /></div>
+                <div key={i} className={`${CARD} p-[24px] md:p-[28px]`}>
+                  <div className="w-[40px] h-[40px] rounded-ds-sm bg-[rgba(0,102,255,.08)] text-primary flex items-center justify-center t-label-1 font-bold mb-[20px]">{String(i + 1).padStart(2, "0")}</div>
+                  <div className="t-caption-1 font-semibold text-labelAlt mb-[6px]">{c.label}</div>
+                  <div className="t-heading-2 text-label mb-[10px]">{c.title}</div>
+                  <div className="t-body-2-reading text-labelAlt text-pretty"><Txt v={c.body} /></div>
                 </div>
               ))}
             </div>
-          </div>
+          </Container>
         </section>
       )}
 
       {/* 04 RSC SOCIAL */}
       {on(social, "visible") && (
         <section id="social" className={`${SECTION} bg-sand`}>
-          <div className={INNER}>
-            <SectionLabel><Label v={s(social, "label")} /></SectionLabel>
-            <div className="flex flex-col items-start gap-[20px] md:flex-row md:items-end md:justify-between md:gap-[40px] md:flex-wrap mb-[64px]">
-              <h2 className={`${H2} md:leading-[1.28] max-w-[660px]`}><Txt v={s(social, "title")} breaks="hard" /></h2>
-              <p className={`${BODY_M} md:text-[13px] md:leading-[1.85] text-[rgba(33,30,25,.6)] max-w-[380px] w-full md:w-[415px] md:h-[76px] text-pretty`}><Txt v={s(social, "lead")} /></p>
-            </div>
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:gap-[28px]">
+          <Container>
+            <SectionHead eyebrow={eyebrow(s(social, "label"))} title={<Txt v={s(social, "title")} breaks="hard" />} lead={<Txt v={s(social, "lead")} />} />
+            <div className="grid grid-cols-1 gap-[16px] md:grid-cols-3 md:gap-[20px] mt-[40px]">
               {list(social, "items").map((c, i) => (
-                <div key={i} className="min-w-0">
-                  <ImageBlock src={c.image} alt={c.title} className="h-[200px] md:h-[340px] mb-[24px]" filter={c.filter || undefined} sizes="(min-width: 761px) 33vw, 100vw" />
-                  <div className="text-[10.5px] tracking-[.28em] text-brownHover mb-[12px]">{c.cat}</div>
-                  <div className="text-[22px] mb-[10px] font-semibold">{c.title}</div>
-                  <div className={`${BODY_M} md:text-[14.5px] md:leading-[1.28] text-[rgba(33,30,25,.62)] text-pretty`}><Txt v={c.desc} /></div>
-                </div>
+                <article key={i} className={`${CARD} ${CARD_HOVER} overflow-hidden`}>
+                  <ImageBlock src={c.image} alt={c.title} className="aspect-[4/3]" filter={c.filter || undefined} sizes="(min-width: 761px) 33vw, 100vw" />
+                  <div className="p-[20px] md:p-[24px]">
+                    <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.cat}</div>
+                    <h3 className="t-heading-2 text-label mb-[8px]">{c.title}</h3>
+                    <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={c.desc} /></p>
+                  </div>
+                </article>
               ))}
             </div>
-          </div>
+          </Container>
         </section>
       )}
 
       {/* 05 MONTHLY & SEASON */}
       {on(solo, "visible") && (
         <section id="solo" className={SECTION}>
-          <div className={INNER}>
-            <SectionLabel><Label v={s(solo, "label")} /></SectionLabel>
-            <div className={`grid grid-cols-1 gap-[20px] md:grid-cols-[repeat(auto-fit,minmax(340px,1fr))] md:gap-px ${LINE_GRID}`}>
+          <Container>
+            <SectionHead eyebrow={eyebrow(s(solo, "label"))} title={list(solo, "cards").length ? "매달, 그리고 시즌마다" : ""} />
+            <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[20px] mt-[40px]">
               {list(solo, "cards").map((c, i) => (
-                <div key={i} className="bg-cream px-[26px] py-[32px] md:px-[48px] md:py-[56px] min-w-0">
-                  <ImageBlock src={c.image} alt={c.title} className="h-[180px] md:h-[260px] mb-[32px]" filter={c.filter || undefined} sizes="(min-width: 761px) 50vw, 100vw" />
-                  <div className="text-[10.5px] tracking-[.28em] text-brownHover mb-[16px]">{c.label}</div>
-                  <div className="text-[26px] mb-[16px] font-semibold">{c.title}</div>
-                  <div className={`${BODY_M} md:text-[14.5px] md:leading-[1.32] text-[rgba(33,30,25,.62)] text-pretty`}><Txt v={c.body} /></div>
-                </div>
+                <article key={i} className={`${CARD} ${CARD_HOVER} overflow-hidden`}>
+                  <ImageBlock src={c.image} alt={c.title} className="aspect-[16/10]" filter={c.filter || undefined} sizes="(min-width: 761px) 50vw, 100vw" />
+                  <div className="p-[24px] md:p-[28px]">
+                    <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.label}</div>
+                    <h3 className="t-heading-1 text-label mb-[10px]">{c.title}</h3>
+                    <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={c.body} /></p>
+                  </div>
+                </article>
               ))}
             </div>
-          </div>
+          </Container>
         </section>
       )}
 
-      {/* 06 MOMENTS — 공간이 아니라 경험 중심. 카드 4장 같은 구조(사진 + 번호·제목·설명) */}
+      {/* 06 MOMENTS */}
       {on(spaces, "visible") && (
         <section id="spaces" className={`${SECTION} bg-sand`}>
-          <div className={INNER}>
-            <SectionLabel><Label v={s(spaces, "label")} /></SectionLabel>
-            <div className="flex flex-col items-start gap-[20px] md:flex-row md:items-end md:justify-between md:gap-[40px] md:flex-wrap mb-[48px] md:mb-[64px]">
-              <h2 className={`${H2} md:leading-[1.28] max-w-[660px]`}>{s(spaces, "title")}</h2>
-              <p className={`${BODY_M} md:text-[15px] md:leading-[1.6] text-[rgba(33,30,25,.6)] max-w-[380px] text-pretty`}><Txt v={s(spaces, "lead")} breaks="hard" /></p>
-            </div>
-            <div className="grid grid-cols-1 gap-[32px] md:grid-cols-2 md:gap-x-[28px] md:gap-y-[48px]">
+          <Container>
+            <SectionHead eyebrow={eyebrow(s(spaces, "label"))} title={s(spaces, "title")} lead={<Txt v={s(spaces, "lead")} breaks="hard" />} />
+            <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 md:gap-[24px] mt-[40px]">
               {list(spaces, "items").map((c, i) => (
                 <article key={i} className="min-w-0">
-                  {/* 네 카드 모두 같은 구조: 사진(없으면 같은 크기의 빈 프레임) + 번호·제목·설명. 글 크기·배치를 통일 */}
                   {c.image ? (
-                    <ImageBlock src={c.image} alt={c.alt || c.title} className={MOMENT_IMG} filter="brightness(0.98) saturate(0.96)" focus={c.position || undefined} sizes="(min-width: 761px) 50vw, 100vw" />
+                    <ImageBlock src={c.image} alt={c.alt || c.title} className="aspect-square rounded-ds" focus={c.position || undefined} sizes="(min-width: 761px) 50vw, 100vw" />
                   ) : (
-                    <div className={`${MOMENT_IMG} border border-[rgba(33,30,25,.14)] bg-cream`} aria-hidden />
+                    <div className="aspect-square rounded-ds bg-fill" aria-hidden />
                   )}
-                  <div className="flex items-baseline gap-[16px] pt-[22px]">
-                    <span className="text-[11px] tracking-[.2em] text-brownHover">{c.n}</span>
-                    <div className="min-w-0">
-                      <h3 className="text-[22px] mb-[8px] font-semibold text-pretty">{c.title}</h3>
-                      <p className={`${BODY_M} md:text-[14px] md:leading-[1.5] text-[rgba(33,30,25,.62)] text-pretty m-0`}><Txt v={c.desc} /></p>
-                      {c.note && <div className="text-[11px] tracking-[.16em] text-[rgba(33,30,25,.42)] mt-[10px]">{c.note}</div>}
-                    </div>
+                  <div className="pt-[16px]">
+                    <div className="t-caption-1 font-semibold text-labelAssist mb-[6px]">{c.n}</div>
+                    <h3 className="t-heading-2 text-label mb-[6px] text-pretty">{c.title}</h3>
+                    <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={c.desc} /></p>
+                    {c.note && <div className="t-caption-1 text-labelAssist mt-[8px]">{c.note}</div>}
                   </div>
                 </article>
               ))}
             </div>
             {s(spaces, "ctaLabel") && s(spaces, "ctaHref") && (
-              <div className="mt-[48px] md:mt-[64px]">
-                <Cta href={s(spaces, "ctaHref")} className="inline-flex items-center px-[28px] py-[15px] rounded-pill bg-ink text-cream text-[13.5px] hover:bg-brownHover hover:text-cream">{s(spaces, "ctaLabel")}</Cta>
-              </div>
+              <div className="mt-[40px]"><ButtonLink href={s(spaces, "ctaHref")} variant="outlined" size="lg">{s(spaces, "ctaLabel")}</ButtonLink></div>
             )}
-          </div>
+          </Container>
         </section>
       )}
 
       {/* 07 MEMBERSHIP (리드 모드면 숨김) */}
       {showMembership && (
         <section id="membership" className={SECTION}>
-          <div className={INNER}>
-            <SectionLabel><Label v={s(mem, "label")} /></SectionLabel>
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-[minmax(320px,1.5fr)_minmax(320px,1fr)] md:gap-[80px] items-center mb-[96px]">
-              <ImageBlock src={s(mem, "image")} alt="RAUM" className="h-[260px] md:h-[600px] min-w-0" filter="brightness(1.05)" sizes="(min-width: 761px) 60vw, 100vw" />
-              <div className="min-w-0">
-                <h2 className="font-semibold text-[25px] leading-[1.36] md:text-[clamp(27px,2.7vw,42px)] md:leading-[1.32] mb-[30px] text-pretty"><Txt v={s(mem, "title")} breaks="hard" /></h2>
-                <p className={`${BODY_M} md:text-[16px] md:leading-[1.28] mb-[44px] text-[rgba(33,30,25,.7)] max-w-[480px] text-pretty`}><Txt v={s(mem, "body")} /></p>
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-px ${LINE_GRID} max-w-[480px] mb-[36px]`}>
-                  <Link href={s(mem, "link1Href") || "/pricing"} className="bg-cream px-[28px] py-[26px] block hover:bg-sandHover">
-                    <div className="text-[11px] tracking-[.2em] text-brownHover mb-[10px]">MEMBERSHIP</div>
-                    <div className="text-[17px] font-semibold flex justify-between items-center gap-[8px]">{s(mem, "link1Label")}<span className="text-brown">→</span></div>
-                  </Link>
-                  <Link href={s(mem, "link2Href") || "/benefits"} className="bg-cream px-[28px] py-[26px] block hover:bg-sandHover">
-                    <div className="text-[11px] tracking-[.2em] text-brownHover mb-[10px]">BENEFITS</div>
-                    <div className="text-[17px] font-semibold flex justify-between items-center gap-[8px]">{s(mem, "link2Label")}<span className="text-brown">→</span></div>
-                  </Link>
+          <Container>
+            <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-[64px] items-center mb-[48px]">
+              <ImageBlock src={s(mem, "image")} alt="RAUM" className="aspect-[4/3] rounded-ds" sizes="(min-width: 761px) 55vw, 100vw" />
+              <div>
+                <SectionHead eyebrow={eyebrow(s(mem, "label"))} title={<Txt v={s(mem, "title")} breaks="hard" />} lead={<Txt v={s(mem, "body")} />} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-[12px] mt-[28px]">
+                  {[{ href: s(mem, "link1Href") || "/pricing", label: s(mem, "link1Label"), k: "MEMBERSHIP" }, { href: s(mem, "link2Href") || "/benefits", label: s(mem, "link2Label"), k: "BENEFITS" }].map((l) => (
+                    <Link key={l.k} href={l.href} className={`${CARD} ${CARD_HOVER} p-[20px] block`}>
+                      <div className="t-caption-1 font-semibold text-primary mb-[8px]">{l.k}</div>
+                      <div className="t-headline-2 text-label flex justify-between items-center gap-[8px]">{l.label}<span className="text-labelAssist">→</span></div>
+                    </Link>
+                  ))}
                 </div>
-                <div className="flex gap-[12px] flex-wrap">
-                  {s(mem, "cta1Label") && <Cta href={s(mem, "cta1Href")} className="inline-flex items-center px-[28px] py-[15px] rounded-pill bg-ink text-cream text-[13.5px] hover:bg-brownHover hover:text-cream">{s(mem, "cta1Label")}</Cta>}
-                  {s(mem, "cta2Label") && <Cta href={s(mem, "cta2Href")} className="inline-flex items-center px-[28px] py-[15px] rounded-pill border border-[rgba(33,30,25,.3)] text-[13.5px] hover:border-brownHover hover:text-brownHover">{s(mem, "cta2Label")}</Cta>}
+                <div className="flex gap-[10px] flex-wrap mt-[24px]">
+                  {s(mem, "cta1Label") && <ButtonLink href={s(mem, "cta1Href")} size="lg">{s(mem, "cta1Label")}</ButtonLink>}
+                  {s(mem, "cta2Label") && <ButtonLink href={s(mem, "cta2Href")} variant="assistive" size="lg">{s(mem, "cta2Label")}</ButtonLink>}
                 </div>
               </div>
             </div>
-            <div className={`grid grid-cols-1 gap-[20px] md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:gap-px ${LINE_GRID}`}>
+            <div className="grid grid-cols-2 gap-[12px] md:grid-cols-4 md:gap-[16px]">
               {list(mem, "values").map((v, i) => (
-                <div key={i} className="bg-cream px-[26px] py-[32px]">
-                  <div className="text-[10.5px] tracking-[.24em] text-brownHover mb-[14px]">{v.label}</div>
-                  <div className={`${BODY_M} md:text-[14px] md:leading-[1.28] text-[rgba(33,30,25,.68)]`}><Txt v={v.text} breaks="hard" /></div>
+                <div key={i} className="bg-sand rounded-ds p-[20px]">
+                  <div className="t-caption-1 font-semibold text-labelAlt mb-[8px]">{v.label}</div>
+                  <div className="t-body-2 font-medium text-label"><Txt v={v.text} breaks="hard" /></div>
                 </div>
               ))}
             </div>
-          </div>
+          </Container>
         </section>
       )}
 
-      {/* 08 FAQ (M11 — 검색·AI 검색 인용용, FAQPage 구조화 데이터 포함) */}
+      {/* 08 FAQ */}
       {showFaq && (
         <section id="faq" className={`${SECTION} bg-sand`}>
-          <div className={INNER}>
-            <SectionLabel><Label v={s(faq, "label")} /></SectionLabel>
-            <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(240px,1fr)_minmax(0,2fr)] md:gap-[80px] items-start">
-              <div>
-                <h2 className={`${H2} md:leading-[1.28] mb-[20px]`}><Txt v={s(faq, "title")} breaks="hard" /></h2>
-                <p className={`${BODY_M} md:text-[15px] md:leading-[1.6] text-[rgba(33,30,25,.62)] max-w-[360px] text-pretty`}><Txt v={s(faq, "lead")} /></p>
-              </div>
-              <div className="border-t border-[rgba(33,30,25,.14)]">
+          <Container>
+            <div className="grid grid-cols-1 gap-[32px] md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-[64px] items-start">
+              <SectionHead eyebrow={eyebrow(s(faq, "label"))} title={<Txt v={s(faq, "title")} breaks="hard" />} lead={<Txt v={s(faq, "lead")} />} />
+              <div className={`${CARD} px-[20px] md:px-[28px]`}>
                 {faqItems.map((it, i) => (
-                  <details key={i} className="group border-b border-[rgba(33,30,25,.14)]">
-                    <summary className="flex items-start justify-between gap-[20px] cursor-pointer list-none py-[22px] md:py-[26px] [&::-webkit-details-marker]:hidden">
-                      <span className="text-[16px] md:text-[18px] font-semibold leading-[1.45] text-pretty">{it.q}</span>
-                      <span aria-hidden className="flex-none text-[20px] leading-none text-brownHover mt-[2px] transition-transform group-open:rotate-45">+</span>
+                  <details key={i} className="group border-b border-lineAlt last:border-b-0">
+                    <summary className="flex items-start justify-between gap-[16px] cursor-pointer list-none py-[18px] md:py-[22px] [&::-webkit-details-marker]:hidden">
+                      <span className="t-headline-2 text-label text-pretty">{it.q}</span>
+                      <svg aria-hidden width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="flex-none text-labelAssist mt-[2px] transition-transform group-open:rotate-180"><path d="M6 9l6 6 6-6" /></svg>
                     </summary>
-                    <div className={`${BODY_M} md:text-[15px] md:leading-[1.8] text-[rgba(33,30,25,.72)] pb-[26px] md:pr-[40px] text-pretty`}><Txt v={it.a} breaks="hard" /></div>
+                    <div className="t-body-2-reading text-labelNeutral pb-[22px] md:pr-[36px] text-pretty"><Txt v={it.a} breaks="hard" /></div>
                   </details>
                 ))}
               </div>
             </div>
-          </div>
+          </Container>
           <JsonLd data={faqJsonLd(faqItems)} />
         </section>
       )}
 
+      {/* CTA 띠 */}
+      <section className="py-[64px] md:py-[96px]">
+        <Container>
+          <div className="bg-inverseBg rounded-ds px-[24px] py-[40px] md:px-[56px] md:py-[64px] text-center">
+            <h2 className="t-title-3 md:t-title-1 text-inverseLabel text-pretty mb-[12px]">상담으로 시작해 보세요</h2>
+            <p className="t-body-1-reading text-[rgba(247,247,248,.7)] max-w-[520px] mx-auto mb-[28px]">이름과 연락처만 남기면 담당자가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다.</p>
+            <ButtonLink href="/fit-check" size="lg">RSC 상담 신청</ButtonLink>
+          </div>
+        </Container>
+      </section>
+
       <SiteFooter />
       <UpButton />
       {popups.length > 0 && <SitePopups popups={popups} />}
-    </>
+    </div>
   );
 }

@@ -12,6 +12,7 @@ import { listPublishedPostMonths, listPublishedPostsByIds } from "@/lib/posts/qu
 import { plainText } from "@/lib/posts/types";
 import { getPageSeo, pageMetadata } from "@/lib/seo/get";
 import { breadcrumbJsonLd } from "@/lib/seo/jsonld";
+import { Badge, CARD, CARD_HOVER, Container } from "@/components/ui/ds";
 
 type Search = Promise<{ y?: string; m?: string }>;
 
@@ -37,48 +38,50 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
   const years = yearOptions([...months, ym], today);
 
   return (
-    <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">
+    <div className="min-h-screen flex flex-col pt-[56px] md:pt-[64px]">
       <Header />
-      <main className="flex-1 px-[18px] pt-[40px] pb-[96px] md:px-[40px] md:pt-[72px] md:pb-[140px]">
-        <div className="w-full max-w-[1240px] mx-auto">
-          <section className="mb-[36px] md:mb-[48px]">
-            <div className="text-[11px] tracking-[.3em] text-brownHover mb-[22px]">NEWS</div>
-            <h1 className="font-semibold text-[30px] md:text-[clamp(30px,3.4vw,44px)] leading-[1.28] mb-[16px] text-pretty">{seo.title || "소식"}</h1>
-            <p className="text-[15px] md:text-[16px] leading-[1.7] text-[rgba(33,30,25,.68)] max-w-[560px] text-pretty">{seo.description}</p>
+      <main className="flex-1 py-[40px] md:py-[72px]">
+        <Container wide>
+          <section className="mb-[28px] md:mb-[40px]">
+            <div className="t-label-1 font-semibold text-primary mb-[10px]">NEWS</div>
+            <h1 className="t-title-1 md:t-display-3 text-label mb-[12px] text-pretty">{seo.title || "소식"}</h1>
+            <p className="t-body-1-reading text-labelAlt max-w-[560px] text-pretty">{seo.description}</p>
           </section>
 
-          <section className="mb-[40px] md:mb-[56px]" aria-label="월별 보기">
-            <div className="mb-[18px]">
+          <section className="mb-[32px] md:mb-[48px]" aria-label="월별 보기">
+            <div className="mb-[14px]">
               <YearSelect years={years} year={ym.y} month={ym.m} />
             </div>
             <MonthTabs year={ym.y} month={ym.m} months={months} />
           </section>
 
           {posts.length === 0 ? (
-            <div className="border border-[rgba(33,30,25,.14)] px-[24px] py-[64px] text-center text-[14px] text-[rgba(33,30,25,.55)]">
+            <div className={`${CARD} px-[24px] py-[64px] text-center t-body-2 text-labelAlt`}>
               {ym.y}년 {ym.m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-[40px] sm:grid-cols-2 lg:grid-cols-3 md:gap-x-[28px] md:gap-y-[48px]">
+            <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 lg:grid-cols-3 md:gap-[24px]">
               {posts.map((p) => (
-                <article key={p.id} className="min-w-0">
+                <article key={p.id} className={`min-w-0 ${CARD} ${CARD_HOVER} overflow-hidden`}>
                   <Link href={`/news/${encodeURIComponent(p.slug)}`} className="block group">
-                    {/* 모든 카드를 인스타 피드 비율(4:5) 상자로 통일. 1080×1350 은 그대로, 비율이 다른 사진은 상자에 맞춰 가운데 기준으로 채운다 */}
-                    <div className="relative mb-[18px] aspect-[4/5] overflow-hidden bg-[#e7e0d3]">
+                    {/* 모든 카드를 인스타 피드 비율(4:5) 상자로 통일 */}
+                    <div className="relative aspect-[4/5] overflow-hidden bg-fill">
                       {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]" unoptimized={p.cover_image.startsWith("http")} />}
                     </div>
-                    <div className="flex items-center gap-[12px] text-[10.5px] tracking-[.28em] text-brownHover mb-[10px]">
-                      <span>{p.category.toUpperCase()}</span>
-                      <span className="tracking-[.1em] text-[rgba(33,30,25,.45)]">{fmtPostDate(p)}</span>
+                    <div className="p-[18px] md:p-[20px]">
+                      <div className="flex items-center gap-[8px] mb-[10px]">
+                        <Badge tone="primary">{p.category}</Badge>
+                        <span className="t-caption-1 text-labelAlt">{fmtPostDate(p)}</span>
+                      </div>
+                      <h2 className="t-heading-2 text-label mb-[6px] text-pretty group-hover:text-primary">{p.title}</h2>
+                      {(p.summary || p.body) && <p className="t-body-2-reading text-labelAlt text-pretty m-0">{p.summary || plainText(p.body, 120)}</p>}
                     </div>
-                    <h2 className="text-[19px] md:text-[21px] leading-[1.4] mb-[8px] font-semibold text-pretty group-hover:text-brownHover">{p.title}</h2>
-                    {(p.summary || p.body) && <p className="text-[14.5px] leading-[1.6] text-[rgba(33,30,25,.62)] text-pretty">{p.summary || plainText(p.body, 120)}</p>}
                   </Link>
                 </article>
               ))}
             </div>
           )}
-        </div>
+        </Container>
         <JsonLd data={breadcrumbJsonLd([{ name: "홈", path: "/" }, { name: "소식", path: "/news" }])} />
       </main>
       <SiteFooter />

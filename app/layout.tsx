@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { samsungOne } from "@/lib/fonts";
+import { pretendard } from "@/lib/fonts";
 import { PageTracker } from "@/components/site/PageTracker";
 import { EnvBanner } from "@/components/site/EnvBanner";
 import { MetaPixel } from "@/components/site/MetaPixel";
@@ -38,7 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const [t, org, settings] = await Promise.all([getTheme(), organizationJsonLd(), getSettings()]);
   const css = `:root{--c-cream:${t.cream};--c-ink:${t.ink};--c-brown:${t.brown};--c-brownHover:${t.brownHover};--c-gold:${t.gold};--c-goldHover:${t.goldHover};--c-sand:${t.sand};--c-sandDeep:${t.sandDeep}}`;
   return (
-    <html lang="ko" className={`${samsungOne.variable} h-full antialiased`}>
+    <html lang="ko" className={`${pretendard.variable} h-full antialiased`}>
       <head>
         <style dangerouslySetInnerHTML={{ __html: css }} />
       </head>

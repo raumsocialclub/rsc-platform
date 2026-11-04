@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo/get";
-import Link from "next/link";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { UpButton } from "@/components/site/UpButton";
 import { Txt, lines } from "@/components/cms/Txt";
+import { Badge, ButtonLink, CARD, Container } from "@/components/ui/ds";
 import { getPageDocs, list, s } from "@/lib/cms/get";
 import { getSettings } from "@/lib/settings/get";
 import { hasPrice, isLeadHiddenHref } from "@/lib/settings/leadMode";
@@ -13,8 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("benefits");
 }
 
-/* deploy/benefits.html 재현. 혜택 목록은 CMS(site_content benefits.rows)
- * 리드 모드(일반 설정)면 금액이 들어간 오른쪽 요약과 가격 안내 버튼만 뺀다. 혜택 목록 자체는 그대로. */
+/* 혜택 목록은 CMS(site_content benefits.rows). 리드 모드면 금액이 들어간 오른쪽 요약과 가격 안내 버튼만 뺀다. */
 const LEAD_CTA_TITLE = "멤버십 혜택은 상담에서 자세히 안내해 드립니다";
 
 type Row = { group: string; title: string; badge: string; lines: string; right: string; rightStrong?: string };
@@ -28,9 +27,7 @@ function Right({ v, strong }: { v: string; strong?: string }) {
         const seg = line.split("{{strong}}");
         return (
           <span key={i}>
-            {seg.map((t, j) => (
-              <span key={j}>{t}{j < seg.length - 1 && <b className="text-ink text-[15px]">{strong}</b>}</span>
-            ))}
+            {seg.map((t, j) => <span key={j}>{t}{j < seg.length - 1 && <b className="text-label">{strong}</b>}</span>)}
             {i < parts.length - 1 && <br />}
           </span>
         );
@@ -55,54 +52,53 @@ export default async function BenefitsPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col pt-[57px] md:pt-[76px]">
+    <div className="min-h-screen flex flex-col pt-[56px] md:pt-[64px]">
       <Header />
-      <main className="flex-1 px-[18px] pt-[40px] pb-[96px] md:px-[40px] md:pt-[72px] md:pb-[140px]">
-        <div className="w-full max-w-[960px] mx-auto">
-          <section className="text-center mb-[56px]">
-            <div className="text-[11px] tracking-[.3em] text-brownHover mb-[22px]">{s(hero, "label")}</div>
-            <h1 className="font-semibold text-[30px] md:text-[clamp(30px,4vw,48px)] leading-[1.28] mb-[20px] text-pretty">{s(hero, "title")}</h1>
-            <p className="mx-auto text-[16px] leading-[1.75] text-[rgba(33,30,25,.68)] max-w-[520px] text-pretty"><Txt v={s(hero, "body")} breaks="hard" /></p>
+      <main className="flex-1 py-[48px] md:py-[80px]">
+        <Container>
+          <section className="text-center max-w-[640px] mx-auto mb-[40px] md:mb-[56px]">
+            <div className="t-label-1 font-semibold text-primary mb-[10px]">{s(hero, "label")}</div>
+            <h1 className="t-title-1 md:t-display-3 text-label mb-[14px] text-pretty">{s(hero, "title")}</h1>
+            <p className="t-body-1-reading text-labelAlt text-pretty"><Txt v={s(hero, "body")} breaks="hard" /></p>
           </section>
 
-          <section className="border border-[rgba(33,30,25,.14)] mb-[64px]">
-            <div className="flex justify-between items-center gap-[12px] px-[28px] py-[16px] bg-ink text-cream">
-              <span className="text-[12px] tracking-[.2em] font-semibold">{s(hero, "tableTitle")}</span>
-              <span className="text-[11px] tracking-[.14em] text-[rgba(247,243,236,.65)]">{items.length} BENEFITS · {groups.length} CATEGORIES</span>
+          <section className="mb-[48px] md:mb-[64px]">
+            <div className="flex justify-between items-center gap-[12px] mb-[16px]">
+              <h2 className="t-heading-1 text-label">{s(hero, "tableTitle")}</h2>
+              <span className="t-caption-1 text-labelAlt">{items.length}개 혜택 · {groups.length}개 분류</span>
             </div>
-            {groups.map((g, gi) => (
-              <div key={g.name}>
-                <div className="px-[28px] py-[12px] bg-sandDeep text-[12.5px] font-semibold text-brown tracking-[.06em]">{g.name}</div>
-                {g.rows.map((r, ri) => {
-                  const last = gi === groups.length - 1 && ri === g.rows.length - 1;
-                  const ls = lines(r.lines);
-                  return (
-                    <div key={r.n} className={`grid grid-cols-1 gap-[10px] px-[18px] py-[20px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.5fr)_minmax(0,.8fr)] md:gap-[24px] md:px-[28px] md:py-[24px] bg-cream items-start ${last ? "" : "border-b border-[rgba(33,30,25,.1)]"}`}>
-                      <div>
-                        <div className="text-[11px] text-[rgba(33,30,25,.45)] mb-[6px]">{r.n}</div>
-                        <div className="text-[16px] font-semibold mb-[10px]">{r.title}</div>
-                        {r.badge && <span className="inline-block text-[11px] px-[10px] py-[4px] border border-[rgba(33,30,25,.25)] rounded-pill text-[rgba(33,30,25,.65)]">{r.badge}</span>}
+            <div className="grid gap-[16px]">
+              {groups.map((g) => (
+                <div key={g.name} className={`${CARD} overflow-hidden`}>
+                  <div className="px-[20px] py-[12px] bg-sand t-label-1 font-semibold text-labelNeutral">{g.name}</div>
+                  {g.rows.map((r, ri) => {
+                    const ls = lines(r.lines);
+                    return (
+                      <div key={r.n} className={`grid grid-cols-1 gap-[10px] px-[20px] py-[18px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.5fr)_minmax(0,.8fr)] md:gap-[24px] md:py-[20px] items-start ${ri < g.rows.length - 1 ? "border-b border-lineAlt" : ""}`}>
+                        <div>
+                          <div className="t-caption-1 text-labelAssist mb-[4px]">{r.n}</div>
+                          <div className="t-headline-2 text-label mb-[8px]">{r.title}</div>
+                          {r.badge && <Badge tone="neutral">{r.badge}</Badge>}
+                        </div>
+                        <div className="t-body-2-reading text-labelNeutral">{ls.map((l, i) => <span key={i}>{l}{i < ls.length - 1 && <br />}</span>)}</div>
+                        <div className="text-left md:text-right t-label-1-reading text-labelAlt"><Right v={r.right} strong={r.rightStrong} /></div>
                       </div>
-                      <div className="text-[13.5px] leading-[1.7] text-[rgba(33,30,25,.75)]">
-                        {ls.map((l, i) => <span key={i}>{l}{i < ls.length - 1 && <br />}</span>)}
-                      </div>
-                      <div className="text-left md:text-right text-[13px] leading-[1.6] text-[rgba(33,30,25,.6)]"><Right v={r.right} strong={r.rightStrong} /></div>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </section>
 
-          <section className="bg-ink text-cream px-[48px] py-[56px] text-center">
-            <div className="text-[11px] tracking-[.3em] text-gold mb-[18px]">{s(cta, "label")}</div>
-            <h2 className="font-semibold text-[22px] md:text-[clamp(22px,2.6vw,32px)] leading-[1.3] mb-[32px]">{ctaTitle}</h2>
-            <div className="flex gap-[12px] justify-center flex-wrap">
-              {showCta(s(cta, "cta1Label"), s(cta, "cta1Href") || "/pricing") && <Link href={s(cta, "cta1Href") || "/pricing"} className="inline-flex items-center px-[32px] py-[16px] rounded-pill bg-gold text-ink text-[14px] font-bold hover:bg-goldHover hover:text-ink">{s(cta, "cta1Label")}</Link>}
-              {showCta(s(cta, "cta2Label"), s(cta, "cta2Href") || "/fit-check") && <Link href={s(cta, "cta2Href") || "/fit-check"} className="inline-flex items-center px-[32px] py-[16px] rounded-pill border border-[rgba(247,243,236,.35)] text-cream text-[14px] hover:border-gold hover:text-gold">{s(cta, "cta2Label")}</Link>}
+          <section className="bg-inverseBg rounded-ds px-[24px] py-[40px] md:px-[48px] md:py-[56px] text-center">
+            <div className="t-label-1 font-semibold text-inversePrimary mb-[10px]">{s(cta, "label")}</div>
+            <h2 className="t-title-3 md:t-title-2 text-inverseLabel mb-[24px] text-pretty">{ctaTitle}</h2>
+            <div className="flex gap-[10px] justify-center flex-wrap">
+              {showCta(s(cta, "cta1Label"), s(cta, "cta1Href") || "/pricing") && <ButtonLink href={s(cta, "cta1Href") || "/pricing"} size="lg">{s(cta, "cta1Label")}</ButtonLink>}
+              {showCta(s(cta, "cta2Label"), s(cta, "cta2Href") || "/fit-check") && <ButtonLink href={s(cta, "cta2Href") || "/fit-check"} variant="inverse" size="lg">{s(cta, "cta2Label")}</ButtonLink>}
             </div>
           </section>
-        </div>
+        </Container>
       </main>
       <SiteFooter />
       <UpButton />
