@@ -139,7 +139,7 @@ export default async function HomePage() {
       {on(solo, "visible") && (
         <section id="solo" data-fold className={SECTION}>
           <Container>
-            <SectionHead eyebrow={eyebrow(s(solo, "label"))} title={list(solo, "cards").length ? "분기마다, 그리고 기수마다" : ""} reveal />
+            <SectionHead eyebrow={eyebrow(s(solo, "label"))} title={list(solo, "cards").length ? <Txt v={"새로운 사람을 만나고,\n서로를 깊이 알아가는 프로그램"} breaks="hard" /> : ""} reveal />
             <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[20px] mt-[40px]">
               {list(solo, "cards").map((c, i) => (
                 <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} overflow-hidden`}>

@@ -195,12 +195,12 @@ export const DOCS: DocDef[] = [
   {
     id: "home.solo",
     page: "home",
-    label: "05 QUARTERLY & COHORT",
+    label: "05 MEET & CONNECT",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨")],
     lists: [{ key: "cards", label: "카드", itemLabel: "카드", fields: [img("image", "사진"), t("label", "라벨"), t("title", "이름"), ta("body", "설명", "soft"), t("filter", "사진 보정(CSS filter)")], min: 1, max: 4 }],
     defaults: {
       visible: true,
-      label: "05  /  QUARTERLY & COHORT",
+      label: "05  /  MEET & CONNECT",
       cards: [
         { image: "/images/social-night.jpg", label: "QUARTERLY", title: "RAUM SOCIAL NIGHT", body: "분기마다 열리는 RSC 대표 싱글 소셜. 공연, 다이닝, 와인, 음악 안에서 자연스럽게 사람을 만납니다.\n연말에는 RSC GRAND SOCIAL BALL 로 한 해를 마무리합니다.", filter: "brightness(1.1) saturate(0.94)" },
         { image: "/images/raum-solo.jpg", label: "SIGNATURE · 6 COHORTS A YEAR", title: "RAUM SOLO", body: "한 번의 소개팅이 아닌, 함께 보내는 한 기수. 1·3·6·8·10·12월, 연 6기로 운영하는 기수제 로테이션 소개 프로그램입니다.\nSIGNATURE 회원은 1기 참여가 포함됩니다.", filter: "grayscale(1) brightness(1.05) contrast(1.05)" },
