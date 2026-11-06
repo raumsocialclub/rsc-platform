@@ -12,7 +12,6 @@ import { listLivePopups } from "@/lib/popups/queries";
 import { Txt } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
-import { getSettings } from "@/lib/settings/get";
 import { hasPrice } from "@/lib/settings/leadMode";
 import { CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 
@@ -31,10 +30,9 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
  * 모든 문구·사진은 CMS(site_content home.*) — 기본값은 lib/cms/schema.ts
  */
 export default async function HomePage() {
-  const [d, settings, popups] = await Promise.all([getPageDocs("home"), getSettings(), listLivePopups()]);
-  const lead = settings.leadMode;
+  const [d, popups] = await Promise.all([getPageDocs("home"), listLivePopups()]);
   const gate = d["home.gate"], tracks = d["home.tracks"], about = d["home.about"], promise = d["home.promise"], faq = d["home.faq"];
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
 
   const gateTracks: GateTrack[] = [
     { key: "social", tab: s(gate, "tabSocial") || "소셜클럽", image: s(gate, "socialImage"), overline: s(gate, "socialOverline"), title: s(gate, "socialTitle"), body: s(gate, "socialBody"), cta: s(gate, "socialCta") || "자세히 보기", href: "/social", applyHref: "/fit-check?track=social" },
@@ -54,7 +52,7 @@ export default async function HomePage() {
       </section>
 
       {/* 00-1 두 가지 방식 */}
-      {on(tracks, "visible") && <TrackCards doc={tracks} gate={gate} lead={lead} />}
+      {on(tracks, "visible") && <TrackCards doc={tracks} gate={gate} />}
 
       {/* 01 NEW DEFINITION */}
       {on(about, "visible") && (

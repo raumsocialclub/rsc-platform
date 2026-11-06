@@ -11,7 +11,6 @@ import { CtaBand } from "@/components/site/CtaBand";
 import { Txt } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
-import { getSettings } from "@/lib/settings/get";
 import { hasPrice } from "@/lib/settings/leadMode";
 import { ButtonLink, CARD, CARD_HOVER, Container, SectionHead, SWIPE, SWIPE_ITEM } from "@/components/ui/ds";
 
@@ -24,16 +23,15 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
 
 /**
  * 소셜클럽 트랙 페이지 (사업전략 2026.11.03: 가입비 멤버십 = 회원 자격 + 행사 6회 + 초대권 2매, 결혼중개 아님).
- * 상단 소개 → 01 멤버십 구성(social.membership, 리드 모드면 금액 숨김) → 02 포지셔닝 → 04 TASTE SOCIAL 프로그램 → 06 MOMENTS → 가입 심사(matching.verify 공용) → FAQ → CTA.
+ * 상단 소개 → 01 멤버십 구성(social.membership — 금액은 비공개, 대면 상담 안내) → 02 포지셔닝 → 04 TASTE SOCIAL 프로그램 → 06 MOMENTS → 가입 심사(matching.verify 공용) → FAQ → CTA.
  * SOCIAL NIGHT · RAUM SOLO 는 1:1 매칭 멤버십 전용이라 /matching 으로 옮겼다. 모든 상담 버튼은 /fit-check?track=social.
  */
 export default async function SocialPage() {
-  const [d, settings] = await Promise.all([getPageDocs(["home", "social", "matching"]), getSettings()]);
-  const lead = settings.leadMode;
+  const d = await getPageDocs(["home", "social", "matching"]);
   const hero = d["social.hero"], membership = d["social.membership"], verify = d["matching.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"];
   const memberItems = list<{ label: string; title: string; body: string }>(membership, "items");
   const memberNote = s(membership, "note");
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
 
   return (
     <div className="pt-[56px] md:pt-[64px]">
@@ -45,10 +43,7 @@ export default async function SocialPage() {
       {on(membership, "visible") && memberItems.length > 0 && (
         <section id="membership" data-fold className={`${SECTION} bg-sand`}>
           <Container>
-            <div className="md:flex md:items-end md:justify-between md:gap-[32px]">
-              <SectionHead eyebrow={s(membership, "label")} title={<Txt v={s(membership, "title")} breaks="hard" />} lead={<Txt v={s(membership, "lead")} />} reveal />
-              {!lead && s(membership, "price") && <div data-reveal className="mt-[20px] md:mt-0 md:text-right flex-none"><div className="t-caption-1 font-semibold text-labelAlt mb-[4px]">SOCIAL CLUB</div><div className="t-headline-1 text-label">{s(membership, "price")}</div></div>}
-            </div>
+            <SectionHead eyebrow={s(membership, "label")} title={<Txt v={s(membership, "title")} breaks="hard" />} lead={<Txt v={s(membership, "lead")} />} reveal />
             <div className="grid grid-cols-1 gap-[12px] sm:grid-cols-2 md:grid-cols-4 md:gap-[16px] mt-[40px]">
               {memberItems.map((c, i) => (
                 <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px]`}>
@@ -58,7 +53,7 @@ export default async function SocialPage() {
                 </div>
               ))}
             </div>
-            {memberNote && !(lead && hasPrice(memberNote)) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[20px] text-pretty max-w-[800px]"><Txt v={memberNote} /></p>}
+            {memberNote && !hasPrice(memberNote) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[20px] text-pretty max-w-[800px]"><Txt v={memberNote} /></p>}
           </Container>
         </section>
       )}

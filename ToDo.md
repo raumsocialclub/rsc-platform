@@ -118,6 +118,7 @@
 - [x] 홈 게이트 히어로(전환 탭 · 스와이프) + 두 방식 비교 카드 + CTA 두 버튼
 - [x] `/social` `/matching` 트랙 페이지 (CMS `social.*` `matching.*`) — 상품 문구는 사업전략(11.03) 기준: 소셜클럽 가입비 구성, ACCESS 5회 · SIGNATURE 10회 만남권, MERRY, 가입 심사 섹션
 - [x] 가격 안내 기본값을 같은 구조로 갱신 (SOCIAL CLUB 카드, 관계 확장 프로그램, YOUR PATH)
+- [x] 가입비·연회비 비공개 (사용자 결정): 공개 페이지·FAQ·llms.txt 에서 금액 제거, 「대면 상담에서 안내」
 - [x] 상담 신청 「관심 있는 방식」 칩 + `?track=` 사전 선택 → `answers.route` → 어드민 「관심 방식」
 - [x] GNB·푸터 메뉴(소셜클럽 · 1:1 매칭), sitemap·llms.txt·페이지 SEO 문서
 - [ ] 운영 배포 (사용자 "배포해" 지시 후)

@@ -12,7 +12,6 @@ import { CtaBand } from "@/components/site/CtaBand";
 import { Txt, lines } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
-import { getSettings } from "@/lib/settings/get";
 import { hasPrice } from "@/lib/settings/leadMode";
 import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 
@@ -21,22 +20,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const SECTION = "py-[64px] md:py-[112px]";
-type Plan = { name: string; tag: string; price: string; features: string; badge: string; dark?: boolean };
+type Plan = { name: string; tag: string; features: string; badge: string; dark?: boolean };
 
 /**
  * 1:1 매칭(결혼중개 멤버십 ACCESS · SIGNATURE) 트랙 페이지. 사업전략(2026.11.03) 기준.
- * 상단 소개 → 01 가입 심사(아무나 들어올 수 없습니다) → 02 진행 방식 4단계 → 03 멤버십 구성(ACCESS · SIGNATURE · MERRY, 리드 모드면 금액 숨김)
+ * 상단 소개 → 01 가입 심사(아무나 들어올 수 없습니다) → 02 진행 방식 4단계 → 03 멤버십 구성(ACCESS · SIGNATURE · MERRY — 금액은 비공개, 대면 상담 안내)
  * → 회원 전용 행사(SOCIAL NIGHT · GRAND BALL · RAUM SOLO, home.solo 재사용) → 04 다른 점 → 05 이런 분께 → 06 FAQ → CTA.
  * 문구는 CMS(matching.* + home.solo). 모든 상담 버튼은 /fit-check?track=matching.
  */
 export default async function MatchingPage() {
-  const [d, settings] = await Promise.all([getPageDocs(["matching", "home"]), getSettings()]);
-  const lead = settings.leadMode;
+  const d = await getPageDocs(["matching", "home"]);
   const hero = d["matching.hero"], verify = d["matching.verify"], how = d["matching.how"], plans = d["matching.plans"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"], solo = d["home.solo"];
   const planItems = list<Plan>(plans, "items");
-  const extras = lines(s(plans, "extras")).filter((x) => !lead || !hasPrice(x));
+  // 가입비·연회비는 비공개(대면 상담 안내): 리드 모드와 무관하게 금액이 들어간 줄은 모두 뺀다
+  const extras = lines(s(plans, "extras")).filter((x) => !hasPrice(x));
   const planNote = s(plans, "note");
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a));
 
   return (
     <div className="pt-[56px] md:pt-[64px]">
@@ -80,10 +79,9 @@ export default async function MatchingPage() {
                     <h3 className={`t-heading-1 ${p.dark ? "text-white" : "text-label"}`}>{p.name}</h3>
                     {p.badge && <Badge tone={p.dark ? "inverse" : "primary"} className={p.dark ? "!bg-white !text-label" : ""}>{p.badge}</Badge>}
                   </div>
-                  <p className={`t-body-2 font-medium m-0 mb-[16px] ${p.dark ? "text-white/80" : "text-labelNeutral"}`}>{p.tag}</p>
-                  {!lead && p.price && <div className={`t-headline-2 mb-[16px] pb-[16px] border-b ${p.dark ? "text-white border-white/20" : "text-label border-lineAlt"}`}>{p.price}</div>}
+                  <p className={`t-body-2 font-medium m-0 mb-[16px] pb-[16px] border-b ${p.dark ? "text-white/80 border-white/20" : "text-labelNeutral border-lineAlt"}`}>{p.tag}</p>
                   <ul className="list-none p-0 m-0 grid gap-[8px]">
-                    {lines(p.features).filter((f) => !lead || !hasPrice(f)).map((f, j) => (
+                    {lines(p.features).filter((f) => !hasPrice(f)).map((f, j) => (
                       <li key={j} className={`flex gap-[10px] items-start t-label-1-reading ${p.dark ? "text-white/85" : "text-labelAlt"}`}>
                         <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`flex-none mt-[3px] ${p.dark ? "text-white" : "text-primary"}`}><path d="M5 12l5 5L20 7" /></svg>
                         <span className="text-pretty">{f}</span>
@@ -104,8 +102,7 @@ export default async function MatchingPage() {
                 </ul>
               </div>
             )}
-            {planNote && !(lead && hasPrice(planNote)) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[16px] text-pretty max-w-[800px]"><Txt v={planNote} /></p>}
-            {!lead && <div className="mt-[24px]" data-reveal><ButtonLink href="/pricing" variant="outlined" size="md">전체 가격 안내 보기</ButtonLink></div>}
+            {planNote && !hasPrice(planNote) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[16px] text-pretty max-w-[800px]"><Txt v={planNote} /></p>}
           </Container>
         </section>
       )}

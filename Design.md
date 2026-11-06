@@ -101,7 +101,7 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 ## 정보 구조 (2026-11 · 두 갈래 홈)
 - 홈(`/`)은 **게이트**다. 맨 위 전환형 히어로(`components/site/GateHero.tsx`)에 「소셜클럽 | 1:1 매칭」 탭이 있고, 탭을 누르면 사진·문구·버튼이 바뀐다(모바일은 스와이프, PC 는 ←/→ 도 됨). 버튼은 각 트랙 페이지와 `/fit-check?track=…` 으로 간다. 레퍼런스: emotional oranges 홈의 로테이션/프라이빗 전환.
 - 그 아래 「두 가지 방식」 비교 카드(`TrackCards`) → 브랜드 소개(01) → 브랜드 약속(03) → FAQ → 두 버튼 CTA(`CtaBand`).
-- `/social` 소셜클럽: 트랙 전환 바(`TrackSwitch`) + 상단 소개 + 멤버십 구성(가입비 = 회원 자격 + 행사 6회 + 초대권 2매) + 02 포지셔닝 · 04 TASTE SOCIAL · 06 MOMENTS + 가입 심사 + FAQ. `/matching` 1:1 매칭: 가입 심사(`VerifySection`, 「아무나 들어올 수 없습니다」) · 진행 방식 4단계 · 멤버십 구성(ACCESS 5회 · SIGNATURE 10회 · MERRY, 리드 모드면 금액 숨김) · 회원 전용 행사(`MembersOnly`: SOCIAL NIGHT · GRAND BALL · RAUM SOLO) · 다른 점 · 이런 분께 · FAQ. 상품 문구의 기준은 RSC 사업전략(2026.11.03).
+- `/social` 소셜클럽: 트랙 전환 바(`TrackSwitch`) + 상단 소개 + 멤버십 구성(가입비 = 회원 자격 + 행사 6회 + 초대권 2매) + 02 포지셔닝 · 04 TASTE SOCIAL · 06 MOMENTS + 가입 심사 + FAQ. `/matching` 1:1 매칭: 가입 심사(`VerifySection`, 「아무나 들어올 수 없습니다」) · 진행 방식 4단계 · 멤버십 구성(ACCESS 5회 · SIGNATURE 10회 · MERRY, 리드 모드면 금액 숨김) · 회원 전용 행사(`MembersOnly`: SOCIAL NIGHT · GRAND BALL · RAUM SOLO) · 다른 점 · 이런 분께 · FAQ. 상품 문구의 기준은 RSC 사업전략(2026.11.03). **가입비·연회비는 비공개(대면 상담에서 안내)** — 공개 페이지·FAQ·llms.txt 에 금액을 쓰지 않으며, `hasPrice` 로 금액이 든 줄은 리드 모드와 무관하게 화면에서 뺀다. `/pricing` 은 리드 모드에서 숨겨진 내부 참고용.
 - 상담 신청(`/fit-check`)은 「관심 있는 방식」 칩(소셜클럽 · 1:1 매칭 · 상담 후 결정)이 맨 위에 있고 `?track=` 으로 미리 선택된다. 값은 `inquiries.answers.route` 에 저장되어 어드민 상담 상세에 「관심 방식」으로 보인다.
 - 문구·사진은 모두 CMS: 사이트 관리 → 메인 페이지(00 게이트 히어로 · 00-1 비교 카드) / 소셜클럽 / 1:1 매칭 탭.
 

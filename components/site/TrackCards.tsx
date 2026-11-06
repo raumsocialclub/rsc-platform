@@ -19,7 +19,7 @@ function parsePoints(v: string): [string, string][] {
  * 홈 「두 가지 방식」 비교 카드. 소셜클럽 / 1:1 매칭 각각 사진 · 한 줄 설명 · 특징 표(대상·방식·주기·관계) · 자세히 보기 · 상담 신청.
  * 문구는 CMS home.tracks, 사진은 home.gate 의 트랙 사진을 같이 쓴다.
  */
-export function TrackCards({ doc, gate, lead }: { doc: DocData; gate: DocData; lead: boolean }) {
+export function TrackCards({ doc, gate }: { doc: DocData; gate: DocData }) {
   const cards: Card[] = [
     { key: "social", title: s(doc, "socialTitle"), desc: s(doc, "socialDesc"), points: s(doc, "socialPoints"), image: s(gate, "socialImage"), href: "/social", applyHref: "/fit-check?track=social" },
     { key: "matching", title: s(doc, "matchingTitle"), desc: s(doc, "matchingDesc"), points: s(doc, "matchingPoints"), image: s(gate, "matchingImage"), href: "/matching", applyHref: "/fit-check?track=matching" },
@@ -55,7 +55,7 @@ export function TrackCards({ doc, gate, lead }: { doc: DocData; gate: DocData; l
             </article>
           ))}
         </div>
-        {note && !(lead && /\d[\d,]*\s*(원|만원)/.test(note)) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[20px] text-pretty max-w-[720px]"><Txt v={note} /></p>}
+        {note && !/\d[\d,]*\s*(원|만원)/.test(note) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[20px] text-pretty max-w-[720px]"><Txt v={note} /></p>}
       </Container>
     </section>
   );
