@@ -6,6 +6,7 @@ import { ImageBlock } from "@/components/site/ImageBlock";
 import { TrackHero } from "@/components/site/TrackHero";
 import { TrackSwitch } from "@/components/site/TrackSwitch";
 import { FaqSection } from "@/components/site/FaqSection";
+import { VerifySection } from "@/components/site/VerifySection";
 import { CtaBand } from "@/components/site/CtaBand";
 import { Txt } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
@@ -22,13 +23,16 @@ const SECTION = "py-[64px] md:py-[112px]";
 const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/").trim() : v.trim());
 
 /**
- * 소셜클럽 트랙 페이지. 상단 소개(social.hero) 아래에 예전 홈의 프로그램 섹션(02 포지셔닝 · 04 RSC SOCIAL · 05 SOCIAL NIGHT/RAUM SOLO · 06 MOMENTS)과 FAQ 를 그대로 쓴다.
- * 문구는 CMS(home.* 재사용 + social.hero). 모든 상담 버튼은 /fit-check?track=social.
+ * 소셜클럽 트랙 페이지 (사업전략 2026.11.03: 가입비 멤버십 = 회원 자격 + 행사 6회 + 초대권 2매, 결혼중개 아님).
+ * 상단 소개 → 01 멤버십 구성(social.membership, 리드 모드면 금액 숨김) → 02 포지셔닝 → 04 TASTE SOCIAL 프로그램 → 06 MOMENTS → 가입 심사(matching.verify 공용) → FAQ → CTA.
+ * SOCIAL NIGHT · RAUM SOLO 는 1:1 매칭 멤버십 전용이라 /matching 으로 옮겼다. 모든 상담 버튼은 /fit-check?track=social.
  */
 export default async function SocialPage() {
-  const [d, settings] = await Promise.all([getPageDocs(["home", "social"]), getSettings()]);
+  const [d, settings] = await Promise.all([getPageDocs(["home", "social", "matching"]), getSettings()]);
   const lead = settings.leadMode;
-  const hero = d["social.hero"], why = d["home.why"], social = d["home.social"], solo = d["home.solo"], spaces = d["home.spaces"], faq = d["home.faq"];
+  const hero = d["social.hero"], membership = d["social.membership"], verify = d["matching.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"];
+  const memberItems = list<{ label: string; title: string; body: string }>(membership, "items");
+  const memberNote = s(membership, "note");
   const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
 
   return (
@@ -37,9 +41,31 @@ export default async function SocialPage() {
       <TrackSwitch current="social" />
       <TrackHero doc={hero} />
 
+      {/* 01 SOCIAL CLUB MEMBERSHIP */}
+      {on(membership, "visible") && memberItems.length > 0 && (
+        <section id="membership" data-fold className={`${SECTION} bg-sand`}>
+          <Container>
+            <div className="md:flex md:items-end md:justify-between md:gap-[32px]">
+              <SectionHead eyebrow={s(membership, "label")} title={<Txt v={s(membership, "title")} breaks="hard" />} lead={<Txt v={s(membership, "lead")} />} reveal />
+              {!lead && s(membership, "price") && <div data-reveal className="mt-[20px] md:mt-0 md:text-right flex-none"><div className="t-caption-1 font-semibold text-labelAlt mb-[4px]">SOCIAL CLUB</div><div className="t-headline-1 text-label">{s(membership, "price")}</div></div>}
+            </div>
+            <div className="grid grid-cols-1 gap-[12px] sm:grid-cols-2 md:grid-cols-4 md:gap-[16px] mt-[40px]">
+              {memberItems.map((c, i) => (
+                <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px]`}>
+                  <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.label}</div>
+                  <div className="t-heading-2 text-label mb-[10px] text-pretty">{c.title}</div>
+                  <div className="t-body-2-reading text-labelAlt text-pretty"><Txt v={c.body} /></div>
+                </div>
+              ))}
+            </div>
+            {memberNote && !(lead && hasPrice(memberNote)) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[20px] text-pretty max-w-[800px]"><Txt v={memberNote} /></p>}
+          </Container>
+        </section>
+      )}
+
       {/* 02 POSITIONING */}
       {on(why, "visible") && (
-        <section id="why" data-fold className={`${SECTION} bg-sand`}>
+        <section id="why" data-fold className={SECTION}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(why, "label"))} title={<Txt v={s(why, "title")} breaks="hard" />} lead={<Txt v={s(why, "lead")} />} reveal />
             <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
@@ -57,7 +83,7 @@ export default async function SocialPage() {
 
       {/* 04 RSC SOCIAL */}
       {on(social, "visible") && (
-        <section id="social" data-fold className={SECTION}>
+        <section id="social" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(social, "label"))} title={<Txt v={s(social, "title")} breaks="hard" />} lead={<Txt v={s(social, "lead")} />} reveal />
             <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">옆으로 밀어서 보기 →</div>
@@ -69,27 +95,6 @@ export default async function SocialPage() {
                     <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.cat}</div>
                     <h3 className="t-heading-2 text-label mb-[8px]">{c.title}</h3>
                     <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={c.desc} /></p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </Container>
-        </section>
-      )}
-
-      {/* 05 SOCIAL NIGHT · RAUM SOLO */}
-      {on(solo, "visible") && (
-        <section id="solo" data-fold className={`${SECTION} bg-sand`}>
-          <Container>
-            <SectionHead eyebrow={eyebrow(s(solo, "label"))} title={list(solo, "cards").length ? <Txt v={"새로운 사람을 만나고,\n서로를 깊이 알아가는 프로그램"} breaks="hard" /> : ""} reveal />
-            <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[20px] mt-[40px]">
-              {list(solo, "cards").map((c, i) => (
-                <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} overflow-hidden`}>
-                  <ImageBlock src={c.image} alt={c.title} className="aspect-[16/10]" filter={c.filter || undefined} sizes="(min-width: 761px) 50vw, 100vw" zoom />
-                  <div className="p-[24px] md:p-[28px]">
-                    <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.label}</div>
-                    <h3 className="t-heading-1 text-label mb-[10px]">{c.title}</h3>
-                    <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={c.body} /></p>
                   </div>
                 </article>
               ))}
@@ -128,7 +133,9 @@ export default async function SocialPage() {
         </section>
       )}
 
-      {on(faq, "visible") && <FaqSection eyebrow={eyebrow(s(faq, "label"))} title={s(faq, "title")} lead={s(faq, "lead")} items={faqItems} />}
+      {on(verify, "visible") && <VerifySection doc={verify} tone="white" />}
+
+      {on(faq, "visible") && <FaqSection eyebrow={eyebrow(s(faq, "label"))} title={s(faq, "title")} lead={s(faq, "lead")} items={faqItems} tone="sand" />}
 
       <CtaBand track="social" title="소셜클럽, 상담으로 시작해 보세요" />
 

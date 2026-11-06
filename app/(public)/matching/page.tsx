@@ -5,6 +5,8 @@ import { UpButton } from "@/components/site/UpButton";
 import { ImageBlock } from "@/components/site/ImageBlock";
 import { TrackHero } from "@/components/site/TrackHero";
 import { TrackSwitch } from "@/components/site/TrackSwitch";
+import { VerifySection } from "@/components/site/VerifySection";
+import { MembersOnly } from "@/components/site/MembersOnly";
 import { FaqSection } from "@/components/site/FaqSection";
 import { CtaBand } from "@/components/site/CtaBand";
 import { Txt, lines } from "@/components/cms/Txt";
@@ -12,24 +14,28 @@ import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
 import { getSettings } from "@/lib/settings/get";
 import { hasPrice } from "@/lib/settings/leadMode";
-import { ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
+import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("matching");
 }
 
 const SECTION = "py-[64px] md:py-[112px]";
-type ProgramRow = { name: string; sub: string; price: string; priceSub: string; unit: string; desc: string };
+type Plan = { name: string; tag: string; price: string; features: string; badge: string; dark?: boolean };
 
 /**
- * 1:1 매칭 트랙 페이지. 상단 소개 → 01 진행 방식(4단계) → 02 다른 점 → 프로그램(가격 안내의 CONNECTION · RAUM MERRY 행을 재사용, 리드 모드면 금액 숨김) → 03 이런 분께 → 04 FAQ → CTA.
- * 문구는 CMS(matching.* + pricing.programs). 모든 상담 버튼은 /fit-check?track=matching.
+ * 1:1 매칭(결혼중개 멤버십 ACCESS · SIGNATURE) 트랙 페이지. 사업전략(2026.11.03) 기준.
+ * 상단 소개 → 01 가입 심사(아무나 들어올 수 없습니다) → 02 진행 방식 4단계 → 03 멤버십 구성(ACCESS · SIGNATURE · MERRY, 리드 모드면 금액 숨김)
+ * → 회원 전용 행사(SOCIAL NIGHT · GRAND BALL · RAUM SOLO, home.solo 재사용) → 04 다른 점 → 05 이런 분께 → 06 FAQ → CTA.
+ * 문구는 CMS(matching.* + home.solo). 모든 상담 버튼은 /fit-check?track=matching.
  */
 export default async function MatchingPage() {
-  const [d, settings] = await Promise.all([getPageDocs(["matching", "pricing"]), getSettings()]);
+  const [d, settings] = await Promise.all([getPageDocs(["matching", "home"]), getSettings()]);
   const lead = settings.leadMode;
-  const hero = d["matching.hero"], how = d["matching.how"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"];
-  const programs = list<ProgramRow>(d["pricing.programs"], "rows").filter((r) => /CONNECTION|MERRY/i.test(r.name));
+  const hero = d["matching.hero"], verify = d["matching.verify"], how = d["matching.how"], plans = d["matching.plans"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"], solo = d["home.solo"];
+  const planItems = list<Plan>(plans, "items");
+  const extras = lines(s(plans, "extras")).filter((x) => !lead || !hasPrice(x));
+  const planNote = s(plans, "note");
   const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !lead || !hasPrice(x.q + x.a));
 
   return (
@@ -38,17 +44,20 @@ export default async function MatchingPage() {
       <TrackSwitch current="matching" />
       <TrackHero doc={hero} />
 
-      {/* 01 HOW IT WORKS */}
+      {/* 01 VERIFIED MEMBERS */}
+      {on(verify, "visible") && <VerifySection doc={verify} />}
+
+      {/* 02 HOW IT WORKS */}
       {on(how, "visible") && (
-        <section id="how" data-fold className={`${SECTION} bg-sand`}>
+        <section id="how" data-fold className={SECTION}>
           <Container>
             <SectionHead eyebrow={s(how, "label")} title={<Txt v={s(how, "title")} breaks="hard" />} lead={<Txt v={s(how, "lead")} />} reveal />
             <ol className="grid grid-cols-1 gap-[12px] md:grid-cols-4 md:gap-[16px] mt-[40px] list-none p-0 m-0">
-              {list(how, "steps").map((st, i) => (
+              {list(how, "steps").map((st, i, arr) => (
                 <li key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px] relative`}>
                   <div className="flex items-center gap-[10px] mb-[16px]">
                     <span className="w-[40px] h-[40px] rounded-full bg-primary text-white flex items-center justify-center t-label-1 font-bold">{String(i + 1).padStart(2, "0")}</span>
-                    {i < list(how, "steps").length - 1 && <span aria-hidden className="hidden md:block flex-1 h-px bg-lineNeutral" />}
+                    {i < arr.length - 1 && <span aria-hidden className="hidden md:block flex-1 h-px bg-lineNeutral" />}
                   </div>
                   <h3 className="t-heading-2 text-label mb-[8px]">{st.title}</h3>
                   <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={st.body} /></p>
@@ -59,16 +68,61 @@ export default async function MatchingPage() {
         </section>
       )}
 
-      {/* 02 WHY RSC */}
+      {/* 03 MEMBERSHIP (ACCESS · SIGNATURE · MERRY) */}
+      {on(plans, "visible") && planItems.length > 0 && (
+        <section id="plans" data-fold className={`${SECTION} bg-sand`}>
+          <Container>
+            <SectionHead eyebrow={s(plans, "label")} title={<Txt v={s(plans, "title")} breaks="hard" />} lead={<Txt v={s(plans, "lead")} />} reveal />
+            <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
+              {planItems.map((p, i) => (
+                <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${p.dark ? "bg-inverseBg text-inverseLabel border border-inverseBg" : CARD} ${CARD_HOVER} rounded-ds p-[24px] md:p-[28px] flex flex-col`}>
+                  <div className="flex items-center justify-between gap-[8px] mb-[12px]">
+                    <h3 className={`t-heading-1 ${p.dark ? "text-white" : "text-label"}`}>{p.name}</h3>
+                    {p.badge && <Badge tone={p.dark ? "inverse" : "primary"} className={p.dark ? "!bg-white !text-label" : ""}>{p.badge}</Badge>}
+                  </div>
+                  <p className={`t-body-2 font-medium m-0 mb-[16px] ${p.dark ? "text-white/80" : "text-labelNeutral"}`}>{p.tag}</p>
+                  {!lead && p.price && <div className={`t-headline-2 mb-[16px] pb-[16px] border-b ${p.dark ? "text-white border-white/20" : "text-label border-lineAlt"}`}>{p.price}</div>}
+                  <ul className="list-none p-0 m-0 grid gap-[8px]">
+                    {lines(p.features).filter((f) => !lead || !hasPrice(f)).map((f, j) => (
+                      <li key={j} className={`flex gap-[10px] items-start t-label-1-reading ${p.dark ? "text-white/85" : "text-labelAlt"}`}>
+                        <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`flex-none mt-[3px] ${p.dark ? "text-white" : "text-primary"}`}><path d="M5 12l5 5L20 7" /></svg>
+                        <span className="text-pretty">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-auto pt-[20px]">
+                    <ButtonLink href="/fit-check?track=matching" variant={p.dark ? "inverse" : "outlined"} size="md" className="w-full">{/MERRY/i.test(p.name) ? "별도 상담 신청" : `${p.name} 상담 신청`}</ButtonLink>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {extras.length > 0 && (
+              <div data-reveal className={`${CARD} mt-[16px] p-[20px] md:p-[24px] grid grid-cols-1 md:grid-cols-[120px_minmax(0,1fr)] gap-[8px] md:gap-[24px]`}>
+                <div className="t-label-1 font-semibold text-primary">필요한 만큼 추가</div>
+                <ul className="list-none p-0 m-0 grid gap-[6px] md:grid-cols-3 md:gap-[12px]">
+                  {extras.map((x, i) => <li key={i} className="t-label-1-reading text-labelNeutral text-pretty">{x}</li>)}
+                </ul>
+              </div>
+            )}
+            {planNote && !(lead && hasPrice(planNote)) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[16px] text-pretty max-w-[800px]"><Txt v={planNote} /></p>}
+            {!lead && <div className="mt-[24px]" data-reveal><ButtonLink href="/pricing" variant="outlined" size="md">전체 가격 안내 보기</ButtonLink></div>}
+          </Container>
+        </section>
+      )}
+
+      {/* MEMBERS ONLY: SOCIAL NIGHT · GRAND BALL · RAUM SOLO */}
+      {on(solo, "visible") && <MembersOnly doc={solo} eyebrow="MEMBERS ONLY" title={"1:1 매칭 회원만의\n특별한 시간"} lead="ACCESS · SIGNATURE 회원은 참여권 차감 없이 분기 테마 나이트와 연말 그랜드 볼에 참여합니다. SIGNATURE 회원은 기수제 로테이션 프로그램 RAUM SOLO 1기가 포함됩니다." />}
+
+      {/* 04 WHY RSC */}
       {on(diff, "visible") && (
-        <section id="why" data-fold className={SECTION}>
+        <section id="why" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={s(diff, "label")} title={<Txt v={s(diff, "title")} breaks="hard" />} reveal />
-            <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
+            <div className="grid grid-cols-1 gap-[12px] sm:grid-cols-2 md:grid-cols-4 md:gap-[16px] mt-[40px]">
               {list(diff, "items").map((c, i) => (
                 <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px]`}>
                   <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.label}</div>
-                  <div className="t-heading-2 text-label mb-[10px]">{c.title}</div>
+                  <div className="t-heading-2 text-label mb-[10px] text-pretty">{c.title}</div>
                   <div className="t-body-2-reading text-labelAlt text-pretty"><Txt v={c.body} /></div>
                 </div>
               ))}
@@ -77,31 +131,7 @@ export default async function MatchingPage() {
         </section>
       )}
 
-      {/* PROGRAMS (가격 안내 CONNECTION · RAUM MERRY 재사용) */}
-      {programs.length > 0 && (
-        <section id="programs" data-fold className={`${SECTION} bg-sand`}>
-          <Container>
-            <SectionHead eyebrow="PROGRAMS" title={<Txt v={"깊이에 따라 고르는\n네 가지 소개 프로그램"} breaks="hard" />} lead={lead ? "구성과 비용은 상담에서 자세히 안내해 드립니다. 실제로 만난 경우에만 1회로 셉니다." : "실제로 만난 경우에만 1회로 세며, 교제·성혼을 보장하지 않고 성혼비는 없습니다. 모든 금액은 VAT 포함입니다."} reveal />
-            <div className="grid grid-cols-1 gap-[12px] md:grid-cols-2 md:gap-[16px] mt-[40px]">
-              {programs.map((r, i) => (
-                <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px] flex flex-col`}>
-                  <div className="t-caption-1 font-semibold text-primary mb-[8px]">{/MERRY/i.test(r.name) ? "FLAGSHIP" : `CONNECTION · ${String(i + 1).padStart(2, "0")}`}</div>
-                  <h3 className="t-heading-1 text-label mb-[4px]">{r.name}</h3>
-                  {r.sub && <div className="t-label-1 text-labelAlt mb-[8px]">{r.sub}</div>}
-                  <p className="t-body-2-reading text-labelAlt text-pretty m-0 mb-[16px]"><Txt v={r.desc} /></p>
-                  <div className="mt-auto pt-[16px] border-t border-lineAlt flex items-baseline justify-between gap-[12px] flex-wrap">
-                    <span className="t-label-1 text-labelNeutral">{r.unit}</span>
-                    {!lead && r.price && <span className="t-headline-1 text-label">{r.price}</span>}
-                  </div>
-                </article>
-              ))}
-            </div>
-            {!lead && <div className="mt-[28px]" data-reveal><ButtonLink href="/pricing#programs" variant="outlined" size="md">전체 가격 안내 보기</ButtonLink></div>}
-          </Container>
-        </section>
-      )}
-
-      {/* 03 WHO IT'S FOR */}
+      {/* 05 WHO IT'S FOR */}
       {on(who, "visible") && (
         <section id="who" data-fold className={SECTION}>
           <Container>
@@ -126,7 +156,7 @@ export default async function MatchingPage() {
 
       {on(faq, "visible") && <FaqSection eyebrow={s(faq, "label")} title={s(faq, "title")} lead={s(faq, "lead")} items={faqItems} />}
 
-      <CtaBand track="matching" title="1:1 매칭, 상담으로 시작해 보세요" body="이름과 연락처만 남기면 전담 디렉터가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다." />
+      <CtaBand track="matching" title="1:1 매칭, 상담으로 시작해 보세요" body="이름과 연락처만 남기면 담당자가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다." />
 
       <SiteFooter />
       <UpButton />

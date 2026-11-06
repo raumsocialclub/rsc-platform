@@ -34,8 +34,8 @@ export const PUBLIC_PAGES: { key: string; path: string; label: string; priority:
 
 const PAGE_DEFAULTS: Record<string, { title: string; description: string }> = {
   home: { title: "라움소셜클럽 | 검증된 싱글 라이프스타일 커뮤니티", description: DEFAULT_DESCRIPTION },
-  social: { title: "소셜클럽", description: "라움이 검증한 싱글 멤버들이 전시·다이닝·와인·운동을 함께하는 소셜클럽. 여러 번 마주치며 자연스럽게 가까워지는 커뮤니티. 상담 후 초대제로 가입합니다." },
-  matching: { title: "1:1 매칭", description: "프로필 열람이 아닌 전담 디렉터의 직접 소개. 라움 커뮤니티 안에서 활동으로 검증된 회원 중 한 분을 연결하는 RSC 1:1 매칭(CONNECTION). 실제로 만난 경우에만 1회로 셉니다." },
+  social: { title: "소셜클럽", description: "라움이 검증한 25~45세 싱글 멤버가 월 1회 TASTE SOCIAL(아트·와인·웰니스·러닝·토크·다이닝)에서 반복해 만나는 소셜클럽 멤버십. 결혼중개가 아닌 커뮤니티, 가입 심사 후 초대제로 가입합니다." },
+  matching: { title: "1:1 매칭", description: "프로필 열람이 아닌 전담 컨시어지의 직접 소개. 가입 심사와 커뮤니티 활동으로 검증된 회원 중 한 분을 라움의 공간에서 만나는 RSC 1:1 매칭(ACCESS 5회 · SIGNATURE 10회). 실제로 만난 경우에만 차감, 성혼사례금 없음." },
   pricing: { title: "멤버십 가격 안내", description: "RSC PREVIEW 165,000원(1회) · ACCESS 연 3,300,000원 · SIGNATURE 연 8,800,000원. 모든 금액 VAT 포함, 자동 갱신 없음. 상담 후 PREVIEW 행사로 먼저 경험해 보세요." },
   benefits: { title: "정회원 혜택 안내", description: "6개 카테고리 행사 우선참여, 지인 초대권 연 8매, RSC 라운지·미팅룸, 평일 무료주차, 라움아트센터 대관 우선, 제휴 브랜드 할인까지 라움소셜클럽 정회원 혜택." },
   news: { title: "소식", description: "라움소셜클럽의 새로운 프로그램, 행사 후기, 공지사항을 전합니다." },
@@ -51,9 +51,9 @@ const DEFAULT_LLMS = `# 라움소셜클럽 (RAUM SOCIAL CLUB, RSC)
 
 ## 핵심 사실
 - 운영: 주식회사 레벤스토리(대표 김기태) · 서울특별시 강남구 언주로 564, 비동 2층 (역삼동, 라움)
-- 가입: 만 19세 이상, 법률상 배우자가 없는 싱글. 사이트에서 상담을 신청하고 상담 후 초대코드로 가입
-- 멤버십: RSC PREVIEW 165,000원(가입 전 행사 1회, 생애 1회) · RSC ACCESS 연 3,300,000원 · RSC SIGNATURE 연 8,800,000원 (VAT 포함, 자동 갱신 없음)
-- 프로그램: ART WALK, SUNDAY RESET, TASTE TABLE, ONE QUESTION SALON, AFTER HOURS, RUN & BRUNCH 등 6개 카테고리 행사 · 분기 RAUM SOCIAL NIGHT(연말 GRAND SOCIAL BALL) · 연 6기 기수제 RAUM SOLO · 관계 프로그램 CONNECTION / RAUM MERRY
+- 가입: 만 25~45세, 법률상 배우자가 없는 싱글. 사이트에서 상담을 신청하고 가입 심사(신분증·혼인관계증명서·재직 증빙) 후 초대코드로 가입
+- 멤버십: 소셜클럽 가입비 1,000,000원(1년 · 행사 6회 · 초대권 2매 · 결혼중개 아님) · 1:1 매칭 ACCESS 연회비 3,300,000원(1:1 만남 5회) · SIGNATURE 연회비 8,800,000원(1:1 만남 10회 + RAUM SOLO 1기 + 전담 컨시어지) · RAUM MERRY 33,000,000원부터(결혼 목적, 별도 심사) · RSC PREVIEW 165,000원(가입 전 행사 1회). VAT 포함, 자동 갱신 없음, 1:1 만남은 실제 대면 시에만 차감, 성혼사례금 없음
+- 프로그램: 월 1회 RSC TASTE SOCIAL(ART WALK, SUNDAY RESET, TASTE TABLE, ONE QUESTION SALON, AFTER HOURS, RUN & BRUNCH) · 1:1 매칭 회원 전용 3·6·9월 RAUM SOCIAL NIGHT 와 11월 GRAND SOCIAL BALL · SIGNATURE 전용 연 6기 기수제 RAUM SOLO
 - 문의: 02-6925-4786 · theraumai@gmail.com · 인스타그램 @raum_socialclub
 `;
 
