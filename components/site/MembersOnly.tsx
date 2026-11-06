@@ -1,4 +1,4 @@
-import { Txt } from "@/components/cms/Txt";
+import { Txt, nowrap } from "@/components/cms/Txt";
 import { ImageBlock } from "@/components/site/ImageBlock";
 import { CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 import type { DocData } from "@/lib/cms/get";
@@ -17,7 +17,7 @@ export function MembersOnly({ doc, eyebrow, title, lead, tone = "white" }: { doc
             <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} overflow-hidden`}>
               <ImageBlock src={c.image} alt={c.title} className="aspect-[16/10]" filter={c.filter || undefined} sizes="(min-width: 761px) 50vw, 100vw" zoom />
               <div className="p-[24px] md:p-[28px]">
-                <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.label}</div>
+                <div className="t-caption-1 font-semibold text-primary mb-[8px] text-pretty">{nowrap(c.label)}</div>
                 <h3 className="t-heading-1 text-label mb-[10px]">{c.title}</h3>
                 <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={c.body} /></p>
               </div>

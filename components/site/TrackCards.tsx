@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Txt, lines } from "@/components/cms/Txt";
+import { Txt, lines, nowrap } from "@/components/cms/Txt";
 import { ImageBlock } from "@/components/site/ImageBlock";
 import { ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 import type { DocData } from "@/lib/cms/get";
@@ -41,9 +41,9 @@ export function TrackCards({ doc, gate }: { doc: DocData; gate: DocData }) {
                 <p className="t-body-2-reading text-labelAlt text-pretty m-0 mb-[18px]"><Txt v={c.desc} /></p>
                 <dl className="grid gap-[8px] border-t border-lineAlt pt-[16px] mb-[22px]">
                   {parsePoints(c.points).map(([k, v], j) => (
-                    <div key={j} className="grid grid-cols-[56px_minmax(0,1fr)] gap-[10px] t-label-1-reading">
+                    <div key={j} className="grid grid-cols-[48px_minmax(0,1fr)] md:grid-cols-[56px_minmax(0,1fr)] gap-[10px] t-label-1-reading">
                       <dt className="font-semibold text-labelNeutral">{k}</dt>
-                      <dd className="text-labelAlt m-0 text-pretty">{v}</dd>
+                      <dd className="text-labelAlt m-0 text-pretty">{nowrap(v)}</dd>
                     </div>
                   ))}
                 </dl>

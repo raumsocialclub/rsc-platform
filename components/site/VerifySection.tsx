@@ -1,4 +1,4 @@
-import { Txt } from "@/components/cms/Txt";
+import { Txt, nowrap } from "@/components/cms/Txt";
 import { CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 import type { DocData } from "@/lib/cms/get";
 import { list, s } from "@/lib/cms/get";
@@ -20,14 +20,16 @@ export function VerifySection({ doc, tone = "sand" }: { doc: DocData; tone?: "sa
     <section id="verify" data-fold className={`py-[64px] md:py-[112px] ${tone === "sand" ? "bg-sand" : ""}`}>
       <Container>
         <SectionHead eyebrow={s(doc, "label")} title={<Txt v={s(doc, "title")} breaks="hard" />} lead={<Txt v={s(doc, "lead")} />} reveal />
-        <div className="grid grid-cols-1 gap-[12px] sm:grid-cols-2 md:grid-cols-4 md:gap-[16px] mt-[40px]">
+        <div className="grid grid-cols-1 gap-[10px] md:grid-cols-4 md:gap-[16px] mt-[32px] md:mt-[40px]">
           {items.map((it, i) => (
-            <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px]`}>
-              <div className="w-[56px] h-[56px] rounded-full bg-inverseBg text-white flex items-center justify-center mb-[24px]">
-                <svg aria-hidden width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{ICONS[it.icon] ?? ICONS.shield}</svg>
+            <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[20px] md:p-[28px] flex gap-[16px] items-start md:block`}>
+              <div className="w-[48px] h-[48px] md:w-[56px] md:h-[56px] rounded-full bg-inverseBg text-white flex items-center justify-center flex-none md:mb-[24px]">
+                <svg aria-hidden width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{ICONS[it.icon] ?? ICONS.shield}</svg>
               </div>
-              <h3 className="t-heading-2 text-label mb-[8px] text-pretty">{it.title}</h3>
-              <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={it.body} /></p>
+              <div className="min-w-0">
+                <h3 className="t-headline-1 md:t-heading-2 text-label mb-[6px] md:mb-[8px] text-pretty">{nowrap(it.title)}</h3>
+                <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={it.body} /></p>
+              </div>
             </div>
           ))}
         </div>

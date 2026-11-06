@@ -86,6 +86,8 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 - `prefers-reduced-motion` 이면 모든 효과를 끈다.
 
 ## 문장 줄바꿈
+- 고유명사(RSC TASTE SOCIAL, RAUM SOLO, SIGNATURE …)와 가운뎃점 목록(아트·와인·웰니스)은 `Txt`/`nowrap()` 이 `whitespace-nowrap` 으로 묶어 줄 중간에서 끊기지 않는다 (`components/cms/Txt.tsx` 의 TERMS 목록에 추가).
+- 모바일에서 4칸 카드(가입 심사·진행 방식)는 아이콘/번호 왼쪽 + 글 오른쪽의 가로 배치로 높이를 줄이고, 멤버십 카드 3장은 프로그램 카드처럼 옆으로 밀어 비교한다.
 - `Txt` 는 마침표·물음표·느낌표 뒤에서 항상 줄을 바꾼다 (PC·모바일 공통, 문장이 중간에 잘려 보이지 않게). 숫자 뒤 점은 제외.
 - CMS 의 `\n` 은 기본(soft) 데스크톱에서만 줄바꿈, 모바일은 띄어쓰기로 이어 붙임. `breaks="hard"` 는 항상 줄바꿈.
 - 안내 문단은 전부 `Txt` 로 렌더하고 `text-pretty` 를 붙인다. 표 셀은 예외.

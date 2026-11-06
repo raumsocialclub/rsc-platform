@@ -9,11 +9,11 @@ import { VerifySection } from "@/components/site/VerifySection";
 import { MembersOnly } from "@/components/site/MembersOnly";
 import { FaqSection } from "@/components/site/FaqSection";
 import { CtaBand } from "@/components/site/CtaBand";
-import { Txt, lines } from "@/components/cms/Txt";
+import { Txt, lines, nowrap } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
 import { hasPrice } from "@/lib/settings/leadMode";
-import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
+import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead, SWIPE, SWIPE_ITEM } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("matching");
@@ -51,15 +51,17 @@ export default async function MatchingPage() {
         <section id="how" data-fold className={SECTION}>
           <Container>
             <SectionHead eyebrow={s(how, "label")} title={<Txt v={s(how, "title")} breaks="hard" />} lead={<Txt v={s(how, "lead")} />} reveal />
-            <ol className="grid grid-cols-1 gap-[12px] md:grid-cols-4 md:gap-[16px] mt-[40px] list-none p-0 m-0">
+            <ol className="grid grid-cols-1 gap-[10px] md:grid-cols-4 md:gap-[16px] mt-[32px] md:mt-[40px] list-none p-0 m-0">
               {list(how, "steps").map((st, i, arr) => (
-                <li key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px] relative`}>
-                  <div className="flex items-center gap-[10px] mb-[16px]">
-                    <span className="w-[40px] h-[40px] rounded-full bg-primary text-white flex items-center justify-center t-label-1 font-bold">{String(i + 1).padStart(2, "0")}</span>
+                <li key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[20px] md:p-[28px] relative flex gap-[14px] items-start md:block`}>
+                  <div className="flex items-center gap-[10px] flex-none md:mb-[16px]">
+                    <span className="w-[36px] h-[36px] md:w-[40px] md:h-[40px] rounded-full bg-primary text-white flex items-center justify-center t-label-2 md:t-label-1 font-bold">{String(i + 1).padStart(2, "0")}</span>
                     {i < arr.length - 1 && <span aria-hidden className="hidden md:block flex-1 h-px bg-lineNeutral" />}
                   </div>
-                  <h3 className="t-heading-2 text-label mb-[8px]">{st.title}</h3>
-                  <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={st.body} /></p>
+                  <div className="min-w-0">
+                    <h3 className="t-headline-1 md:t-heading-2 text-label mb-[6px] md:mb-[8px]">{nowrap(st.title)}</h3>
+                    <p className="t-body-2-reading text-labelAlt text-pretty m-0"><Txt v={st.body} /></p>
+                  </div>
                 </li>
               ))}
             </ol>
@@ -72,9 +74,10 @@ export default async function MatchingPage() {
         <section id="plans" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={s(plans, "label")} title={<Txt v={s(plans, "title")} breaks="hard" />} lead={<Txt v={s(plans, "lead")} />} reveal />
-            <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
+            <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">옆으로 밀어서 비교하기 →</div>
+            <div className={`${SWIPE} mt-[12px] md:grid-cols-3 md:gap-[16px] md:mt-[40px]`}>
               {planItems.map((p, i) => (
-                <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${p.dark ? "bg-inverseBg text-inverseLabel border border-inverseBg" : CARD} ${CARD_HOVER} rounded-ds p-[24px] md:p-[28px] flex flex-col`}>
+                <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${SWIPE_ITEM} ${p.dark ? "bg-inverseBg text-inverseLabel border border-inverseBg" : CARD} ${CARD_HOVER} rounded-ds p-[24px] md:p-[28px] flex flex-col`}>
                   <div className="flex items-center justify-between gap-[8px] mb-[12px]">
                     <h3 className={`t-heading-1 ${p.dark ? "text-white" : "text-label"}`}>{p.name}</h3>
                     {p.badge && <Badge tone={p.dark ? "inverse" : "primary"} className={p.dark ? "!bg-white !text-label" : ""}>{p.badge}</Badge>}
@@ -84,7 +87,7 @@ export default async function MatchingPage() {
                     {lines(p.features).filter((f) => !hasPrice(f)).map((f, j) => (
                       <li key={j} className={`flex gap-[10px] items-start t-label-1-reading ${p.dark ? "text-white/85" : "text-labelAlt"}`}>
                         <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`flex-none mt-[3px] ${p.dark ? "text-white" : "text-primary"}`}><path d="M5 12l5 5L20 7" /></svg>
-                        <span className="text-pretty">{f}</span>
+                        <span className="text-pretty">{nowrap(f)}</span>
                       </li>
                     ))}
                   </ul>
@@ -98,7 +101,7 @@ export default async function MatchingPage() {
               <div data-reveal className={`${CARD} mt-[16px] p-[20px] md:p-[24px] grid grid-cols-1 md:grid-cols-[120px_minmax(0,1fr)] gap-[8px] md:gap-[24px]`}>
                 <div className="t-label-1 font-semibold text-primary">필요한 만큼 추가</div>
                 <ul className="list-none p-0 m-0 grid gap-[6px] md:grid-cols-3 md:gap-[12px]">
-                  {extras.map((x, i) => <li key={i} className="t-label-1-reading text-labelNeutral text-pretty">{x}</li>)}
+                  {extras.map((x, i) => <li key={i} className="t-label-1-reading text-labelNeutral text-pretty">{nowrap(x)}</li>)}
                 </ul>
               </div>
             )}
@@ -115,11 +118,11 @@ export default async function MatchingPage() {
         <section id="why" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={s(diff, "label")} title={<Txt v={s(diff, "title")} breaks="hard" />} reveal />
-            <div className="grid grid-cols-1 gap-[12px] sm:grid-cols-2 md:grid-cols-4 md:gap-[16px] mt-[40px]">
+            <div className="grid grid-cols-1 gap-[10px] md:grid-cols-4 md:gap-[16px] mt-[32px] md:mt-[40px]">
               {list(diff, "items").map((c, i) => (
-                <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px]`}>
-                  <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.label}</div>
-                  <div className="t-heading-2 text-label mb-[10px] text-pretty">{c.title}</div>
+                <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[20px] md:p-[28px]`}>
+                  <div className="t-caption-1 font-semibold text-primary mb-[6px] md:mb-[8px]">{c.label}</div>
+                  <div className="t-headline-1 md:t-heading-2 text-label mb-[8px] md:mb-[10px] text-pretty">{nowrap(c.title)}</div>
                   <div className="t-body-2-reading text-labelAlt text-pretty"><Txt v={c.body} /></div>
                 </div>
               ))}
@@ -140,7 +143,7 @@ export default async function MatchingPage() {
                   {lines(s(who, "points")).map((p, i) => (
                     <li key={i} className="flex gap-[12px] items-start t-body-1-reading text-labelNeutral text-pretty">
                       <span aria-hidden className="w-[24px] h-[24px] rounded-full bg-[rgba(0,102,255,.1)] text-primary flex items-center justify-center flex-none mt-[1px]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg></span>
-                      <span>{p}</span>
+                      <span>{nowrap(p)}</span>
                     </li>
                   ))}
                 </ul>

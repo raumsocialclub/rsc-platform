@@ -8,7 +8,7 @@ import { TrackSwitch } from "@/components/site/TrackSwitch";
 import { FaqSection } from "@/components/site/FaqSection";
 import { VerifySection } from "@/components/site/VerifySection";
 import { CtaBand } from "@/components/site/CtaBand";
-import { Txt } from "@/components/cms/Txt";
+import { Txt, nowrap } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
 import { hasPrice } from "@/lib/settings/leadMode";
@@ -44,11 +44,11 @@ export default async function SocialPage() {
         <section id="membership" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={s(membership, "label")} title={<Txt v={s(membership, "title")} breaks="hard" />} lead={<Txt v={s(membership, "lead")} />} reveal />
-            <div className="grid grid-cols-1 gap-[12px] sm:grid-cols-2 md:grid-cols-4 md:gap-[16px] mt-[40px]">
+            <div className="grid grid-cols-1 gap-[10px] md:grid-cols-4 md:gap-[16px] mt-[32px] md:mt-[40px]">
               {memberItems.map((c, i) => (
-                <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px]`}>
-                  <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.label}</div>
-                  <div className="t-heading-2 text-label mb-[10px] text-pretty">{c.title}</div>
+                <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[20px] md:p-[28px]`}>
+                  <div className="t-caption-1 font-semibold text-primary mb-[6px] md:mb-[8px]">{c.label}</div>
+                  <div className="t-headline-1 md:t-heading-2 text-label mb-[8px] md:mb-[10px] text-pretty">{nowrap(c.title)}</div>
                   <div className="t-body-2-reading text-labelAlt text-pretty"><Txt v={c.body} /></div>
                 </div>
               ))}
