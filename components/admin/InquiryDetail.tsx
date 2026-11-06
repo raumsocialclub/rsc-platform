@@ -103,7 +103,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   const a = inquiry.answers ?? {};
   const rows: { q: string; a: string }[] = [
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
-    ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
+    ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : a.route ? [{ q: /소셜클럽|1:1|상담/.test(a.route) ? "관심 방식" : "라움과의 인연", a: a.route }] : []),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
     ...(a.consentAt ? [{ q: "개인정보 동의", a: `${fmtDate(a.consentAt, true)}${a.consentVersion ? ` · 동의문 ${a.consentVersion}` : ""}` }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),

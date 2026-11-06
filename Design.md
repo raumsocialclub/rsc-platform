@@ -98,6 +98,13 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 ## 카피 톤
 차분한 존댓말, 짧은 문장, 마침표. 영어 오버라인 + 한글 제목 조합 유지. 문구는 CMS(`site_content`)가 우선이며 코드의 기본값은 CMS 가 비어 있을 때만 쓰인다.
 
+## 정보 구조 (2026-11 · 두 갈래 홈)
+- 홈(`/`)은 **게이트**다. 맨 위 전환형 히어로(`components/site/GateHero.tsx`)에 「소셜클럽 | 1:1 매칭」 탭이 있고, 탭을 누르면 사진·문구·버튼이 바뀐다(모바일은 스와이프, PC 는 ←/→ 도 됨). 버튼은 각 트랙 페이지와 `/fit-check?track=…` 으로 간다. 레퍼런스: emotional oranges 홈의 로테이션/프라이빗 전환.
+- 그 아래 「두 가지 방식」 비교 카드(`TrackCards`) → 브랜드 소개(01) → 브랜드 약속(03) → FAQ → 두 버튼 CTA(`CtaBand`).
+- `/social` 소셜클럽: 트랙 전환 바(`TrackSwitch`) + 상단 소개 + 예전 홈의 02·04·05·06 섹션 + FAQ. `/matching` 1:1 매칭: 진행 방식 4단계 · 다른 점 · 소개 프로그램(가격 안내의 CONNECTION·MERRY 행 재사용, 리드 모드면 금액 숨김) · 이런 분께 · FAQ.
+- 상담 신청(`/fit-check`)은 「관심 있는 방식」 칩(소셜클럽 · 1:1 매칭 · 상담 후 결정)이 맨 위에 있고 `?track=` 으로 미리 선택된다. 값은 `inquiries.answers.route` 에 저장되어 어드민 상담 상세에 「관심 방식」으로 보인다.
+- 문구·사진은 모두 CMS: 사이트 관리 → 메인 페이지(00 게이트 히어로 · 00-1 비교 카드) / 소셜클럽 / 1:1 매칭 탭.
+
 ## 적용 범위
 - 1단계(완료): 공개 사이트 전체 — 홈, 상담 신청(/fit-check), 상담 전 설문(/apply), 혜택, 멤버십, 소식, 약관·개인정보·환불, 404·에러.
 - 2단계(완료, 2026-11): 어드민(흰 사이드바 + sand 본문, `components/admin/ui.tsx` 의 CARD·TH·TD·FIELD·BTN_*·PageTitle·Badge)·회원·로그인·결제 화면을 같은 토큰으로 교체. 레거시 색 이름(cream·ink·brown·gold 등)은 코드에서 더 쓰지 않으며 tailwind 매핑만 호환용으로 남겨 둔다.

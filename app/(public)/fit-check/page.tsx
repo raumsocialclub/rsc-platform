@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/seo/get";
 import Link from "next/link";
 import { Logo } from "@/components/site/Logo";
 import { FitCheck } from "@/components/fit-check/FitCheck";
-import { LeadForm } from "@/components/fit-check/LeadForm";
+import { LeadForm, type LeadTrack } from "@/components/fit-check/LeadForm";
 import { getSettings } from "@/lib/settings/get";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -11,11 +11,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * 상담 신청. 기본은 한 화면 간단 신청(LeadForm: 이름·휴대폰·동의). 일반 설정 → "설문형 상담 신청 켜기" 면 6문항 설문(FitCheck).
+ * 상담 신청. 기본은 한 화면 간단 신청(LeadForm: 관심 방식·이름·휴대폰·동의). ?track=social|matching 으로 들어오면 그 방식이 미리 선택된다. 일반 설정 → "설문형 상담 신청 켜기" 면 6문항 설문(FitCheck).
  * 흰 배경에 얇은 상단 바(로고 + 닫기)만 두고 양식을 가운데 카드로 보여준다.
  */
-export default async function FitCheckPage() {
-  const { surveyMode } = await getSettings();
+export default async function FitCheckPage({ searchParams }: { searchParams: Promise<{ track?: string }> }) {
+  const [{ surveyMode }, sp] = await Promise.all([getSettings(), searchParams]);
+  const track: LeadTrack = sp.track === "social" || sp.track === "matching" ? sp.track : "undecided";
+  const title = track === "social" ? "소셜클럽 상담 신청" : track === "matching" ? "1:1 매칭 상담 신청" : "RSC 상담 신청";
   return (
     <div className="min-h-screen flex flex-col bg-sand">
       <header className="h-[56px] md:h-[64px] bg-white border-b border-lineAlt flex items-center justify-between gap-[24px] px-[20px] md:px-[32px]">
@@ -24,7 +26,7 @@ export default async function FitCheckPage() {
       </header>
       <main className="flex-1 flex flex-col justify-center px-[16px] py-[32px] md:px-[32px] md:py-[64px]">
         <div className="w-full max-w-[640px] mx-auto bg-white border border-lineAlt rounded-ds p-[24px] md:p-[48px]">
-          {surveyMode ? <FitCheck /> : <LeadForm title="RSC 상담 신청" note="남겨주신 연락처로 담당자가 직접 연락드립니다." />}
+          {surveyMode ? <FitCheck /> : <LeadForm title={title} note="남겨주신 연락처로 담당자가 직접 연락드립니다." track={track} />}
         </div>
       </main>
     </div>

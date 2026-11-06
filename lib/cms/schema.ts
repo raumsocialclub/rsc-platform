@@ -20,7 +20,7 @@ export type Field = {
 export type ListDef = { key: string; label: string; itemLabel: string; fields: Field[]; min?: number; max?: number };
 export type DocDef = {
   id: string;
-  page: "global" | "home" | "pricing" | "benefits" | "legal" | "settings" | "seo";
+  page: "global" | "home" | "social" | "matching" | "pricing" | "benefits" | "legal" | "settings" | "seo";
   label: string;
   description?: string;
   fields: Field[];
@@ -278,6 +278,137 @@ export const DOCS: DocDef[] = [
     },
   },
 
+  /* ---------- 홈 게이트 (소셜클럽 / 1:1 매칭 두 갈래) ---------- */
+  {
+    id: "home.gate",
+    page: "home",
+    label: "00 게이트 히어로 (소셜클럽 · 1:1 매칭 전환)",
+    description: "메인 맨 위의 전환형 히어로. 탭을 누르면 사진·문구·버튼이 바뀌고, 버튼은 각 트랙 페이지(/social, /matching)와 상담 신청으로 이어집니다.",
+    fields: [
+      t("tabSocial", "탭 1 이름"), t("tabMatching", "탭 2 이름"),
+      { key: "defaultTrack", label: "처음 보여줄 트랙", type: "select", options: [{ value: "social", label: "소셜클럽" }, { value: "matching", label: "1:1 매칭" }] },
+      img("socialImage", "소셜클럽 배경 사진", "가로 1920px 이상 권장"), t("socialOverline", "소셜클럽 작은 제목"), ta("socialTitle", "소셜클럽 큰 제목", "hard"), ta("socialBody", "소셜클럽 설명", "soft"), t("socialCta", "소셜클럽 이동 버튼 문구"),
+      img("matchingImage", "1:1 매칭 배경 사진", "가로 1920px 이상 권장"), t("matchingOverline", "1:1 매칭 작은 제목"), ta("matchingTitle", "1:1 매칭 큰 제목", "hard"), ta("matchingBody", "1:1 매칭 설명", "soft"), t("matchingCta", "1:1 매칭 이동 버튼 문구"),
+      t("applyCta", "상담 신청 버튼 문구"),
+    ],
+    defaults: {
+      tabSocial: "소셜클럽", tabMatching: "1:1 매칭", defaultTrack: "social",
+      socialImage: "/images/hero.jpg", socialOverline: "RSC SOCIAL CLUB", socialTitle: "함께 경험하며,\n자연스럽게 가까워지는 사람들", socialBody: "라움이 검증한 싱글 멤버들이 전시·다이닝·와인·운동을 함께합니다.\n여러 번 마주치며 서로의 결을 알아가는 커뮤니티입니다.", socialCta: "소셜클럽 자세히 보기",
+      matchingImage: "/images/after-hours.jpg", matchingOverline: "RSC 1:1 MATCHING", matchingTitle: "한 사람을,\n깊이 알고 만납니다", matchingBody: "프로필 열람이 아니라 전담 디렉터의 직접 소개.\n라움 커뮤니티 안에서 활동으로 검증된 회원 중 한 분을 신중하게 연결합니다.", matchingCta: "1:1 매칭 자세히 보기",
+      applyCta: "상담 신청",
+    },
+  },
+  {
+    id: "home.tracks",
+    page: "home",
+    label: "00-1 두 가지 방식 비교 카드",
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), t("socialTitle", "소셜클럽 카드 제목"), ta("socialDesc", "소셜클럽 카드 설명", "soft"), ta("socialPoints", "소셜클럽 특징 (줄마다 '항목: 내용')"), t("matchingTitle", "1:1 매칭 카드 제목"), ta("matchingDesc", "1:1 매칭 카드 설명", "soft"), ta("matchingPoints", "1:1 매칭 특징 (줄마다 '항목: 내용')"), ta("note", "하단 안내", "soft"), bool("visible", "표시")],
+    defaults: {
+      label: "TWO WAYS TO MEET",
+      title: "나에게 맞는 방식을\n먼저 골라 보세요",
+      lead: "같은 공간, 같은 기준으로 검증된 사람들. 만나는 방식만 다릅니다. 둘 다 상담은 무료이며, 상담 후 함께 정해도 됩니다.",
+      socialTitle: "소셜클럽",
+      socialDesc: "여러 사람과 자연스럽게, 반복해서 만나고 싶은 분",
+      socialPoints: "대상: 새로운 취향과 사람을 넓게 만나고 싶은 싱글\n방식: 전시·다이닝·와인·운동 등 소규모 모임\n주기: 매주 열리는 행사 + 분기 SOCIAL NIGHT\n관계: 여러 번 마주치며 자연스럽게 시작",
+      matchingTitle: "1:1 매칭",
+      matchingDesc: "한 사람을 진지하게, 깊이 알고 만나고 싶은 분",
+      matchingPoints: "대상: 결혼·진지한 교제를 염두에 둔 싱글\n방식: 상담·인터뷰 후 전담 디렉터가 직접 소개\n주기: 준비된 분이 있을 때 1회씩, 실제 대면 기준\n관계: 만남 후 피드백을 반영해 다음 소개로",
+      note: "SIGNATURE 멤버십은 소셜클럽과 1:1 소개가 함께 포함됩니다. 어느 쪽이 맞을지 모르겠다면 상담에서 함께 정해 드립니다.",
+      visible: true,
+    },
+  },
+
+  /* ---------- 소셜클럽 ---------- */
+  {
+    id: "social.hero",
+    page: "social",
+    label: "상단 소개",
+    fields: [img("image", "사진"), t("overline", "작은 제목"), ta("title", "큰 제목", "hard"), ta("body", "설명", "soft"), t("cta1Label", "버튼 1 문구"), link("cta1Href", "버튼 1 링크"), t("cta2Label", "버튼 2 문구"), link("cta2Href", "버튼 2 링크")],
+    defaults: {
+      image: "/images/moment-04-evening.jpg",
+      overline: "RSC SOCIAL CLUB",
+      title: "라움이 검증한 멤버가 모이는\n싱글 라이프스타일 커뮤니티",
+      body: "아름다운 공간에서, 서로의 특별함을 발견하는 곳.\n문화와 취향을 함께하며 자연스럽게 서로를 발견합니다.",
+      cta1Label: "소셜클럽 상담 신청", cta1Href: "/fit-check?track=social",
+      cta2Label: "프로그램 보기", cta2Href: "#social",
+    },
+  },
+
+  /* ---------- 1:1 매칭 ---------- */
+  {
+    id: "matching.hero",
+    page: "matching",
+    label: "상단 소개",
+    fields: [img("image", "사진"), t("overline", "작은 제목"), ta("title", "큰 제목", "hard"), ta("body", "설명", "soft"), t("cta1Label", "버튼 1 문구"), link("cta1Href", "버튼 1 링크"), t("cta2Label", "버튼 2 문구"), link("cta2Href", "버튼 2 링크")],
+    defaults: {
+      image: "/images/after-hours.jpg",
+      overline: "RSC 1:1 MATCHING · CONNECTION",
+      title: "한 사람을,\n깊이 알고 만납니다",
+      body: "불특정 다수의 프로필이 아니라, 라움 커뮤니티 안에서 활동으로 검증된 회원 중 한 분을 전담 디렉터가 직접 소개합니다.\n실제로 만난 경우에만 1회로 셉니다.",
+      cta1Label: "1:1 매칭 상담 신청", cta1Href: "/fit-check?track=matching",
+      cta2Label: "진행 방식 보기", cta2Href: "#how",
+    },
+  },
+  {
+    id: "matching.how",
+    page: "matching",
+    label: "01 진행 방식",
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), bool("visible", "표시")],
+    lists: [{ key: "steps", label: "단계", itemLabel: "단계", fields: [t("title", "제목"), ta("body", "설명", "soft")], min: 2, max: 6 }],
+    defaults: {
+      label: "HOW IT WORKS", title: "상담에서 만남까지,\n네 단계로 진행됩니다", lead: "모든 단계는 전담 디렉터가 함께합니다. 서두르지 않고, 준비된 분이 있을 때만 소개합니다.", visible: true,
+      steps: [
+        { title: "상담 · 인터뷰", body: "라움에서 1시간 안팎의 대면 인터뷰. 가치관, 생활 방식, 바라는 관계를 깊이 듣습니다." },
+        { title: "큐레이션", body: "RSC 커뮤니티 안에서 활동으로 검증된 회원 중 디렉터가 직접 한 분을 고릅니다. 프로필 열람은 없습니다." },
+        { title: "실제 만남", body: "라움의 공간 또는 두 분이 편한 장소에서 만납니다. 일정 조율은 디렉터가 맡습니다." },
+        { title: "피드백 · 다음 소개", body: "만남 후 양쪽의 이야기를 듣고 다음 소개에 반영합니다. 실제로 만난 경우에만 1회로 셉니다." },
+      ],
+    },
+  },
+  {
+    id: "matching.diff",
+    page: "matching",
+    label: "02 다른 점",
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), bool("visible", "표시")],
+    lists: [{ key: "items", label: "카드", itemLabel: "카드", fields: [t("label", "라벨"), t("title", "제목"), ta("body", "설명", "soft")], min: 1, max: 6 }],
+    defaults: {
+      label: "WHY RSC", title: "결혼정보회사와도,\n데이팅 앱과도 다릅니다", visible: true,
+      items: [
+        { label: "01 VERIFIED BY COMMUNITY", title: "활동으로 확인된 사람", body: "서류만으로 검증하지 않습니다. 라움의 공간과 프로그램에 실제로 참여해 온 회원 중에서 소개합니다." },
+        { label: "02 ONE AT A TIME", title: "프로필 열람 없이, 한 번에 한 분", body: "사진과 조건을 넘겨 보는 방식이 아닙니다. 디렉터가 직접 고른 한 분을 이유와 함께 소개합니다." },
+        { label: "03 NO PRESSURE", title: "성혼비 없음, 강요 없음", body: "실제로 만난 경우에만 1회로 세고, 교제나 성혼을 보장하거나 강요하지 않습니다. 성혼비도 없습니다." },
+      ],
+    },
+  },
+  {
+    id: "matching.who",
+    page: "matching",
+    label: "03 이런 분께",
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("points", "항목 (줄마다 하나)"), img("image", "사진"), bool("visible", "표시")],
+    defaults: {
+      label: "WHO IT'S FOR", title: "이런 분께 맞습니다", visible: true,
+      image: "/images/about.jpg",
+      points: "결혼이나 진지한 교제를 염두에 두고 있는 분\n여러 사람보다 한 사람을 깊이 알아가고 싶은 분\n바쁜 일상 속에서 소개의 과정을 맡기고 싶은 분\n앱의 불특정 다수보다 검증된 커뮤니티 안의 만남을 원하는 분",
+    },
+  },
+  {
+    id: "matching.faq",
+    page: "matching",
+    label: "04 자주 묻는 질문",
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), bool("visible", "표시")],
+    lists: [{ key: "items", label: "질문", itemLabel: "질문", fields: [t("q", "질문"), ta("a", "답변", "hard")], min: 1, max: 20 }],
+    defaults: {
+      label: "FAQ", title: "1:1 매칭, 자주 묻는 질문", lead: "더 궁금한 점은 상담에서 편하게 물어보세요.", visible: true,
+      items: [
+        { q: "소셜클럽 회원이 아니어도 1:1 매칭을 신청할 수 있나요?", a: "네. 상담 신청 후 인터뷰를 거쳐 진행합니다. 다만 소개 대상은 라움 커뮤니티 안에서 활동으로 검증된 회원이므로, 본인도 간단한 검증 절차를 거칩니다." },
+        { q: "소개는 어떤 기준으로 이루어지나요?", a: "인터뷰에서 들은 가치관·생활 방식·바라는 관계를 바탕으로 전담 디렉터가 직접 한 분을 고릅니다. 조건표를 맞추는 방식이 아니라, 두 분이 실제로 잘 맞을지를 봅니다." },
+        { q: "만나기 전에 상대 프로필을 볼 수 있나요?", a: "사진과 조건을 넘겨 보는 프로필 열람 방식은 쓰지 않습니다. 디렉터가 소개 이유와 함께 상대를 설명드리고, 양쪽이 동의하면 만남을 잡습니다." },
+        { q: "만남이 성사되지 않으면 어떻게 되나요?", a: "실제로 만난 경우에만 1회로 셉니다. 일정이 맞지 않거나 한쪽이 원하지 않으면 차감되지 않고 다음 소개를 준비합니다." },
+        { q: "결혼을 전제로 해야 하나요?", a: "아니요. 진지한 교제를 바라는 분이면 충분합니다. 결혼을 목적으로 하는 분께는 별도 신청·심사로 진행하는 RAUM MERRY 를 안내드립니다." },
+      ],
+    },
+  },
+
   /* ---------- 가격 ---------- */
   {
     id: "pricing.hero",
@@ -438,6 +569,8 @@ export const DOC_BY_ID = new Map(DOCS.map((d) => [d.id, d]));
 export const PAGES: { key: DocDef["page"]; label: string; preview: string }[] = [
   { key: "global", label: "브랜드 · 테마", preview: "/" },
   { key: "home", label: "메인 페이지", preview: "/" },
+  { key: "social", label: "소셜클럽", preview: "/social" },
+  { key: "matching", label: "1:1 매칭", preview: "/matching" },
   { key: "pricing", label: "가격 안내", preview: "/pricing" },
   { key: "benefits", label: "혜택 안내", preview: "/benefits" },
   { key: "legal", label: "약관", preview: "/terms" },

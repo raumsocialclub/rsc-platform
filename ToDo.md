@@ -114,5 +114,12 @@
 - [ ] 사용자: Vercel Pro·Supabase Pro 결제, Sentry 가입 후 DSN 을 Vercel 환경변수에, Deploy Hook → GitHub Secret, main 보호 규칙 (SETUP 4-4~4-6)
 - [ ] 스테이징 DB: Supabase 프로젝트 한도(무료 2개) 때문에 보류 → Pro 전환 또는 옛 프로젝트 정리 후 "스테이징 DB 만들어라"
 
+## M16. 두 갈래 홈 — 소셜클럽 / 1:1 매칭 (사용자 요청, 2026-11)
+- [x] 홈 게이트 히어로(전환 탭 · 스와이프) + 두 방식 비교 카드 + CTA 두 버튼
+- [x] `/social` `/matching` 트랙 페이지 (CMS `social.*` `matching.*`, 가격 안내 프로그램 행 재사용)
+- [x] 상담 신청 「관심 있는 방식」 칩 + `?track=` 사전 선택 → `answers.route` → 어드민 「관심 방식」
+- [x] GNB·푸터 메뉴(소셜클럽 · 1:1 매칭), sitemap·llms.txt·페이지 SEO 문서
+- [ ] 운영 배포 (사용자 "배포해" 지시 후)
+
 ## 2차 (별도 지시 후)
 - 멤버십 결제/분납(빌링키), 네이버 로그인, 지인 초대권 사용, 알림톡(솔라피) 전환, 사이트 이미지 CMS, 리마인더 자동 발송

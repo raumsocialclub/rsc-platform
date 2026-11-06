@@ -3,18 +3,23 @@
 import Link from "next/link";
 import { useState } from "react";
 import { InstagramButton } from "@/components/site/InstagramButton";
-import { Button, ButtonLink, CARD, FIELD_HELP, FIELD_LABEL, INPUT } from "@/components/ui/ds";
+import { Button, ButtonLink, CARD, CHIP, CHIP_OFF, CHIP_ON, FIELD_HELP, FIELD_LABEL, INPUT } from "@/components/ui/ds";
 import { formatPhoneInput } from "@/lib/phone";
 import { readUtm } from "@/lib/utm/client";
 import { trackLead } from "@/components/site/MetaPixel";
 import { Txt } from "@/components/cms/Txt";
 
 /**
- * 간단 상담 신청 (기본). 이름·휴대폰·개인정보 동의만 받는다 (Wanted DS 텍스트 필드 · 체크박스 · 큰 버튼).
+ * 간단 상담 신청 (기본). 관심 방식(소셜클럽 · 1:1 매칭 · 상담 후 결정) 칩 + 이름·휴대폰·개인정보 동의 (Wanted DS 텍스트 필드 · 체크박스 · 큰 버튼).
+ * 관심 방식은 /fit-check?track= 으로 미리 선택되고 inquiries.answers.route 에 라벨로 저장된다 (어드민 상담 상세 「관심 방식」).
  * 「상담 가능 시간」 선택은 인터뷰 기간 동안 잠시 뺐다 (2026-10). API(/api/inquiries)·관리자 화면·DB 는 slot 을 그대로 받는다.
  * 완료 시 메타 픽셀 Lead 이벤트를 보낸다(픽셀 ID 가 설정된 경우에만 실제 전송).
  */
-export function LeadForm({ title, note }: { title: string; note: string }) {
+export type LeadTrack = "social" | "matching" | "undecided";
+export const TRACK_LABEL: Record<LeadTrack, string> = { social: "소셜클럽", matching: "1:1 매칭", undecided: "상담 후 결정" };
+
+export function LeadForm({ title, note, track: initialTrack = "undecided" }: { title: string; note: string; /** 어느 트랙에서 들어왔는지 (/fit-check?track=social|matching). 폼에서 바꿀 수 있고 inquiries.answers.route 로 저장된다 */ track?: LeadTrack }) {
+  const [track, setTrack] = useState<LeadTrack>(initialTrack);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -30,7 +35,7 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone, consent: true, utm: readUtm() }) });
+      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone, consent: true, route: TRACK_LABEL[track], utm: readUtm() }) });
       const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !json?.ok) throw new Error(json?.message ?? "신청을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
       trackLead();
@@ -64,6 +69,15 @@ export function LeadForm({ title, note }: { title: string; note: string }) {
       <p className="t-body-1-reading text-labelAlt mb-[32px] text-pretty"><Txt v={note} /></p>
 
       <div className="grid gap-[20px]">
+        <fieldset className="border-0 p-0 m-0 min-w-0">
+          <legend className={FIELD_LABEL}>관심 있는 방식</legend>
+          <div className="grid grid-cols-3 gap-[8px]">
+            {(Object.keys(TRACK_LABEL) as LeadTrack[]).map((k) => (
+              <button key={k} type="button" aria-pressed={track === k} onClick={() => setTrack(k)} className={`${CHIP} ${track === k ? CHIP_ON : CHIP_OFF} px-[8px]`}>{TRACK_LABEL[k]}</button>
+            ))}
+          </div>
+          <span className={FIELD_HELP}>{track === "social" ? "함께 경험하며 자연스럽게 가까워지는 커뮤니티." : track === "matching" ? "전담 디렉터가 검증된 회원 중 한 분을 직접 소개합니다." : "어느 쪽이 맞을지 모르겠다면 상담에서 함께 정해 드립니다."}</span>
+        </fieldset>
         <label className="block">
           <span className={FIELD_LABEL}>이름 <span className="text-negative">*</span></span>
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름을 입력해 주세요." autoComplete="name" maxLength={50} required className={INPUT} />

@@ -21,6 +21,8 @@ export const AI_BOTS = ["GPTBot", "ChatGPT-User", "OAI-SearchBot", "ClaudeBot", 
 /** 공개 페이지 (검색·사이트맵·llms.txt 대상). key 는 seo.<key> 문서 id 와 같다. */
 export const PUBLIC_PAGES: { key: string; path: string; label: string; priority: number; changeFrequency: "daily" | "weekly" | "monthly" | "yearly" }[] = [
   { key: "home", path: "/", label: "메인", priority: 1, changeFrequency: "weekly" },
+  { key: "social", path: "/social", label: "소셜클럽", priority: 0.95, changeFrequency: "weekly" },
+  { key: "matching", path: "/matching", label: "1:1 매칭", priority: 0.95, changeFrequency: "weekly" },
   { key: "pricing", path: "/pricing", label: "멤버십 가격 안내", priority: 0.9, changeFrequency: "monthly" },
   { key: "benefits", path: "/benefits", label: "정회원 혜택 안내", priority: 0.8, changeFrequency: "monthly" },
   { key: "news", path: "/news", label: "소식", priority: 0.7, changeFrequency: "weekly" },
@@ -32,6 +34,8 @@ export const PUBLIC_PAGES: { key: string; path: string; label: string; priority:
 
 const PAGE_DEFAULTS: Record<string, { title: string; description: string }> = {
   home: { title: "라움소셜클럽 | 검증된 싱글 라이프스타일 커뮤니티", description: DEFAULT_DESCRIPTION },
+  social: { title: "소셜클럽", description: "라움이 검증한 싱글 멤버들이 전시·다이닝·와인·운동을 함께하는 소셜클럽. 여러 번 마주치며 자연스럽게 가까워지는 커뮤니티. 상담 후 초대제로 가입합니다." },
+  matching: { title: "1:1 매칭", description: "프로필 열람이 아닌 전담 디렉터의 직접 소개. 라움 커뮤니티 안에서 활동으로 검증된 회원 중 한 분을 연결하는 RSC 1:1 매칭(CONNECTION). 실제로 만난 경우에만 1회로 셉니다." },
   pricing: { title: "멤버십 가격 안내", description: "RSC PREVIEW 165,000원(1회) · ACCESS 연 3,300,000원 · SIGNATURE 연 8,800,000원. 모든 금액 VAT 포함, 자동 갱신 없음. 상담 후 PREVIEW 행사로 먼저 경험해 보세요." },
   benefits: { title: "정회원 혜택 안내", description: "6개 카테고리 행사 우선참여, 지인 초대권 연 8매, RSC 라운지·미팅룸, 평일 무료주차, 라움아트센터 대관 우선, 제휴 브랜드 할인까지 라움소셜클럽 정회원 혜택." },
   news: { title: "소식", description: "라움소셜클럽의 새로운 프로그램, 행사 후기, 공지사항을 전합니다." },
@@ -43,7 +47,7 @@ const PAGE_DEFAULTS: Record<string, { title: string; description: string }> = {
 
 const DEFAULT_LLMS = `# 라움소셜클럽 (RAUM SOCIAL CLUB, RSC)
 
-> 라움(RAUM)이 검증한 싱글 회원들이 서울 강남 라움아트센터의 공간에서 문화·미식·운동·회복 프로그램을 함께 경험하고 관계를 이어가는 프라이빗 소셜 커뮤니티입니다. 매칭 서비스가 아니라 커뮤니티이며, 상담 후 초대제로 가입합니다.
+> 라움(RAUM)이 검증한 싱글 회원들이 서울 강남 라움아트센터의 공간에서 문화·미식·운동·회복 프로그램을 함께 경험하고 관계를 이어가는 프라이빗 소셜 커뮤니티입니다. 두 가지 방식으로 만납니다 — 소셜클럽(/social: 함께 경험하며 가까워지는 커뮤니티)과 1:1 매칭(/matching: 전담 디렉터가 검증된 회원 중 한 분을 직접 소개). 상담 후 초대제로 가입합니다.
 
 ## 핵심 사실
 - 운영: 주식회사 레벤스토리(대표 김기태) · 서울특별시 강남구 언주로 564, 비동 2층 (역삼동, 라움)
