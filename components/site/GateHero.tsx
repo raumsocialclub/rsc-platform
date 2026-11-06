@@ -84,7 +84,7 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
       {/* 문구 */}
       <div className="relative z-10 mt-auto p-[20px] pb-[24px] md:p-[48px] md:pb-[48px] max-w-[720px]">
         <div key={cur.key} className="anim-up">
-          <div className="t-eyebrow text-white/80 mb-[12px]">{cur.overline}</div>
+          <div className="t-eyebrow tracking-[0.14em] text-white/80 mb-[12px]">{cur.overline}</div>
           <h1 className="t-title-1 md:t-display-2 lg:t-display-1 text-white text-pretty mb-[14px] md:mb-[18px]"><Txt v={cur.title} breaks="hard" /></h1>
           <p className="t-body-2-reading md:t-body-1-reading md:text-[18px] md:leading-[1.6] text-white/85 text-pretty max-w-[560px] mb-[24px] md:mb-[32px]"><Txt v={cur.body} /></p>
           <div className="flex gap-[10px] flex-wrap">
