@@ -15,6 +15,24 @@ describe("상담 신청 POST /api/inquiries", () => {
     db.calls.length = 0;
     db.tables.inquiries = [];
   });
+  it("관심 방식과 들어온 경로를 answers 에 저장하고, 이상한 경로 값은 버린다", async () => {
+    const { POST } = await import("@/app/api/inquiries/route");
+    const res = await POST(post({ ...base, route: "1:1 매칭", track: "matching", entryTrack: "matching", entryPath: "/matching" }));
+    expect(res.status).toBe(200);
+    const row = db.calls[0].payload as { answers: Record<string, string> };
+    expect(row.answers.track).toBe("matching");
+    expect(row.answers.entryTrack).toBe("matching");
+    expect(row.answers.entryPath).toBe("/matching");
+    db.calls.length = 0;
+    const res2 = await POST(post({ ...base, track: "social", entryPath: "javascript:alert(1)" }));
+    expect(res2.status).toBe(200);
+    const row2 = db.calls[0].payload as { answers: Record<string, string | undefined> };
+    expect(row2.answers.track).toBe("social");
+    expect(row2.answers.entryPath).toBeUndefined();
+    expect(row2.answers.entryTrack).toBeUndefined();
+    const bad = await POST(post({ ...base, track: "vip" }));
+    expect(bad.status).toBe(400);
+  });
   it("간단 신청: 이름·휴대폰·가능 시간·동의 시각만 저장하고 결과 유형은 null", async () => {
     const { POST } = await import("@/app/api/inquiries/route");
     const res = await POST(post(base));

@@ -18,7 +18,8 @@ const sourceOnly = { id: "inq-4", name: "이서연", phone: "010-4444-1234", cre
 describe("메타 리드 양식 변환", () => {
   it("앞 14열은 메타 리드 파일과 같고 뒤에 원본 UTM 5열이 붙는다", () => {
     expect([...LEAD_COLUMNS]).toEqual(["id", "created_time", "ad_id", "ad_name", "adset_id", "adset_name", "campaign_id", "campaign_name", "form_id", "form_name", "is_organic", "platform", "full_name", "phone_number"]);
-    expect([...CSV_COLUMNS].slice(14)).toEqual(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]);
+    expect([...CSV_COLUMNS].slice(14, 19)).toEqual(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]);
+    expect([...CSV_COLUMNS].slice(19)).toEqual(["interest", "entry"]);
   });
   it("광고 유입: 메타 ID 는 *_id, 이름은 *_name 그대로, platform ig", () => {
     const r = toLeadRow(paid);

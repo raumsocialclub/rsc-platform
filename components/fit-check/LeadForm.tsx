@@ -8,10 +8,12 @@ import { formatPhoneInput } from "@/lib/phone";
 import { readUtm } from "@/lib/utm/client";
 import { trackLead } from "@/components/site/MetaPixel";
 import { Txt } from "@/components/cms/Txt";
+import { entryPathFromReferrer } from "@/lib/inquiries/track";
 
 /**
  * 간단 상담 신청 (기본). 관심 방식(소셜클럽 · 1:1 매칭 · 상담 후 결정) 칩 + 이름·휴대폰·개인정보 동의 (Wanted DS 텍스트 필드 · 체크박스 · 큰 버튼).
- * 관심 방식은 /fit-check?track= 으로 미리 선택되고 inquiries.answers.route 에 라벨로 저장된다 (어드민 상담 상세 「관심 방식」).
+ * 관심 방식은 /fit-check?track= 으로 미리 선택되고 inquiries.answers 에 route(라벨)·track(키)로 저장된다. 함께 entryTrack(어느 상담 버튼으로 들어왔는지)·entryPath(직전 페이지)를 보내
+ * 어드민 「상담 신청」 목록·상세·CSV 에서 「관심 방식」「들어온 경로」로 보인다 (lib/inquiries/track.ts).
  * 「상담 가능 시간」 선택은 인터뷰 기간 동안 잠시 뺐다 (2026-10). API(/api/inquiries)·관리자 화면·DB 는 slot 을 그대로 받는다.
  * 완료 시 메타 픽셀 Lead 이벤트를 보낸다(픽셀 ID 가 설정된 경우에만 실제 전송).
  * 화면 문구는 CMS(apply.form)에서 copy 로 넘어온다. 저장되는 route 값(TRACK_LABEL)은 칩 이름을 바꿔도 고정이라 어드민 필터가 흔들리지 않는다.
@@ -70,7 +72,8 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
     setError(null);
     setSubmitting(true);
     try {
-      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone, consent: true, route: TRACK_LABEL[track], utm: readUtm() }) });
+      const entryPath = entryPathFromReferrer(document.referrer, window.location.origin);
+      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone, consent: true, route: TRACK_LABEL[track], track, entryTrack: initialTrack === "undecided" ? undefined : initialTrack, entryPath, utm: readUtm() }) });
       const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !json?.ok) throw new Error(json?.message ?? "신청을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
       trackLead();

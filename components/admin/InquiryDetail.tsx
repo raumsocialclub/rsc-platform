@@ -7,6 +7,7 @@ import { IssuedCodeBox } from "./IssuedCodeBox";
 import { INQUIRY_STATUS, badgeStyle, fmtDate } from "@/lib/admin/format";
 import type { InquiryCrm } from "@/lib/crm/inquiries";
 import { STATUS_KO } from "@/lib/crm/types";
+import { entryLabel, inquiryTrack, trackLabel } from "@/lib/inquiries/track";
 
 export type InquiryRow = {
   id: string;
@@ -24,7 +25,10 @@ export type InquiryRow = {
     ref?: string;           // /apply?ref=코드 (추천인·직접 전달 링크)
     apply?: Record<string, string | string[]>;  // 상담 전 설문 응답 원본(키-값). CSV·목록 요약에 쓴다
     profile?: string;
-    route?: string;
+    route?: string;         // 관심 방식 라벨(간단 신청) 또는 라움과의 인연(설문형)
+    track?: string;         // 관심 방식 키: social | matching | undecided (2026-11-09~)
+    entryTrack?: string;    // 어느 상담 버튼으로 들어왔는지: social | matching (/fit-check?track=)
+    entryPath?: string;     // 직전 페이지 경로("/social") 또는 외부 호스트("ext:instagram.com")
     slot?: string;
     consentAt?: string;
     consentVersion?: string;
@@ -103,7 +107,8 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   const a = inquiry.answers ?? {};
   const rows: { q: string; a: string }[] = [
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
-    ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : a.route ? [{ q: /소셜클럽|1:1|상담/.test(a.route) ? "관심 방식" : "라움과의 인연", a: a.route }] : []),
+    ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : inquiryTrack(inquiry) ? [{ q: "관심 방식", a: trackLabel(inquiry) }] : a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
+    ...(entryLabel(inquiry) ? [{ q: "들어온 경로", a: entryLabel(inquiry) }] : []),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
     ...(a.consentAt ? [{ q: "개인정보 동의", a: `${fmtDate(a.consentAt, true)}${a.consentVersion ? ` · 동의문 ${a.consentVersion}` : ""}` }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),

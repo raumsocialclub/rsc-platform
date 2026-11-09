@@ -1,9 +1,11 @@
 import type { InquiryRow } from "@/components/admin/InquiryDetail";
+import { entryLabel, trackLabel } from "@/lib/inquiries/track";
 
 /**
  * 상담 신청 → 메타(인스타그램·페이스북) 광고 관리자의 리드 CSV 양식.
  * 광고 관리자에서 내려받은 "Leads" 파일과 앞 14열이 같아 두 파일을 하나로 합쳐 유입 광고별 성과를 볼 수 있다.
  * 그 뒤에 원본 UTM 5열(utm_source … utm_content)을 그대로 붙여, 변환 과정에서 정보가 사라지지 않게 한다.
+ * 맨 뒤 2열(interest, entry)은 관심 방식(소셜클럽 · 1:1 매칭 · 상담 후 결정)과 들어온 경로(어느 페이지·버튼에서 신청했는지) — CRM 상담 때 참고용 (lib/inquiries/track.ts).
  *
  * 광고 UTM → 열 대응. 광고 링크를 메타 동적 매개변수로 만들면 그대로 들어온다:
  *   ?utm_source={{site_source_name}}&utm_medium=paid&utm_campaign={{campaign.id}}&utm_term={{adset.id}}&utm_content={{ad.id}}
@@ -22,13 +24,14 @@ import type { InquiryRow } from "@/components/admin/InquiryDetail";
  */
 export const LEAD_COLUMNS = ["id", "created_time", "ad_id", "ad_name", "adset_id", "adset_name", "campaign_id", "campaign_name", "form_id", "form_name", "is_organic", "platform", "full_name", "phone_number"] as const;
 export const UTM_RAW_COLUMNS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
-export const CSV_COLUMNS = [...LEAD_COLUMNS, ...UTM_RAW_COLUMNS] as const;
+export const TRACK_COLUMNS = ["interest", "entry"] as const;
+export const CSV_COLUMNS = [...LEAD_COLUMNS, ...UTM_RAW_COLUMNS, ...TRACK_COLUMNS] as const;
 export type LeadRow = Record<(typeof CSV_COLUMNS)[number], string>;
 
 /** 메타 리드 파일의 form_id 는 메타 양식 번호라 우리 사이트 신청에는 고정 식별자를 넣는다. */
 export const LEAD_FORM = { id: "rsc-website", name: "라움소셜클럽 웹사이트 상담 신청" } as const;
 
-export type LeadSource = Pick<InquiryRow, "id" | "name" | "phone" | "created_at" | "utm">;
+export type LeadSource = Pick<InquiryRow, "id" | "name" | "phone" | "created_at" | "utm"> & Partial<Pick<InquiryRow, "answers">>;
 export type UtmFilter = { source: string; campaign: string };
 
 /** CSV 기간(한국 날짜 YYYY-MM-DD, 양 끝 포함). null 이면 전체. */
@@ -125,6 +128,8 @@ export function toLeadRow(r: LeadSource): LeadRow {
     utm_campaign: utm?.utm_campaign ?? "",
     utm_term: utm?.utm_term ?? "",
     utm_content: utm?.utm_content ?? "",
+    interest: trackLabel({ answers: r.answers ?? null }),
+    entry: entryLabel({ answers: r.answers ?? null }),
   };
 }
 
@@ -135,7 +140,7 @@ export function csvCell(v: string): string {
   return `"${safe.replace(/"/g, '""')}"`;
 }
 
-/** 엑셀용 BOM + CRLF. 앞 14열은 메타 리드 파일과 동일, 뒤 5열은 원본 UTM. */
+/** 엑셀용 BOM + CRLF. 앞 14열은 메타 리드 파일과 동일, 뒤 5열은 원본 UTM, 마지막 2열은 관심 방식·들어온 경로. */
 export function leadsCsv(rows: LeadSource[]): string {
   const head = CSV_COLUMNS.map((c) => `"${c}"`).join(",");
   const lines = rows.map((r) => { const l = toLeadRow(r); return CSV_COLUMNS.map((c) => csvCell(l[c])).join(","); });
