@@ -66,7 +66,7 @@ export async function SiteFooter() {
           </div>
           <div className="flex items-center gap-[16px] flex-wrap t-caption-1">
             <Link href="/terms" className="text-labelAlt hover:text-label">{L("legalTerms", "이용약관")}</Link>
-            <Link href="/privacy" className="font-semibold text-label">{L("legalPrivacy", "개인정보처리방침")}</Link>
+            <Link href="/privacy" className="text-labelAlt hover:text-label">{L("legalPrivacy", "개인정보처리방침")}</Link>
             {!lead && <Link href="/refund" className="text-labelAlt hover:text-label">{L("legalRefund", "환불규정")}</Link>}
           </div>
         </div>
