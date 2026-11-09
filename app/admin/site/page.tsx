@@ -30,7 +30,8 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Pr
   }
 
   const page = PAGES.find((p) => p.key === sp.page)?.key ?? (hits[0]?.page ?? "global");
-  const docs = DOCS.filter((d) => d.page === page && !d.hidden);
+  // 섹션은 라벨의 번호(00, 00-1, 01 …) 순으로 — 화면 위에서 아래 순서와 같게
+  const docs = DOCS.filter((d) => d.page === page && !d.hidden).sort((a, b) => a.label.localeCompare(b.label, "ko", { numeric: true }));
   const requested = sp.doc ? DOC_BY_ID.get(sp.doc) : undefined;
   const def = (requested && requested.page === page && !requested.hidden ? requested : docs[0])!;
   const [{ data: rows }, { data: row }] = await Promise.all([
