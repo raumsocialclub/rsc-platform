@@ -3,6 +3,7 @@ import { pretendard } from "@/lib/fonts";
 import { PageTracker } from "@/components/site/PageTracker";
 import { EnvBanner } from "@/components/site/EnvBanner";
 import { MetaPixel } from "@/components/site/MetaPixel";
+import { ChannelTalk } from "@/components/site/ChannelTalk";
 import { RevealObserver } from "@/components/site/RevealObserver";
 import { getSettings } from "@/lib/settings/get";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -54,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <PageTracker />
         <RevealObserver />
         <MetaPixel pixelId={settings.metaPixelId} />
+        <ChannelTalk pluginKey={settings.channelTalkPluginKey} />
       </body>
     </html>
   );

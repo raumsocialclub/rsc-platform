@@ -24,12 +24,13 @@ export const SETTINGS_DOCS: DocDef[] = [
     page: "settings",
     label: "상담 신청 · 광고 측정",
     description:
-      "상담 신청(/fit-check)은 기본으로 이름·휴대폰·개인정보 동의만 받는 한 화면입니다(상담 가능 시간 선택은 인터뷰 기간 동안 잠시 뺐습니다). '설문형 상담 신청'을 켜면 예전처럼 6문항 설문을 거쳐 성향 결과 유형(THE SETTLER 등)을 함께 저장합니다. 상담 전 설문(/apply)은 여기서 켜고 끄지 않습니다 — 어드민 「상담 전 설문」에서 만든 비밀 링크로만 열립니다. 메타 픽셀 ID 를 넣으면 공개 페이지에 픽셀이 실리고 상담 신청 완료 시 Lead 이벤트를 보냅니다(비우면 실리지 않음).",
+      "상담 신청(/fit-check)은 기본으로 이름·휴대폰·개인정보 동의만 받는 한 화면입니다(상담 가능 시간 선택은 인터뷰 기간 동안 잠시 뺐습니다). '설문형 상담 신청'을 켜면 예전처럼 6문항 설문을 거쳐 성향 결과 유형(THE SETTLER 등)을 함께 저장합니다. 상담 전 설문(/apply)은 여기서 켜고 끄지 않습니다 — 어드민 「상담 전 설문」에서 만든 비밀 링크로만 열립니다. 메타 픽셀 ID 를 넣으면 공개 페이지에 픽셀이 실리고 상담 신청 완료 시 Lead 이벤트를 보냅니다(비우면 실리지 않음). 채널톡 플러그인 키를 넣으면 공개 페이지 오른쪽 아래에 채널톡 채팅 버튼이 실립니다(어드민·로그인·설문 화면 제외, 비우면 실리지 않음).",
     fields: [
       b("surveyMode", "설문형 상담 신청 켜기 (성향 결과 유형 저장)"),
       t("metaPixelId", "메타 픽셀 ID", "메타 이벤트 관리자 → 데이터 소스 → 픽셀 ID (숫자 15~16자리). 비우면 픽셀을 싣지 않습니다"),
+      t("channelTalkPluginKey", "채널톡 플러그인 키 (Plugin Key)", "채널톡 데스크 → 설정 → 채널톡 버튼 설치 → Plugin Key (예: f142dd95-00e0-471e-94fc-fd7baf35f537 꼴). Access Secret 은 넣지 마세요. 비우면 버튼을 싣지 않습니다"),
     ],
-    defaults: { surveyMode: false, metaPixelId: "" },
+    defaults: { surveyMode: false, metaPixelId: "", channelTalkPluginKey: "" },
   },
   {
     id: "settings.security",

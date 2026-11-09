@@ -50,6 +50,10 @@
   --ds-dimmer: rgba(23, 23, 25, 0.52);
 }
 
+/* 채널톡 버튼(우하단 48~60px)이 떠 있으면 「맨 위로」 버튼을 그 위로 올린다 — components/site/ChannelTalk.tsx 가 html[data-chat] 을 켠다 */
+html[data-chat] .up-button { bottom: 92px; }
+@media (min-width: 761px) { html[data-chat] .up-button { bottom: 104px; } }
+
 @layer base {
   html {
     scroll-behavior: smooth;
