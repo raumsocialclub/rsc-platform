@@ -8,8 +8,9 @@ const all = Object.fromEntries(DOCS.map((d) => [d.id, mergeDoc(d, null)]));
 describe("어드민 문구 검색 (searchDocs)", () => {
   it("사이트에 보이는 문장으로 섹션을 찾는다", () => {
     const hits = searchDocs(all, "아무나, 들어올 수 없습니다");
-    expect(hits.some((h) => h.docId === "matching.verify")).toBe(true);
-    expect(hits[0].pageLabel).toBe("1:1 매칭");
+    // 소셜클럽·1:1 매칭 페이지가 각각 자기 문서를 가지므로 둘 다 찾혀야 한다
+    expect(hits.some((h) => h.docId === "social.verify" && h.pageLabel === "소셜클럽")).toBe(true);
+    expect(hits.some((h) => h.docId === "matching.verify" && h.pageLabel === "1:1 매칭")).toBe(true);
   });
   it("목록 항목(FAQ 답변) 안의 문장도 찾고 몇 번째 항목인지 알려준다", () => {
     const hits = searchDocs(all, "Founding Member 선착순 100명");

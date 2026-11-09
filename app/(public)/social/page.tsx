@@ -23,12 +23,12 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
 
 /**
  * 소셜클럽 트랙 페이지 (사업전략 2026.11.03: 가입비 멤버십 = 회원 자격 + 행사 6회 + 초대권 2매, 결혼중개 아님).
- * 상단 소개 → 01 멤버십 구성(social.membership — 금액은 비공개, 대면 상담 안내) → 02 포지셔닝 → 04 TASTE SOCIAL 프로그램 → 06 MOMENTS → 가입 심사(matching.verify 공용) → FAQ → CTA.
+ * 상단 소개 → 01 멤버십 구성(social.membership — 금액은 비공개, 대면 상담 안내) → 02 포지셔닝 → 04 TASTE SOCIAL 프로그램 → 06 MOMENTS → 가입 심사(social.verify, 1:1 매칭과 별도 문서) → FAQ → CTA.
  * SOCIAL NIGHT · RAUM SOLO 는 1:1 매칭 멤버십 전용이라 /matching 으로 옮겼다. 모든 상담 버튼은 /fit-check?track=social.
  */
 export default async function SocialPage() {
-  const d = await getPageDocs(["home", "social", "matching"]);
-  const hero = d["social.hero"], membership = d["social.membership"], verify = d["matching.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"], cta = d["social.cta"], gate = d["home.gate"];
+  const d = await getPageDocs(["home", "social"]);
+  const hero = d["social.hero"], membership = d["social.membership"], verify = d["social.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"], cta = d["social.cta"], gate = d["home.gate"];
   const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
   const memberItems = list<{ label: string; title: string; body: string }>(membership, "items");
   const memberNote = s(membership, "note");

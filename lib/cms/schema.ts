@@ -404,6 +404,24 @@ export const DOCS: DocDef[] = [
 
   /* ---------- 1:1 매칭 ---------- */
   {
+    id: "social.verify",
+    page: "social",
+    anchor: "#verify",
+    label: "05 가입 심사 (아무나, 들어올 수 없습니다)",
+    description: "소셜클럽 페이지의 가입 심사 섹션. 1:1 매칭 페이지의 같은 섹션은 「1:1 매칭」 탭 → 01 가입 심사에서 따로 수정합니다. 카드는 아이콘 · 제목 · 설명으로 이루어지며 최대 6개입니다.",
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), bool("visible", "표시")],
+    lists: [{ key: "items", label: "확인 항목", itemLabel: "항목", fields: [{ key: "icon", label: "아이콘", type: "select", options: [{ value: "shield", label: "방패(신원)" }, { value: "briefcase", label: "서류가방(직업)" }, { value: "chat", label: "말풍선(인터뷰)" }, { value: "people", label: "사람들(커뮤니티)" }] }, t("title", "제목"), ta("body", "설명", "soft")], min: 1, max: 6 }],
+    defaults: {
+      label: "VERIFIED MEMBERS", title: "아무나,\n들어올 수 없습니다", lead: "가입 전 모든 회원의 신원·혼인 관계·직업·진정성을 확인합니다. 기준을 통과한 검증된 분들끼리만, 철저히 프라이빗하게 소개합니다.", visible: true,
+      items: [
+        { icon: "shield", title: "본인 · 혼인 관계 확인", body: "신분증과 혼인관계증명서로 실명·본인 명의, 법률상 배우자가 없음을 확인합니다." },
+        { icon: "briefcase", title: "직업 확인", body: "재직 증명서, 사업자 등록 등 직업·사업 서류를 확인합니다." },
+        { icon: "chat", title: "프로필 · 취향 인터뷰", body: "라움에서의 대면 인터뷰로 생활 방식, 취향, 바라는 관계를 듣고 커뮤니티 매너 서약을 받습니다." },
+        { icon: "people", title: "활동으로 2차 검증", body: "서류로 끝나지 않습니다. 라움의 공간과 프로그램에 실제로 참여해 온 회원 중에서만 소개합니다." },
+      ],
+    },
+  },
+  {
     id: "social.cta",
     page: "social",
     label: "06 하단 상담 띠 (검은 박스)",
@@ -430,7 +448,8 @@ export const DOCS: DocDef[] = [
     id: "matching.verify",
     page: "matching",
     anchor: "#verify",
-    label: "01 가입 심사 (아무나 들어올 수 없습니다 · 소셜클럽 페이지에도 표시)",
+    label: "01 가입 심사 (아무나, 들어올 수 없습니다)",
+    description: "1:1 매칭 페이지의 가입 심사 섹션. 소셜클럽 페이지의 같은 섹션은 「소셜클럽」 탭 → 05 가입 심사에서 따로 수정합니다.",
     fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), bool("visible", "표시")],
     lists: [{ key: "items", label: "확인 항목", itemLabel: "항목", fields: [{ key: "icon", label: "아이콘", type: "select", options: [{ value: "shield", label: "방패(신원)" }, { value: "briefcase", label: "서류가방(직업)" }, { value: "chat", label: "말풍선(인터뷰)" }, { value: "people", label: "사람들(커뮤니티)" }] }, t("title", "제목"), ta("body", "설명", "soft")], min: 1, max: 6 }],
     defaults: {
