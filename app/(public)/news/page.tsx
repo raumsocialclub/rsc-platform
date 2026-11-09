@@ -14,6 +14,7 @@ import { getPageSeo, pageMetadata } from "@/lib/seo/get";
 import { breadcrumbJsonLd } from "@/lib/seo/jsonld";
 import { Badge, CARD, CARD_HOVER, Container } from "@/components/ui/ds";
 import { Txt } from "@/components/cms/Txt";
+import { getDoc, s } from "@/lib/cms/get";
 
 type Search = Promise<{ y?: string; m?: string }>;
 
@@ -30,7 +31,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Search 
  */
 export default async function NewsPage({ searchParams }: { searchParams: Search }) {
   const { y, m } = await searchParams;
-  const [lite, seo] = await Promise.all([listPublishedPostMonths(), getPageSeo("news")]);
+  const [lite, seo, copy] = await Promise.all([listPublishedPostMonths(), getPageSeo("news"), getDoc("news.page")]);
   const months = monthsOf(lite);
   const today = todayYM();
   const ym = parseYM(y, m) ?? pickDefaultMonth(months, today);
@@ -44,7 +45,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
       <main className="flex-1 py-[40px] md:py-[72px]">
         <Container wide>
           <section className="mb-[28px] md:mb-[40px]">
-            <div className="anim-up t-eyebrow text-primary mb-[10px]">NEWS</div>
+            <div className="anim-up t-eyebrow text-primary mb-[10px]">{s(copy, "eyebrow") || "NEWS"}</div>
             <h1 className="anim-up t-title-1 md:t-display-3 text-label mb-[12px] text-pretty">{seo.title || "소식"}</h1>
             <p className="anim-up-2 t-body-1-reading text-labelAlt max-w-[560px] text-pretty"><Txt v={seo.description} /></p>
           </section>
@@ -58,7 +59,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
 
           {posts.length === 0 ? (
             <div className={`${CARD} px-[24px] py-[64px] text-center t-body-2 text-labelAlt`}>
-              {ym.y}년 {ym.m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.
+              {(s(copy, "emptyText") || "{y}년 {m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.").replace("{y}", String(ym.y)).replace("{m}", String(ym.m))}
             </div>
           ) : (
             <div data-fold className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 lg:grid-cols-3 md:gap-[24px]">

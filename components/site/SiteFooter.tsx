@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Txt } from "@/components/cms/Txt";
-import { getBrand } from "@/lib/cms/get";
+import { getBrand, getNav } from "@/lib/cms/get";
 import { getSettings } from "@/lib/settings/get";
 import { InstagramButton } from "./InstagramButton";
 import { businessInfo } from "@/lib/site/business";
@@ -11,10 +11,11 @@ const LINK = "t-label-1 text-labelAlt hover:text-label hover:translate-x-[2px] i
 
 /**
  * 푸터 (Wanted DS): 연회색 배경, 브랜드 한 줄 + 메뉴·연락처·패밀리 사이트 열, 맨 아래 약관 링크·사업자 정보.
- * 연락처·문구는 CMS(global.brand). 리드 모드면 멤버십·환불규정 링크를 숨긴다.
+ * 연락처·문구는 CMS(global.brand), 메뉴 이름은 CMS(global.nav). 리드 모드면 멤버십·환불규정 링크를 숨긴다.
  */
 export async function SiteFooter() {
-  const [b, settings] = await Promise.all([getBrand(), getSettings()]);
+  const [b, n, settings] = await Promise.all([getBrand(), getNav(), getSettings()]);
+  const L = (k: string, fb: string) => n[k] || fb;
   const lead = settings.leadMode;
   const biz = businessInfo(b);
   const family = [{ label: b.familySite1Label, url: b.familySite1Url }, { label: b.familySite2Label, url: b.familySite2Url }].filter((f) => f.label && f.url);
@@ -31,19 +32,19 @@ export async function SiteFooter() {
             <div className="mt-[20px]"><InstagramButton href={b.instagramUrl} size="sm" /></div>
           </div>
           <div>
-            <div className="t-label-1 font-semibold text-label mb-[14px]">메뉴</div>
+            <div className="t-label-1 font-semibold text-label mb-[14px]">{L("footerMenuTitle", "메뉴")}</div>
             <nav className="flex flex-col gap-[10px]">
-              <Link href="/social" className={LINK}>소셜클럽</Link>
-              <Link href="/matching" className={LINK}>1:1 매칭</Link>
-              <Link href="/#about" className={LINK}>소개</Link>
-              {!lead && <Link href="/pricing" className={LINK}>멤버십</Link>}
-              <Link href="/news" className={LINK}>소식</Link>
-              <Link href="/#faq" className={LINK}>자주 묻는 질문</Link>
-              <Link href="/fit-check" className={LINK}>상담 신청</Link>
+              <Link href="/social" className={LINK}>{L("navSocial", "소셜클럽")}</Link>
+              <Link href="/matching" className={LINK}>{L("navMatching", "1:1 매칭")}</Link>
+              <Link href="/#about" className={LINK}>{L("navAbout", "소개")}</Link>
+              {!lead && <Link href="/pricing" className={LINK}>{L("navMembership", "멤버십")}</Link>}
+              <Link href="/news" className={LINK}>{L("navNews", "소식")}</Link>
+              <Link href="/#faq" className={LINK}>{L("footerFaq", "자주 묻는 질문")}</Link>
+              <Link href="/fit-check" className={LINK}>{L("footerApply", "상담 신청")}</Link>
             </nav>
           </div>
           <div>
-            <div className="t-label-1 font-semibold text-label mb-[14px]">문의</div>
+            <div className="t-label-1 font-semibold text-label mb-[14px]">{L("footerContactTitle", "문의")}</div>
             <div className="flex flex-col gap-[10px] t-label-1 text-labelAlt">
               <a href={`tel:${b.phone}`} className="hover:text-label">{b.phone}</a>
               <a href={`mailto:${b.email}`} className="hover:text-label">{b.email}</a>
@@ -52,7 +53,7 @@ export async function SiteFooter() {
             </div>
           </div>
           <div>
-            <div className="t-label-1 font-semibold text-label mb-[14px]">패밀리 사이트</div>
+            <div className="t-label-1 font-semibold text-label mb-[14px]">{L("footerFamilyTitle", "패밀리 사이트")}</div>
             <nav className="flex flex-col gap-[10px]">
               {family.map((f) => <a key={f.url} href={f.url} target="_blank" rel="noreferrer" className={LINK}>{f.label} ↗</a>)}
             </nav>
@@ -64,9 +65,9 @@ export async function SiteFooter() {
             <div>{b.copyright}</div>
           </div>
           <div className="flex items-center gap-[16px] flex-wrap t-caption-1">
-            <Link href="/terms" className="text-labelAlt hover:text-label">이용약관</Link>
-            <Link href="/privacy" className="font-semibold text-label">개인정보처리방침</Link>
-            {!lead && <Link href="/refund" className="text-labelAlt hover:text-label">환불규정</Link>}
+            <Link href="/terms" className="text-labelAlt hover:text-label">{L("legalTerms", "이용약관")}</Link>
+            <Link href="/privacy" className="font-semibold text-label">{L("legalPrivacy", "개인정보처리방침")}</Link>
+            {!lead && <Link href="/refund" className="text-labelAlt hover:text-label">{L("legalRefund", "환불규정")}</Link>}
           </div>
         </div>
       </div>

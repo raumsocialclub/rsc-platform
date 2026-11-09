@@ -5,7 +5,7 @@ import { ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/componen
 import type { DocData } from "@/lib/cms/get";
 import { s } from "@/lib/cms/get";
 
-type Card = { key: "social" | "matching"; title: string; desc: string; points: string; image: string; href: string; applyHref: string };
+type Card = { key: "social" | "matching"; eyebrow: string; title: string; desc: string; points: string; image: string; href: string; applyHref: string };
 
 /** "항목: 내용" 줄 → [항목, 내용] */
 function parsePoints(v: string): [string, string][] {
@@ -21,10 +21,11 @@ function parsePoints(v: string): [string, string][] {
  */
 export function TrackCards({ doc, gate }: { doc: DocData; gate: DocData }) {
   const cards: Card[] = [
-    { key: "social", title: s(doc, "socialTitle"), desc: s(doc, "socialDesc"), points: s(doc, "socialPoints"), image: s(gate, "socialImage"), href: "/social", applyHref: "/fit-check?track=social" },
-    { key: "matching", title: s(doc, "matchingTitle"), desc: s(doc, "matchingDesc"), points: s(doc, "matchingPoints"), image: s(gate, "matchingImage"), href: "/matching", applyHref: "/fit-check?track=matching" },
+    { key: "social", eyebrow: s(doc, "socialEyebrow") || "01 · SOCIAL CLUB", title: s(doc, "socialTitle"), desc: s(doc, "socialDesc"), points: s(doc, "socialPoints"), image: s(gate, "socialImage"), href: "/social", applyHref: "/fit-check?track=social" },
+    { key: "matching", eyebrow: s(doc, "matchingEyebrow") || "02 · 1:1 MATCHING", title: s(doc, "matchingTitle"), desc: s(doc, "matchingDesc"), points: s(doc, "matchingPoints"), image: s(gate, "matchingImage"), href: "/matching", applyHref: "/fit-check?track=matching" },
   ];
   const note = s(doc, "note");
+  const detailCta = s(doc, "detailCta") || "자세히 보기", applyCta = s(doc, "applyCta") || "상담 신청";
   return (
     <section id="tracks" data-fold className="py-[64px] md:py-[112px] bg-sand">
       <Container>
@@ -32,11 +33,11 @@ export function TrackCards({ doc, gate }: { doc: DocData; gate: DocData }) {
         <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[20px] mt-[40px]">
           {cards.map((c, i) => (
             <article key={c.key} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} overflow-hidden flex flex-col`}>
-              <Link href={c.href} className="block" aria-label={`${c.title} 자세히 보기`}>
+              <Link href={c.href} className="block" aria-label={`${c.title} ${detailCta}`}>
                 <ImageBlock src={c.image} alt="" className="aspect-[16/9]" sizes="(min-width: 761px) 50vw, 100vw" zoom />
               </Link>
               <div className="p-[24px] md:p-[28px] flex flex-col flex-1">
-                <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.key === "social" ? "01 · SOCIAL CLUB" : "02 · 1:1 MATCHING"}</div>
+                <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.eyebrow}</div>
                 <h3 className="t-title-3 text-label mb-[6px]">{c.title}</h3>
                 <p className="t-body-2-reading text-labelAlt text-pretty m-0 mb-[18px]"><Txt v={c.desc} /></p>
                 <dl className="grid gap-[8px] border-t border-lineAlt pt-[16px] mb-[22px]">
@@ -48,8 +49,8 @@ export function TrackCards({ doc, gate }: { doc: DocData; gate: DocData }) {
                   ))}
                 </dl>
                 <div className="mt-auto flex gap-[8px] flex-wrap">
-                  <ButtonLink href={c.href} variant="outlined" size="md">자세히 보기</ButtonLink>
-                  <ButtonLink href={c.applyHref} size="md">상담 신청</ButtonLink>
+                  <ButtonLink href={c.href} variant="outlined" size="md">{detailCta}</ButtonLink>
+                  <ButtonLink href={c.applyHref} size="md">{applyCta}</ButtonLink>
                 </div>
               </div>
             </article>

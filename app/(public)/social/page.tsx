@@ -28,7 +28,8 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
  */
 export default async function SocialPage() {
   const d = await getPageDocs(["home", "social", "matching"]);
-  const hero = d["social.hero"], membership = d["social.membership"], verify = d["matching.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"];
+  const hero = d["social.hero"], membership = d["social.membership"], verify = d["matching.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"], cta = d["social.cta"], gate = d["home.gate"];
+  const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
   const memberItems = list<{ label: string; title: string; body: string }>(membership, "items");
   const memberNote = s(membership, "note");
   const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
@@ -36,7 +37,7 @@ export default async function SocialPage() {
   return (
     <div className="pt-[56px] md:pt-[64px]">
       <Header />
-      <TrackSwitch current="social" />
+      <TrackSwitch current="social" labels={switchLabels} />
       <TrackHero doc={hero} />
 
       {/* 01 SOCIAL CLUB MEMBERSHIP */}
@@ -81,7 +82,7 @@ export default async function SocialPage() {
         <section id="social" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(social, "label"))} title={<Txt v={s(social, "title")} breaks="hard" />} lead={<Txt v={s(social, "lead")} />} reveal />
-            <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">옆으로 밀어서 보기 →</div>
+            {s(social, "swipeHint") && <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">{s(social, "swipeHint")}</div>}
             <div className={`${SWIPE} mt-[12px] md:grid-cols-3 md:gap-[20px] md:mt-[40px]`}>
               {list(social, "items").map((c, i) => (
                 <article key={i} data-reveal style={{ "--d": `${(i % 3) * 90}ms` } as React.CSSProperties} className={`${SWIPE_ITEM} ${CARD} ${CARD_HOVER} overflow-hidden`}>
@@ -103,7 +104,7 @@ export default async function SocialPage() {
         <section id="spaces" data-fold className={SECTION}>
           <Container>
             <SectionHead eyebrow={eyebrow(s(spaces, "label"))} title={s(spaces, "title")} lead={<Txt v={s(spaces, "lead")} breaks="hard" />} reveal />
-            <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">옆으로 밀어서 보기 →</div>
+            {s(spaces, "swipeHint") && <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">{s(spaces, "swipeHint")}</div>}
             <div className={`${SWIPE} mt-[12px] md:grid-cols-2 md:gap-[24px] md:mt-[40px]`}>
               {list(spaces, "items").map((c, i) => (
                 <article key={i} data-reveal style={{ "--d": `${(i % 2) * 90}ms` } as React.CSSProperties} className={`${SWIPE_ITEM} group min-w-0`}>
@@ -132,7 +133,7 @@ export default async function SocialPage() {
 
       {on(faq, "visible") && <FaqSection eyebrow={eyebrow(s(faq, "label"))} title={s(faq, "title")} lead={s(faq, "lead")} items={faqItems} tone="sand" />}
 
-      <CtaBand track="social" title="소셜클럽, 상담으로 시작해 보세요" />
+      <CtaBand track="social" title={s(cta, "title")} body={s(cta, "body")} ctaLabel={s(cta, "ctaLabel")} />
 
       <SiteFooter />
       <UpButton />

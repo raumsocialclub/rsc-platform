@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/ds";
 
-/** 트랙 페이지 상단의 「소셜클럽 | 1:1 매칭」 전환 바. 현재 페이지가 강조되고, 다른 트랙으로 바로 넘어갈 수 있다. */
-export function TrackSwitch({ current }: { current: "social" | "matching" }) {
+export type TrackSwitchLabels = { socialLabel?: string; socialSub?: string; matchingLabel?: string; matchingSub?: string };
+
+/** 트랙 페이지 상단의 「소셜클럽 | 1:1 매칭」 전환 바. 현재 페이지가 강조되고, 다른 트랙으로 바로 넘어갈 수 있다. 이름·한 줄 설명은 CMS home.gate(tabSocial·tabSocialSub…). */
+export function TrackSwitch({ current, labels = {} }: { current: "social" | "matching"; labels?: TrackSwitchLabels }) {
   const items = [
-    { key: "social", href: "/social", label: "소셜클럽", sub: "함께 경험하며 가까워지는" },
-    { key: "matching", href: "/matching", label: "1:1 매칭", sub: "한 사람을 깊이 알고 만나는" },
+    { key: "social", href: "/social", label: labels.socialLabel || "소셜클럽", sub: labels.socialSub || "함께 경험하며 가까워지는" },
+    { key: "matching", href: "/matching", label: labels.matchingLabel || "1:1 매칭", sub: labels.matchingSub || "한 사람을 깊이 알고 만나는" },
   ] as const;
   return (
     <div className="border-b border-lineAlt bg-white">

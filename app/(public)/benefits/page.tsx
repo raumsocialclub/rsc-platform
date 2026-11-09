@@ -13,8 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("benefits");
 }
 
-/* 혜택 목록은 CMS(site_content benefits.rows). 리드 모드면 금액이 들어간 오른쪽 요약과 가격 안내 버튼만 뺀다. */
-const LEAD_CTA_TITLE = "멤버십 혜택은 상담에서 자세히 안내해 드립니다";
+/* 혜택 목록은 CMS(site_content benefits.rows). 리드 모드면 금액이 들어간 오른쪽 요약과 가격 안내 버튼만 빼고, 하단 제목은 benefits.hero.leadNote 로 바꾼다. */
 
 type Row = { group: string; title: string; badge: string; lines: string; right: string; rightStrong?: string };
 
@@ -41,7 +40,7 @@ export default async function BenefitsPage() {
   const lead = settings.leadMode;
   const hero = d["benefits.hero"], cta = d["benefits.cta"];
   const items = list<Row>(d["benefits.rows"], "items").map((r) => (lead && hasPrice(`${r.right ?? ""} ${r.rightStrong ?? ""}`) ? { ...r, right: "", rightStrong: "" } : r));
-  const ctaTitle = lead && /가격/.test(s(cta, "title")) ? LEAD_CTA_TITLE : s(cta, "title");
+  const ctaTitle = lead && /가격/.test(s(cta, "title")) ? s(hero, "leadNote") || "멤버십 혜택은 상담에서 자세히 안내해 드립니다" : s(cta, "title");
   const showCta = (label: string, href: string) => !!label && !(lead && isLeadHiddenHref(href));
   const groups: { name: string; rows: (Row & { n: string })[] }[] = [];
   items.forEach((r, i) => {

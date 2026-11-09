@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 /** 소식 상세 (M11). 발행되지 않은 글은 RLS 로 안 보이므로 404 */
 export default async function NewsDetailPage({ params }: Params) {
   const { slug } = await params;
-  const [p, org] = await Promise.all([getPostBySlug(decode(slug)), getDoc("seo.org")]);
+  const [p, org, copy] = await Promise.all([getPostBySlug(decode(slug)), getDoc("seo.org"), getDoc("news.page")]);
   if (!p || !p.published) notFound();
 
   return (
@@ -57,8 +57,8 @@ export default async function NewsDetailPage({ params }: Params) {
           {p.summary && <p className="t-headline-1 text-label mb-[28px] text-pretty">{p.summary}</p>}
           <Markdown source={p.body} />
           <div className="mt-[48px] pt-[24px] border-t border-lineAlt flex justify-between items-center gap-[16px] flex-wrap">
-            <ButtonLink href="/news" variant="text" size="md">← 소식 목록</ButtonLink>
-            <ButtonLink href="/fit-check" size="md">RSC 상담 신청하기</ButtonLink>
+            <ButtonLink href="/news" variant="text" size="md">{s(copy, "backLabel") || "← 소식 목록"}</ButtonLink>
+            <ButtonLink href="/fit-check" size="md">{s(copy, "ctaLabel") || "RSC 상담 신청하기"}</ButtonLink>
           </div>
         </article>
         <JsonLd data={[articleJsonLd(p, s(org, "name") || "라움소셜클럽"), breadcrumbJsonLd([{ name: "홈", path: "/" }, { name: "소식", path: "/news" }, { name: p.title, path: `/news/${encodeURIComponent(p.slug)}` }])]} />

@@ -43,7 +43,9 @@ function sanitize(id: string, raw: unknown): Record<string, unknown> | null {
 function pathsFor(id: string): string[] {
   const page = id.split(".")[0];
   if (page === "global") return ["/", "/pricing", "/benefits", "/fit-check", "/terms", "/privacy", "/refund", "/login", "/join", "/programs", "/my"];
-  if (page === "home") return ["/"];
+  if (page === "home" || page === "social" || page === "matching") return ["/", "/social", "/matching"]; // home.faq·home.gate·matching.verify 등은 세 페이지가 함께 쓴다
+  if (page === "apply") return ["/fit-check"];
+  if (page === "news") return ["/news"];
   if (page === "pricing") return ["/pricing"];
   if (page === "benefits") return ["/benefits"];
   if (page === "legal") return [`/${id.split(".")[1]}`];

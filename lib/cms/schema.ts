@@ -20,9 +20,13 @@ export type Field = {
 export type ListDef = { key: string; label: string; itemLabel: string; fields: Field[]; min?: number; max?: number };
 export type DocDef = {
   id: string;
-  page: "global" | "home" | "social" | "matching" | "pricing" | "benefits" | "legal" | "settings" | "seo";
+  page: "global" | "home" | "social" | "matching" | "apply" | "news" | "pricing" | "benefits" | "legal" | "settings" | "seo";
   label: string;
   description?: string;
+  /** 「사이트에서 보기」가 이동할 섹션 앵커 (예: "#faq") */
+  anchor?: string;
+  /** 더 이상 화면에 쓰이지 않는 문서 — 어드민 목록에서 숨긴다 (저장된 값은 보존) */
+  hidden?: boolean;
   fields: Field[];
   lists?: ListDef[];
   defaults: Record<string, unknown>;
@@ -102,12 +106,31 @@ export const DOCS: DocDef[] = [
     ],
     defaults: { cream: "#ffffff", ink: "#171719", brown: "#0066ff", brownHover: "#005eeb", gold: "#3385ff", goldHover: "#66a3ff", sand: "#f7f7f8", sandDeep: "#f4f4f5" },
   },
+  {
+    id: "global.nav",
+    page: "global",
+    label: "메뉴 이름 (상단 메뉴 · 푸터)",
+    description: "상단 메뉴(GNB)와 푸터에 보이는 메뉴 이름입니다. 링크 주소는 바뀌지 않고 이름만 바뀝니다. 「프로그램」「멤버십」「내 예약」「로그인」은 리드 모드에서는 보이지 않습니다.",
+    fields: [
+      t("navSocial", "메뉴: 소셜클럽"), t("navMatching", "메뉴: 1:1 매칭"), t("navAbout", "메뉴: 소개"), t("navPrograms", "메뉴: 프로그램"), t("navMembership", "메뉴: 멤버십"), t("navNews", "메뉴: 소식"), t("navFaq", "메뉴: FAQ"),
+      t("navMy", "메뉴: 내 예약"), t("navLogin", "메뉴: 로그인"), t("navLogout", "메뉴: 로그아웃"),
+      t("footerMenuTitle", "푸터 1열 제목"), t("footerFaq", "푸터: 자주 묻는 질문"), t("footerApply", "푸터: 상담 신청"), t("footerContactTitle", "푸터 2열 제목"), t("footerFamilyTitle", "푸터 3열 제목"),
+      t("legalTerms", "푸터: 이용약관"), t("legalPrivacy", "푸터: 개인정보처리방침"), t("legalRefund", "푸터: 환불규정"),
+    ],
+    defaults: {
+      navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식", navFaq: "FAQ",
+      navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃",
+      footerMenuTitle: "메뉴", footerFaq: "자주 묻는 질문", footerApply: "상담 신청", footerContactTitle: "문의", footerFamilyTitle: "패밀리 사이트",
+      legalTerms: "이용약관", legalPrivacy: "개인정보처리방침", legalRefund: "환불규정",
+    },
+  },
 
   /* ---------- 홈 ---------- */
   {
     id: "home.hero",
     page: "home",
-    label: "히어로",
+    hidden: true, // 2026-11 두 갈래 홈(home.gate)으로 교체되어 화면에 쓰이지 않음
+    label: "(사용 안 함) 옛 히어로",
     fields: [img("image", "배경 사진", "가로 1920px 이상 권장"), t("overline", "작은 제목"), ta("title", "큰 제목", "hard"), ta("body", "설명", "soft"), t("cta1Label", "버튼 1 문구"), link("cta1Href", "버튼 1 링크"), t("cta2Label", "버튼 2 문구"), link("cta2Href", "버튼 2 링크")],
     defaults: {
       image: "/images/hero.jpg",
@@ -123,6 +146,7 @@ export const DOCS: DocDef[] = [
   {
     id: "home.about",
     page: "home",
+    anchor: "#about",
     label: "01 소개 (NEW DEFINITION)",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨"), t("title", "제목"), ta("p1", "본문 1", "hard"), ta("p2", "본문 2", "soft"), ta("quote", "인용문", "soft"), img("image", "사진")],
     defaults: {
@@ -137,8 +161,9 @@ export const DOCS: DocDef[] = [
   },
   {
     id: "home.why",
-    page: "home",
-    label: "02 포지셔닝",
+    page: "social",
+    anchor: "#why",
+    label: "02 포지셔닝 (MATCHING이 아니라 COMMUNITY)",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), ta("closing", "마무리 문장", "soft")],
     lists: [{ key: "items", label: "3단계 카드", itemLabel: "카드", fields: [t("label", "라벨"), ta("text", "내용", "soft")], min: 1, max: 6 }],
     defaults: {
@@ -157,7 +182,8 @@ export const DOCS: DocDef[] = [
   {
     id: "home.promise",
     page: "home",
-    label: "03 브랜드 약속",
+    anchor: "#promise",
+    label: "02 브랜드 약속",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard")],
     lists: [{ key: "items", label: "가치 카드", itemLabel: "카드", fields: [t("label", "라벨"), t("title", "제목"), ta("body", "설명", "soft")], min: 1, max: 6 }],
     defaults: {
@@ -173,13 +199,15 @@ export const DOCS: DocDef[] = [
   },
   {
     id: "home.social",
-    page: "home",
-    label: "04 RSC SOCIAL 프로그램",
-    fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard"), ta("lead", "설명", "soft")],
+    page: "social",
+    anchor: "#social",
+    label: "03 TASTE SOCIAL 프로그램 카드",
+    fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), t("swipeHint", "모바일 스와이프 안내", undefined, "모바일에서 카드 위에 보이는 작은 안내 문구")],
     lists: [{ key: "items", label: "프로그램 카드", itemLabel: "카드", fields: [img("image", "사진"), t("cat", "카테고리"), t("title", "이름"), ta("desc", "설명", "soft"), t("filter", "사진 보정(CSS filter)", undefined, "예: brightness(0.97) saturate(0.94)")], min: 1, max: 12 }],
     defaults: {
       visible: true,
       label: "04  /  RSC TASTE SOCIAL — MONTHLY",
+      swipeHint: "옆으로 밀어서 보기 →",
       title: "매달 한 번, RSC를 일상으로 만드는\n취향 프로그램",
       lead: "연애를 앞세우지 않습니다. 월 1회 열리는 TASTE SOCIAL 에서\n좋아하는 것을 함께 경험하다 보면 자연스럽게 사람을 알게 됩니다.",
       items: [
@@ -194,13 +222,16 @@ export const DOCS: DocDef[] = [
   },
   {
     id: "home.solo",
-    page: "home",
-    label: "05 MEET & CONNECT",
-    fields: [bool("visible", "표시"), t("label", "섹션 라벨")],
+    page: "matching",
+    anchor: "#members",
+    label: "04 회원 전용 행사 (SOCIAL NIGHT · GRAND BALL · RAUM SOLO)",
+    fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard"), ta("lead", "설명", "soft")],
     lists: [{ key: "cards", label: "카드", itemLabel: "카드", fields: [img("image", "사진"), t("label", "라벨"), t("title", "이름"), ta("body", "설명", "soft"), t("filter", "사진 보정(CSS filter)")], min: 1, max: 4 }],
     defaults: {
       visible: true,
-      label: "05  /  MEMBERS ONLY",
+      label: "MEMBERS ONLY",
+      title: "1:1 매칭 회원만의\n특별한 시간",
+      lead: "ACCESS · SIGNATURE 회원은 참여권 차감 없이 분기 테마 나이트와 연말 그랜드 볼에 참여합니다. SIGNATURE 회원은 기수제 로테이션 프로그램 RAUM SOLO 1기가 포함됩니다.",
       cards: [
         { image: "/images/social-night.jpg", label: "ACCESS · SIGNATURE · 3 · 6 · 9월 + 11월 GRAND BALL", title: "RAUM SOCIAL NIGHT", body: "3·6·9월에 열리는 테마 나이트(Masquerade · Garden · Summer White). 공연, 다이닝, 와인, 음악 안에서 자연스럽게 사람을 만납니다.\n11월에는 RSC GRAND SOCIAL BALL 로 한 해를 함께한 회원 전원이 모입니다. 참여권 차감이 없는 멤버십 회원 전용 행사입니다.", filter: "brightness(1.1) saturate(0.94)" },
         { image: "/images/raum-solo.jpg", label: "SIGNATURE · 6 COHORTS A YEAR", title: "RAUM SOLO", body: "한 번의 소개팅이 아닌, 함께 보내는 한 기수. 오리엔테이션 → 오프닝 나이트 → 와인 → 웰니스 → 살롱 → 애프터아워즈 → SOLO BALL 로 이어지는 기수제 로테이션 프로그램입니다.\n1·3·6·8·10·12월 연 6기로 운영하며, SIGNATURE 회원은 1기 참여가 포함됩니다.", filter: "grayscale(1) brightness(1.05) contrast(1.05)" },
@@ -209,14 +240,16 @@ export const DOCS: DocDef[] = [
   },
   {
     id: "home.spaces",
-    page: "home",
-    label: "06 함께하는 시간 (MOMENTS)",
+    page: "social",
+    anchor: "#spaces",
+    label: "04 함께하는 시간 (MOMENTS)",
     description: "경험 중심 4장 카드. 네 장 모두 정사각형 사진 + 번호·제목·설명 구조(글 크기·배치 동일). 사진 초점은 '가로% 세로%'.",
-    fields: [bool("visible", "표시"), t("label", "섹션 라벨"), t("title", "제목"), ta("lead", "설명", "hard"), t("ctaLabel", "버튼 문구", undefined, "비우면 버튼을 표시하지 않음"), link("ctaHref", "버튼 링크")],
+    fields: [bool("visible", "표시"), t("label", "섹션 라벨"), t("title", "제목"), ta("lead", "설명", "hard"), t("swipeHint", "모바일 스와이프 안내"), t("ctaLabel", "버튼 문구", undefined, "비우면 버튼을 표시하지 않음"), link("ctaHref", "버튼 링크")],
     lists: [{ key: "items", label: "카드", itemLabel: "카드", fields: [img("image", "사진 (정사각형 1:1 권장)"), t("n", "번호"), t("title", "제목"), ta("desc", "설명", "soft"), t("alt", "사진 설명(대체 텍스트)", undefined, "화면 낭독기·검색엔진용. 사진이 보여주는 장면을 한 문장으로"), t("position", "사진 초점", undefined, "예: 50% 60% — 모바일에서 잘리는 부분을 조정"), t("note", "보조 정보(선택)", undefined, "예: 장소명. 사진과 장소의 관계가 확실할 때만")], min: 1, max: 6 }],
     defaults: {
       visible: true,
       label: "06  /  MOMENTS",
+      swipeHint: "옆으로 밀어서 보기 →",
       title: "취향을 나누고, 서로를 알아가는 시간",
       lead: "문화와 웰니스, 함께하는 저녁까지.\n라움소셜클럽에서 싱글들의 새로운 일상이 시작됩니다.",
       ctaLabel: "프로그램 살펴보기",
@@ -232,7 +265,8 @@ export const DOCS: DocDef[] = [
   {
     id: "home.membership",
     page: "home",
-    label: "07 멤버십",
+    hidden: true, // 2026-11 두 갈래 홈에서 제외됨 (멤버십 구성은 social.membership · matching.plans)
+    label: "(사용 안 함) 옛 멤버십 섹션",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨"), img("image", "사진"), ta("title", "제목", "hard"), ta("body", "설명", "soft"), t("link1Label", "카드 링크 1 문구"), link("link1Href", "카드 링크 1"), t("link2Label", "카드 링크 2 문구"), link("link2Href", "카드 링크 2"), t("cta1Label", "버튼 1 문구"), link("cta1Href", "버튼 1 링크"), t("cta2Label", "버튼 2 문구"), link("cta2Href", "버튼 2 링크")],
     lists: [{ key: "values", label: "가치 5칸", itemLabel: "칸", fields: [t("label", "라벨"), ta("text", "내용", "hard")], min: 1, max: 8 }],
     defaults: {
@@ -256,8 +290,9 @@ export const DOCS: DocDef[] = [
   {
     id: "home.faq",
     page: "home",
-    label: "08 자주 묻는 질문 (FAQ)",
-    description: "검색엔진·AI 검색이 '가입 조건·회비·환불' 같은 질문에 답할 때 인용하는 섹션입니다. 질문은 방문자가 실제로 검색할 문장으로 쓰는 것이 좋습니다.",
+    anchor: "#faq",
+    label: "03 자주 묻는 질문 (FAQ · 소셜클럽 페이지에도 표시)",
+    description: "메인과 소셜클럽 페이지에 함께 나오는 FAQ 입니다. 1:1 매칭 페이지의 FAQ 는 「1:1 매칭」 탭에 따로 있습니다. 금액(원)이 들어간 질문·답변은 화면에서 자동으로 빠집니다. 검색엔진·AI 검색이 '가입 조건·회비·환불' 같은 질문에 답할 때 인용하는 섹션입니다. 질문은 방문자가 실제로 검색할 문장으로 쓰는 것이 좋습니다.",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard"), ta("lead", "설명", "soft")],
     lists: [{ key: "items", label: "질문", itemLabel: "질문", fields: [t("q", "질문"), ta("a", "답변", "hard")], min: 1, max: 20 }],
     defaults: {
@@ -282,17 +317,18 @@ export const DOCS: DocDef[] = [
   {
     id: "home.gate",
     page: "home",
-    label: "00 게이트 히어로 (소셜클럽 · 1:1 매칭 전환)",
+    anchor: "#gate-hero",
+    label: "00 대문 히어로 (소셜클럽 · 1:1 매칭 전환)",
     description: "메인 맨 위의 전환형 히어로. 탭을 누르면 사진·문구·버튼이 바뀌고, 버튼은 각 트랙 페이지(/social, /matching)와 상담 신청으로 이어집니다.",
     fields: [
-      t("tabSocial", "탭 1 이름"), t("tabMatching", "탭 2 이름"),
+      t("tabSocial", "탭 1 이름"), t("tabSocialSub", "탭 1 한 줄 설명", undefined, "소셜클럽·1:1 매칭 페이지 상단 전환 바에서 이름 아래에 표시"), t("tabMatching", "탭 2 이름"), t("tabMatchingSub", "탭 2 한 줄 설명"),
       { key: "defaultTrack", label: "처음 보여줄 트랙", type: "select", options: [{ value: "social", label: "소셜클럽" }, { value: "matching", label: "1:1 매칭" }] },
       img("socialImage", "소셜클럽 배경 사진", "가로 1920px 이상 권장"), t("socialOverline", "소셜클럽 작은 제목"), ta("socialTitle", "소셜클럽 큰 제목", "hard"), ta("socialBody", "소셜클럽 설명", "soft"), t("socialCta", "소셜클럽 이동 버튼 문구"),
       img("matchingImage", "1:1 매칭 배경 사진", "가로 1920px 이상 권장"), t("matchingOverline", "1:1 매칭 작은 제목"), ta("matchingTitle", "1:1 매칭 큰 제목", "hard"), ta("matchingBody", "1:1 매칭 설명", "soft"), t("matchingCta", "1:1 매칭 이동 버튼 문구"),
       t("applyCta", "상담 신청 버튼 문구"),
     ],
     defaults: {
-      tabSocial: "소셜클럽", tabMatching: "1:1 매칭", defaultTrack: "social",
+      tabSocial: "소셜클럽", tabSocialSub: "함께 경험하며 가까워지는", tabMatching: "1:1 매칭", tabMatchingSub: "한 사람을 깊이 알고 만나는", defaultTrack: "social",
       socialImage: "/images/hero.jpg", socialOverline: "RAUM SOCIAL CLUB", socialTitle: "취향으로 만나,\n함께하는 일상이 넓어지는 곳.", socialBody: "싱글을 위한 라이프스타일 커뮤니티.\n좋아하는 것을 함께하며, 서로를 알아갑니다.", socialCta: "소셜클럽 자세히 보기",
       matchingImage: "/images/after-hours.jpg", matchingOverline: "RAUM 1:1 MATCHING", matchingTitle: "한 사람을,\n깊이 알고 만나는 곳.", matchingBody: "검증된 멤버를 위한 프라이빗 1:1 소개.\n전담 컨시어지가 직접 소개하고, 만남은 라움에서 이루어집니다.", matchingCta: "1:1 매칭 자세히 보기",
       applyCta: "상담 신청",
@@ -301,10 +337,13 @@ export const DOCS: DocDef[] = [
   {
     id: "home.tracks",
     page: "home",
+    anchor: "#tracks",
     label: "00-1 두 가지 방식 비교 카드",
-    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), t("socialTitle", "소셜클럽 카드 제목"), ta("socialDesc", "소셜클럽 카드 설명", "soft"), ta("socialPoints", "소셜클럽 특징 (줄마다 '항목: 내용')"), t("matchingTitle", "1:1 매칭 카드 제목"), ta("matchingDesc", "1:1 매칭 카드 설명", "soft"), ta("matchingPoints", "1:1 매칭 특징 (줄마다 '항목: 내용')"), ta("note", "하단 안내", "soft"), bool("visible", "표시")],
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), t("detailCta", "「자세히 보기」 버튼 문구"), t("applyCta", "「상담 신청」 버튼 문구"), t("socialEyebrow", "소셜클럽 카드 작은 제목"), t("socialTitle", "소셜클럽 카드 제목"), ta("socialDesc", "소셜클럽 카드 설명", "soft"), ta("socialPoints", "소셜클럽 특징 (줄마다 '항목: 내용')"), t("matchingEyebrow", "1:1 매칭 카드 작은 제목"), t("matchingTitle", "1:1 매칭 카드 제목"), ta("matchingDesc", "1:1 매칭 카드 설명", "soft"), ta("matchingPoints", "1:1 매칭 특징 (줄마다 '항목: 내용')"), ta("note", "하단 안내", "soft"), bool("visible", "표시")],
     defaults: {
       label: "TWO WAYS TO MEET",
+      detailCta: "자세히 보기", applyCta: "상담 신청",
+      socialEyebrow: "01 · SOCIAL CLUB", matchingEyebrow: "02 · 1:1 MATCHING",
       title: "나에게 맞는 방식을\n먼저 골라 보세요",
       lead: "같은 공간, 같은 가입 심사를 거친 사람들. 만나는 방식만 다릅니다. 둘 다 상담은 무료이며, 상담에서 함께 정해도 됩니다.",
       socialTitle: "소셜클럽",
@@ -318,11 +357,20 @@ export const DOCS: DocDef[] = [
     },
   },
 
+  {
+    id: "home.cta",
+    page: "home",
+    label: "04 하단 상담 띠 (검은 박스)",
+    description: "메인 맨 아래 검은 띠. 버튼 두 개는 각각 소셜클럽·1:1 매칭 상담 신청으로 갑니다.",
+    fields: [t("title", "제목"), ta("body", "설명", "soft"), t("socialLabel", "소셜클럽 버튼 문구"), t("matchingLabel", "1:1 매칭 버튼 문구")],
+    defaults: { title: "상담으로 시작해 보세요", body: "이름과 연락처만 남기면 담당자가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다.", socialLabel: "소셜클럽 상담 신청", matchingLabel: "1:1 매칭 상담 신청" },
+  },
+
   /* ---------- 소셜클럽 ---------- */
   {
     id: "social.hero",
     page: "social",
-    label: "상단 소개",
+    label: "00 상단 소개",
     fields: [img("image", "사진"), t("overline", "작은 제목"), ta("title", "큰 제목", "hard"), ta("body", "설명", "soft"), t("cta1Label", "버튼 1 문구"), link("cta1Href", "버튼 1 링크"), t("cta2Label", "버튼 2 문구"), link("cta2Href", "버튼 2 링크")],
     defaults: {
       image: "/images/moment-04-evening.jpg",
@@ -336,6 +384,7 @@ export const DOCS: DocDef[] = [
   {
     id: "social.membership",
     page: "social",
+    anchor: "#membership",
     label: "01 소셜클럽 멤버십 구성",
     description: "가입비로 받는 것(사업전략 PRICING). 금액은 비공개 — 대면 상담에서 안내하므로 문구에 숫자를 넣지 않습니다.",
     fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), ta("note", "하단 안내", "soft"), bool("visible", "표시")],
@@ -355,9 +404,18 @@ export const DOCS: DocDef[] = [
 
   /* ---------- 1:1 매칭 ---------- */
   {
+    id: "social.cta",
+    page: "social",
+    label: "06 하단 상담 띠 (검은 박스)",
+    fields: [t("title", "제목"), ta("body", "설명", "soft"), t("ctaLabel", "버튼 문구")],
+    defaults: { title: "소셜클럽, 상담으로 시작해 보세요", body: "이름과 연락처만 남기면 담당자가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다.", ctaLabel: "소셜클럽 상담 신청" },
+  },
+
+  /* ---------- 1:1 매칭 ---------- */
+  {
     id: "matching.hero",
     page: "matching",
-    label: "상단 소개",
+    label: "00 상단 소개",
     fields: [img("image", "사진"), t("overline", "작은 제목"), ta("title", "큰 제목", "hard"), ta("body", "설명", "soft"), t("cta1Label", "버튼 1 문구"), link("cta1Href", "버튼 1 링크"), t("cta2Label", "버튼 2 문구"), link("cta2Href", "버튼 2 링크")],
     defaults: {
       image: "/images/after-hours.jpg",
@@ -371,7 +429,8 @@ export const DOCS: DocDef[] = [
   {
     id: "matching.verify",
     page: "matching",
-    label: "01 가입 심사 (아무나 들어올 수 없습니다)",
+    anchor: "#verify",
+    label: "01 가입 심사 (아무나 들어올 수 없습니다 · 소셜클럽 페이지에도 표시)",
     fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), bool("visible", "표시")],
     lists: [{ key: "items", label: "확인 항목", itemLabel: "항목", fields: [{ key: "icon", label: "아이콘", type: "select", options: [{ value: "shield", label: "방패(신원)" }, { value: "briefcase", label: "서류가방(직업)" }, { value: "chat", label: "말풍선(인터뷰)" }, { value: "people", label: "사람들(커뮤니티)" }] }, t("title", "제목"), ta("body", "설명", "soft")], min: 1, max: 6 }],
     defaults: {
@@ -387,6 +446,7 @@ export const DOCS: DocDef[] = [
   {
     id: "matching.how",
     page: "matching",
+    anchor: "#how",
     label: "02 진행 방식",
     fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), bool("visible", "표시")],
     lists: [{ key: "steps", label: "단계", itemLabel: "단계", fields: [t("title", "제목"), ta("body", "설명", "soft")], min: 2, max: 6 }],
@@ -403,12 +463,13 @@ export const DOCS: DocDef[] = [
   {
     id: "matching.plans",
     page: "matching",
+    anchor: "#plans",
     label: "03 멤버십 구성 (ACCESS · SIGNATURE · MERRY)",
     description: "결혼중개 멤버십 2종과 플래그십. 가입비·연회비는 비공개(대면 상담 안내)이므로 문구에 금액을 넣지 않습니다. 금액이 들어간 줄은 화면에서 자동으로 빠집니다.",
-    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), ta("extras", "확장 옵션 (줄마다 하나)"), ta("note", "하단 안내", "soft"), bool("visible", "표시")],
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), t("swipeHint", "모바일 스와이프 안내"), t("ctaSuffix", "카드 버튼 문구 뒷말", undefined, "멤버십 이름 뒤에 붙습니다. 예: 'ACCESS 상담 신청'"), t("merryCta", "MERRY 카드 버튼 문구"), t("extrasTitle", "확장 옵션 칸 제목"), ta("extras", "확장 옵션 (줄마다 하나)"), ta("note", "하단 안내", "soft"), bool("visible", "표시")],
     lists: [{ key: "items", label: "멤버십", itemLabel: "멤버십", fields: [t("name", "이름"), t("tag", "한 줄 태그"), ta("features", "포함 항목 (줄마다 하나)"), t("badge", "배지", undefined, "예: 주력"), bool("dark", "강조(다크 카드)")], min: 1, max: 4 }],
     defaults: {
-      label: "MEMBERSHIP", title: "깊이에 따라 고르는\n두 가지 멤버십", lead: "두 멤버십 모두 소셜클럽(회원 자격 · 행사 6회 · 초대권 2매)을 포함하고, 1:1 만남은 실제로 만난 경우에만 차감됩니다. 결혼을 목적으로 하는 분께는 RAUM MERRY 를 별도 심사로 안내합니다.", visible: true,
+      label: "MEMBERSHIP", swipeHint: "옆으로 밀어서 비교하기 →", ctaSuffix: "상담 신청", merryCta: "별도 상담 신청", extrasTitle: "필요한 만큼 추가", title: "깊이에 따라 고르는\n두 가지 멤버십", lead: "두 멤버십 모두 소셜클럽(회원 자격 · 행사 6회 · 초대권 2매)을 포함하고, 1:1 만남은 실제로 만난 경우에만 차감됩니다. 결혼을 목적으로 하는 분께는 RAUM MERRY 를 별도 심사로 안내합니다.", visible: true,
       items: [
         { name: "ACCESS", tag: "소셜클럽 + 1:1 만남 5회", features: "1:1 만남 5회 (실제 대면 시에만 차감)\n소셜클럽 전체 포함 (행사 6회 · 초대권 2매)\n분기 RAUM SOCIAL NIGHT · 연말 GRAND SOCIAL BALL\n라움 라운지·다이닝·공연 공간에서의 만남", badge: "", dark: false },
         { name: "SIGNATURE", tag: "소셜클럽 + 1:1 만남 10회 + RAUM SOLO", features: "1:1 만남 10회 (실제 대면 시에만 차감)\nRAUM SOLO 1기 포함 (기수제 로테이션, 연 6기)\n전담 Relationship Concierge\n소셜클럽 전체 + SOCIAL NIGHT · GRAND SOCIAL BALL\n60일 안에 ACCESS 에서 전환 시 차액만 납부", badge: "주력", dark: true },
@@ -421,7 +482,8 @@ export const DOCS: DocDef[] = [
   {
     id: "matching.diff",
     page: "matching",
-    label: "04 다른 점",
+    anchor: "#why",
+    label: "05 다른 점 (WHY RSC)",
     fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), bool("visible", "표시")],
     lists: [{ key: "items", label: "카드", itemLabel: "카드", fields: [t("label", "라벨"), t("title", "제목"), ta("body", "설명", "soft")], min: 1, max: 6 }],
     defaults: {
@@ -437,10 +499,11 @@ export const DOCS: DocDef[] = [
   {
     id: "matching.who",
     page: "matching",
-    label: "05 이런 분께",
-    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("points", "항목 (줄마다 하나)"), img("image", "사진"), bool("visible", "표시")],
+    anchor: "#who",
+    label: "06 이런 분께",
+    fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("points", "항목 (줄마다 하나)"), t("ctaLabel", "버튼 문구"), img("image", "사진"), bool("visible", "표시")],
     defaults: {
-      label: "WHO IT'S FOR", title: "이런 분께 맞습니다", visible: true,
+      label: "WHO IT'S FOR", title: "이런 분께 맞습니다", ctaLabel: "1:1 매칭 상담 신청", visible: true,
       image: "/images/about.jpg",
       points: "결혼이나 진지한 교제를 염두에 두고 있는 25~45세 싱글\n결혼정보회사에서 '만남 몇 회'를 사 봤지만 관계로 이어지지 않았던 분\n앱의 불특정 다수보다 검증된 커뮤니티 안의 만남을 원하는 분\n바쁜 일상 속에서 소개와 일정 조율을 맡기고, 좋은 공간에서 만나고 싶은 분",
     },
@@ -448,7 +511,8 @@ export const DOCS: DocDef[] = [
   {
     id: "matching.faq",
     page: "matching",
-    label: "06 자주 묻는 질문",
+    anchor: "#faq",
+    label: "07 자주 묻는 질문",
     fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), bool("visible", "표시")],
     lists: [{ key: "items", label: "질문", itemLabel: "질문", fields: [t("q", "질문"), ta("a", "답변", "hard")], min: 1, max: 20 }],
     defaults: {
@@ -462,6 +526,52 @@ export const DOCS: DocDef[] = [
         { q: "결혼을 전제로 해야 하나요?", a: "아니요. 진지한 교제를 바라는 분이면 충분합니다. 결혼을 목적으로 하는 분께는 별도 신청과 심사로 진행하는 플래그십 RAUM MERRY 를 안내드립니다." },
       ],
     },
+  },
+
+  {
+    id: "matching.cta",
+    page: "matching",
+    label: "08 하단 상담 띠 (검은 박스)",
+    fields: [t("title", "제목"), ta("body", "설명", "soft"), t("ctaLabel", "버튼 문구")],
+    defaults: { title: "1:1 매칭, 상담으로 시작해 보세요", body: "이름과 연락처만 남기면 담당자가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다.", ctaLabel: "1:1 매칭 상담 신청" },
+  },
+
+  /* ---------- 상담 신청 (/fit-check) ---------- */
+  {
+    id: "apply.form",
+    page: "apply",
+    label: "상담 신청 양식",
+    description: "간단 상담 신청 화면(/fit-check)의 모든 문구. 「관심 있는 방식」 칩의 이름을 바꿔도 어드민 상담 목록에는 소셜클럽 · 1:1 매칭 · 상담 후 결정으로 저장됩니다. 개인정보 동의 문구는 개인정보처리방침과 내용이 맞아야 합니다.",
+    fields: [
+      t("titleDefault", "제목 (기본)"), t("titleSocial", "제목 (소셜클럽에서 들어왔을 때)"), t("titleMatching", "제목 (1:1 매칭에서 들어왔을 때)"), ta("note", "제목 아래 안내", "soft"),
+      t("trackLegend", "관심 방식 항목 이름"), t("chipSocial", "칩 1: 소셜클럽"), t("chipMatching", "칩 2: 1:1 매칭"), t("chipUndecided", "칩 3: 상담 후 결정"),
+      t("helpSocial", "칩 1 선택 시 한 줄 설명"), t("helpMatching", "칩 2 선택 시 한 줄 설명"), t("helpUndecided", "칩 3 선택 시 한 줄 설명"),
+      t("nameLabel", "이름 항목 이름"), t("namePlaceholder", "이름 입력 안내"), t("phoneLabel", "휴대폰 항목 이름"), t("phoneHelp", "휴대폰 입력 아래 안내"),
+      t("consentTitle", "동의 체크 문구"), t("consentCollect", "동의: 수집 항목"), t("consentPurpose", "동의: 이용 목적"), t("consentRetention", "동의: 보관 기간"), t("consentRefuse", "동의: 거부 시"),
+      ta("consentMore", "동의 아래 안내", undefined, "{privacy} 자리에 개인정보처리방침 링크, {terms} 자리에 이용약관 링크가 들어갑니다"),
+      t("submitLabel", "신청 버튼 문구"), t("submittingLabel", "신청 중 버튼 문구"), ta("submitNote", "버튼 아래 안내", "soft"),
+      t("doneTitle", "접수 완료 제목"), ta("doneBody", "접수 완료 안내", "soft"), t("doneHome", "접수 완료 버튼 문구"), t("closeLabel", "오른쪽 위 닫기 문구"),
+    ],
+    defaults: {
+      titleDefault: "RSC 상담 신청", titleSocial: "소셜클럽 상담 신청", titleMatching: "1:1 매칭 상담 신청", note: "남겨주신 연락처로 담당자가 직접 연락드립니다.",
+      trackLegend: "관심 있는 방식", chipSocial: "소셜클럽", chipMatching: "1:1 매칭", chipUndecided: "상담 후 결정",
+      helpSocial: "함께 경험하며 자연스럽게 가까워지는 커뮤니티.", helpMatching: "전담 컨시어지가 검증된 회원 중 한 분을 직접 소개합니다.", helpUndecided: "어느 쪽이 맞을지 모르겠다면 상담에서 함께 정해 드립니다.",
+      nameLabel: "이름", namePlaceholder: "이름을 입력해 주세요.", phoneLabel: "휴대폰 번호", phoneHelp: "숫자만 입력하면 하이픈이 자동으로 붙습니다.",
+      consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 휴대폰 번호(필수) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)", consentPurpose: "신청하신 가입 상담의 진행과 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 상담 신청이 접수되지 않습니다.",
+      consentMore: "자세한 내용은 {privacy}에서 확인하실 수 있습니다. 사이트 이용 조건은 {terms}을 참고해 주세요.",
+      submitLabel: "상담 신청하기", submittingLabel: "접수 중…", submitNote: "신청은 회원 가입이 아니며, 담당자가 연락드린 뒤 상담이 진행됩니다.",
+      doneTitle: "신청이 접수되었습니다", doneBody: "담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 전화(02-6925-4786) 또는 이메일로 알려 주세요.", doneHome: "홈으로 돌아가기", closeLabel: "닫기 ✕",
+    },
+  },
+
+  /* ---------- 소식 (/news) ---------- */
+  {
+    id: "news.page",
+    page: "news",
+    label: "소식 목록 · 상세 문구",
+    description: "소식 페이지의 제목과 설명은 「SEO」 → 페이지별 설정(소식)에서, 글은 「소식 게시판」에서 관리합니다. 여기서는 그 밖의 고정 문구만 바꿉니다.",
+    fields: [t("eyebrow", "제목 위 작은 영문"), ta("emptyText", "글이 없는 달 안내", undefined, "{y} 자리에 연도, {m} 자리에 월이 들어갑니다"), t("backLabel", "상세 글 하단 「목록으로」 문구"), t("ctaLabel", "상세 글 하단 상담 버튼 문구")],
+    defaults: { eyebrow: "NEWS", emptyText: "{y}년 {m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.", backLabel: "← 소식 목록", ctaLabel: "RSC 상담 신청하기" },
   },
 
   /* ---------- 가격 ---------- */
@@ -576,8 +686,8 @@ export const DOCS: DocDef[] = [
     id: "benefits.hero",
     page: "benefits",
     label: "상단 소개",
-    fields: [t("label", "작은 제목"), t("title", "제목"), ta("body", "설명", "hard"), t("tableTitle", "표 제목")],
-    defaults: { label: "RSC MEMBER BENEFITS", title: "정회원 혜택 안내", body: "“아름다운 공간에서, 서로의 특별함을 발견하는 곳”\n라움이 검증한 멤버가 모이는, 싱글 라이프스타일 커뮤니티", tableTitle: "회원 혜택 구성" },
+    fields: [t("label", "작은 제목"), t("title", "제목"), ta("body", "설명", "hard"), t("tableTitle", "표 제목"), t("leadNote", "리드 모드 하단 문구", undefined, "리드 모드에서 가격 안내 버튼 대신 보이는 문구")],
+    defaults: { label: "RSC MEMBER BENEFITS", title: "정회원 혜택 안내", body: "“아름다운 공간에서, 서로의 특별함을 발견하는 곳”\n라움이 검증한 멤버가 모이는, 싱글 라이프스타일 커뮤니티", tableTitle: "회원 혜택 구성", leadNote: "멤버십 혜택은 상담에서 자세히 안내해 드립니다" },
   },
   {
     id: "benefits.rows",
@@ -622,11 +732,13 @@ export const DOCS: DocDef[] = [
 DOCS.push(...SETTINGS_DOCS, ...SEO_DOCS);
 export const DOC_BY_ID = new Map(DOCS.map((d) => [d.id, d]));
 export const PAGES: { key: DocDef["page"]; label: string; preview: string }[] = [
-  { key: "global", label: "브랜드 · 테마", preview: "/" },
+  { key: "global", label: "브랜드 · 메뉴 · 테마", preview: "/" },
   { key: "home", label: "메인 페이지", preview: "/" },
   { key: "social", label: "소셜클럽", preview: "/social" },
   { key: "matching", label: "1:1 매칭", preview: "/matching" },
-  { key: "pricing", label: "가격 안내", preview: "/pricing" },
+  { key: "apply", label: "상담 신청", preview: "/fit-check" },
+  { key: "news", label: "소식", preview: "/news" },
+  { key: "pricing", label: "가격 안내 (리드 모드에선 숨김)", preview: "/pricing" },
   { key: "benefits", label: "혜택 안내", preview: "/benefits" },
   { key: "legal", label: "약관", preview: "/terms" },
 ];

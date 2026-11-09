@@ -57,6 +57,14 @@ export async function getTheme(): Promise<Theme> {
   return { cream: pick("cream"), ink: pick("ink"), brown: pick("brown"), brownHover: pick("brownHover"), gold: pick("gold"), goldHover: pick("goldHover"), sand: pick("sand"), sandDeep: pick("sandDeep") };
 }
 
+/** 메뉴 이름(global.nav) — 문자열만 */
+export async function getNav(): Promise<Record<string, string>> {
+  const d = await getDoc("global.nav");
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(d)) out[k] = typeof v === "string" ? v : "";
+  return out;
+}
+
 export type Brand = Record<string, string>;
 export async function getBrand(): Promise<Brand> {
   const d = await getDoc("global.brand");

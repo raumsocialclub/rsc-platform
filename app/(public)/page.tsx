@@ -31,7 +31,7 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
  */
 export default async function HomePage() {
   const [d, popups] = await Promise.all([getPageDocs("home"), listLivePopups()]);
-  const gate = d["home.gate"], tracks = d["home.tracks"], about = d["home.about"], promise = d["home.promise"], faq = d["home.faq"];
+  const gate = d["home.gate"], tracks = d["home.tracks"], about = d["home.about"], promise = d["home.promise"], faq = d["home.faq"], cta = d["home.cta"];
   const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
 
   const gateTracks: GateTrack[] = [
@@ -93,7 +93,7 @@ export default async function HomePage() {
       {/* FAQ */}
       {on(faq, "visible") && <FaqSection eyebrow={eyebrow(s(faq, "label"))} title={s(faq, "title")} lead={s(faq, "lead")} items={faqItems} tone="white" />}
 
-      <CtaBand />
+      <CtaBand title={s(cta, "title")} body={s(cta, "body")} socialLabel={s(cta, "socialLabel")} matchingLabel={s(cta, "matchingLabel")} />
 
       <SiteFooter />
       <UpButton />

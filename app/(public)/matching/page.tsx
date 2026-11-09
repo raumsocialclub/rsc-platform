@@ -26,11 +26,15 @@ type Plan = { name: string; tag: string; features: string; badge: string; dark?:
  * 1:1 매칭(결혼중개 멤버십 ACCESS · SIGNATURE) 트랙 페이지. 사업전략(2026.11.03) 기준.
  * 상단 소개 → 01 가입 심사(아무나 들어올 수 없습니다) → 02 진행 방식 4단계 → 03 멤버십 구성(ACCESS · SIGNATURE · MERRY — 금액은 비공개, 대면 상담 안내)
  * → 회원 전용 행사(SOCIAL NIGHT · GRAND BALL · RAUM SOLO, home.solo 재사용) → 04 다른 점 → 05 이런 분께 → 06 FAQ → CTA.
- * 문구는 CMS(matching.* + home.solo). 모든 상담 버튼은 /fit-check?track=matching.
+ * 문구는 모두 CMS(matching.* + home.solo, 전환 바 이름은 home.gate). 모든 상담 버튼은 /fit-check?track=matching.
  */
+const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/").trim() : v.trim());
+
 export default async function MatchingPage() {
   const d = await getPageDocs(["matching", "home"]);
-  const hero = d["matching.hero"], verify = d["matching.verify"], how = d["matching.how"], plans = d["matching.plans"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"], solo = d["home.solo"];
+  const hero = d["matching.hero"], verify = d["matching.verify"], how = d["matching.how"], plans = d["matching.plans"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"], solo = d["home.solo"], cta = d["matching.cta"], gate = d["home.gate"];
+  const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
+  const ctaSuffix = s(plans, "ctaSuffix") || "상담 신청", merryCta = s(plans, "merryCta") || "별도 상담 신청";
   const planItems = list<Plan>(plans, "items");
   // 가입비·연회비는 비공개(대면 상담 안내): 리드 모드와 무관하게 금액이 들어간 줄은 모두 뺀다
   const extras = lines(s(plans, "extras")).filter((x) => !hasPrice(x));
@@ -40,7 +44,7 @@ export default async function MatchingPage() {
   return (
     <div className="pt-[56px] md:pt-[64px]">
       <Header />
-      <TrackSwitch current="matching" />
+      <TrackSwitch current="matching" labels={switchLabels} />
       <TrackHero doc={hero} />
 
       {/* 01 VERIFIED MEMBERS */}
@@ -74,7 +78,7 @@ export default async function MatchingPage() {
         <section id="plans" data-fold className={`${SECTION} bg-sand`}>
           <Container>
             <SectionHead eyebrow={s(plans, "label")} title={<Txt v={s(plans, "title")} breaks="hard" />} lead={<Txt v={s(plans, "lead")} />} reveal />
-            <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">옆으로 밀어서 비교하기 →</div>
+            {s(plans, "swipeHint") && <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">{s(plans, "swipeHint")}</div>}
             <div className={`${SWIPE} mt-[12px] md:grid-cols-3 md:gap-[16px] md:mt-[40px]`}>
               {planItems.map((p, i) => (
                 <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${SWIPE_ITEM} ${p.dark ? "bg-inverseBg text-inverseLabel border border-inverseBg" : CARD} ${CARD_HOVER} rounded-ds p-[24px] md:p-[28px] flex flex-col`}>
@@ -92,14 +96,14 @@ export default async function MatchingPage() {
                     ))}
                   </ul>
                   <div className="mt-auto pt-[20px]">
-                    <ButtonLink href="/fit-check?track=matching" variant={p.dark ? "inverse" : "outlined"} size="md" className="w-full">{/MERRY/i.test(p.name) ? "별도 상담 신청" : `${p.name} 상담 신청`}</ButtonLink>
+                    <ButtonLink href="/fit-check?track=matching" variant={p.dark ? "inverse" : "outlined"} size="md" className="w-full">{/MERRY/i.test(p.name) ? merryCta : `${p.name} ${ctaSuffix}`}</ButtonLink>
                   </div>
                 </article>
               ))}
             </div>
             {extras.length > 0 && (
               <div data-reveal className={`${CARD} mt-[16px] p-[20px] md:p-[24px] grid grid-cols-1 md:grid-cols-[120px_minmax(0,1fr)] gap-[8px] md:gap-[24px]`}>
-                <div className="t-label-1 font-semibold text-primary">필요한 만큼 추가</div>
+                <div className="t-label-1 font-semibold text-primary">{s(plans, "extrasTitle") || "필요한 만큼 추가"}</div>
                 <ul className="list-none p-0 m-0 grid gap-[6px] md:grid-cols-3 md:gap-[12px]">
                   {extras.map((x, i) => <li key={i} className="t-label-1-reading text-labelNeutral text-pretty">{nowrap(x)}</li>)}
                 </ul>
@@ -111,7 +115,7 @@ export default async function MatchingPage() {
       )}
 
       {/* MEMBERS ONLY: SOCIAL NIGHT · GRAND BALL · RAUM SOLO */}
-      {on(solo, "visible") && <MembersOnly doc={solo} eyebrow="MEMBERS ONLY" title={"1:1 매칭 회원만의\n특별한 시간"} lead="ACCESS · SIGNATURE 회원은 참여권 차감 없이 분기 테마 나이트와 연말 그랜드 볼에 참여합니다. SIGNATURE 회원은 기수제 로테이션 프로그램 RAUM SOLO 1기가 포함됩니다." />}
+      {on(solo, "visible") && <MembersOnly doc={solo} eyebrow={eyebrow(s(solo, "label"))} title={s(solo, "title")} lead={s(solo, "lead")} />}
 
       {/* 04 WHY RSC */}
       {on(diff, "visible") && (
@@ -147,7 +151,7 @@ export default async function MatchingPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-[32px]"><ButtonLink href="/fit-check?track=matching" size="lg">1:1 매칭 상담 신청</ButtonLink></div>
+                {s(who, "ctaLabel") && <div className="mt-[32px]"><ButtonLink href="/fit-check?track=matching" size="lg">{s(who, "ctaLabel")}</ButtonLink></div>}
               </div>
             </div>
           </Container>
@@ -156,7 +160,7 @@ export default async function MatchingPage() {
 
       {on(faq, "visible") && <FaqSection eyebrow={s(faq, "label")} title={s(faq, "title")} lead={s(faq, "lead")} items={faqItems} />}
 
-      <CtaBand track="matching" title="1:1 매칭, 상담으로 시작해 보세요" body="이름과 연락처만 남기면 담당자가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다." />
+      <CtaBand track="matching" title={s(cta, "title")} body={s(cta, "body")} ctaLabel={s(cta, "ctaLabel")} />
 
       <SiteFooter />
       <UpButton />
