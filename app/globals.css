@@ -26,6 +26,7 @@
   --ds-primary: #0066ff;
   --ds-primary-strong: #005eeb;
   --ds-primary-heavy: #0054d1;
+  --ds-primary-rgb: 0,102,255;   /* 반투명 포인트(rgba(var(--ds-primary-rgb), .08)) — 테마의 포인트 색을 layout 이 덮어쓴다 */
   --ds-line: rgba(112, 115, 124, 0.22);
   --ds-line-neutral: rgba(112, 115, 124, 0.16);
   --ds-line-alt: rgba(112, 115, 124, 0.08);

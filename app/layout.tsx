@@ -6,7 +6,7 @@ import { MetaPixel } from "@/components/site/MetaPixel";
 import { RevealObserver } from "@/components/site/RevealObserver";
 import { getSettings } from "@/lib/settings/get";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getBrand, getTheme } from "@/lib/cms/get";
+import { getBrand, getTheme, hexToRgb } from "@/lib/cms/get";
 import { getSeo, robotsFor, siteUrl, absUrl } from "@/lib/seo/get";
 import { organizationJsonLd } from "@/lib/seo/jsonld";
 import "./globals.css";
@@ -34,10 +34,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** 루트 레이아웃. 어드민 "색상 테마" 값을 :root CSS 변수로 주입한다(tailwind 토큰이 이 변수를 쓴다). */
+/**
+ * 루트 레이아웃. 어드민 "색상 테마" 값을 :root CSS 변수로 주입한다(tailwind 토큰이 이 변수를 쓴다).
+ * 옛 변수(--c-*)와 함께 새 디자인 토큰(--ds-primary 등)도 덮어써야 버튼·링크·배지 색이 바뀐다 (2026-11-09 수정 — 그 전엔 --c-* 만 바뀌어 공개 사이트 포인트 색이 그대로였다).
+ * 어드민은 app/admin/layout.tsx 에서 기본 파랑으로 되돌려 운영 화면은 테마와 무관하게 유지한다.
+ */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [t, org, settings] = await Promise.all([getTheme(), organizationJsonLd(), getSettings()]);
-  const css = `:root{--c-cream:${t.cream};--c-ink:${t.ink};--c-brown:${t.brown};--c-brownHover:${t.brownHover};--c-gold:${t.gold};--c-goldHover:${t.goldHover};--c-sand:${t.sand};--c-sandDeep:${t.sandDeep}}`;
+  const css = `:root{--c-cream:${t.cream};--c-ink:${t.ink};--c-brown:${t.brown};--c-brownHover:${t.brownHover};--c-gold:${t.gold};--c-goldHover:${t.goldHover};--c-sand:${t.sand};--c-sandDeep:${t.sandDeep};--ds-primary:${t.brown};--ds-primary-strong:${t.brownHover};--ds-primary-heavy:${t.brownHover};--ds-primary-rgb:${hexToRgb(t.brown)};--ds-inverse-primary:${t.gold};--ds-label:${t.ink}}`;
   return (
     <html lang="ko" className={`${pretendard.variable} h-full antialiased`}>
       <head>

@@ -73,7 +73,7 @@ export default async function BenefitsPage() {
                   {g.rows.map((r, ri) => {
                     const ls = lines(r.lines);
                     return (
-                      <div key={r.n} className={`grid grid-cols-1 gap-[10px] px-[20px] py-[18px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.5fr)_minmax(0,.8fr)] md:gap-[24px] md:py-[20px] items-start transition-colors hover:bg-[rgba(0,102,255,.03)] ${ri < g.rows.length - 1 ? "border-b border-lineAlt" : ""}`}>
+                      <div key={r.n} className={`grid grid-cols-1 gap-[10px] px-[20px] py-[18px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.5fr)_minmax(0,.8fr)] md:gap-[24px] md:py-[20px] items-start transition-colors hover:bg-[rgba(var(--ds-primary-rgb),.03)] ${ri < g.rows.length - 1 ? "border-b border-lineAlt" : ""}`}>
                         <div>
                           <div className="t-caption-1 text-labelAssist mb-[4px]">{r.n}</div>
                           <div className="t-headline-2 text-label mb-[8px]">{r.title}</div>

@@ -72,7 +72,7 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
               role="tab"
               aria-selected={k === i}
               onClick={() => go(k)}
-              className={`h-[36px] md:h-[40px] px-[16px] md:px-[20px] rounded-pill t-label-1 md:text-[15px] font-semibold cursor-pointer border-0 transition-[background-color,color,transform] duration-200 active:scale-[.97] ${k === i ? "bg-primary text-white shadow-[0_4px_12px_rgba(0,102,255,.35)]" : "bg-transparent text-labelNeutral hover:text-label"}`}
+              className={`h-[36px] md:h-[40px] px-[16px] md:px-[20px] rounded-pill t-label-1 md:text-[15px] font-semibold cursor-pointer border-0 transition-[background-color,color,transform] duration-200 active:scale-[.97] ${k === i ? "bg-primary text-white shadow-[0_4px_12px_rgba(var(--ds-primary-rgb),.35)]" : "bg-transparent text-labelNeutral hover:text-label"}`}
             >
               {t.tab}
             </button>

@@ -10,6 +10,12 @@ export const metadata: Metadata = { title: { default: "RSC ADMIN", template: "%s
  * 어드민 셸. proxy.ts 가 비로그인은 /login 으로 보내고, 여기서 members.role ∈ {admin, owner} · 활동 상태를 검사한다. (FLOWS.md 6, M12)
  * Wanted DS: 240px 흰 사이드바 + 연회색(sand) 본문. 900px 이하는 사이드바가 상단 가로 바.
  */
+/** 어드민은 사이트 「색상 테마」와 무관하게 기본 팔레트(흰 배경 · 검정 글자 · 파란 포인트)를 유지한다 — 루트 레이아웃이 :root 에 넣는 테마 변수를 이 영역에서 되돌린다 */
+const ADMIN_PALETTE = {
+  "--c-cream": "#ffffff", "--c-ink": "#171719", "--c-brown": "#0066ff", "--c-brownHover": "#005eeb", "--c-gold": "#3385ff", "--c-goldHover": "#66a3ff", "--c-sand": "#f7f7f8", "--c-sandDeep": "#f4f4f5",
+  "--ds-primary": "#0066ff", "--ds-primary-strong": "#005eeb", "--ds-primary-heavy": "#0054d1", "--ds-primary-rgb": "0,102,255", "--ds-inverse-primary": "#3385ff", "--ds-label": "#171719",
+} as React.CSSProperties;
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const me = await getCurrentMember();
   if (!me) redirect("/login?next=/admin");
@@ -38,7 +44,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ];
 
   return (
-    <div className="min-h-screen bg-sand grid grid-cols-1 min-[901px]:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-sand grid grid-cols-1 min-[901px]:grid-cols-[240px_minmax(0,1fr)]" style={ADMIN_PALETTE}>
       <AdminSidebar items={items} user={{ name: me.name, email: me.email ?? "", initial: initialOf(me), roleLabel: ROLE_KO[me.role] }} />
       <main className="min-w-0 px-[16px] py-[20px] min-[901px]:px-[40px] min-[901px]:pt-[32px] min-[901px]:pb-[96px] max-w-[1440px]">{children}</main>
     </div>

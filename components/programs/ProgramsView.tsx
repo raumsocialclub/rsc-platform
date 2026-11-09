@@ -24,7 +24,7 @@ export function ProgramsView({ programs, filter, greeting }: { programs: Program
                 key={f.key}
                 href={f.key === "ALL" ? "/programs" : `/programs?cat=${f.key}`}
                 className="border border-[rgba(112,115,124,.22)] px-[16px] py-[8px] rounded-pill text-[13px] font-semibold hover:text-primaryStrong"
-                style={{ background: on ? "#0066ff" : "transparent", color: on ? "#ffffff" : "#0066ff" }}
+                style={{ background: on ? "var(--ds-primary)" : "transparent", color: on ? "#ffffff" : "var(--ds-primary)" }}
               >
                 {f.label}
               </Link>

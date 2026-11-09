@@ -25,7 +25,7 @@ export function BookingList({ bookings, tab, name, now, rules }: { bookings: Boo
         {[{ key: "upcoming", label: "다가오는 예약" }, { key: "past", label: "지난 예약" }].map((t) => {
           const on = t.key === tab;
           return (
-            <Link key={t.key} href={t.key === "upcoming" ? "/my" : "/my?tab=past"} className="border border-[rgba(112,115,124,.22)] px-[16px] py-[8px] rounded-pill text-[13px] font-semibold hover:text-primaryStrong" style={{ background: on ? "#0066ff" : "transparent", color: on ? "#ffffff" : "#0066ff" }}>
+            <Link key={t.key} href={t.key === "upcoming" ? "/my" : "/my?tab=past"} className="border border-[rgba(112,115,124,.22)] px-[16px] py-[8px] rounded-pill text-[13px] font-semibold hover:text-primaryStrong" style={{ background: on ? "var(--ds-primary)" : "transparent", color: on ? "#ffffff" : "var(--ds-primary)" }}>
               {t.label}
             </Link>
           );

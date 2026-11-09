@@ -79,7 +79,7 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3 md:gap-[16px] mt-[40px]">
               {list(promise, "items").map((c, i) => (
                 <div key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${CARD} ${CARD_HOVER} p-[24px] md:p-[28px]`}>
-                  <div className="w-[40px] h-[40px] rounded-ds-sm bg-[rgba(0,102,255,.08)] text-primary flex items-center justify-center t-label-1 font-bold mb-[20px]">{String(i + 1).padStart(2, "0")}</div>
+                  <div className="w-[40px] h-[40px] rounded-ds-sm bg-[rgba(var(--ds-primary-rgb),.08)] text-primary flex items-center justify-center t-label-1 font-bold mb-[20px]">{String(i + 1).padStart(2, "0")}</div>
                   <div className="t-caption-1 font-semibold text-labelAlt mb-[6px]">{c.label}</div>
                   <div className="t-heading-2 text-label mb-[10px]">{c.title}</div>
                   <div className="t-body-2-reading text-labelAlt text-pretty"><Txt v={c.body} /></div>

@@ -15,10 +15,10 @@ const SIZE: Record<BtnSize, string> = {
   sm: "h-[32px] px-[14px] text-[13px] leading-[1.385] tracking-[0.0194em]",
 };
 const VARIANT: Record<BtnVariant, string> = {
-  solid: "bg-primary border-primary text-white hover:bg-primaryStrong hover:border-primaryStrong hover:text-white hover:shadow-[0_6px_16px_rgba(0,102,255,.28)] active:bg-primaryHeavy active:shadow-none disabled:bg-disable disabled:border-disable disabled:text-labelDisable",
-  outlined: "bg-transparent border-line text-primary hover:bg-[rgba(0,102,255,.05)] hover:text-primary disabled:text-labelDisable disabled:border-lineAlt",
+  solid: "bg-primary border-primary text-white hover:bg-primaryStrong hover:border-primaryStrong hover:text-white hover:shadow-[0_6px_16px_rgba(var(--ds-primary-rgb),.28)] active:bg-primaryHeavy active:shadow-none disabled:bg-disable disabled:border-disable disabled:text-labelDisable",
+  outlined: "bg-transparent border-line text-primary hover:bg-[rgba(var(--ds-primary-rgb),.05)] hover:text-primary disabled:text-labelDisable disabled:border-lineAlt",
   assistive: "bg-transparent border-line text-labelNeutral hover:bg-fillAlt hover:text-label disabled:text-labelDisable disabled:border-lineAlt",
-  text: "bg-transparent border-transparent text-primary px-[8px] hover:bg-[rgba(0,102,255,.05)] hover:text-primary",
+  text: "bg-transparent border-transparent text-primary px-[8px] hover:bg-[rgba(var(--ds-primary-rgb),.05)] hover:text-primary",
   inverse: "bg-white border-white text-label hover:bg-[#f4f4f5] hover:border-[#f4f4f5] hover:text-label hover:shadow-[0_6px_16px_rgba(0,0,0,.25)] active:shadow-none",
 };
 
@@ -66,8 +66,8 @@ export const SWIPE = "flex gap-[16px] overflow-x-auto snap-x snap-mandatory -mx-
 export const SWIPE_ITEM = "flex-none w-[82%] snap-start md:w-auto";
 
 /** 입력칸 (Text Field): 48px, 12px 모서리, 포커스 시 파란 테두리 */
-export const INPUT = "w-full h-[48px] rounded-ds border border-lineNeutral bg-white px-[16px] text-[16px] leading-[1.5] text-label outline-none shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-labelAssist hover:border-line focus:border-primary focus:ring-2 focus:ring-[rgba(0,102,255,.2)] disabled:bg-disable disabled:text-labelDisable appearance-none";
-export const TEXTAREA = "w-full min-h-[120px] rounded-ds border border-lineNeutral bg-white px-[16px] py-[12px] text-[16px] leading-[1.5] text-label outline-none shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-labelAssist hover:border-line focus:border-primary focus:ring-2 focus:ring-[rgba(0,102,255,.2)] resize-y";
+export const INPUT = "w-full h-[48px] rounded-ds border border-lineNeutral bg-white px-[16px] text-[16px] leading-[1.5] text-label outline-none shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-labelAssist hover:border-line focus:border-primary focus:ring-2 focus:ring-[rgba(var(--ds-primary-rgb),.2)] disabled:bg-disable disabled:text-labelDisable appearance-none";
+export const TEXTAREA = "w-full min-h-[120px] rounded-ds border border-lineNeutral bg-white px-[16px] py-[12px] text-[16px] leading-[1.5] text-label outline-none shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-labelAssist hover:border-line focus:border-primary focus:ring-2 focus:ring-[rgba(var(--ds-primary-rgb),.2)] resize-y";
 export const INPUT_ERR = "!border-negative focus:!ring-[rgba(255,66,66,.2)]";
 export const FIELD_LABEL = "block t-label-1 font-semibold text-labelNeutral mb-[8px]";
 export const FIELD_HELP = "block mt-[8px] t-caption-1 text-labelAlt";
@@ -75,14 +75,14 @@ export const FIELD_ERROR = "block mt-[8px] t-caption-1 text-negativeFg";
 
 /** 칩(선택 버튼): 선택 안 됨 흰색 / 선택됨 파란 테두리·연파랑 */
 export const CHIP = "min-h-[44px] inline-flex items-center justify-center text-center px-[16px] py-[10px] t-body-2 font-medium rounded-ds border cursor-pointer select-none transition-[color,background-color,border-color,transform] duration-200 active:scale-[.97]";
-export const CHIP_ON = "border-primary bg-[rgba(0,102,255,.08)] text-primary";
+export const CHIP_ON = "border-primary bg-[rgba(var(--ds-primary-rgb),.08)] text-primary";
 export const CHIP_OFF = "border-lineNeutral bg-white text-labelNeutral hover:border-primary hover:text-primary";
 
 /** 배지 */
 export function Badge({ tone = "neutral", children, className = "", fit }: { tone?: "neutral" | "primary" | "positive" | "cautionary" | "negative" | "inverse"; children: ReactNode; className?: string; /** 긴 영어 문구: 줄을 바꾸지 않고 좁은 화면에서 글자를 줄인다 */ fit?: boolean }) {
   const t = {
     neutral: "bg-fill text-labelNeutral",
-    primary: "bg-[rgba(0,102,255,.1)] text-primary",
+    primary: "bg-[rgba(var(--ds-primary-rgb),.1)] text-primary",
     positive: "bg-[rgba(0,191,64,.12)] text-positiveFg",
     cautionary: "bg-[rgba(255,146,0,.14)] text-cautionaryFg",
     negative: "bg-[rgba(255,66,66,.12)] text-negativeFg",

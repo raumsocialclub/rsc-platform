@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /* 모든 문구·표는 CMS(site_content pricing.*) */
 const TH = "text-left t-caption-1 font-semibold text-labelAlt px-[16px] py-[12px] bg-sand border-b border-lineAlt whitespace-nowrap";
 const TD = "t-body-2 text-labelNeutral px-[16px] py-[14px] border-b border-lineAlt align-top";
-const TR = "transition-colors hover:bg-[rgba(0,102,255,.03)]";
+const TR = "transition-colors hover:bg-[rgba(var(--ds-primary-rgb),.03)]";
 const SUB = "t-caption-1 text-labelAlt mt-[3px]";
 const SEC = "mb-[56px] md:mb-[80px]";
 
@@ -112,7 +112,7 @@ export default async function PricingPage() {
             </div>
             <div className="md:hidden grid gap-[12px] mt-[16px]">
               {list<PathRow>(path, "rows").map((r, i) => (
-                <div key={i} data-reveal style={{ "--d": `${(i % 3) * 70}ms` } as React.CSSProperties} className={`${CARD} p-[20px] ${r.highlight ? "border-primary bg-[rgba(0,102,255,.04)]" : ""}`}>
+                <div key={i} data-reveal style={{ "--d": `${(i % 3) * 70}ms` } as React.CSSProperties} className={`${CARD} p-[20px] ${r.highlight ? "border-primary bg-[rgba(var(--ds-primary-rgb),.04)]" : ""}`}>
                   <div className="flex justify-between items-start gap-[12px]">
                     <b className="t-headline-2 text-label">{r.a}</b>
                     <b className="t-headline-2 text-label whitespace-nowrap flex-none">{r.b}</b>
@@ -128,7 +128,7 @@ export default async function PricingPage() {
               <thead><tr><th className={TH}>선택안</th><th className={TH}>결제액</th><th className={TH}>포함 구성</th><th className={TH}>적합 고객</th></tr></thead>
               <tbody>
                 {list<PathRow>(path, "rows").map((r, i) => (
-                  <tr key={i} className={`${TR} ${r.highlight ? "bg-[rgba(0,102,255,.05)]" : ""}`}>
+                  <tr key={i} className={`${TR} ${r.highlight ? "bg-[rgba(var(--ds-primary-rgb),.05)]" : ""}`}>
                     <td className={TD}>{r.highlight ? <b className="text-label">{r.a}</b> : r.a}</td>
                     <td className={`${TD} whitespace-nowrap`}>{r.highlight ? <b className="text-label">{r.b}</b> : r.b}</td>
                     <td className={TD}>{r.highlight ? <b className="text-label">{r.c}</b> : r.c}</td>

@@ -146,7 +146,7 @@ export default async function MatchingPage() {
                 <ul className="list-none p-0 m-0 mt-[28px] grid gap-[12px]">
                   {lines(s(who, "points")).map((p, i) => (
                     <li key={i} className="flex gap-[12px] items-start t-body-1-reading text-labelNeutral text-pretty">
-                      <span aria-hidden className="w-[24px] h-[24px] rounded-full bg-[rgba(0,102,255,.1)] text-primary flex items-center justify-center flex-none mt-[1px]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg></span>
+                      <span aria-hidden className="w-[24px] h-[24px] rounded-full bg-[rgba(var(--ds-primary-rgb),.1)] text-primary flex items-center justify-center flex-none mt-[1px]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg></span>
                       <span>{nowrap(p)}</span>
                     </li>
                   ))}

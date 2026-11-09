@@ -50,6 +50,11 @@ export const list = <T = Record<string, string>>(d: DocData, k: string): T[] => 
 export const on = (d: DocData, k: string): boolean => d[k] !== false;
 
 export type Theme = { cream: string; ink: string; brown: string; brownHover: string; gold: string; goldHover: string; sand: string; sandDeep: string };
+/** "#4d1b20" → "77,27,32" (rgba(var(--ds-primary-rgb), .08) 같은 반투명 포인트 색에 쓴다). 형식이 틀리면 기본 파랑 */
+export function hexToRgb(hex: string): string {
+  const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  return m ? `${parseInt(m[1], 16)},${parseInt(m[2], 16)},${parseInt(m[3], 16)}` : "0,102,255";
+}
 export async function getTheme(): Promise<Theme> {
   const d = await getDoc("global.theme2"); // 2026-11-04 새 디자인 토큰 문서 (옛 global.theme 은 이전 디자인 전용)
   const def = DOC_BY_ID.get("global.theme2")!.defaults as Theme;
