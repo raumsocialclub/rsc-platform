@@ -89,7 +89,7 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 - **모바일 가로 스와이프** `SWIPE` + `SWIPE_ITEM`: 프로그램·순간 카드는 모바일에서 82% 폭 카드로 옆으로 밀어 보고(스냅), 데스크톱은 그리드. 위에 "옆으로 밀어서 보기 →" 안내.
 - **FAQ**: 열리면 답이 떠오르고(`faq-body`) 질문이 파란색. **표 행**은 호버 시 연파랑.
 - **종이 접기** `data-fold`: 섹션이 화면에 들어올 때 위쪽 모서리를 축으로 -18° 에서 펼쳐진다(위쪽 그늘이 함께 사라짐). `animation-timeline: view()` 를 지원하면 스크롤 위치에 정확히 따라가고, 아니면 RevealObserver 가 한 번 펼친다. 히어로(첫 화면)에는 쓰지 않는다.
-- `prefers-reduced-motion` 이면 모든 효과를 끈다.
+- `prefers-reduced-motion` 이면 스스로 움직이는 효과(등장·폴드·켄 번즈·스크롤 가라앉기·빛줄기·스와이프 포커스)는 끈다. 단 사용자가 직접 일으키는 사진 호버·누름 반응은 0.2s 로 남긴다 — Windows 「애니메이션 효과」를 끈 PC 가 많아, 전부 끄면 "효과가 없다"고 보인다.
 
 ## 문장 줄바꿈
 - 고유명사(RSC TASTE SOCIAL, RAUM SOLO, SIGNATURE …)와 가운뎃점 목록(아트·와인·웰니스)은 `Txt`/`nowrap()` 이 `whitespace-nowrap` 으로 묶어 줄 중간에서 끊기지 않는다 (`components/cms/Txt.tsx` 의 TERMS 목록에 추가).

@@ -11,7 +11,10 @@ describe("img-live (사진 호버·누름 효과)", () => {
     expect(css).toMatch(/\.img-live::after \{[^}]*linear-gradient/);
     expect(css).toMatch(/\.img-live:active > img[^{]*\{ transform: scale\(1\.02\)/);
     expect(css).toMatch(/@media \(hover: none\) \{[\s\S]*?\.img-live::after \{ display: none; \}/);
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*\.img-live > img[^}]*transform: none !important/);
+    // 동작 줄이기: 자동 움직임(켄 번즈·가라앉기)은 끄고, 호버·누름 반응은 0.2s 로 남긴다 (끄면 그 설정을 켠 PC 에서 "효과가 없다"고 보인다)
+    expect(css).toMatch(/\.img-live-hero \{ animation: none !important; transform: none !important; \}/);
+    expect(css).toMatch(/\.img-live > img \{ animation: none !important; scale: 1 !important; transition-duration: \.2s !important; \}/);
+    expect(css).not.toMatch(/\.img-live > img[^}]*transform: none !important/);
   });
   it("모바일 생동감: 스크롤 가라앉기·히어로 켄 번즈·스와이프 포커스·카드 누름이 정의된다", () => {
     expect(css).toMatch(/@keyframes rsc-img-settle \{ from \{ scale: 1\.12; \} to \{ scale: 1; \} \}/);
