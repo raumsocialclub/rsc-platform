@@ -150,7 +150,7 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
  * [모든 기기·스크롤] 사진이 화면에 들어올 때 12% 크게 시작해 제자리로 가라앉는다(settle). 스크롤 연동(animation-timeline: view)을
  *   지원하면 스크롤 위치를 정확히 따라가고, 아니면 RevealObserver 가 .is-in 을 붙여 한 번 가라앉힌다.
  * [모든 기기·누름] :active(터치 포함) 150ms 동안 2% 로 살짝 가라앉았다가 손을 떼면 되돌아온다 → 눌리는 느낌. iOS 는 RevealObserver 의 touchstart 리스너가 :active 를 켠다.
- * [대문 히어로] .img-live-hero: 배경 사진이 16초 주기로 천천히 확대·이동(켄 번즈) → 모바일에서도 첫 화면이 살아 있다. settle 은 제외.
+ * [대문 히어로] .img-live-hero: 배경 상자가 16초 주기로 천천히 확대·이동(켄 번즈) → 모바일에서도 첫 화면이 살아 있다. 상자에 걸어 사진의 호버 확대와 함께 동작. settle 은 제외.
  * Tailwind 유틸리티가 이기도록 components 레이어에 둔다. 확대는 transform, 가라앉기는 scale 속성을 써서 서로 곱해진다(충돌 없음). */
 @keyframes rsc-img-settle { from { scale: 1.12; } to { scale: 1; } }
 @keyframes rsc-kenburns { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.08) translate(-1.5%, -1%); } }
@@ -170,8 +170,8 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
   .img-live:hover > img, .group:hover .img-live > img { transform: scale(1.05); }
   .img-live:hover::after, .group:hover .img-live::after { opacity: 1; transform: translateX(120%); transition: transform .9s cubic-bezier(.22,1,.36,1), opacity .2s ease; }
   .img-live:active > img, .group:active .img-live > img { transform: scale(1.02); transition-duration: .15s; }
-  /* 대문 히어로 배경: 켄 번즈 (호버 확대 대신 늘 천천히 움직인다) */
-  .img-live-hero > img { animation: rsc-kenburns 16s ease-in-out infinite alternate; }
+  /* 대문 히어로 배경: 켄 번즈. 사진(img)이 아니라 감싸는 상자에 걸어서, 사진의 호버 확대(transform)와 겹치지 않고 둘 다 동작한다 */
+  .img-live-hero { animation: rsc-kenburns 16s ease-in-out infinite alternate; transform-origin: 50% 50%; }
 }
 /* 스크롤 가라앉기(settle). view() 는 가장 가까운 "스크롤 컨테이너" 기준인데 overflow:hidden 도 스크롤 컨테이너로 치므로,
  * 사진 래퍼와 사진을 감싼 카드(overflow-hidden)는 clip 으로 바꿔 뷰포트 기준으로 진행되게 한다 (보이는 모습은 같다). */
@@ -194,7 +194,7 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
   .img-live::after { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .img-live > img, .group:hover .img-live > img, .img-live:active > img, .img-live-hero > img { transform: none !important; scale: 1 !important; animation: none !important; transition: none !important; }
+  .img-live > img, .group:hover .img-live > img, .img-live:active > img, .img-live-hero { transform: none !important; scale: 1 !important; animation: none !important; transition: none !important; }
   .img-live::after { display: none; }
   .swipe-item { animation: none !important; scale: 1 !important; opacity: 1 !important; }
 }

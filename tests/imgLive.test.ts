@@ -17,7 +17,9 @@ describe("img-live (사진 호버·누름 효과)", () => {
     expect(css).toMatch(/@keyframes rsc-img-settle \{ from \{ scale: 1\.12; \} to \{ scale: 1; \} \}/);
     expect(css).toMatch(/@supports \(animation-timeline: view\(\)\) \{\s*\.img-live:not\(\.img-live-hero\) > img \{ animation: rsc-img-settle/);
     expect(css).toMatch(/html\.js \.img-live:not\(\.img-live-hero\):not\(\.is-in\) > img \{ scale: 1\.12; \}/);
-    expect(css).toMatch(/\.img-live-hero > img \{ animation: rsc-kenburns 16s/);
+    // 켄 번즈는 상자(.img-live-hero)에: 사진(img)에 걸면 호버 확대(transform)를 덮어써 대문 호버가 죽는다
+    expect(css).toMatch(/\.img-live-hero \{ animation: rsc-kenburns 16s/);
+    expect(css).not.toMatch(/\.img-live-hero > img \{ animation/);
     expect(css).toMatch(/@media \(max-width: 760px\) \{\s*@supports \(animation-timeline: view\(\)\) \{\s*\.swipe-item \{ animation: rsc-swipe-focus linear both; animation-timeline: view\(inline\)/);
     const ds = read("components/ui/ds.tsx");
     expect(ds).toMatch(/CARD_HOVER = "group transition-\[transform,translate,scale,box-shadow,border-color\][^"]*active:scale-\[\.985\]"/);
