@@ -76,8 +76,13 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 
 ## 움직임 (생동감)
 - **버튼**: 호버 시 색이 진해지고 파란 그림자(solid), 누르면 `scale(.97)`. 모든 변화 200ms ease-out.
-- **사진** `img-live`(globals.css, `ImageBlock` 기본): 호버 시 700ms 동안 5% 확대 + 빛줄기가 한 번 지나가고, 누르면(터치 포함) 150ms 동안 2% 로 살짝 가라앉는다. 대문 히어로 배경·소식·프로그램 사진까지 모든 공개 사진에 적용. 터치 기기는 빛줄기 생략.
-- **카드** `CARD_HOVER`: 호버 시 4px 떠오름 + `shadow-md` + 테두리 진하게, 안의 사진도 함께 움직인다 (`group` → `img-live`).
+- **사진** `img-live`(globals.css, `ImageBlock` 기본): 대문 히어로 배경·소식·프로그램 사진까지 모든 공개 사진에 적용.
+  - PC 호버: 700ms 동안 5% 확대 + 빛줄기가 한 번 지나간다. 터치 기기는 빛줄기 생략.
+  - 모든 기기 스크롤: 화면에 들어올 때 12% 크게 시작해 제자리로 가라앉는다(`rsc-img-settle`). `animation-timeline: view()` 지원 시 스크롤에 정확히 연동, 아니면 RevealObserver 의 `is-in` 폴백.
+  - 모든 기기 누름(`:active`, 터치 포함): 150ms 동안 2% 로 살짝 가라앉는다. iOS 는 RevealObserver 의 빈 touchstart 리스너가 :active 를 켠다.
+  - 대문 히어로 `img-live-hero`: 배경이 16초 주기로 천천히 확대·이동(켄 번즈) → 모바일에서도 첫 화면이 살아 있다.
+- **카드** `CARD_HOVER`: 호버 시 4px 떠오름 + `shadow-md` + 테두리 진하게, 누르면 `scale(.985)`, 안의 사진도 함께 움직인다 (`group` → `img-live`).
+- **모바일 스와이프 카드** `swipe-item`(`SWIPE_ITEM`): 화면 가운데 카드만 또렷하고 양옆은 6% 작고 흐리게(`rsc-swipe-focus`, `view(inline)`), 손가락을 따라 바뀐다. 미지원 브라우저는 평소 모습.
 - **스크롤 등장** `data-reveal` (+ `--d` 로 지연): 화면에 들어오면 아래에서 22px 떠오르며 나타난다. `RevealObserver`(루트 레이아웃)가 `html.js` 를 붙인 뒤에만 숨기므로 JS 가 없으면 그대로 보인다. `SectionHead`·`ImageBlock` 은 `reveal` prop.
 - **첫 화면**: `anim-up` / `anim-up-2` / `anim-up-3` 순서 등장, 사진은 `anim-zoom`.
 - **GNB**: 메뉴 밑줄이 왼쪽에서 자라남(`link-grow`), 스크롤하면 그림자. 모바일 메뉴는 `anim-pop` + 항목 순차 등장.

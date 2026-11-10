@@ -56,7 +56,7 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
     >
       {/* 배경 사진 (두 장 모두 그려 두고 교차) */}
       {tracks.map((t, k) => (
-        <div key={t.key} aria-hidden className={`img-live absolute inset-0 transition-opacity duration-700 ease-out ${k === i ? "opacity-100" : "opacity-0"}`}>
+        <div key={t.key} aria-hidden className={`img-live img-live-hero absolute inset-0 transition-opacity duration-700 ease-out ${k === i ? "opacity-100" : "opacity-0"}`}>
           <Image src={t.image} alt="" fill priority={k === start} sizes="(min-width: 1200px) 1200px, 100vw" className={`object-cover transition-transform duration-[1400ms] ease-out ${k === i ? "scale-100" : "scale-[1.06]"}`} unoptimized={t.image.startsWith("http")} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.28)_0%,rgba(0,0,0,.18)_35%,rgba(0,0,0,.72)_100%)]" />
         </div>

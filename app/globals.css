@@ -146,13 +146,19 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 }
 
 /* ---------- 사진 생동감 (img-live): 모든 공개 사진에 공통 ----------
- * 호버: 사진이 700ms 동안 5% 확대 + 살짝 밝아지고, 빛줄기(sheen)가 왼쪽→오른쪽으로 한 번 지나간다.
- * 누름(:active, 터치 포함): 150ms 동안 2% 로 살짝 가라앉았다가 손을 떼면 되돌아온다 → 눌리는 느낌.
- * 카드(.group) 위에 올려도 안의 사진이 함께 움직인다. Tailwind 유틸리티가 이기도록 components 레이어에 둔다. */
+ * [PC·호버] 사진이 700ms 동안 5% 확대 + 살짝 밝은 빛줄기(sheen)가 왼쪽→오른쪽으로 한 번 지나간다. 카드(.group) 위에 올려도 안의 사진이 함께 움직인다.
+ * [모든 기기·스크롤] 사진이 화면에 들어올 때 12% 크게 시작해 제자리로 가라앉는다(settle). 스크롤 연동(animation-timeline: view)을
+ *   지원하면 스크롤 위치를 정확히 따라가고, 아니면 RevealObserver 가 .is-in 을 붙여 한 번 가라앉힌다.
+ * [모든 기기·누름] :active(터치 포함) 150ms 동안 2% 로 살짝 가라앉았다가 손을 떼면 되돌아온다 → 눌리는 느낌. iOS 는 RevealObserver 의 touchstart 리스너가 :active 를 켠다.
+ * [대문 히어로] .img-live-hero: 배경 사진이 16초 주기로 천천히 확대·이동(켄 번즈) → 모바일에서도 첫 화면이 살아 있다. settle 은 제외.
+ * Tailwind 유틸리티가 이기도록 components 레이어에 둔다. 확대는 transform, 가라앉기는 scale 속성을 써서 서로 곱해진다(충돌 없음). */
+@keyframes rsc-img-settle { from { scale: 1.12; } to { scale: 1; } }
+@keyframes rsc-kenburns { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.08) translate(-1.5%, -1%); } }
+@keyframes rsc-swipe-focus { 0% { scale: .94; opacity: .72; } 42%, 58% { scale: 1; opacity: 1; } 100% { scale: .94; opacity: .72; } }
 @layer components {
   .img-live { isolation: isolate; }
   .img-live > img {
-    transition: transform .7s cubic-bezier(.22,1,.36,1), scale .7s cubic-bezier(.22,1,.36,1), filter .7s cubic-bezier(.22,1,.36,1);
+    transition: transform .7s cubic-bezier(.22,1,.36,1), scale 1.1s cubic-bezier(.22,1,.36,1), filter .7s cubic-bezier(.22,1,.36,1);
     will-change: transform;
   }
   .img-live::after {
@@ -164,14 +170,33 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
   .img-live:hover > img, .group:hover .img-live > img { transform: scale(1.05); }
   .img-live:hover::after, .group:hover .img-live::after { opacity: 1; transform: translateX(120%); transition: transform .9s cubic-bezier(.22,1,.36,1), opacity .2s ease; }
   .img-live:active > img, .group:active .img-live > img { transform: scale(1.02); transition-duration: .15s; }
+  /* 대문 히어로 배경: 켄 번즈 (호버 확대 대신 늘 천천히 움직인다) */
+  .img-live-hero > img { animation: rsc-kenburns 16s ease-in-out infinite alternate; }
+}
+/* 스크롤 가라앉기(settle). view() 는 가장 가까운 "스크롤 컨테이너" 기준인데 overflow:hidden 도 스크롤 컨테이너로 치므로,
+ * 사진 래퍼와 사진을 감싼 카드(overflow-hidden)는 clip 으로 바꿔 뷰포트 기준으로 진행되게 한다 (보이는 모습은 같다). */
+.img-live, .overflow-hidden:has(.img-live) { overflow: clip; }
+@supports (animation-timeline: view()) {
+  .img-live:not(.img-live-hero) > img { animation: rsc-img-settle linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+}
+@supports not (animation-timeline: view()) {
+  html.js .img-live:not(.img-live-hero):not(.is-in) > img { scale: 1.12; }
+  html.js .img-live.is-in > img { scale: 1; }
+}
+/* 모바일 가로 스와이프: 화면 가운데 카드만 또렷하고 양옆 카드는 살짝 작고 흐리다 → 손가락을 따라 살아 움직인다 (스크롤 연동 지원 브라우저) */
+@media (max-width: 760px) {
+  @supports (animation-timeline: view()) {
+    .swipe-item { animation: rsc-swipe-focus linear both; animation-timeline: view(inline); animation-range: cover 0% cover 100%; }
+  }
 }
 @media (hover: none) {
-  /* 터치 기기: 호버가 없으니 빛줄기는 생략하고, 누름 효과만 남긴다 */
+  /* 터치 기기: 호버가 없으니 빛줄기는 생략하고, 스크롤·누름 효과만 남긴다 */
   .img-live::after { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .img-live > img, .group:hover .img-live > img, .img-live:active > img { transform: none !important; transition: none !important; }
+  .img-live > img, .group:hover .img-live > img, .img-live:active > img, .img-live-hero > img { transform: none !important; scale: 1 !important; animation: none !important; transition: none !important; }
   .img-live::after { display: none; }
+  .swipe-item { animation: none !important; scale: 1 !important; opacity: 1 !important; }
 }
 
 /* FAQ 펼침 */

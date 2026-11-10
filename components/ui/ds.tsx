@@ -60,10 +60,10 @@ export function SectionHead({ eyebrow, title, lead, align = "left", className = 
 /** 카드: 흰 배경 · 1px 선 · 12px 모서리. tone="alt" 는 연회색 배경 */
 export const CARD = "bg-white border border-lineAlt rounded-ds";
 export const CARD_ALT = "bg-sand border border-transparent rounded-ds";
-export const CARD_HOVER = "group transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-[4px] hover:shadow-md hover:border-lineNeutral";
+export const CARD_HOVER = "group transition-[transform,translate,scale,box-shadow,border-color] duration-300 ease-out hover:-translate-y-[4px] hover:shadow-md hover:border-lineNeutral active:scale-[.985]";
 /** 모바일 가로 스와이프 줄 (드래그로 넘김, 데스크톱은 그리드) */
 export const SWIPE = "flex gap-[16px] overflow-x-auto snap-x snap-mandatory -mx-[20px] px-[20px] pb-[8px] scrollbar-none [-webkit-overflow-scrolling:touch] md:grid md:overflow-visible md:mx-0 md:px-0 md:pb-0 md:snap-none";
-export const SWIPE_ITEM = "flex-none w-[82%] snap-start md:w-auto";
+export const SWIPE_ITEM = "swipe-item flex-none w-[82%] snap-start md:w-auto";
 
 /** 입력칸 (Text Field): 48px, 12px 모서리, 포커스 시 파란 테두리 */
 export const INPUT = "w-full h-[48px] rounded-ds border border-lineNeutral bg-white px-[16px] text-[16px] leading-[1.5] text-label outline-none shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-labelAssist hover:border-line focus:border-primary focus:ring-2 focus:ring-[rgba(var(--ds-primary-rgb),.2)] disabled:bg-disable disabled:text-labelDisable appearance-none";
