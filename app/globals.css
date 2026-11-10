@@ -145,6 +145,35 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
   .anim-up, .anim-up-2, .anim-up-3, .anim-zoom, .anim-pop { animation: none; }
 }
 
+/* ---------- 사진 생동감 (img-live): 모든 공개 사진에 공통 ----------
+ * 호버: 사진이 700ms 동안 5% 확대 + 살짝 밝아지고, 빛줄기(sheen)가 왼쪽→오른쪽으로 한 번 지나간다.
+ * 누름(:active, 터치 포함): 150ms 동안 2% 로 살짝 가라앉았다가 손을 떼면 되돌아온다 → 눌리는 느낌.
+ * 카드(.group) 위에 올려도 안의 사진이 함께 움직인다. Tailwind 유틸리티가 이기도록 components 레이어에 둔다. */
+@layer components {
+  .img-live { isolation: isolate; }
+  .img-live > img {
+    transition: transform .7s cubic-bezier(.22,1,.36,1), scale .7s cubic-bezier(.22,1,.36,1), filter .7s cubic-bezier(.22,1,.36,1);
+    will-change: transform;
+  }
+  .img-live::after {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+    background: linear-gradient(105deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.22) 50%, rgba(255,255,255,0) 65%);
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  .img-live:hover > img, .group:hover .img-live > img { transform: scale(1.05); }
+  .img-live:hover::after, .group:hover .img-live::after { opacity: 1; transform: translateX(120%); transition: transform .9s cubic-bezier(.22,1,.36,1), opacity .2s ease; }
+  .img-live:active > img, .group:active .img-live > img { transform: scale(1.02); transition-duration: .15s; }
+}
+@media (hover: none) {
+  /* 터치 기기: 호버가 없으니 빛줄기는 생략하고, 누름 효과만 남긴다 */
+  .img-live::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .img-live > img, .group:hover .img-live > img, .img-live:active > img { transform: none !important; transition: none !important; }
+  .img-live::after { display: none; }
+}
+
 /* FAQ 펼침 */
 details[open] > .faq-body { animation: rsc-fade-up .35s cubic-bezier(.22,1,.36,1) both; }
 

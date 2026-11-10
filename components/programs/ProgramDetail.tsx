@@ -23,7 +23,7 @@ export function ProgramDetail({ p, refundText = "프로그램 3일 전까지 100
       <Link href="/programs" className="inline-block text-[13px] text-[rgba(55,56,60,.61)] mb-[24px]">← 프로그램 목록</Link>
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.4fr)_minmax(320px,1fr)] gap-[36px] md:gap-[48px] items-start">
         <div>
-          <div className="relative h-[260px] md:h-[460px] bg-[#f4f4f5] overflow-hidden mb-[36px]">
+          <div className="relative h-[260px] md:h-[460px] bg-[#f4f4f5] overflow-hidden mb-[36px] img-live">
             {p.image_url && <Image src={p.image_url} alt={p.name} fill priority sizes="(max-width: 760px) 100vw, 60vw" className="object-cover" style={{ filter: "brightness(0.95) saturate(0.92)" }} />}
           </div>
           <div className="text-[11px] tracking-[.02em] text-primaryStrong mb-[16px]">{categoryLabel(p.category)}{p.subtitle ? ` · ${p.subtitle}` : ""}</div>

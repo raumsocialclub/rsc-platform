@@ -49,7 +49,7 @@ export default async function NewsDetailPage({ params }: Params) {
             {p.event_date ? <>행사일 {fmtPostDate(p)}<span className="mx-[10px] text-labelAssist">|</span>{fmtDate(p.published_at)} 게시</> : fmtDate(p.published_at)}
           </div>
           {p.cover_image && (
-            <div className="w-full overflow-hidden rounded-ds bg-fill mb-[36px]">
+            <div className="relative w-full overflow-hidden rounded-ds bg-fill mb-[36px] img-live">
               {/* 인스타그램 피드 비율(1080×1350) 원본 그대로 — 잘라내지 않는다 */}
               <Image src={p.cover_image} alt="" width={1080} height={1350} priority sizes="(min-width: 761px) 760px, 100vw" className="block w-full h-auto" unoptimized={p.cover_image.startsWith("http")} />
             </div>

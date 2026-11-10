@@ -76,7 +76,8 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 
 ## 움직임 (생동감)
 - **버튼**: 호버 시 색이 진해지고 파란 그림자(solid), 누르면 `scale(.97)`. 모든 변화 200ms ease-out.
-- **카드** `CARD_HOVER`: 호버 시 4px 떠오름 + `shadow-md` + 테두리 진하게, 안의 사진은 `ImageBlock zoom` 으로 700ms 동안 5% 확대 (`group`).
+- **사진** `img-live`(globals.css, `ImageBlock` 기본): 호버 시 700ms 동안 5% 확대 + 빛줄기가 한 번 지나가고, 누르면(터치 포함) 150ms 동안 2% 로 살짝 가라앉는다. 대문 히어로 배경·소식·프로그램 사진까지 모든 공개 사진에 적용. 터치 기기는 빛줄기 생략.
+- **카드** `CARD_HOVER`: 호버 시 4px 떠오름 + `shadow-md` + 테두리 진하게, 안의 사진도 함께 움직인다 (`group` → `img-live`).
 - **스크롤 등장** `data-reveal` (+ `--d` 로 지연): 화면에 들어오면 아래에서 22px 떠오르며 나타난다. `RevealObserver`(루트 레이아웃)가 `html.js` 를 붙인 뒤에만 숨기므로 JS 가 없으면 그대로 보인다. `SectionHead`·`ImageBlock` 은 `reveal` prop.
 - **첫 화면**: `anim-up` / `anim-up-2` / `anim-up-3` 순서 등장, 사진은 `anim-zoom`.
 - **GNB**: 메뉴 밑줄이 왼쪽에서 자라남(`link-grow`), 스크롤하면 그림자. 모바일 메뉴는 `anim-pop` + 항목 순차 등장.

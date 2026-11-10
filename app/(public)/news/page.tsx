@@ -67,8 +67,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
                 <article key={p.id} data-reveal style={{ "--d": `${(i % 3) * 80}ms` } as React.CSSProperties} className={`min-w-0 ${CARD} ${CARD_HOVER} overflow-hidden`}>
                   <Link href={`/news/${encodeURIComponent(p.slug)}`} className="block group">
                     {/* 모든 카드를 인스타 피드 비율(4:5) 상자로 통일 */}
-                    <div className="relative aspect-[4/5] overflow-hidden bg-fill">
-                      {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.05]" unoptimized={p.cover_image.startsWith("http")} />}
+                    <div className="relative aspect-[4/5] overflow-hidden bg-fill img-live">
+                      {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center" unoptimized={p.cover_image.startsWith("http")} />}
                     </div>
                     <div className="p-[18px] md:p-[20px]">
                       <div className="flex items-center gap-[8px] mb-[10px]">
