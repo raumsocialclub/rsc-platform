@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, ButtonLink, CARD, FIELD_ERROR, FIELD_HELP, FIELD_LABEL, INPUT, TEXTAREA, btn } from "@/components/ui/ds";
-import { formatPhoneInput } from "@/lib/phone";
+import { formatPhoneInput, normalizePhone } from "@/lib/phone";
 import { Txt } from "@/components/cms/Txt";
 import { PARTNER_KIND_KO, PARTNER_KINDS, PARTNER_MESSAGE_MAX, PARTNER_MESSAGE_MIN, type PartnerKind } from "@/lib/partner/types";
 import { PARTNER_FILES_BUCKET, PARTNER_FILE_ACCEPT, PARTNER_FILE_MAX, fileProblem, type PartnerFile } from "@/lib/partner/files";
@@ -60,6 +60,13 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
   const [fileError, setFileError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const phoneInput = useRef<HTMLInputElement>(null);
+  /* 브라우저 자동완성이 React 가 켜지기 전에 값을 채우면 onChange 가 오지 않는다 — 켜진 직후 칸의 값을 한 번 읽어 서식을 맞춘다 */
+  useEffect(() => {
+    const v = phoneInput.current?.value;
+    if (v && v !== phone) setPhone(formatPhoneInput(v));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const addFiles = (picked: FileList | null) => {
     if (!picked) return;
@@ -99,7 +106,7 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const phoneOk = /^01[016789]-\d{3,4}-\d{4}$/.test(phone);
+  const phoneOk = normalizePhone(phone) !== null;
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const messageLen = message.trim().length;
   const missing: string[] = [
@@ -119,7 +126,7 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
     setSubmitting(true);
     try {
       const uploaded = await uploadAll();
-      const res = await fetch("/api/partner", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, company: company.trim(), name: name.trim(), phone, email: email.trim(), message: message.trim(), consent: true, website, files: uploaded }) });
+      const res = await fetch("/api/partner", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, company: company.trim(), name: name.trim(), phone: normalizePhone(phone) ?? phone, email: email.trim(), message: message.trim(), consent: true, website, files: uploaded }) });
       const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !json?.ok) throw new Error(json?.message ?? "접수하지 못했습니다. 잠시 후 다시 시도해 주세요.");
       setDone(true);
@@ -172,7 +179,7 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
         </div>
         <div>
           <label htmlFor="pf-phone" className={FIELD_LABEL}>{C.phoneLabel} <span className="text-negative">*</span></label>
-          <input id="pf-phone" value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="010-0000-0000" inputMode="numeric" autoComplete="tel" className={INPUT} />
+          <input ref={phoneInput} id="pf-phone" value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} onBlur={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="010-0000-0000" inputMode="numeric" autoComplete="tel" className={INPUT} />
           <span className={FIELD_HELP}>{C.phoneHelp}</span>
         </div>
         <div>

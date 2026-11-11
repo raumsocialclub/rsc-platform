@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { InstagramButton } from "@/components/site/InstagramButton";
 import { Button, ButtonLink, CARD, CHIP, CHIP_OFF, CHIP_ON, FIELD_HELP, FIELD_LABEL, INPUT } from "@/components/ui/ds";
-import { formatPhoneInput } from "@/lib/phone";
+import { formatPhoneInput, normalizePhone } from "@/lib/phone";
 import { readUtm } from "@/lib/utm/client";
 import { trackLead } from "@/components/site/MetaPixel";
 import { Txt } from "@/components/cms/Txt";
@@ -64,7 +64,14 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const phoneOk = /^01[016789]-\d{3,4}-\d{4}$/.test(phone);
+  const phoneInput = useRef<HTMLInputElement>(null);
+  /* 브라우저 자동완성이 React 가 켜지기 전에 값을 채우면 onChange 가 오지 않는다 — 켜진 직후 칸의 값을 한 번 읽어 서식을 맞춘다 */
+  useEffect(() => {
+    const v = phoneInput.current?.value;
+    if (v && v !== phone) setPhone(formatPhoneInput(v));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const phoneOk = normalizePhone(phone) !== null;
   const canSubmit = name.trim() !== "" && phoneOk && agreed;
 
   const submit = async () => {
@@ -73,7 +80,7 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
     setSubmitting(true);
     try {
       const entryPath = entryPathFromReferrer(document.referrer, window.location.origin);
-      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone, consent: true, route: TRACK_LABEL[track], track, entryTrack: initialTrack === "undecided" ? undefined : initialTrack, entryPath, utm: readUtm() }) });
+      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone: normalizePhone(phone) ?? phone, consent: true, route: TRACK_LABEL[track], track, entryTrack: initialTrack === "undecided" ? undefined : initialTrack, entryPath, utm: readUtm() }) });
       const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !json?.ok) throw new Error(json?.message ?? "신청을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
       trackLead();
@@ -122,7 +129,7 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
         </label>
         <label className="block">
           <span className={FIELD_LABEL}>{C.phoneLabel} <span className="text-negative">*</span></span>
-          <input value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="010-0000-0000" inputMode="numeric" autoComplete="tel" required className={INPUT} />
+          <input ref={phoneInput} value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} onBlur={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="010-0000-0000" inputMode="numeric" autoComplete="tel" required className={INPUT} />
           <span className={FIELD_HELP}>{C.phoneHelp}</span>
         </label>
         <div className={`${CARD} p-[16px] md:p-[18px]`}>
