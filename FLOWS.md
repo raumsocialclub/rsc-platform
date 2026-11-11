@@ -7,6 +7,11 @@
 4. 가입: Supabase Auth `signUp` (이메일) 또는 `signInWithOAuth` (kakao/google; 네이버는 Supabase 기본 provider 아님 → 네이버는 커스텀 OIDC 또는 2차) — `options.data = {name, phone, invite_code}`.
 5. `on_auth_user_created` 트리거가 `members` 생성 → 서버 콜백 `/auth/callback`에서 `invite_codes.used_by/used_at` 기록. status=active 즉시 활성(승인 대기 없음).
 
+## 1-1. 제휴문의 (2026-11-11)
+1. 방문자 `/partner` 양식(문의 유형 · 회사 · 담당자 · 휴대전화 · 이메일 · 내용 · 개인정보 동의) → `POST /api/partner` (service role, IP 10분 3회) → `partner_inquiries` insert(status=new, consent_at · consent_version 기록) → 제휴 담당 이메일(`global.brand.partnerEmail`)로 접수 알림(Resend 키가 있을 때만).
+2. 어드민 `/admin/partners`(사이드바 「제휴문의」, 접수 건수 배지) 목록·상세 → 상태(접수 · 검토 중 · 진행·완료 · 보류) · 메모 저장 `PATCH /api/admin/partners/:id` → `admin_logs`(partner.update). 「메일 회신」은 담당자 메일 앱을 연다.
+3. 보관 1년 → `purge_expired_partner_inquiries` 크론(매일 03:41 UTC). 상담 신청(inquiries)·CRM·초대코드와는 분리.
+
 ## 2. 프로그램 예약 → 결제 → 확정
 1. `/programs/[id]` "예약하고 결제하기" → `POST /api/bookings { sessionId, qty }`
    - 서버: 로그인 확인 → `rpc('reserve_seat')` → booking(pending, 15분 만료) 반환. 가격은 DB에서 계산(클라이언트 값 무시).

@@ -674,3 +674,30 @@ create table apply_links (
 alter table apply_links enable row level security;
 create policy "admin apply links" on apply_links for all using (is_admin()) with check (is_admin());
 -- 방문자 쪽 토큰 확인·제출 처리는 서버(service role)만 한다 (app/api/apply, app/(public)/apply/[token])
+
+-- ---------- 2026-11-11: 제휴문의 (/partner 양식 → /admin/partners). 상담 신청(inquiries)과 분리: CRM·초대코드·리드 모드와 무관한 사업 제휴 접수.
+-- 저장은 /api/partner (service role) 만. 보관 1년 → purge_expired_partner_inquiries 크론.
+create table partner_inquiries (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null check (kind in ('brand', 'corporate', 'venue', 'other')),  -- 브랜드·콘텐츠 / 기업·단체 / 공간·행사 / 기타
+  company text not null,                      -- 회사 · 브랜드명
+  name text not null,                         -- 담당자명
+  phone text not null,
+  email text not null,
+  message text not null,
+  status text not null default 'new' check (status in ('new', 'reviewing', 'done', 'declined')),
+  memo text,
+  consent_at timestamptz not null default now(),
+  consent_version text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index partner_inquiries_list_idx on partner_inquiries(status, created_at desc);
+create trigger partner_inquiries_updated_at before update on partner_inquiries for each row execute function set_updated_at();
+alter table partner_inquiries enable row level security;
+create policy "admin partner inquiries" on partner_inquiries for all using (is_admin()) with check (is_admin());
+create or replace function purge_expired_partner_inquiries() returns void language sql security definer set search_path = public as $$
+  delete from partner_inquiries where created_at < now() - interval '1 year';
+$$;
+revoke all on function purge_expired_partner_inquiries() from public, anon, authenticated;
+select cron.schedule('purge-expired-partner-inquiries', '41 3 * * *', $$select public.purge_expired_partner_inquiries()$$);

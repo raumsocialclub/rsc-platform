@@ -23,7 +23,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const owner = isOwnerRole(me);
 
   const supabase = await createClient();
-  const { count: pendingInquiries } = await supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending");
+  const [{ count: pendingInquiries }, { count: newPartners }] = await Promise.all([
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("partner_inquiries").select("id", { count: "exact", head: true }).eq("status", "new"),
+  ]);
 
   const items = [
     { href: "/admin", label: "대시보드" },
@@ -32,6 +35,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/orders", label: "예약 · 결제" },
     { href: "/admin/inquiries", label: "상담 신청", badge: pendingInquiries ?? 0 },
     { href: "/admin/calls", label: "콜 현황" },
+    { href: "/admin/partners", label: "제휴문의", badge: newPartners ?? 0 },
     { href: "/admin/apply", label: "상담 전 설문" },
     { href: "/admin/coupons", label: "쿠폰 · 초대권" },
     { href: "/admin/stats", label: "통계 · 리포트" },
