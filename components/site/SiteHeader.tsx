@@ -13,11 +13,11 @@ export type HeaderBrand = { ctaLabel: string; ctaHref: string; logoEmblem: strin
 const DEFAULT_BRAND: HeaderBrand = { ctaLabel: "RSC 상담 신청", ctaHref: "/fit-check", logoEmblem: "/images/logo-emblem.png", logoText: "/images/logo-text-nav.png" };
 /** 메뉴 이름 (CMS global.nav). 비어 있으면 기본 이름 */
 export type NavLabels = Partial<Record<"navSocial" | "navMatching" | "navAbout" | "navPrograms" | "navMembership" | "navNews" | "navFaq" | "navMy" | "navLogin" | "navLogout", string>>;
-const DEFAULT_NAV: Required<NavLabels> = { navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식", navFaq: "FAQ", navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃" };
-const NAV = "link-grow t-label-1 font-semibold text-labelNeutral hover:text-primary py-[4px]";
+const DEFAULT_NAV: Required<NavLabels> = { navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식", navFaq: "FAQ", navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃" };
+const NAV = "link-grow t-label-1 lg:t-body-2 font-semibold text-labelNeutral hover:text-primary py-[4px] whitespace-nowrap";
 
 /**
- * 공통 GNB (Wanted DS). 흰 배경 64px(모바일 56px) 고정 바 · 로고 · 메뉴(소셜클럽 · 1:1 매칭 · 소개 · 소식 · FAQ) · 주요 버튼. "혜택" 메뉴는 내용 확정 전이라 2026-11 요청으로 뺐다(페이지 /benefits 는 유지). 모바일은 햄버거 → 전체 화면 메뉴.
+ * 공통 GNB (Wanted DS). 흰 배경 64px(모바일 56px) 고정 바 · 로고 · 메뉴(브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식 · FAQ, 가운데 정렬 · 넓은 간격) · 주요 버튼. "혜택" 메뉴는 내용 확정 전이라 2026-11 요청으로 뺐다(페이지 /benefits 는 유지). 모바일은 햄버거 → 전체 화면 메뉴.
  * 로그인 상태(user)면 "프로그램 · 내 예약 · 이니셜 아바타". leadMode(리드 모드)면 예약·로그인 링크를 숨기고 상담 신청만 남긴다.
  */
 export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = false, labels }: { user?: HeaderUser | null; brand?: HeaderBrand; leadMode?: boolean; labels?: NavLabels }) {
@@ -41,11 +41,11 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
     <>
       <header className={`fixed top-0 left-0 right-0 z-[60] h-[56px] md:h-[64px] bg-white/95 backdrop-blur-[12px] border-b transition-[box-shadow,border-color] duration-300 ${scrolled ? "border-lineNeutral shadow-sm" : "border-lineAlt"}`}>
         <div className="h-full max-w-[1200px] mx-auto px-[20px] md:px-[32px] flex items-center justify-between gap-[16px]">
-          <Logo href="/" emblemClass="h-[26px] md:h-[32px]" textClass="h-[14px] md:h-[16px]" textSrc={brand.logoText} emblemSrc={brand.logoEmblem} className="gap-[10px]" />
-          <nav className="hidden md:flex items-center gap-[28px] ml-[40px] mr-auto">
+          <Logo href="/" emblemClass="h-[26px] md:h-[32px]" textClass="h-[14px] md:h-[16px]" textSrc={brand.logoText} emblemSrc={brand.logoEmblem} className="gap-[10px] flex-none" />
+          <nav className="hidden md:flex items-center gap-[24px] lg:gap-[48px] mx-auto px-[16px] lg:px-[24px]">
+            <Link href="/#about" className={NAV}>{L.navAbout}</Link>
             <Link href="/social" className={NAV}>{L.navSocial}</Link>
             <Link href="/matching" className={NAV}>{L.navMatching}</Link>
-            <Link href="/#about" className={NAV}>{L.navAbout}</Link>
             {!leadMode && <Link href="/programs" className={NAV}>{L.navPrograms}</Link>}
             {!leadMode && <Link href="/pricing" className={NAV}>{L.navMembership}</Link>}
             <Link href="/news" className={NAV}>{L.navNews}</Link>
@@ -90,9 +90,9 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
           </div>
           <nav className="flex flex-col">
             {[
+              { href: "/#about", label: L.navAbout },
               { href: "/social", label: L.navSocial },
               { href: "/matching", label: L.navMatching },
-              { href: "/#about", label: L.navAbout },
               ...(!leadMode ? [{ href: "/programs", label: loggedIn ? L.navPrograms : `${L.navPrograms} 예약` }] : []),
               ...(!leadMode ? [{ href: "/pricing", label: L.navMembership }] : []),
               { href: "/news", label: L.navNews },

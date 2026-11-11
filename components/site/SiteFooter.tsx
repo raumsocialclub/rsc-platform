@@ -34,9 +34,9 @@ export async function SiteFooter() {
           <div>
             <div className="t-label-1 font-semibold text-label mb-[14px]">{L("footerMenuTitle", "메뉴")}</div>
             <nav className="flex flex-col gap-[10px]">
+              <Link href="/#about" className={LINK}>{L("navAbout", "브랜드소개")}</Link>
               <Link href="/social" className={LINK}>{L("navSocial", "소셜클럽")}</Link>
               <Link href="/matching" className={LINK}>{L("navMatching", "1:1 매칭")}</Link>
-              <Link href="/#about" className={LINK}>{L("navAbout", "소개")}</Link>
               {!lead && <Link href="/pricing" className={LINK}>{L("navMembership", "멤버십")}</Link>}
               <Link href="/news" className={LINK}>{L("navNews", "소식")}</Link>
               <Link href="/#faq" className={LINK}>{L("footerFaq", "자주 묻는 질문")}</Link>
