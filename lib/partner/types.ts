@@ -17,6 +17,7 @@ export type PartnerInquiryRow = {
   message: string;
   status: PartnerStatus;
   memo: string | null;
+  files: { path: string; name: string; size: number }[];
   consent_at: string;
   consent_version: string | null;
   created_at: string;

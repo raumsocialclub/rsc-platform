@@ -92,7 +92,7 @@ export async function sendOpsAlert(params: { to: string; title: string; kind: st
 }
 
 /** 제휴문의 접수 알림 (제휴 담당 이메일로). 본문은 어드민 /admin/partners 에서 다시 볼 수 있으므로 요약만 담는다. */
-export async function sendPartnerInquiryNotice(params: { to: string; kind: string; company: string; name: string; phone: string; email: string; message: string }): Promise<NotifyResult> {
+export async function sendPartnerInquiryNotice(params: { to: string; kind: string; company: string; name: string; phone: string; email: string; message: string; files?: { name: string; size: number }[] }): Promise<NotifyResult> {
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] ?? c);
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rsc-platform.vercel.app";
   const { PARTNER_KIND_KO } = await import("@/lib/partner/types");
@@ -107,6 +107,7 @@ export async function sendPartnerInquiryNotice(params: { to: string; kind: strin
         <tr><td style="padding:4px 10px 4px 0;color:#5a3d24">담당자</td><td style="padding:4px 0">${esc(params.name)} · ${esc(params.phone)} · ${esc(params.email)}</td></tr>
       </table>
       <p style="font-size:13px;white-space:pre-wrap;background:#f7f7f8;padding:12px;margin:12px 0">${esc(params.message)}</p>
+      ${params.files?.length ? `<p style="font-size:13px">첨부 ${params.files.length}개: ${params.files.map((f) => esc(f.name)).join(", ")} (어드민에서 내려받기)</p>` : ""}
       <p style="font-size:12px;color:#5a3d24"><a href="${site}/admin/partners">어드민 제휴문의에서 보기</a></p>
     </div>`;
   return sendEmail(params.to, `[RSC 제휴문의] ${params.company} · ${kindKo}`, html);

@@ -31,7 +31,7 @@ export function PartnersView({ rows, selected, status }: { rows: PartnerInquiryR
                   return (
                     <tr key={r.id} className={active ? "bg-[rgba(0,102,255,.06)]" : "hover:bg-[rgba(112,115,124,.05)]"}>
                       <td className={`${TD} text-[rgba(55,56,60,.61)]`}><Link href={href} className="block">{fmtShortDate(r.created_at)}</Link></td>
-                      <td className={TD}><Link href={href} className="block font-bold">{r.company}</Link></td>
+                      <td className={TD}><Link href={href} className="block font-bold">{r.company}{(r.files ?? []).length > 0 && <span className="ml-[6px] text-[11px] font-normal text-[rgba(55,56,60,.61)]">📎{r.files.length}</span>}</Link></td>
                       <td className={TD}>{r.name}</td>
                       <td className={TD}>{PARTNER_KIND_KO[r.kind] ?? r.kind}</td>
                       <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{r.phone}<div className="text-[11px]">{r.email}</div></td>

@@ -701,3 +701,21 @@ create or replace function purge_expired_partner_inquiries() returns void langua
 $$;
 revoke all on function purge_expired_partner_inquiries() from public, anon, authenticated;
 select cron.schedule('purge-expired-partner-inquiries', '41 3 * * *', $$select public.purge_expired_partner_inquiries()$$);
+
+-- ---------- 2026-11-11: 제휴문의 첨부 파일. 비공개 버킷 partner-files(파일당 10MB · 무료 저장 용량 1GB 고려), 경로 inbox/<uuid>/<파일명>. 확장자(pdf·hwp·hwpx·doc·docx·xls·xlsx·ppt·pptx·jpg·png)·개수(3)는 서버 /api/partner/upload-url 가 검사하고
+-- 브라우저가 서명된 업로드 URL 로 직접 올린다(Vercel 요청 본문 4.5MB 한도 회피). 어드민은 /api/admin/partners/:id/file?i= 로 서명 URL 을 받아 내려받는다.
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('partner-files', 'partner-files', false, 10485760)
+on conflict (id) do update set public = false, file_size_limit = 10485760;
+alter table partner_inquiries add column if not exists files jsonb not null default '[]'::jsonb;  -- [{path, name, size}]
+create policy "partner files admin read" on storage.objects for select using (bucket_id = 'partner-files' and public.is_admin());
+create policy "partner files admin delete" on storage.objects for delete using (bucket_id = 'partner-files' and public.is_admin());
+-- 보관 1년: 행과 함께 첨부도 지운다. 제출되지 않은 채 하루 지난 업로드(inbox 고아 파일)도 지운다.
+create or replace function purge_expired_partner_inquiries() returns void language sql security definer set search_path = public as $$
+  delete from storage.objects o where o.bucket_id = 'partner-files' and exists (
+    select 1 from partner_inquiries p, jsonb_array_elements(p.files) f where f->>'path' = o.name and p.created_at < now() - interval '1 year');
+  delete from partner_inquiries where created_at < now() - interval '1 year';
+  delete from storage.objects o where o.bucket_id = 'partner-files' and o.created_at < now() - interval '1 day' and not exists (
+    select 1 from partner_inquiries p, jsonb_array_elements(p.files) f where f->>'path' = o.name);
+$$;
+revoke all on function purge_expired_partner_inquiries() from public, anon, authenticated;

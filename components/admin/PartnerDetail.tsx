@@ -48,7 +48,17 @@ export function PartnerDetail({ row }: { row: PartnerInquiryRow }) {
       <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-[14px] gap-y-[8px] text-[13px] mb-[16px]">
         {info.map((r) => (<div key={r.q} className="contents"><dt className="text-[rgba(55,56,60,.61)] whitespace-nowrap">{r.q}</dt><dd className="text-[rgba(46,47,51,.88)] m-0">{r.a}</dd></div>))}
       </dl>
-      <div className="bg-sand p-[14px] mb-[20px] text-[13px] leading-[1.7] whitespace-pre-wrap break-words text-[rgba(46,47,51,.88)]">{row.message}</div>
+      <div className="bg-sand p-[14px] mb-[16px] text-[13px] leading-[1.7] whitespace-pre-wrap break-words text-[rgba(46,47,51,.88)]">{row.message}</div>
+      {(row.files ?? []).length > 0 && (
+        <div className="mb-[20px]">
+          <div className="text-[12px] text-[rgba(55,56,60,.61)] mb-[6px]">첨부 파일 {row.files.length}개 (링크는 5분간 유효)</div>
+          <ul className="list-none m-0 p-0 flex flex-col gap-[6px]">
+            {row.files.map((f, i) => (
+              <li key={f.path}><a href={`/api/admin/partners/${row.id}/file?i=${i}`} className="text-[13px] text-primary underline break-all">{f.name}</a> <span className="text-[11px] text-[rgba(55,56,60,.61)]">{f.size >= 1024 * 1024 ? `${(f.size / 1024 / 1024).toFixed(1)}MB` : `${Math.max(1, Math.round(f.size / 1024))}KB`}</span></li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <label className="block text-[12px] text-[rgba(55,56,60,.61)] mb-[6px]">상태</label>
       <select value={status} onChange={(e) => setStatus(e.target.value as PartnerStatus)} className={`${FIELD} mb-[12px]`}>
