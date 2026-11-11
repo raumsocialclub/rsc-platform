@@ -12,7 +12,7 @@ const LINK = "t-label-1 text-labelAlt hover:text-label hover:translate-x-[2px] i
 /**
  * 푸터 (Wanted DS): 연회색 배경, 브랜드 한 줄 + 메뉴·연락처·제휴문의 열, 맨 아래 약관 링크·사업자 정보.
  * 연락처·제휴 담당 연락처는 CMS(global.brand), 메뉴 이름·열 제목은 CMS(global.nav). 리드 모드면 멤버십·환불규정 링크를 숨긴다.
- * 「패밀리 사이트」 열은 2026-11 요청으로 「제휴문의」(제휴 담당 전화·이메일 + /partner 안내)로 바꿨다.
+ * 「패밀리 사이트」 열은 2026-11 요청으로 「제휴문의 →」(/partner 로 가는 제목 링크 하나, 연락처는 페이지에서)로 바꿨다. 2열 제목은 「서비스 문의」.
  */
 export async function SiteFooter() {
   const [b, n, settings] = await Promise.all([getBrand(), getNav(), getSettings()]);
@@ -53,12 +53,7 @@ export async function SiteFooter() {
             </div>
           </div>
           <div data-testid="footer-partner">
-            <div className="t-label-1 font-semibold text-label mb-[14px]">{L("footerPartnerTitle", "제휴문의")}</div>
-            <div className="flex flex-col gap-[10px] t-label-1 text-labelAlt">
-              {b.partnerPhone && <a href={`tel:${b.partnerPhone}`} className="hover:text-label">{b.partnerPhone}</a>}
-              {b.partnerEmail && <a href={`mailto:${b.partnerEmail}`} className="hover:text-label break-all">{b.partnerEmail}</a>}
-              <Link href="/partner" className={LINK}>{L("footerPartnerLink", "제휴 안내 보기")} →</Link>
-            </div>
+            <Link href="/partner" className="t-label-1 font-semibold text-label hover:text-primary hover:translate-x-[2px] inline-block transition-[color,transform] duration-200">{L("footerPartnerTitle", "제휴문의")} →</Link>
           </div>
         </div>
         <div className="border-t border-lineNeutral pt-[20px] flex flex-col gap-[12px] md:flex-row md:items-start md:justify-between">

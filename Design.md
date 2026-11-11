@@ -69,7 +69,7 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 - **배지** `<Badge tone>` neutral·primary·positive·cautionary·negative·inverse — pill, 12px SemiBold.
 - **섹션 머리** `<SectionHead eyebrow title lead align>`.
 - **GNB** `SiteHeader` — 흰 배경 95% + blur, 하단 lineAlt. 데스크톱 메뉴(브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식 · FAQ) `t-label-1`(lg `t-body-2`) SemiBold, 로고와 우측 버튼 사이 가운데 정렬 · 간격 24px(lg 48px), 우측 로그인(assistive md) + 상담 신청(solid md). 모바일: 햄버거 → 흰 전체 화면 메뉴(`t-heading-2` 목록, 하단 풀폭 solid 버튼).
-- **푸터** `SiteFooter` — sand 배경, 4열(브랜드·메뉴·문의·제휴문의) + 사업자 정보 한 줄 + 약관 링크. 제휴문의 열은 제휴 담당 전화·이메일(`global.brand` partnerPhone·partnerEmail) + `/partner` 링크. 「패밀리 사이트」 열은 2026-11-11 요청으로 뺐다.
+- **푸터** `SiteFooter` — sand 배경, 4열(브랜드·메뉴·서비스 문의·제휴문의) + 사업자 정보 한 줄 + 약관 링크. 제휴문의 열은 `/partner` 로 가는 「제휴문의 →」 제목 링크 하나(연락처는 페이지에서, 2026-11-11 중복 정리). 「패밀리 사이트」 열은 2026-11-11 요청으로 뺐다.
 - **다크 CTA 밴드** `bg-inverseBg rounded-ds`, 라벨 `text-inversePrimary`, 제목 `text-inverseLabel`, 본문 `rgba(247,247,248,.7)`, 버튼 solid + inverse.
 - **플로팅 UP 버튼** 우하단 44px 흰 원 + lineNeutral + shadow-md, 뷰포트 60% 스크롤 후 표시.
 - **탭(법적 고지 등)** 하단 2px 언더라인, 선택 `text-label`/미선택 `text-labelAlt`.

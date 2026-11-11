@@ -8,12 +8,13 @@ const page = readFileSync("app/(public)/partner/page.tsx", "utf8");
 
 /** 푸터 「패밀리 사이트」 → 「제휴문의」 + /partner 제휴문의 페이지 (2026-11 요청) */
 describe("제휴문의", () => {
-  it("푸터에서 패밀리 사이트가 빠지고 제휴문의 열(전화·이메일·안내 링크)이 들어간다", () => {
+  it("푸터: 패밀리 사이트 없음, 2열 「서비스 문의」, 3열은 /partner 로 가는 「제휴문의 →」 링크 하나(연락처 없음)", () => {
     expect(footer).not.toMatch(/footerFamilyTitle|familySite|FamilySite/);
-    expect(footer).toContain('L("footerPartnerTitle", "제휴문의")');
-    expect(footer).toContain("tel:${b.partnerPhone}");
-    expect(footer).toContain("mailto:${b.partnerEmail}");
-    expect(footer).toContain('href="/partner"');
+    expect(footer).toContain('L("footerContactTitle", "문의")');
+    expect(DOC_BY_ID.get("global.nav")!.defaults.footerContactTitle).toBe("서비스 문의");
+    expect(footer).toMatch(/<Link href="\/partner" [^>]*>\{L\("footerPartnerTitle", "제휴문의"\)\} →<\/Link>/);
+    expect(footer).not.toContain("partnerPhone");
+    expect(footer).not.toContain("partnerEmail");
   });
   it("제휴 담당 연락처는 CMS global.brand 에 있고 기본값이 채워져 있다", () => {
     const brand = DOC_BY_ID.get("global.brand")!;
