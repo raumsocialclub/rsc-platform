@@ -10,15 +10,15 @@ const INK_FILTER = "invert(1) brightness(0.15)";
 const LINK = "t-label-1 text-labelAlt hover:text-label hover:translate-x-[2px] inline-block transition-[color,transform] duration-200";
 
 /**
- * 푸터 (Wanted DS): 연회색 배경, 브랜드 한 줄 + 메뉴·연락처·패밀리 사이트 열, 맨 아래 약관 링크·사업자 정보.
- * 연락처·문구는 CMS(global.brand), 메뉴 이름은 CMS(global.nav). 리드 모드면 멤버십·환불규정 링크를 숨긴다.
+ * 푸터 (Wanted DS): 연회색 배경, 브랜드 한 줄 + 메뉴·연락처·제휴문의 열, 맨 아래 약관 링크·사업자 정보.
+ * 연락처·제휴 담당 연락처는 CMS(global.brand), 메뉴 이름·열 제목은 CMS(global.nav). 리드 모드면 멤버십·환불규정 링크를 숨긴다.
+ * 「패밀리 사이트」 열은 2026-11 요청으로 「제휴문의」(제휴 담당 전화·이메일 + /partner 안내)로 바꿨다.
  */
 export async function SiteFooter() {
   const [b, n, settings] = await Promise.all([getBrand(), getNav(), getSettings()]);
   const L = (k: string, fb: string) => n[k] || fb;
   const lead = settings.leadMode;
   const biz = businessInfo(b);
-  const family = [{ label: b.familySite1Label, url: b.familySite1Url }, { label: b.familySite2Label, url: b.familySite2Url }].filter((f) => f.label && f.url);
   return (
     <footer className="bg-sand border-t border-lineAlt">
       <div className="max-w-[1200px] mx-auto px-[20px] md:px-[32px] pt-[56px] pb-[40px] md:pt-[72px] md:pb-[48px]">
@@ -52,11 +52,13 @@ export async function SiteFooter() {
               <span className="whitespace-pre-line"><Txt v={b.address} /></span>
             </div>
           </div>
-          <div>
-            <div className="t-label-1 font-semibold text-label mb-[14px]">{L("footerFamilyTitle", "패밀리 사이트")}</div>
-            <nav className="flex flex-col gap-[10px]">
-              {family.map((f) => <a key={f.url} href={f.url} target="_blank" rel="noreferrer" className={LINK}>{f.label} ↗</a>)}
-            </nav>
+          <div data-testid="footer-partner">
+            <div className="t-label-1 font-semibold text-label mb-[14px]">{L("footerPartnerTitle", "제휴문의")}</div>
+            <div className="flex flex-col gap-[10px] t-label-1 text-labelAlt">
+              {b.partnerPhone && <a href={`tel:${b.partnerPhone}`} className="hover:text-label">{b.partnerPhone}</a>}
+              {b.partnerEmail && <a href={`mailto:${b.partnerEmail}`} className="hover:text-label break-all">{b.partnerEmail}</a>}
+              <Link href="/partner" className={LINK}>{L("footerPartnerLink", "제휴 안내 보기")} →</Link>
+            </div>
           </div>
         </div>
         <div className="border-t border-lineNeutral pt-[20px] flex flex-col gap-[12px] md:flex-row md:items-start md:justify-between">

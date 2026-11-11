@@ -20,7 +20,7 @@ export type Field = {
 export type ListDef = { key: string; label: string; itemLabel: string; fields: Field[]; min?: number; max?: number };
 export type DocDef = {
   id: string;
-  page: "global" | "home" | "social" | "matching" | "apply" | "news" | "pricing" | "benefits" | "legal" | "settings" | "seo";
+  page: "global" | "home" | "social" | "matching" | "apply" | "news" | "partner" | "pricing" | "benefits" | "legal" | "settings" | "seo";
   label: string;
   description?: string;
   /** 「사이트에서 보기」가 이동할 섹션 앵커 (예: "#faq") */
@@ -59,10 +59,8 @@ export const DOCS: DocDef[] = [
       t("email", "이메일"),
       t("instagramHandle", "인스타그램 계정 (@ 제외)"),
       link("instagramUrl", "인스타그램 링크"),
-      t("familySite1Label", "패밀리 사이트 1 이름"),
-      link("familySite1Url", "패밀리 사이트 1 주소"),
-      t("familySite2Label", "패밀리 사이트 2 이름"),
-      link("familySite2Url", "패밀리 사이트 2 주소"),
+      t("partnerPhone", "제휴 담당 전화", undefined, "푸터 「제휴문의」 열과 /partner 페이지에 보입니다"),
+      t("partnerEmail", "제휴 담당 이메일"),
       t("copyright", "저작권 표기"),
       t("bizName", "정식 상호", undefined, "사업자등록증의 상호. 비우면 푸터·약관의 사업자 정보가 표시되지 않습니다"),
       t("bizRep", "대표자"),
@@ -83,8 +81,8 @@ export const DOCS: DocDef[] = [
       email: "theraumai@gmail.com",
       instagramHandle: "raum_socialclub",
       instagramUrl: "https://www.instagram.com/raum_socialclub/",
-      familySite1Label: "라움아트센터", familySite1Url: "https://www.theraum.co.kr",
-      familySite2Label: "하우스오브더라움", familySite2Url: "https://houseoftheraum.co.kr",
+      partnerPhone: "010-9272-7783",
+      partnerEmail: "se.na@theraum.co.kr",
       copyright: "© 2026 RAUM SOCIAL CLUB",
       bizName: "주식회사 레벤스토리", bizRep: "김기태", bizNumber: "629-87-01795", bizMailOrder: "", bizAddress: "서울특별시 강남구 언주로 564, 비동 2층 (역삼동, 라움)",
     },
@@ -110,17 +108,17 @@ export const DOCS: DocDef[] = [
     id: "global.nav",
     page: "global",
     label: "메뉴 이름 (상단 메뉴 · 푸터)",
-    description: "상단 메뉴(GNB)와 푸터에 보이는 메뉴 이름입니다. 링크 주소는 바뀌지 않고 이름만 바뀝니다. 「프로그램」「멤버십」「내 예약」「로그인」은 리드 모드에서는 보이지 않습니다.",
+    description: "상단 메뉴(GNB)와 푸터에 보이는 메뉴 이름입니다. 푸터 3열은 「제휴문의」(연락처는 브랜드 · 연락처의 제휴 담당 전화·이메일). 링크 주소는 바뀌지 않고 이름만 바뀝니다. 「프로그램」「멤버십」「내 예약」「로그인」은 리드 모드에서는 보이지 않습니다.",
     fields: [
       t("navSocial", "메뉴: 소셜클럽"), t("navMatching", "메뉴: 1:1 매칭"), t("navAbout", "메뉴: 브랜드소개"), t("navPrograms", "메뉴: 프로그램"), t("navMembership", "메뉴: 멤버십"), t("navNews", "메뉴: 소식"), t("navFaq", "메뉴: FAQ"),
       t("navMy", "메뉴: 내 예약"), t("navLogin", "메뉴: 로그인"), t("navLogout", "메뉴: 로그아웃"),
-      t("footerMenuTitle", "푸터 1열 제목"), t("footerFaq", "푸터: 자주 묻는 질문"), t("footerApply", "푸터: 상담 신청"), t("footerContactTitle", "푸터 2열 제목"), t("footerFamilyTitle", "푸터 3열 제목"),
+      t("footerMenuTitle", "푸터 1열 제목"), t("footerFaq", "푸터: 자주 묻는 질문"), t("footerApply", "푸터: 상담 신청"), t("footerContactTitle", "푸터 2열 제목"), t("footerPartnerTitle", "푸터 3열 제목 (제휴문의)"), t("footerPartnerLink", "푸터: 제휴 안내 링크 문구"),
       t("legalTerms", "푸터: 이용약관"), t("legalPrivacy", "푸터: 개인정보처리방침"), t("legalRefund", "푸터: 환불규정"),
     ],
     defaults: {
       navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식", navFaq: "FAQ",
       navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃",
-      footerMenuTitle: "메뉴", footerFaq: "자주 묻는 질문", footerApply: "상담 신청", footerContactTitle: "문의", footerFamilyTitle: "패밀리 사이트",
+      footerMenuTitle: "메뉴", footerFaq: "자주 묻는 질문", footerApply: "상담 신청", footerContactTitle: "문의", footerPartnerTitle: "제휴문의", footerPartnerLink: "제휴 안내 보기",
       legalTerms: "이용약관", legalPrivacy: "개인정보처리방침", legalRefund: "환불규정",
     },
   },
@@ -593,6 +591,59 @@ export const DOCS: DocDef[] = [
     defaults: { eyebrow: "NEWS", emptyText: "{y}년 {m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.", backLabel: "← 소식 목록", ctaLabel: "RSC 상담 신청하기" },
   },
 
+  /* ---------- 제휴문의 (/partner) ---------- */
+  {
+    id: "partner.page",
+    page: "partner",
+    label: "제휴문의 페이지",
+    description: "푸터 「제휴문의」 열에서 들어오는 /partner 페이지의 문구입니다. 담당 전화·이메일은 「브랜드 · 연락처」의 제휴 담당 전화·이메일을 씁니다. 페이지 제목·검색 설명은 「SEO」 → 페이지별 설정(제휴문의).",
+    fields: [
+      t("eyebrow", "제목 위 작은 영문"),
+      t("title", "제목", "soft"),
+      ta("body", "소개 문단", "soft"),
+      t("tracksTitle", "협업 분야 제목"),
+      t("contactTitle", "연락처 제목"),
+      t("partnerCardTitle", "제휴 담당 카드 제목"),
+      ta("partnerCardBody", "제휴 담당 카드 설명", "soft"),
+      t("partnerCtaLabel", "제휴 담당 카드 버튼 (이메일 작성)"),
+      t("mailSubject", "제안 메일 제목 자동 입력", undefined, "버튼을 누르면 메일 제목에 미리 들어가는 문구"),
+      t("generalCardTitle", "일반 문의 카드 제목"),
+      ta("generalCardBody", "일반 문의 카드 설명", "soft"),
+      t("generalCtaLabel", "일반 문의 카드 버튼 (상담 신청)"),
+      t("guideTitle", "제안서 안내 제목"),
+      ta("guideItems", "제안서에 담을 내용", "hard", "줄마다 하나"),
+      ta("guideNote", "제안서 안내 맺음말", "soft"),
+    ],
+    lists: [
+      {
+        key: "tracks", label: "협업 분야", itemLabel: "분야", min: 1, max: 6,
+        fields: [t("title", "분야 이름"), ta("body", "설명", "soft"), t("examples", "예시 (가운뎃점으로 구분)")],
+      },
+    ],
+    defaults: {
+      eyebrow: "PARTNERSHIP",
+      title: "라움소셜클럽과 함께할\n파트너를 찾습니다",
+      body: "라움소셜클럽은 라움이 검증한 싱글 멤버가 라움아트센터의 공간에서 문화·미식·운동·회복을 함께 경험하는 커뮤니티입니다.\n멤버의 일상을 더 특별하게 만들어 줄 브랜드·기업·공간과의 협업을 환영합니다.",
+      tracksTitle: "이런 협업을 기다립니다",
+      contactTitle: "제휴 담당에게 연락하기",
+      partnerCardTitle: "제휴 · 협업 제안",
+      partnerCardBody: "브랜드 협업, 기업 제휴, 공간·행사 협업 제안은 제휴 담당에게 직접 보내 주세요.\n검토 후 담당자가 연락드립니다.",
+      partnerCtaLabel: "이메일로 제안하기",
+      mailSubject: "[제휴 제안] 라움소셜클럽 협업 문의",
+      generalCardTitle: "멤버십 · 일반 문의",
+      generalCardBody: "소셜클럽과 1:1 매칭 가입이 궁금하시면 상담을 신청해 주세요.\n이름과 연락처만 남기시면 담당자가 직접 연락드립니다.",
+      generalCtaLabel: "RSC 상담 신청",
+      guideTitle: "제안서에 이런 내용을 담아 주세요",
+      guideItems: "회사 · 브랜드 소개와 공식 채널\n제안하는 협업 내용과 기대하는 효과\n희망 시기 · 규모 · 예산 범위\n담당자 이름과 연락처",
+      guideNote: "첨부 파일은 이메일로 함께 보내 주시면 됩니다. 제안 내용은 검토 목적으로만 쓰고 외부에 공개하지 않습니다.",
+      tracks: [
+        { title: "브랜드 · 콘텐츠 협업", body: "월 1회 열리는 RSC TASTE SOCIAL 프로그램(아트, 와인, 웰니스, 러닝, 토크, 다이닝)에 브랜드의 제품과 경험을 더합니다. 검증된 멤버에게 브랜드를 자연스럽게 소개할 수 있습니다.", examples: "와인·F&B 페어링 · 웰니스·뷰티 체험 · 아트·공연 초청 · 멤버 전용 혜택" },
+        { title: "기업 · 단체 제휴", body: "임직원 복지로 소셜클럽 멤버십과 1:1 매칭 상담을 제공합니다. 기업 맞춤 소셜 프로그램과 단체 행사도 함께 기획합니다.", examples: "임직원 복지 멤버십 · 기업 전용 소셜 행사 · 사내 상담 데이" },
+        { title: "공간 · 행사 협업", body: "라움아트센터와 라움의 공간에서 열리는 행사를 함께 만들거나, 파트너의 공간에서 RSC 행사를 엽니다. 서로의 공간과 멤버를 잇는 협업입니다.", examples: "공동 행사 기획 · 공간 교류 · 팝업·전시" },
+      ],
+    },
+  },
+
   /* ---------- 가격 ---------- */
   {
     id: "pricing.hero",
@@ -757,6 +808,7 @@ export const PAGES: { key: DocDef["page"]; label: string; preview: string }[] = 
   { key: "matching", label: "1:1 매칭", preview: "/matching" },
   { key: "apply", label: "상담 신청", preview: "/fit-check" },
   { key: "news", label: "소식", preview: "/news" },
+  { key: "partner", label: "제휴문의", preview: "/partner" },
   { key: "pricing", label: "가격 안내 (리드 모드에선 숨김)", preview: "/pricing" },
   { key: "benefits", label: "혜택 안내", preview: "/benefits" },
   { key: "legal", label: "약관", preview: "/terms" },

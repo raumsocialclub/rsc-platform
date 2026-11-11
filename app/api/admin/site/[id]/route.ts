@@ -42,15 +42,16 @@ function sanitize(id: string, raw: unknown): Record<string, unknown> | null {
 
 function pathsFor(id: string): string[] {
   const page = id.split(".")[0];
-  if (page === "global") return ["/", "/pricing", "/benefits", "/fit-check", "/terms", "/privacy", "/refund", "/login", "/join", "/programs", "/my"];
+  if (page === "global") return ["/", "/pricing", "/benefits", "/fit-check", "/news", "/partner", "/terms", "/privacy", "/refund", "/login", "/join", "/programs", "/my"];
   if (page === "home" || page === "social" || page === "matching") return ["/", "/social", "/matching"]; // home.faq·home.gate·matching.verify 등은 세 페이지가 함께 쓴다
   if (page === "apply") return ["/fit-check"];
   if (page === "news") return ["/news"];
+  if (page === "partner") return ["/partner"];
   if (page === "pricing") return ["/pricing"];
   if (page === "benefits") return ["/benefits"];
   if (page === "legal") return [`/${id.split(".")[1]}`];
   if (page === "settings") return ["/", "/pricing", "/benefits", "/programs", "/my", "/login"];
-  if (page === "seo") return ["/", "/pricing", "/benefits", "/fit-check", "/news", "/terms", "/privacy", "/refund", "/robots.txt", "/sitemap.xml", "/llms.txt"];
+  if (page === "seo") return ["/", "/pricing", "/benefits", "/fit-check", "/news", "/partner", "/terms", "/privacy", "/refund", "/robots.txt", "/sitemap.xml", "/llms.txt"];
   return [];
 }
 

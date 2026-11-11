@@ -26,6 +26,7 @@ export const PUBLIC_PAGES: { key: string; path: string; label: string; priority:
   { key: "pricing", path: "/pricing", label: "멤버십 가격 안내", priority: 0.9, changeFrequency: "monthly" },
   { key: "benefits", path: "/benefits", label: "정회원 혜택 안내", priority: 0.8, changeFrequency: "monthly" },
   { key: "news", path: "/news", label: "소식", priority: 0.7, changeFrequency: "weekly" },
+  { key: "partner", path: "/partner", label: "제휴문의", priority: 0.5, changeFrequency: "yearly" },
   { key: "fitcheck", path: "/fit-check", label: "RSC 상담 신청", priority: 0.6, changeFrequency: "yearly" },
   { key: "terms", path: "/terms", label: "이용약관", priority: 0.2, changeFrequency: "yearly" },
   { key: "privacy", path: "/privacy", label: "개인정보처리방침", priority: 0.2, changeFrequency: "yearly" },
@@ -39,6 +40,7 @@ const PAGE_DEFAULTS: Record<string, { title: string; description: string }> = {
   pricing: { title: "멤버십 안내", description: "소셜클럽 · ACCESS · SIGNATURE 멤버십 구성 안내. 가입비·연회비는 대면 상담에서 안내해 드립니다." },
   benefits: { title: "정회원 혜택 안내", description: "6개 카테고리 행사 우선참여, 지인 초대권 연 8매, RSC 라운지·미팅룸, 평일 무료주차, 라움아트센터 대관 우선, 제휴 브랜드 할인까지 라움소셜클럽 정회원 혜택." },
   news: { title: "소식", description: "라움소셜클럽의 새로운 프로그램, 행사 후기, 공지사항을 전합니다." },
+  partner: { title: "제휴문의", description: "브랜드·콘텐츠 협업, 기업·단체 제휴, 공간·행사 협업 제안을 기다립니다. 라움소셜클럽 제휴 담당 연락처와 제안 안내." },
   fitcheck: { title: "RSC 상담 신청", description: "이름과 연락처만 남기시면 담당자가 직접 연락드립니다. 상담 후 초대코드로 가입할 수 있습니다." },
   terms: { title: "이용약관", description: "라움소셜클럽 이용약관" },
   privacy: { title: "개인정보처리방침", description: "라움소셜클럽 개인정보처리방침" },
@@ -55,6 +57,7 @@ const DEFAULT_LLMS = `# 라움소셜클럽 (RAUM SOCIAL CLUB, RSC)
 - 멤버십: 소셜클럽(가입비 · 1년 회원 자격 · 행사 6회 · 초대권 2매 · 결혼중개 아님) · 1:1 매칭 ACCESS(연회비 · 1:1 만남 5회) · SIGNATURE(연회비 · 1:1 만남 10회 + RAUM SOLO 1기 + 전담 컨시어지) · RAUM MERRY(결혼 목적, 별도 심사) · RSC PREVIEW(가입 전 행사 1회). 가입비·연회비는 비공개로 대면 상담에서 안내, 자동 갱신 없음, 1:1 만남은 실제 대면 시에만 차감, 성혼사례금 없음
 - 프로그램: 월 1회 RSC TASTE SOCIAL(ART WALK, SUNDAY RESET, TASTE TABLE, ONE QUESTION SALON, AFTER HOURS, RUN & BRUNCH) · 1:1 매칭 회원 전용 3·6·9월 RAUM SOCIAL NIGHT 와 11월 GRAND SOCIAL BALL · SIGNATURE 전용 연 6기 기수제 RAUM SOLO
 - 문의: 02-6925-4786 · theraumai@gmail.com · 인스타그램 @raum_socialclub
+- 제휴 문의(/partner): 010-9272-7783 · se.na@theraum.co.kr
 `;
 
 export const SEO_DOCS: DocDef[] = [

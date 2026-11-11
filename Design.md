@@ -69,7 +69,7 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 - **배지** `<Badge tone>` neutral·primary·positive·cautionary·negative·inverse — pill, 12px SemiBold.
 - **섹션 머리** `<SectionHead eyebrow title lead align>`.
 - **GNB** `SiteHeader` — 흰 배경 95% + blur, 하단 lineAlt. 데스크톱 메뉴(브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식 · FAQ) `t-label-1`(lg `t-body-2`) SemiBold, 로고와 우측 버튼 사이 가운데 정렬 · 간격 24px(lg 48px), 우측 로그인(assistive md) + 상담 신청(solid md). 모바일: 햄버거 → 흰 전체 화면 메뉴(`t-heading-2` 목록, 하단 풀폭 solid 버튼).
-- **푸터** `SiteFooter` — sand 배경, 4열(브랜드·메뉴·문의·패밀리 사이트) + 사업자 정보 한 줄 + 약관 링크.
+- **푸터** `SiteFooter` — sand 배경, 4열(브랜드·메뉴·문의·제휴문의) + 사업자 정보 한 줄 + 약관 링크. 제휴문의 열은 제휴 담당 전화·이메일(`global.brand` partnerPhone·partnerEmail) + `/partner` 링크. 「패밀리 사이트」 열은 2026-11-11 요청으로 뺐다.
 - **다크 CTA 밴드** `bg-inverseBg rounded-ds`, 라벨 `text-inversePrimary`, 제목 `text-inverseLabel`, 본문 `rgba(247,247,248,.7)`, 버튼 solid + inverse.
 - **플로팅 UP 버튼** 우하단 44px 흰 원 + lineNeutral + shadow-md, 뷰포트 60% 스크롤 후 표시.
 - **탭(법적 고지 등)** 하단 2px 언더라인, 선택 `text-label`/미선택 `text-labelAlt`.
@@ -109,6 +109,7 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 ## 정보 구조 (2026-11 · 두 갈래 홈)
 - 홈(`/`)은 **게이트**다. 맨 위 전환형 히어로(`components/site/GateHero.tsx`)에 「소셜클럽 | 1:1 매칭」 탭이 있고, 탭을 누르면 사진·문구·버튼이 바뀐다(모바일은 스와이프, PC 는 ←/→ 도 됨). 버튼은 각 트랙 페이지와 `/fit-check?track=…` 으로 간다. 레퍼런스: emotional oranges 홈의 로테이션/프라이빗 전환.
 - 그 아래 「두 가지 방식」 비교 카드(`TrackCards`) → 브랜드 소개(01) → 브랜드 약속(03) → FAQ → 두 버튼 CTA(`CtaBand`).
+- `/partner` 제휴문의: 상단 소개 → 협업 분야 3카드(브랜드·콘텐츠 / 기업·단체 / 공간·행사) → 연락처 두 카드(제휴 담당 = 010·se.na, 일반 문의 = 02·theraumai + 상담 신청) → 제안서 안내. 신청 양식 없이 메일(제목 자동 입력)·전화로 받는다. 문구 `partner.page`, 연락처 `global.brand`.
 - `/social` 소셜클럽: 트랙 전환 바(`TrackSwitch`) + 상단 소개 + 멤버십 구성(가입비 = 회원 자격 + 행사 6회 + 초대권 2매) + 02 포지셔닝 · 04 TASTE SOCIAL · 06 MOMENTS + 가입 심사 + FAQ. `/matching` 1:1 매칭: 가입 심사(`VerifySection`, 「아무나 들어올 수 없습니다」) · 진행 방식 4단계 · 멤버십 구성(ACCESS 5회 · SIGNATURE 10회 · MERRY, 리드 모드면 금액 숨김) · 회원 전용 행사(`MembersOnly`: SOCIAL NIGHT · GRAND BALL · RAUM SOLO) · 다른 점 · 이런 분께 · FAQ. 상품 문구의 기준은 RSC 사업전략(2026.11.03). **가입비·연회비는 비공개(대면 상담에서 안내)** — 공개 페이지·FAQ·llms.txt 에 금액을 쓰지 않으며, `hasPrice` 로 금액이 든 줄은 리드 모드와 무관하게 화면에서 뺀다. `/pricing` 은 리드 모드에서 숨겨진 내부 참고용.
 - 상담 신청(`/fit-check`)은 「관심 있는 방식」 칩(소셜클럽 · 1:1 매칭 · 상담 후 결정)이 맨 위에 있고 `?track=` 으로 미리 선택된다. 값은 `inquiries.answers.route` 에 저장되어 어드민 상담 상세에 「관심 방식」으로 보인다.
 - 문구·사진은 모두 CMS: 사이트 관리 → 메인 페이지(00 대문 히어로 · 00-1 비교 카드 · 소개 · 약속 · FAQ · 하단 상담 띠) / 소셜클럽 / 1:1 매칭 / 상담 신청 / 소식 탭. **공개 화면에 보이는 문장은 모두 CMS 문서에 있어야 한다** (2026-11-09 M17): 새 섹션이나 버튼을 만들 때 문구를 코드에 직접 쓰지 말고 `lib/cms/schema.ts` 에 필드와 기본값을 추가하고 `s(doc, key) || "기본값"` 으로 읽는다. 메뉴 이름은 `global.nav`, 상담 신청 양식은 `apply.form`. 어드민 「문구 검색」은 모든 문서의 현재 값을 훑으므로(`lib/cms/search.ts`) 코드에만 있는 문구는 찾히지 않는다.
