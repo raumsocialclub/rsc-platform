@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { Button, ButtonLink, CARD, FIELD_ERROR, FIELD_HELP, FIELD_LABEL, INPUT, TEXTAREA, btn } from "@/components/ui/ds";
 import { formatPhoneInput } from "@/lib/phone";
 import { Txt } from "@/components/cms/Txt";
-import { PARTNER_KIND_KO, PARTNER_KINDS, type PartnerKind } from "@/lib/partner/types";
+import { PARTNER_KIND_KO, PARTNER_KINDS, PARTNER_MESSAGE_MAX, PARTNER_MESSAGE_MIN, type PartnerKind } from "@/lib/partner/types";
 import { PARTNER_FILES_BUCKET, PARTNER_FILE_ACCEPT, PARTNER_FILE_MAX, fileProblem, type PartnerFile } from "@/lib/partner/files";
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,7 +19,7 @@ export type PartnerFormCopy = {
   formTitle: string; formNote: string;
   kindLabel: string; kindBrand: string; kindCorporate: string; kindVenue: string; kindOther: string;
   companyLabel: string; companyPlaceholder: string; nameLabel: string; namePlaceholder: string; phoneLabel: string; phoneHelp: string; emailLabel: string; emailPlaceholder: string;
-  messageLabel: string; messagePlaceholder: string; attachLabel: string; attachHelp: string; attachButton: string; attachNote: string;
+  messageLabel: string; messagePlaceholder: string; messageHelp: string; readyHint: string; attachLabel: string; attachHelp: string; attachButton: string; attachNote: string;
   consentTitle: string; consentAgree: string; consentCollect: string; consentPurpose: string; consentRetention: string; consentRefuse: string; consentMore: string;
   submitLabel: string; submittingLabel: string; submitNote: string; doneTitle: string; doneBody: string; doneHome: string;
 };
@@ -27,7 +27,7 @@ export const DEFAULT_PARTNER_COPY: PartnerFormCopy = {
   formTitle: "제휴 · 협업 제안하기", formNote: "아래 내용을 남겨 주시면 제휴 담당이 검토 후 이메일 또는 전화로 연락드립니다.",
   kindLabel: "문의 유형", kindBrand: PARTNER_KIND_KO.brand, kindCorporate: PARTNER_KIND_KO.corporate, kindVenue: PARTNER_KIND_KO.venue, kindOther: PARTNER_KIND_KO.other,
   companyLabel: "회사 · 브랜드명", companyPlaceholder: "예: 주식회사 라움", nameLabel: "담당자명", namePlaceholder: "이름을 입력해 주세요.", phoneLabel: "휴대전화", phoneHelp: "숫자만 입력하면 하이픈이 자동으로 붙습니다.", emailLabel: "이메일", emailPlaceholder: "name@company.com",
-  messageLabel: "제안 내용", messagePlaceholder: "회사 · 브랜드 소개, 제안하는 협업 내용과 기대 효과, 희망 시기 · 규모를 적어 주세요.", attachLabel: "파일 첨부 (선택)", attachHelp: "PDF · HWP · Word · Excel · PowerPoint · JPG · PNG, 파일당 10MB, 최대 3개", attachButton: "파일 선택", attachNote: "용량이 큰 자료는 제휴 담당 이메일({email})로 보내 주셔도 됩니다.",
+  messageLabel: "제안 내용", messagePlaceholder: "회사 · 브랜드 소개, 제안하는 협업 내용과 기대 효과, 희망 시기 · 규모를 적어 주세요.", messageHelp: "{min}자 이상 {max}자까지 적을 수 있습니다.", readyHint: "보내려면 아직 필요한 것:", attachLabel: "파일 첨부 (선택)", attachHelp: "PDF · HWP · Word · Excel · PowerPoint · JPG · PNG, 파일당 10MB, 최대 3개", attachButton: "파일 선택", attachNote: "용량이 큰 자료는 제휴 담당 이메일({email})로 보내 주셔도 됩니다.",
   consentTitle: "개인정보 수집 및 이용 안내", consentAgree: "개인정보 수집 및 이용 안내에 동의합니다", consentCollect: "회사 · 브랜드명, 담당자명, 휴대전화번호, 이메일, 제안 내용(제안서에 적힌 정보 포함)", consentPurpose: "제휴 · 협업 제안의 접수와 검토, 검토 결과 회신과 협의를 위한 연락", consentRetention: "접수일로부터 1년 보유 후 지체 없이 파기합니다. 동의를 철회하시면 그 즉시 파기하며, 제휴가 성사된 경우 계약 관련 정보는 관계 법령이 정한 기간 동안 보관합니다.", consentRefuse: "정보주체는 위 개인정보 수집 · 이용에 대한 동의를 거부할 권리가 있습니다. 다만 동의를 거부하시는 경우 제휴문의 접수가 제한됩니다.",
   consentMore: "그 밖의 사항은 {privacy}을 따릅니다.",
   submitLabel: "제휴문의 보내기", submittingLabel: "접수 중…", submitNote: "접수된 제안은 검토 목적으로만 쓰고 외부에 공개하지 않습니다.",
@@ -101,7 +101,17 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
 
   const phoneOk = /^01[016789]-\d{3,4}-\d{4}$/.test(phone);
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const canSubmit = kind !== "" && company.trim() !== "" && name.trim() !== "" && phoneOk && emailOk && message.trim().length >= 10 && agreed;
+  const messageLen = message.trim().length;
+  const missing: string[] = [
+    ...(kind === "" ? [C.kindLabel] : []),
+    ...(company.trim() === "" ? [C.companyLabel] : []),
+    ...(name.trim() === "" ? [C.nameLabel] : []),
+    ...(!phoneOk ? [C.phoneLabel] : []),
+    ...(!emailOk ? [C.emailLabel] : []),
+    ...(messageLen < PARTNER_MESSAGE_MIN ? [`${C.messageLabel} ${PARTNER_MESSAGE_MIN}자 이상${messageLen > 0 ? ` (지금 ${messageLen}자)` : ""}`] : []),
+    ...(!agreed ? [C.consentAgree] : []),
+  ];
+  const canSubmit = missing.length === 0;
 
   const submit = async () => {
     if (!canSubmit || submitting) return;
@@ -173,8 +183,11 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
 
       <div className="mb-[16px]">
         <label htmlFor="pf-message" className={FIELD_LABEL}>{C.messageLabel} <span className="text-negative">*</span></label>
-        <textarea id="pf-message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder={C.messagePlaceholder} maxLength={3000} rows={7} className={TEXTAREA} />
-        <span className={`${FIELD_HELP} text-right`}>{message.trim().length.toLocaleString()} / 3,000</span>
+        <textarea id="pf-message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder={C.messagePlaceholder} maxLength={PARTNER_MESSAGE_MAX} rows={7} className={TEXTAREA} aria-describedby="pf-message-help" />
+        <span id="pf-message-help" className={`${FIELD_HELP} flex justify-between gap-[12px]`}>
+          <span>{C.messageHelp.replace("{min}", String(PARTNER_MESSAGE_MIN)).replace("{max}", PARTNER_MESSAGE_MAX.toLocaleString())}</span>
+          <span className={`tabular-nums ${messageLen > 0 && messageLen < PARTNER_MESSAGE_MIN ? "text-negativeFg" : ""}`}>{messageLen.toLocaleString()} / {PARTNER_MESSAGE_MAX.toLocaleString()}</span>
+        </span>
       </div>
 
       <div className="mb-[20px]" data-testid="partner-files">
@@ -220,6 +233,7 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
 
       {error && <p className={`${FIELD_ERROR} mb-[12px]`} role="alert">{error}</p>}
       {progress && <p className="mb-[12px] t-caption-1 text-labelAlt" role="status">{progress}</p>}
+      {!canSubmit && !submitting && <p className="mb-[12px] t-caption-1 text-labelAlt" data-testid="partner-missing"><span className="font-semibold text-labelNeutral">{C.readyHint}</span> {missing.join(" · ")}</p>}
       <Button type="submit" size="lg" disabled={!canSubmit || submitting} className="w-full md:w-auto md:min-w-[240px]">{submitting ? C.submittingLabel : C.submitLabel}</Button>
       <p className="mt-[10px] t-caption-1 text-labelAlt">{C.submitNote}</p>
     </form>

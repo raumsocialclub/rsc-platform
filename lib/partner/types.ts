@@ -24,5 +24,9 @@ export type PartnerInquiryRow = {
   updated_at: string;
 };
 
+/** 제안 내용 최소·최대 글자 수 (양식 안내와 API 검증이 같은 값을 쓴다) */
+export const PARTNER_MESSAGE_MIN = 10;
+export const PARTNER_MESSAGE_MAX = 3000;
+
 /** 제휴문의 개인정보 동의문 버전. 수집 항목·목적·기간(1년)을 바꾸면 올린다. */
 export const PARTNER_CONSENT_VERSION = "2026-11-11";

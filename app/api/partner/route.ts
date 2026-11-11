@@ -4,7 +4,7 @@ import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { normalizePhone } from "@/lib/phone";
 import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
-import { PARTNER_CONSENT_VERSION, PARTNER_KINDS } from "@/lib/partner/types";
+import { PARTNER_CONSENT_VERSION, PARTNER_KINDS, PARTNER_MESSAGE_MAX, PARTNER_MESSAGE_MIN } from "@/lib/partner/types";
 import { sendPartnerInquiryNotice } from "@/lib/notify";
 import { PARTNER_FILE_MAX, verifyFiles } from "@/lib/partner/files";
 import { getBrand } from "@/lib/cms/get";
@@ -21,7 +21,7 @@ const BodySchema = z.object({
   name: z.string().trim().min(1, "담당자명을 입력해 주세요.").max(50, "담당자명이 너무 깁니다."),
   phone: z.string().trim().min(1, "연락처를 입력해 주세요.").max(30),
   email: z.string().trim().min(1, "이메일을 입력해 주세요.").max(120).email("이메일 형식을 확인해 주세요."),
-  message: z.string().trim().min(10, "제안 내용을 10자 이상 적어 주세요.").max(3000, "제안 내용은 3,000자까지 적을 수 있습니다."),
+  message: z.string().trim().min(PARTNER_MESSAGE_MIN, `제안 내용을 ${PARTNER_MESSAGE_MIN}자 이상 적어 주세요.`).max(PARTNER_MESSAGE_MAX, `제안 내용은 ${PARTNER_MESSAGE_MAX.toLocaleString()}자까지 적을 수 있습니다.`),
   consent: z.literal(true, { message: "개인정보 수집·이용에 동의해 주세요." }),
   /** 봇 함정(honeypot): 사람은 비워 두는 숨은 칸 */
   website: z.string().max(0).optional().default(""),

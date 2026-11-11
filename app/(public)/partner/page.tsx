@@ -32,7 +32,7 @@ export default async function PartnerPage({ searchParams }: { searchParams: Prom
   const copy = {
     formTitle: F("formTitle"), formNote: F("formNote"), kindLabel: F("kindLabel"), kindBrand: F("kindBrand"), kindCorporate: F("kindCorporate"), kindVenue: F("kindVenue"), kindOther: F("kindOther"),
     companyLabel: F("companyLabel"), companyPlaceholder: F("companyPlaceholder"), nameLabel: F("nameLabel"), namePlaceholder: F("namePlaceholder"), phoneLabel: F("phoneLabel"), phoneHelp: F("phoneHelp"), emailLabel: F("emailLabel"), emailPlaceholder: F("emailPlaceholder"),
-    messageLabel: F("messageLabel"), messagePlaceholder: F("messagePlaceholder"), attachLabel: F("attachLabel"), attachHelp: F("attachHelp"), attachButton: F("attachButton"), attachNote: F("attachNote"),
+    messageLabel: F("messageLabel"), messagePlaceholder: F("messagePlaceholder"), messageHelp: F("messageHelp"), readyHint: F("readyHint"), attachLabel: F("attachLabel"), attachHelp: F("attachHelp"), attachButton: F("attachButton"), attachNote: F("attachNote"),
     consentTitle: F("consentTitle"), consentAgree: F("consentAgree"), consentCollect: F("consentCollect"), consentPurpose: F("consentPurpose"), consentRetention: F("consentRetention"), consentRefuse: F("consentRefuse"), consentMore: F("consentMore"),
     submitLabel: F("submitLabel"), submittingLabel: F("submittingLabel"), submitNote: F("submitNote"), doneTitle: F("doneTitle"), doneBody: F("doneBody"), doneHome: F("doneHome"),
   };

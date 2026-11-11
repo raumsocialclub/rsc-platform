@@ -31,7 +31,7 @@ describe("제휴문의", () => {
     expect(doc.page).toBe("partner");
     const tracks = doc.defaults.tracks as { title: string }[];
     expect(tracks.map((t) => t.title)).toEqual(["브랜드 · 콘텐츠 협업", "기업 · 단체 제휴", "공간 · 행사 협업"]);
-    for (const k of ["title", "body", "trackCta", "contactTitle", "formTitle", "kindLabel", "kindBrand", "kindCorporate", "kindVenue", "kindOther", "companyLabel", "messageLabel", "attachHelp", "attachButton", "attachNote", "consentTitle", "consentAgree", "consentPurpose", "consentCollect", "consentRetention", "consentRefuse", "submitLabel", "doneTitle", "guideTitle", "guideItems"]) expect(String(doc.defaults[k] ?? "")).not.toBe("");
+    for (const k of ["title", "body", "trackCta", "contactTitle", "formTitle", "kindLabel", "kindBrand", "kindCorporate", "kindVenue", "kindOther", "companyLabel", "messageLabel", "messageHelp", "readyHint", "attachHelp", "attachButton", "attachNote", "consentTitle", "consentAgree", "consentPurpose", "consentCollect", "consentRetention", "consentRefuse", "submitLabel", "doneTitle", "guideTitle", "guideItems"]) expect(String(doc.defaults[k] ?? "")).not.toBe("");
     expect(String(doc.defaults.attachNote)).toContain("{email}");
     expect(PAGES.some((p) => p.key === "partner" && p.preview === "/partner")).toBe(true);
   });
@@ -55,6 +55,9 @@ describe("제휴문의", () => {
     expect(form).toContain('fetch("/api/partner/upload-url"');
     expect(form).toContain("uploadToSignedUrl(");
     expect(form).toContain('type="file" multiple accept={PARTNER_FILE_ACCEPT}');
+    expect(form).toContain("PARTNER_MESSAGE_MIN");
+    expect(form).toContain('data-testid="partner-missing"');
+    expect(readFileSync("app/api/partner/route.ts", "utf8")).toContain("min(PARTNER_MESSAGE_MIN");
     for (const h of ["수집 · 이용 목적", "수집 항목", "보유 · 이용 기간", "동의 거부 관련"]) expect(form).toContain(h);
     const doc = DOC_BY_ID.get("partner.page")!.defaults as Record<string, string>;
     expect(doc.consentPurpose).toContain("제휴");
