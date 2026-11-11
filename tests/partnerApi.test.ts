@@ -24,7 +24,7 @@ describe("제휴문의 POST /api/partner", () => {
   });
   it("첨부: 버킷에 있는 파일만 files 로 기록하고, 확인에 실패하면 400 · 4개 이상은 400", async () => {
     const { POST } = await import("@/app/api/partner/route");
-    const files = [{ path: "inbox/00000000-0000-0000-0000-000000000000/제안서.pdf", name: "제안서.pdf", size: 1234 }];
+    const files = [{ path: "inbox/00000000-0000-0000-0000-000000000000/file.pdf", name: "제안서.pdf", size: 1234 }];
     verify.mockResolvedValueOnce([{ ...files[0], size: 2000 }]);
     const ok = await POST(post({ ...base, files }));
     expect(ok.status).toBe(200);

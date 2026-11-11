@@ -95,7 +95,7 @@ export function PartnerForm({ copy, partnerEmail = "", initialKind }: { copy?: P
       const j = (await res.json().catch(() => null)) as { ok?: boolean; path?: string; token?: string; message?: string } | null;
       if (!res.ok || !j?.ok || !j.path || !j.token) throw new Error(j?.message ?? "파일을 올리지 못했습니다.");
       const { error } = await supabase.storage.from(PARTNER_FILES_BUCKET).uploadToSignedUrl(j.path, j.token, f, { contentType: f.type || "application/octet-stream", upsert: false });
-      if (error) throw new Error(`${f.name}: 파일을 올리지 못했습니다. 잠시 후 다시 시도해 주세요.`);
+      if (error) throw new Error(`${f.name}: 파일을 올리지 못했습니다 (${error.message}). 잠시 후 다시 시도해 주세요.`);
       out.push({ path: j.path, name: f.name, size: f.size });
     }
     setProgress(null);

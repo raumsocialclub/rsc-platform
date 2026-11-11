@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * 제휴문의 첨부 파일 규칙. 브라우저가 /api/partner/upload-url 로 서명 업로드 URL 을 받아 partner-files 버킷(비공개)에 직접 올리고,
- * 제출할 때 [{path, name, size}] 를 보내면 서버가 실제로 올라가 있는지 확인한 뒤 partner_inquiries.files 에 기록한다.
+ * 제출할 때 [{path, name, size}] 를 보내면 서버가 실제로 올라가 있는지 확인한 뒤 partner_inquiries.files 에 기록한다(name 은 표시·내려받기용 원래 파일명).
  */
 export const PARTNER_FILES_BUCKET = "partner-files";
 export const PARTNER_FILE_MAX = 3;
@@ -32,12 +32,15 @@ export function safeFileName(name: string): string {
   return `${stem}.${ext}`;
 }
 
-/** 새 업로드 경로 inbox/<uuid>/<파일명> */
+/**
+ * 새 업로드 경로 inbox/<uuid>/file.<확장자>. 저장소 키는 영문·숫자만 안전하다(한글 파일명은 "Invalid key" 로 거부됨) —
+ * 원래 파일명은 partner_inquiries.files[].name 에 따로 두고 내려받을 때 그 이름을 붙인다.
+ */
 export function uploadPathFor(name: string): string {
-  return `inbox/${crypto.randomUUID()}/${safeFileName(name)}`;
+  return `inbox/${crypto.randomUUID()}/file.${fileExt(name)}`;
 }
 
-const PATH_RE = /^inbox\/[0-9a-f-]{36}\/[^/]{1,130}$/;
+const PATH_RE = /^inbox\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/file\.[a-z0-9]{1,8}$/;
 export const isUploadPath = (p: string) => PATH_RE.test(p) && isAllowedExt(p);
 
 /**
@@ -56,7 +59,8 @@ export async function verifyFiles(client: SupabaseClient, files: PartnerFile[]):
     if (!obj) return null;
     const size = Number((obj.metadata as { size?: number } | null)?.size ?? f.size) || f.size;
     if (size > PARTNER_FILE_MAX_BYTES) return null;
-    out.push({ path: f.path, name: safeFileName(f.name || base), size });
+    const name = isAllowedExt(f.name) ? safeFileName(f.name) : base;
+    out.push({ path: f.path, name, size });
   }
   return out;
 }

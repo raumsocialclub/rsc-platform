@@ -702,7 +702,7 @@ $$;
 revoke all on function purge_expired_partner_inquiries() from public, anon, authenticated;
 select cron.schedule('purge-expired-partner-inquiries', '41 3 * * *', $$select public.purge_expired_partner_inquiries()$$);
 
--- ---------- 2026-11-11: 제휴문의 첨부 파일. 비공개 버킷 partner-files(파일당 10MB · 무료 저장 용량 1GB 고려), 경로 inbox/<uuid>/<파일명>. 확장자(pdf·hwp·hwpx·doc·docx·xls·xlsx·ppt·pptx·jpg·png)·개수(3)는 서버 /api/partner/upload-url 가 검사하고
+-- ---------- 2026-11-11: 제휴문의 첨부 파일. 비공개 버킷 partner-files(파일당 10MB · 무료 저장 용량 1GB 고려), 경로 inbox/<uuid>/file.<확장자>(저장소 키는 영문·숫자만, 원래 파일명은 files[].name). 확장자(pdf·hwp·hwpx·doc·docx·xls·xlsx·ppt·pptx·jpg·png)·개수(3)는 서버 /api/partner/upload-url 가 검사하고
 -- 브라우저가 서명된 업로드 URL 로 직접 올린다(Vercel 요청 본문 4.5MB 한도 회피). 어드민은 /api/admin/partners/:id/file?i= 로 서명 URL 을 받아 내려받는다.
 insert into storage.buckets (id, name, public, file_size_limit)
 values ('partner-files', 'partner-files', false, 10485760)

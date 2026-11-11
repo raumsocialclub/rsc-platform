@@ -10,13 +10,15 @@ describe("제휴문의 첨부 파일 규칙", () => {
     expect(fileProblem("a.pdf", PARTNER_FILE_MAX_BYTES + 1)).not.toBeNull();
     expect(PARTNER_FILE_MAX_BYTES).toBe(10 * 1024 * 1024);
   });
-  it("저장 파일명은 경로·제어 문자를 빼고 한글은 유지, 경로는 inbox/<uuid>/<파일명>", () => {
+  it("저장 파일명은 경로·제어 문자를 빼고 한글은 유지, 경로는 inbox/<uuid>/file.<확장자>", () => {
     expect(safeFileName("../../evil<>.pdf")).toBe("evil.pdf");
     expect(safeFileName("C:\\\\docs\\\\제안서 v2.hwp")).toBe("제안서 v2.hwp");
     const p = uploadPathFor("제안서.pdf");
+    expect(p).toMatch(/^inbox\/[0-9a-f-]{36}\/file\.pdf$/); // 저장소 키는 영문·숫자만 (한글 파일명은 name 에만)
     expect(isUploadPath(p)).toBe(true);
-    expect(isUploadPath("inbox/not-a-uuid/a.pdf")).toBe(false);
-    expect(isUploadPath("other/00000000-0000-0000-0000-000000000000/a.pdf")).toBe(false);
-    expect(isUploadPath("inbox/00000000-0000-0000-0000-000000000000/a.exe")).toBe(false);
+    expect(isUploadPath("inbox/not-a-uuid/file.pdf")).toBe(false);
+    expect(isUploadPath("other/00000000-0000-0000-0000-000000000000/file.pdf")).toBe(false);
+    expect(isUploadPath("inbox/00000000-0000-0000-0000-000000000000/file.exe")).toBe(false);
+    expect(isUploadPath("inbox/00000000-0000-0000-0000-000000000000/제안서.pdf")).toBe(false);
   });
 });
