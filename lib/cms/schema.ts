@@ -484,13 +484,13 @@ export const DOCS: DocDef[] = [
     label: "03 멤버십 가입비 (RAUM CLASSIC · SIGNATURE · PRIVÉ)",
     description: "결혼중개업은 가입비를 홈페이지에 공개해야 하므로(2026-11-12 사용자 결정) 등급 이름 · 한글 이름 · 가입비(VAT 포함)와 상담 버튼만 보여줍니다. 포함 구성은 상담에서 안내합니다.",
     fields: [t("label", "작은 제목"), ta("title", "제목", "hard"), ta("lead", "설명", "soft"), t("swipeHint", "모바일 스와이프 안내"), t("priceLabel", "금액 위 작은 글자", undefined, "예: 가입비"), t("vatLabel", "금액 옆 안내", undefined, "예: VAT 포함"), t("ctaLabel", "카드 버튼 문구"), ta("note", "하단 안내 (비우면 숨김)", "soft"), bool("visible", "표시")],
-    lists: [{ key: "items", label: "등급", itemLabel: "등급", fields: [t("name", "이름 (영문)"), t("sub", "이름 (한글)"), t("price", "가입비", undefined, "예: 4,400,000원"), t("badge", "배지", undefined, "예: ★ 대표 (대표 상품 표시)"), bool("dark", "강조(다크 카드)")], min: 1, max: 4 }],
+    lists: [{ key: "items", label: "등급", itemLabel: "등급", fields: [t("name", "이름 (영문)"), t("sub", "이름 (한글)"), t("price", "가입비", undefined, "예: 4,400,000원"), t("badge", "배지", undefined, "예: ★ (대표 상품 표시)"), bool("dark", "강조(다크 카드)")], min: 1, max: 4 }],
     defaults: {
       label: "MEMBERSHIP", swipeHint: "옆으로 밀어서 비교하기 →", priceLabel: "가입비", vatLabel: "VAT 포함", ctaLabel: "상담 신청하기",
       title: "1:1 매칭 멤버십\n가입비 안내", lead: "세 가지 등급의 가입비를 안내해 드립니다. 등급별 구성과 진행 방식은 상담에서 자세히 설명드립니다.", note: "", visible: true,
       items: [
         { name: "RAUM CLASSIC", sub: "라움 클래식", price: "4,400,000원", badge: "", dark: false },
-        { name: "RAUM SIGNATURE", sub: "라움 시그니처", price: "8,800,000원", badge: "★ 대표", dark: true },
+        { name: "RAUM SIGNATURE", sub: "라움 시그니처", price: "8,800,000원", badge: "★", dark: true },
         { name: "RAUM PRIVÉ", sub: "라움 프리베", price: "22,000,000원", badge: "", dark: false },
       ],
     },
