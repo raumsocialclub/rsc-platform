@@ -719,3 +719,30 @@ create or replace function purge_expired_partner_inquiries() returns void langua
     select 1 from partner_inquiries p, jsonb_array_elements(p.files) f where f->>'path' = o.name);
 $$;
 revoke all on function purge_expired_partner_inquiries() from public, anon, authenticated;
+
+-- ---------- 2026-11-12: 마케팅 정보 수신 동의(선택). 상담 신청(/fit-check) 개인정보 동의 아래 체크 → /api/inquiries 가 inquiries 행과 함께 저장.
+-- 상담 신청은 180일 뒤 지워지지만 수신 동의는 철회 시까지 유효해야 하므로 별도 표(크론 삭제 대상 아님). inquiry_id 는 상담 신청이 지워지면 null.
+-- 철회(/admin/marketing)는 withdrawn_at 기록으로 발송을 멈추고, 철회 기록은 1년 뒤 자동 삭제. 2년마다 수신 동의 재확인은 어드민이 재확인 예정일(동의일+2년)을 보고 진행.
+create table marketing_consents (
+  id uuid primary key default gen_random_uuid(),
+  inquiry_id uuid references inquiries(id) on delete set null,
+  name text not null,
+  phone text not null,
+  region text,                                -- 거주지역(시/도)
+  track text,                                 -- 관심 방식: social | matching | undecided
+  channels text not null default '전화, 문자, 카카오톡',
+  consent_at timestamptz not null default now(),
+  consent_version text not null,
+  withdrawn_at timestamptz,
+  withdrawn_by uuid references members(id) on delete set null,
+  created_at timestamptz not null default now()
+);
+create index marketing_consents_list_idx on marketing_consents(withdrawn_at, consent_at desc);
+create index marketing_consents_phone_idx on marketing_consents(phone);
+alter table marketing_consents enable row level security;
+create policy "admin marketing consents" on marketing_consents for all using (is_admin()) with check (is_admin());
+create or replace function purge_withdrawn_marketing_consents() returns void language sql security definer set search_path = public as $$
+  delete from marketing_consents where withdrawn_at is not null and withdrawn_at < now() - interval '1 year';
+$$;
+revoke all on function purge_withdrawn_marketing_consents() from public, anon, authenticated;
+select cron.schedule('purge-withdrawn-marketing-consents', '47 3 * * *', $$select public.purge_withdrawn_marketing_consents()$$);

@@ -17,6 +17,7 @@ import { entryPathFromReferrer } from "@/lib/inquiries/track";
  * 관심 방식은 /fit-check?track= 으로 미리 선택되고 inquiries.answers 에 route(라벨)·track(키)로 저장된다. 함께 entryTrack(어느 상담 버튼으로 들어왔는지)·entryPath(직전 페이지)를 보내
  * 어드민 「상담 신청」 목록·상세·CSV 에서 「관심 방식」「들어온 경로」로 보인다 (lib/inquiries/track.ts).
  * 「상담 가능 시간」 선택은 인터뷰 기간 동안 잠시 뺐다 (2026-10). API(/api/inquiries)·관리자 화면·DB 는 slot 을 그대로 받는다.
+ * 개인정보 동의 아래 「마케팅 정보 수신 동의(선택)」(2026-11-12): 목적 문구는 고른 관심 방식(소셜클럽 · 1:1 매칭 · 상담 후 결정)에 따라 바뀌고, 접기/펼치기로 안내를 접을 수 있다. 체크하면 marketing: true 로 보내 marketing_consents 에 저장(lib/inquiries/marketing.ts).
  * 완료 시 메타 픽셀 Lead 이벤트를 보낸다(픽셀 ID 가 설정된 경우에만 실제 전송).
  * 화면 문구는 CMS(apply.form)에서 copy 로 넘어온다. 저장되는 route 값(TRACK_LABEL)은 칩 이름을 바꿔도 고정이라 어드민 필터가 흔들리지 않는다.
  */
@@ -29,6 +30,7 @@ export type LeadCopy = {
   nameLabel: string; namePlaceholder: string; phoneLabel: string; phoneHelp: string;
   jobLabel: string; eduLabel: string; regionLabel: string; districtLabel: string; districtPlaceholder: string; selectPlaceholder: string;
   consentTitle: string; consentCollect: string; consentPurpose: string; consentRetention: string; consentRefuse: string; consentMore: string;
+  marketingTitle: string; marketingOpen: string; marketingClosed: string; marketingPurposeSocial: string; marketingPurposeMatching: string; marketingPurposeUndecided: string; marketingMethod: string; marketingItems: string; marketingRetention: string; marketingNote: string;
   submitLabel: string; submittingLabel: string; submitNote: string; doneTitle: string; doneBody: string; doneHome: string; closeLabel: string;
 };
 /** CMS(apply.form) 기본값과 같은 문구 — CMS 를 읽지 못해도 화면이 비지 않도록 */
@@ -40,6 +42,10 @@ export const DEFAULT_LEAD_COPY: LeadCopy = {
   jobLabel: "직업", eduLabel: "학력", regionLabel: "거주지역 · 시/도", districtLabel: "거주지역 · 시/군/구", districtPlaceholder: "예: 송파구", selectPlaceholder: "선택해 주세요",
   consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 휴대폰 번호, 직업, 학력, 거주지역(시/도 필수 · 시/군/구 선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)", consentPurpose: "신청하신 가입 상담의 진행과 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 상담 신청이 접수되지 않습니다.",
   consentMore: "자세한 내용은 {privacy}에서 확인하실 수 있습니다. 사이트 이용 조건은 {terms}을 참고해 주세요.",
+  marketingTitle: "마케팅 정보 수신 동의", marketingOpen: "접기", marketingClosed: "펼치기",
+  marketingPurposeSocial: "소셜클럽 신규 모임·행사 안내, 이벤트·프로모션 안내, 재상담 안내", marketingPurposeMatching: "1:1 매칭 서비스의 맞춤 제안, 이벤트·프로모션 안내, 재상담 안내", marketingPurposeUndecided: "소셜클럽 모임·행사와 1:1 매칭 서비스 안내, 이벤트·프로모션 안내, 재상담 안내",
+  marketingMethod: "전화, 문자, 카카오톡", marketingItems: "이름, 휴대폰 번호, 거주지역, 관심 방식·상담 이력", marketingRetention: "수신 동의 철회 시까지 (법령에 따라 2년마다 수신 동의 여부를 확인합니다)",
+  marketingNote: "동의하지 않아도 상담 및 기본 서비스 이용에는 제한이 없습니다. 수신 동의는 전화(02-6925-4786)나 이메일로 언제든 철회할 수 있습니다.",
   submitLabel: "상담 신청하기", submittingLabel: "접수 중…", submitNote: "신청은 회원 가입이 아니며, 담당자가 연락드린 뒤 상담이 진행됩니다.",
   doneTitle: "신청이 접수되었습니다", doneBody: "담당자가 남겨주신 연락처로 순차적으로 연락드립니다. 신청 취소나 문의는 전화(02-6925-4786) 또는 이메일로 알려 주세요.", doneHome: "홈으로 돌아가기", closeLabel: "닫기 ✕",
 };
@@ -68,6 +74,8 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
   const [region, setRegion] = useState("");
   const [district, setDistrict] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [marketing, setMarketing] = useState(false);
+  const [marketingOpen, setMarketingOpen] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -88,7 +96,7 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
     setSubmitting(true);
     try {
       const entryPath = entryPathFromReferrer(document.referrer, window.location.origin);
-      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone: normalizePhone(phone) ?? phone, job, education, region, district: district.trim(), consent: true, route: TRACK_LABEL[track], track, entryTrack: initialTrack === "undecided" ? undefined : initialTrack, entryPath, utm: readUtm() }) });
+      const res = await fetch("/api/inquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), phone: normalizePhone(phone) ?? phone, job, education, region, district: district.trim(), consent: true, marketing, route: TRACK_LABEL[track], track, entryTrack: initialTrack === "undecided" ? undefined : initialTrack, entryPath, utm: readUtm() }) });
       const json = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !json?.ok) throw new Error(json?.message ?? "신청을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
       trackLead();
@@ -179,6 +187,26 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
             <div><dt className="inline font-semibold text-labelNeutral">거부 시: </dt><dd className="inline">{C.consentRefuse}</dd></div>
           </dl>
           <p className="mt-[8px] ml-[32px] t-caption-1 text-labelAlt"><ConsentMore text={C.consentMore} /></p>
+        </div>
+        <div className={`${CARD} p-[16px] md:p-[18px]`} data-testid="lead-marketing">
+          <div className="flex items-start gap-[12px]">
+            <label className="flex items-start gap-[12px] cursor-pointer flex-1 min-w-0">
+              <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="w-[20px] h-[20px] mt-[1px] accent-primary cursor-pointer flex-none rounded" data-testid="lead-marketing-check" />
+              <span className="t-body-2 font-semibold text-label">{C.marketingTitle} <span className="text-labelAlt font-normal">(선택)</span></span>
+            </label>
+            <button type="button" onClick={() => setMarketingOpen((v) => !v)} aria-expanded={marketingOpen} aria-controls="lead-marketing-detail" className="flex-none t-caption-1 text-labelAlt underline hover:text-label">{marketingOpen ? C.marketingOpen : C.marketingClosed}</button>
+          </div>
+          {marketingOpen && (
+            <div id="lead-marketing-detail">
+              <dl className="mt-[10px] ml-[32px] grid gap-[3px] t-label-1-reading text-labelAlt">
+                <div><dt className="inline font-semibold text-labelNeutral">목적: </dt><dd className="inline">{track === "social" ? C.marketingPurposeSocial : track === "matching" ? C.marketingPurposeMatching : C.marketingPurposeUndecided}</dd></div>
+                <div><dt className="inline font-semibold text-labelNeutral">방법: </dt><dd className="inline">{C.marketingMethod}</dd></div>
+                <div><dt className="inline font-semibold text-labelNeutral">항목: </dt><dd className="inline">{C.marketingItems}</dd></div>
+                <div><dt className="inline font-semibold text-labelNeutral">보유·이용 기간: </dt><dd className="inline">{C.marketingRetention}</dd></div>
+              </dl>
+              <p className="mt-[8px] ml-[32px] t-caption-1 text-labelAlt">{C.marketingNote}</p>
+            </div>
+          )}
         </div>
       </div>
 

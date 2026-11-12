@@ -34,6 +34,8 @@ export type InquiryRow = {
     slot?: string;
     consentAt?: string;
     consentVersion?: string;
+    marketing?: boolean;    // 마케팅 정보 수신 동의(선택) 여부 (2026-11-12~). 동의 기록 자체는 marketing_consents 표(/admin/marketing)
+    marketingAt?: string; marketingVersion?: string;
     answers?: { key: string; label: string; question: string; answer: string }[];
   } | null;
   /** 광고 유입(UTM). 광고 링크 없이 들어온 신청은 null */
@@ -114,6 +116,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
     ...profileRows(a),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
     ...(a.consentAt ? [{ q: "개인정보 동의", a: `${fmtDate(a.consentAt, true)}${a.consentVersion ? ` · 동의문 ${a.consentVersion}` : ""}` }] : []),
+    ...(a.marketing === true ? [{ q: "마케팅 수신", a: `동의${a.marketingAt ? ` · ${fmtDate(a.marketingAt, true)}` : ""}${a.marketingVersion ? ` · 동의문 ${a.marketingVersion}` : ""}` }] : a.marketing === false ? [{ q: "마케팅 수신", a: "미동의" }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),
     ...(inquiry.utm?.utm_campaign ? [{ q: "캠페인", a: inquiry.utm.utm_campaign }] : []),
     ...(inquiry.utm?.utm_content ? [{ q: "광고 소재", a: inquiry.utm.utm_content }] : []),

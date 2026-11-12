@@ -1,7 +1,7 @@
 # RSC 핵심 흐름 (시퀀스)
 
 ## 1. 상담 → 초대 → 가입
-1. 방문자 `/fit-check` 간단 신청(관심 방식 · 이름 · 휴대폰 · 직업 · 학력 · 거주지역 시/도(필수) + 시/군/구(선택) · 개인정보 동의; 2026-11-12 부터 5항목) 또는 설문 완료 → `POST /api/inquiries` → `inquiries` insert(status=pending; 직업·학력·거주지는 `answers.job · education · region · district`). 어드민 목록 「직업 · 학력 · 거주지」열 · 상세 · CSV 뒤 4열(job, education, region, district)에 고른 글자 그대로 나온다.
+1. 방문자 `/fit-check` 간단 신청(관심 방식 · 이름 · 휴대폰 · 직업 · 학력 · 거주지역 시/도(필수) + 시/군/구(선택) · 개인정보 동의; 2026-11-12 부터 5항목) 또는 설문 완료 → `POST /api/inquiries` → `inquiries` insert(status=pending; 직업·학력·거주지는 `answers.job · education · region · district`). 어드민 목록 「직업 · 학력 · 거주지」열 · 상세 · CSV 뒤 4열(job, education, region, district)에 고른 글자 그대로 나온다. 개인정보 동의 아래 「마케팅 정보 수신 동의(선택)」(목적 문구는 관심 방식별)에 체크하면 같은 요청으로 `marketing_consents`(이름·휴대폰·거주지역·관심 방식·동의 일시·동의문 버전)에 따로 저장되고 `answers.marketing · marketingAt` 에도 남는다 → 어드민 `/admin/marketing`(동의 중·철회 탭, 철회/철회 취소 `PATCH /api/admin/marketing/:id`, 주관리자 CSV `/api/admin/marketing/export`, 재확인 예정일 = 동의일 + 2년). 상담 신청이 180일 뒤 지워져도 수신 동의는 철회 전까지 남고(inquiry_id 만 null), 철회 기록은 1년 뒤 크론 삭제.
 2. 어드민 `/admin/inquiries`에서 상담 진행 → "초대코드 발급" → `invite_codes` insert(`RSC-` + 4 + 4 대문자/숫자, 30일 만료) → 알림톡/이메일 발송(코드 + `/join?code=` 링크) → inquiry status=invited.
 3. 방문자 `/join` 코드 입력 → `POST /api/invites/verify` (service role) → 유효하면 `/join/register?code=`.
 4. 가입: Supabase Auth `signUp` (이메일) 또는 `signInWithOAuth` (kakao/google; 네이버는 Supabase 기본 provider 아님 → 네이버는 커스텀 OIDC 또는 2차) — `options.data = {name, phone, invite_code}`.

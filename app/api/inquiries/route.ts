@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizePhone } from "@/lib/phone";
 import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
 import { UTM_KEYS } from "@/lib/utm/client";
-import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
+import { MARKETING_CONSENT_VERSION, PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
+import { MARKETING_CHANNELS } from "@/lib/inquiries/marketing";
 import { TRACKS, cleanEntryPath } from "@/lib/inquiries/track";
 import { DISTRICT_MAX, EDUCATION_OPTIONS, JOB_OPTIONS, REGION_OPTIONS } from "@/lib/inquiries/profile";
 
@@ -19,6 +20,7 @@ import { DISTRICT_MAX, EDUCATION_OPTIONS, JOB_OPTIONS, REGION_OPTIONS } from "@/
  * 설문 답변 원본(picks/answers)은 받더라도 버린다 (zod 가 정의되지 않은 키를 제거).
  * 개인정보 수집·이용 동의(consent) 없이는 저장하지 않으며, 동의 시각과 동의문 버전(PRIVACY_CONSENT_VERSION)을 서버에서 기록한다.
  * 보관: 180일 (DB purge_expired_inquiries 크론) — 개인정보처리방침 제4조와 일치.
+ * 마케팅 정보 수신 동의(marketing: true, 선택)는 별도 표 marketing_consents 에 이름·휴대폰·거주지역·관심 방식·동의문 버전(MARKETING_CONSENT_VERSION)으로 저장한다 — 상담 신청이 180일 뒤 지워져도 철회 전까지 유효 (lib/inquiries/marketing.ts). answers 에도 marketing·marketingAt 을 남겨 상담 상세·CSV 에서 바로 보인다.
  */
 const UtmSchema = z.object(Object.fromEntries(UTM_KEYS.map((k) => [k, z.string().trim().max(100).optional()])) as Record<(typeof UTM_KEYS)[number], z.ZodOptional<z.ZodString>>);
 
@@ -36,6 +38,7 @@ const BodySchema = z.object({
   district: z.string().trim().max(DISTRICT_MAX, "시/군/구는 30자까지 입력할 수 있습니다.").optional().default(""),
   resultType: z.string().max(60).optional().default(""),
   consent: z.literal(true, { message: "개인정보 수집·이용에 동의해 주세요." }),
+  marketing: z.boolean().optional().default(false),
   utm: UtmSchema.nullable().optional(),
 });
 
@@ -69,12 +72,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, message: "연락처는 010-1234-5678 형식으로 입력해 주세요." }, { status: 400 });
   }
 
+  const now = new Date().toISOString();
   const row = {
     name: body.name,
     phone,
     email: null,
     answers: {
-      route: body.route, slot: body.slot, consentAt: new Date().toISOString(), consentVersion: PRIVACY_CONSENT_VERSION,
+      route: body.route, slot: body.slot, consentAt: now, consentVersion: PRIVACY_CONSENT_VERSION,
+      marketing: body.marketing,
+      ...(body.marketing ? { marketingAt: now, marketingVersion: MARKETING_CONSENT_VERSION } : {}),
       ...(body.job ? { job: body.job } : {}),
       ...(body.education ? { education: body.education } : {}),
       ...(body.region ? { region: body.region } : {}),
@@ -90,10 +96,17 @@ export async function POST(req: Request) {
   try {
     if (!hasServiceRoleKey()) console.warn("[inquiries] SUPABASE_SERVICE_ROLE_KEY 없음 — inquiries 는 익명 insert 정책이 없어 저장이 거부될 수 있습니다");
     const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient();
-    const { error } = await supabase.from("inquiries").insert(row);
+    const { data: inserted, error } = await supabase.from("inquiries").insert(row).select("id").single();
     if (error) {
       console.error("[inquiries] insert failed:", error);
       return NextResponse.json({ ok: false, message: "신청을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });
+    }
+    if (body.marketing) {
+      const { error: mErr } = await supabase.from("marketing_consents").insert({
+        inquiry_id: (inserted as { id?: string } | null)?.id ?? null, name: body.name, phone, region: body.region ?? null, track: body.track ?? null,
+        channels: MARKETING_CHANNELS, consent_at: now, consent_version: MARKETING_CONSENT_VERSION,
+      });
+      if (mErr) console.error("[inquiries] marketing consent insert failed (상담 신청은 저장됨, answers.marketing 참고):", mErr);
     }
     return NextResponse.json({ ok: true });
   } catch (e) {

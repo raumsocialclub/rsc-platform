@@ -7,6 +7,7 @@ import { type ProfileAnswers } from "@/lib/inquiries/profile";
  * 광고 관리자에서 내려받은 "Leads" 파일과 앞 14열이 같아 두 파일을 하나로 합쳐 유입 광고별 성과를 볼 수 있다.
  * 그 뒤에 원본 UTM 5열(utm_source … utm_content)을 그대로 붙여, 변환 과정에서 정보가 사라지지 않게 한다.
  * 맨 뒤 2열(interest, entry)은 관심 방식(소셜클럽 · 1:1 매칭 · 상담 후 결정)과 들어온 경로(어느 페이지·버튼에서 신청했는지) — CRM 상담 때 참고용 (lib/inquiries/track.ts).
+ * 그 뒤 marketing(동의/미동의, 2026-11-12 전 신청은 빈칸)·marketing_at(KST) 은 마케팅 정보 수신 동의(선택) 여부 (lib/inquiries/marketing.ts).
  * 그 뒤 4열(job, education, region, district)은 2026-11-12 부터 상담 신청 양식에서 받는 직업·학력·거주지역(시/도)·시/군/구 — 양식에서 고른 글자 그대로(lib/inquiries/profile.ts). 그 전 신청은 빈칸.
  *
  * 광고 UTM → 열 대응. 광고 링크를 메타 동적 매개변수로 만들면 그대로 들어온다:
@@ -28,7 +29,8 @@ export const LEAD_COLUMNS = ["id", "created_time", "ad_id", "ad_name", "adset_id
 export const UTM_RAW_COLUMNS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
 export const TRACK_COLUMNS = ["interest", "entry"] as const;
 export const PROFILE_COLUMNS = ["job", "education", "region", "district"] as const;
-export const CSV_COLUMNS = [...LEAD_COLUMNS, ...UTM_RAW_COLUMNS, ...TRACK_COLUMNS, ...PROFILE_COLUMNS] as const;
+export const MARKETING_COLUMNS = ["marketing", "marketing_at"] as const;
+export const CSV_COLUMNS = [...LEAD_COLUMNS, ...UTM_RAW_COLUMNS, ...TRACK_COLUMNS, ...PROFILE_COLUMNS, ...MARKETING_COLUMNS] as const;
 export type LeadRow = Record<(typeof CSV_COLUMNS)[number], string>;
 
 /** 메타 리드 파일의 form_id 는 메타 양식 번호라 우리 사이트 신청에는 고정 식별자를 넣는다. */
@@ -137,6 +139,8 @@ export function toLeadRow(r: LeadSource): LeadRow {
     education: (r.answers as ProfileAnswers | null | undefined)?.education ?? "",
     region: (r.answers as ProfileAnswers | null | undefined)?.region ?? "",
     district: (r.answers as ProfileAnswers | null | undefined)?.district ?? "",
+    marketing: r.answers?.marketing === true ? "동의" : r.answers?.marketing === false ? "미동의" : "",
+    marketing_at: r.answers?.marketingAt ? toKstIso(r.answers.marketingAt) : "",
   };
 }
 

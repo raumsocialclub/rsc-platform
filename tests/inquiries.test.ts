@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeDb } from "./helpers/fakeDb";
-import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
+import { MARKETING_CONSENT_VERSION, PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 
 /** 상담 신청 저장(/api/inquiries): 개인정보 최소화(설문 원본 미저장) + 광고 UTM 저장 */
 const db = fakeDb();
@@ -14,6 +14,7 @@ describe("상담 신청 POST /api/inquiries", () => {
   beforeEach(() => {
     db.calls.length = 0;
     db.tables.inquiries = [];
+    db.tables.marketing_consents = [];
   });
   it("관심 방식과 들어온 경로를 answers 에 저장하고, 이상한 경로 값은 버린다", async () => {
     const { POST } = await import("@/app/api/inquiries/route");
@@ -69,6 +70,23 @@ describe("상담 신청 POST /api/inquiries", () => {
     expect(a).not.toHaveProperty("job");
     expect(a).not.toHaveProperty("region");
     expect(a).not.toHaveProperty("district");
+  });
+  it("마케팅 수신 동의(선택)에 체크하면 marketing_consents 에 따로 저장하고 answers 에도 남긴다; 체크 안 하면 표에 안 넣고 answers.marketing=false", async () => {
+    const { POST } = await import("@/app/api/inquiries/route");
+    const res = await POST(post({ ...base, track: "social", region: "경기도", marketing: true }));
+    expect(res.status).toBe(200);
+    expect(db.calls.map((c) => c.table)).toEqual(["inquiries", "marketing_consents"]);
+    const a = (db.calls[0].payload as { answers: Record<string, unknown> }).answers;
+    expect(a.marketing).toBe(true);
+    expect(a.marketingVersion).toBe(MARKETING_CONSENT_VERSION);
+    const m = db.calls[1].payload as Record<string, unknown>;
+    expect(m).toMatchObject({ name: "홍길동", phone: "010-1234-5678", region: "경기도", track: "social", consent_version: MARKETING_CONSENT_VERSION });
+    expect(typeof m.inquiry_id).toBe("string");
+    db.calls.length = 0;
+    const res2 = await POST(post({ ...base }));
+    expect(res2.status).toBe(200);
+    expect(db.calls.map((c) => c.table)).toEqual(["inquiries"]);
+    expect((db.calls[0].payload as { answers: Record<string, unknown> }).answers.marketing).toBe(false);
   });
   it("상담 가능 시간을 비워도 접수된다 (선택 항목)", async () => {
     const { POST } = await import("@/app/api/inquiries/route");
