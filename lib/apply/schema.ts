@@ -5,6 +5,8 @@
  * 화면(components/apply/ApplyForm.tsx)과 서버 검증(app/api/apply/route.ts)이 이 정의를 함께 쓴다.
  * 문항을 더하거나 빼려면 여기만 고치면 된다. 값은 전부 문자열(복수 선택은 문자열 배열)로 저장한다.
  */
+import { EDUCATION_OPTIONS, JOB_OPTIONS, REGION_OPTIONS } from "@/lib/inquiries/profile";
+
 export type FieldType = "text" | "number" | "email" | "tel" | "date" | "textarea" | "select" | "radio" | "checks" | "siblings";
 
 export type Field = {
@@ -23,17 +25,16 @@ export type Field = {
 
 export type Step = { key: string; title: string; note?: string; fields: Field[] };
 
-export const SIDO = ["서울특별시", "경기도", "인천광역시", "부산광역시", "대구광역시", "광주광역시", "대전광역시", "울산광역시", "세종특별자치시", "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도", "해외"];
+/** 시/도 선택지는 상담 신청(/fit-check)과 같다 (2026-11-12: 충청·전라·경상은 남북 합침, 해외 포함 — lib/inquiries/profile.ts). 상세입력 칸은 뺐다 */
+export const SIDO = [...REGION_OPTIONS];
 
 const region = (prefix: string, label: string): Field[] => [
   { key: `${prefix}Sido`, label: `${label} · 시/도`, type: "select", options: SIDO },
   { key: `${prefix}Gugun`, label: `${label} · 시/군/구`, type: "text", placeholder: "예: 송파구", indent: true },
-  { key: `${prefix}Detail`, label: `${label} · 상세입력`, type: "text", placeholder: `${label}을(를) 입력해 주세요`, indent: true },
 ];
 
 const HEIGHT_HINT = "* 솔직한 키 작성을 부탁드립니다.";
 
-export const JOB_CATEGORIES = ["대기업", "중견기업", "중소기업", "스타트업", "공기업", "공공기관", "외국계기업", "미용", "미디어", "예술", "레저/스포츠", "외식/식음료", "공인중개사", "문과전문직", "이과전문직", "간호사", "의료직", "유치원교사", "초등학교교사", "중,고등학교교사", "학원강사", "교육직", "공무원", "경찰", "소방관", "직업군인", "사업가", "자영업", "금융직", "프리랜서"];
 export const EMPLOYMENT = ["정규직", "계약직", "프리랜서", "가업승계", "개인사업자", "법인사업자"];
 export const IDEAL_JOBS = ["상관없음", "금융권", "사업", "공무원/공공기관(공무원 및 공공기관 직원)", "대기업", "중견기업", "중소기업", "자영업", "안전 관련 직종(경찰, 소방 및 안전관련 직종)", "교육 및 교직원(교사, 교수, 학교 직원 등)", "예술 및 창작 관련(예술가 및 디자이너 등)", "스포츠 및 게임(스포츠 선수, 프로게이머 등)", "전문직(변호사, 판사, 검사, 법무사, 의사 등)", "의료관련직(간호사, 간호조무사, 물리치료사 등)"];
 export const IDEAL_EMPLOYMENT = ["상관없음", "프리랜서", "법인사업자", "개인사업자", "가업승계", "정규직", "위촉직", "계약직"];
@@ -69,7 +70,7 @@ export const STEPS: Step[] = [
   {
     key: "education", title: "학력",
     fields: [
-      { key: "education", label: "최종학력", type: "radio", options: ["고졸", "전문대 재학", "전문대 수료", "전문대 졸업", "대학 재학", "대학 중퇴", "대학 수료", "대학 졸업", "대학원 재학", "대학원졸업", "박사 과정", "박사 취득"] },
+      { key: "education", label: "최종학력", type: "select", options: [...EDUCATION_OPTIONS] }, // 상담 신청(/fit-check)과 같은 10종 (2026-11-12)
       { key: "univName", label: "대학명(학사)", type: "text", placeholder: "대학명(학사)을 입력해 주세요", hint: "* 캠퍼스의 경우 (캠퍼스)라고 작성해주세요." },
       { key: "univYear", label: "졸업년도(학사)", type: "number", placeholder: "예: 2015" },
       { key: "univMajor", label: "전공(학사)", type: "text", placeholder: "전공(학사)을 입력해 주세요" },
@@ -81,9 +82,7 @@ export const STEPS: Step[] = [
   {
     key: "job", title: "직업",
     fields: [
-      { key: "job", label: "직업", type: "text", placeholder: "직업을 입력해 주세요" },
-      { key: "jobCategory", label: "직업 분류", type: "radio", options: JOB_CATEGORIES, other: true },
-      { key: "jobOther", label: "기타직업", type: "text", placeholder: "기타직업을 입력해 주세요" },
+      { key: "jobCategory", label: "직업", type: "select", options: [...JOB_OPTIONS] }, // 상담 신청(/fit-check)과 같은 9종 (2026-11-12). 이전의 직업 자유 입력·기타직업 칸은 뺐다
       { key: "employment", label: "고용형태", type: "radio", options: EMPLOYMENT, other: true },
       { key: "workType", label: "근무형태", type: "radio", options: ["일반근무", "교대근무", "재택근무", "자율근무", "파트타임"] },
       { key: "salary", label: "연봉(세전)", type: "number", unit: "원", placeholder: "연봉(세전)을 입력해 주세요" },
