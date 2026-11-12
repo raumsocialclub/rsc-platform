@@ -1,7 +1,7 @@
 # RSC 핵심 흐름 (시퀀스)
 
 ## 1. 상담 → 초대 → 가입
-1. 방문자 `/fit-check` 설문 완료 → `POST /api/inquiries` → `inquiries` insert(status=pending).
+1. 방문자 `/fit-check` 간단 신청(관심 방식 · 이름 · 휴대폰 · 직업 · 학력 · 거주지역 시/도(필수) + 시/군/구(선택) · 개인정보 동의; 2026-11-12 부터 5항목) 또는 설문 완료 → `POST /api/inquiries` → `inquiries` insert(status=pending; 직업·학력·거주지는 `answers.job · education · region · district`). 어드민 목록 「직업 · 학력 · 거주지」열 · 상세 · CSV 뒤 4열(job, education, region, district)에 고른 글자 그대로 나온다.
 2. 어드민 `/admin/inquiries`에서 상담 진행 → "초대코드 발급" → `invite_codes` insert(`RSC-` + 4 + 4 대문자/숫자, 30일 만료) → 알림톡/이메일 발송(코드 + `/join?code=` 링크) → inquiry status=invited.
 3. 방문자 `/join` 코드 입력 → `POST /api/invites/verify` (service role) → 유효하면 `/join/register?code=`.
 4. 가입: Supabase Auth `signUp` (이메일) 또는 `signInWithOAuth` (kakao/google; 네이버는 Supabase 기본 provider 아님 → 네이버는 커스텀 OIDC 또는 2차) — `options.data = {name, phone, invite_code}`.

@@ -7,13 +7,14 @@ import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
 import { UTM_KEYS } from "@/lib/utm/client";
 import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 import { TRACKS, cleanEntryPath } from "@/lib/inquiries/track";
+import { DISTRICT_MAX, EDUCATION_OPTIONS, JOB_OPTIONS, REGION_OPTIONS } from "@/lib/inquiries/profile";
 
 /**
  * POST /api/inquiries — Fit Check 설문 완료 시 inquiries 에 저장한다. (FLOWS.md 1-1)
  * 로그인 불필요. 저장은 서버(service role)만 한다 — inquiries 의 익명 insert 정책("anyone can submit inquiry")은 2026-11-04 에 없앴다
  * (공개 anon 키로 DB 에 직접 넣는 스팸 차단). 요청 제한: 같은 IP 10분에 5번 (lib/ratelimit.ts).
  *
- * 개인정보 최소화: 이름·휴대폰·상담 가능 시간·광고 UTM·동의 시각만 저장한다. (설문형 모드일 때만 결과 유형·유입 경로가 추가됨)
+ * 저장 항목: 이름·휴대폰(필수) + 직업·학력·거주지역(시/도·시/군/구, 2026-11-12 추가 — 간단 신청 양식에서는 필수, API 는 설문형 모드와의 호환을 위해 선택) + 상담 가능 시간·광고 UTM·동의 시각. (설문형 모드일 때만 결과 유형·유입 경로가 추가됨)
  * 관심 방식(track: social·matching·undecided)과 들어온 경로(entryTrack: 어느 상담 버튼, entryPath: 직전 페이지 경로 또는 ext:외부호스트)도 answers 에 남겨 CRM 상담 때 참고한다 (lib/inquiries/track.ts).
  * 설문 답변 원본(picks/answers)은 받더라도 버린다 (zod 가 정의되지 않은 키를 제거).
  * 개인정보 수집·이용 동의(consent) 없이는 저장하지 않으며, 동의 시각과 동의문 버전(PRIVACY_CONSENT_VERSION)을 서버에서 기록한다.
@@ -29,6 +30,10 @@ const BodySchema = z.object({
   entryTrack: z.enum(["social", "matching"]).optional(),
   entryPath: z.string().max(200).optional().default(""),
   slot: z.string().max(120).optional().default(""),
+  job: z.enum(JOB_OPTIONS, { message: "직업을 선택해 주세요." }).optional(),
+  education: z.enum(EDUCATION_OPTIONS, { message: "학력을 선택해 주세요." }).optional(),
+  region: z.enum(REGION_OPTIONS, { message: "거주지역(시/도)을 선택해 주세요." }).optional(),
+  district: z.string().trim().max(DISTRICT_MAX, "시/군/구는 30자까지 입력할 수 있습니다.").optional().default(""),
   resultType: z.string().max(60).optional().default(""),
   consent: z.literal(true, { message: "개인정보 수집·이용에 동의해 주세요." }),
   utm: UtmSchema.nullable().optional(),
@@ -70,6 +75,10 @@ export async function POST(req: Request) {
     email: null,
     answers: {
       route: body.route, slot: body.slot, consentAt: new Date().toISOString(), consentVersion: PRIVACY_CONSENT_VERSION,
+      ...(body.job ? { job: body.job } : {}),
+      ...(body.education ? { education: body.education } : {}),
+      ...(body.region ? { region: body.region } : {}),
+      ...(body.region && body.district ? { district: body.district } : {}),
       ...(body.track ? { track: body.track } : {}),
       ...(body.entryTrack ? { entryTrack: body.entryTrack } : {}),
       ...(cleanEntryPath(body.entryPath) ? { entryPath: cleanEntryPath(body.entryPath) } : {}),

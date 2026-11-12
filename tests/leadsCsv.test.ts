@@ -19,7 +19,16 @@ describe("메타 리드 양식 변환", () => {
   it("앞 14열은 메타 리드 파일과 같고 뒤에 원본 UTM 5열이 붙는다", () => {
     expect([...LEAD_COLUMNS]).toEqual(["id", "created_time", "ad_id", "ad_name", "adset_id", "adset_name", "campaign_id", "campaign_name", "form_id", "form_name", "is_organic", "platform", "full_name", "phone_number"]);
     expect([...CSV_COLUMNS].slice(14, 19)).toEqual(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]);
-    expect([...CSV_COLUMNS].slice(19)).toEqual(["interest", "entry"]);
+    expect([...CSV_COLUMNS].slice(19)).toEqual(["interest", "entry", "job", "education", "region", "district"]);
+  });
+  it("직업·학력·거주지역·시/군/구는 신청 때 고른 글자 그대로 열에 들어가고, 없던 신청은 빈칸", () => {
+    const r = toLeadRow({ ...noUtm, answers: { job: "공무원 · 공기업", education: "대학(4년제) 졸업", region: "경기도", district: "성남시 분당구" } });
+    expect([r.job, r.education, r.region, r.district]).toEqual(["공무원 · 공기업", "대학(4년제) 졸업", "경기도", "성남시 분당구"]);
+    const old = toLeadRow(noUtm);
+    expect([old.job, old.education, old.region, old.district]).toEqual(["", "", "", ""]);
+    const csv = leadsCsv([{ ...noUtm, answers: { job: "전문직", education: "대학원(박사) 졸업", region: "해외", district: "" } }]);
+    const line = csv.split("\r\n")[1];
+    expect(line.endsWith('"전문직","대학원(박사) 졸업","해외",""')).toBe(true);
   });
   it("광고 유입: 메타 ID 는 *_id, 이름은 *_name 그대로, platform ig", () => {
     const r = toLeadRow(paid);

@@ -46,6 +46,30 @@ describe("상담 신청 POST /api/inquiries", () => {
     expect(row.answers.consentAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(row.answers.consentVersion).toBe(PRIVACY_CONSENT_VERSION);
   });
+  it("직업·학력·거주지역(시/도)·시/군/구를 answers 에 그대로 저장한다 (2026-11-12 추가 항목)", async () => {
+    const { POST } = await import("@/app/api/inquiries/route");
+    const res = await POST(post({ ...base, job: "전문직", education: "대학원(석사) 졸업", region: "서울특별시", district: " 송파구 " }));
+    expect(res.status).toBe(200);
+    const a = (db.calls[0].payload as { answers: Record<string, string> }).answers;
+    expect(a.job).toBe("전문직");
+    expect(a.education).toBe("대학원(석사) 졸업");
+    expect(a.region).toBe("서울특별시");
+    expect(a.district).toBe("송파구");
+  });
+  it("직업·학력·거주지는 목록에 없는 값이면 400, 없으면(설문형 등) 그냥 생략", async () => {
+    const { POST } = await import("@/app/api/inquiries/route");
+    const bad = await POST(post({ ...base, job: "회장님" }));
+    expect(bad.status).toBe(400);
+    const badRegion = await POST(post({ ...base, region: "전라북도" }));
+    expect(badRegion.status).toBe(400);
+    expect(db.calls.length).toBe(0);
+    const ok = await POST(post({ ...base, district: "송파구" })); // 시/도 없이 시/군/구만 → 시/군/구도 버림
+    expect(ok.status).toBe(200);
+    const a = (db.calls[0].payload as { answers: Record<string, string> }).answers;
+    expect(a).not.toHaveProperty("job");
+    expect(a).not.toHaveProperty("region");
+    expect(a).not.toHaveProperty("district");
+  });
   it("상담 가능 시간을 비워도 접수된다 (선택 항목)", async () => {
     const { POST } = await import("@/app/api/inquiries/route");
     const res = await POST(post({ name: "홍길동", phone: "01012345678", consent: true }));

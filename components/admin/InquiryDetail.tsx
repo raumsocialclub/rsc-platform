@@ -8,6 +8,7 @@ import { INQUIRY_STATUS, badgeStyle, fmtDate } from "@/lib/admin/format";
 import type { InquiryCrm } from "@/lib/crm/inquiries";
 import { STATUS_KO } from "@/lib/crm/types";
 import { entryLabel, inquiryTrack, trackLabel } from "@/lib/inquiries/track";
+import { profileRows } from "@/lib/inquiries/profile";
 
 export type InquiryRow = {
   id: string;
@@ -27,6 +28,7 @@ export type InquiryRow = {
     profile?: string;
     route?: string;         // 관심 방식 라벨(간단 신청) 또는 라움과의 인연(설문형)
     track?: string;         // 관심 방식 키: social | matching | undecided (2026-11-09~)
+    job?: string; education?: string; region?: string; district?: string; // 직업·학력·거주지역(시/도)·시/군/구 (2026-11-12~, lib/inquiries/profile.ts)
     entryTrack?: string;    // 어느 상담 버튼으로 들어왔는지: social | matching (/fit-check?track=)
     entryPath?: string;     // 직전 페이지 경로("/social") 또는 외부 호스트("ext:instagram.com")
     slot?: string;
@@ -109,6 +111,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
     ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : inquiryTrack(inquiry) ? [{ q: "관심 방식", a: trackLabel(inquiry) }] : a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
     ...(entryLabel(inquiry) ? [{ q: "들어온 경로", a: entryLabel(inquiry) }] : []),
+    ...profileRows(a),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
     ...(a.consentAt ? [{ q: "개인정보 동의", a: `${fmtDate(a.consentAt, true)}${a.consentVersion ? ` · 동의문 ${a.consentVersion}` : ""}` }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),

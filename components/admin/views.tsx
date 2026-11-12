@@ -10,6 +10,7 @@ import type { InquiryCrm } from "@/lib/crm/inquiries";
 import { STATUS_KO, type CallStatus } from "@/lib/crm/types";
 import { PROFILES } from "@/lib/fit-check/questions";
 import { entryLabel, inquiryTrack, trackLabel, type TrackFilter } from "@/lib/inquiries/track";
+import { residenceLabel, type ProfileAnswers } from "@/lib/inquiries/profile";
 
 /* ---------- 상담 신청 ---------- */
 /** 유입 광고 요약: utm_source / utm_campaign (UTM 이 없으면 "기록 없음" — 광고를 안 봤다는 뜻은 아님) */
@@ -20,6 +21,12 @@ export const callBadge = (s: CallStatus) => badgeStyle(s === "done" ? "ok" : s =
 export const callLabel = (c: Pick<InquiryCrm, "status" | "attempts">) => (c.attempts ? `${STATUS_KO[c.status]} · ${c.attempts}차` : STATUS_KO[c.status]);
 
 export type CrmInfo = { at: string | null; error: string | null } | null;
+
+/** 목록 한 칸용 직업 · 학력 · 거주지 (2026-11-12 추가 항목, 없으면 빈 문자열) */
+function profileSummary(r: { answers?: Record<string, unknown> | null }): string {
+  const a = (r.answers ?? null) as ProfileAnswers | null;
+  return [a?.job, a?.education, residenceLabel(a)].filter((v): v is string => !!v).join(" · ");
+}
 
 /** 관심 방식 배지 색: 소셜클럽 초록 · 1:1 매칭 파랑 · 상담 후 결정 회색 */
 const trackBadge = (r: InquiryRow) => { const t = inquiryTrack(r); return badgeStyle(t === "social" ? "ok" : t === "matching" ? "brand" : "mute"); };
@@ -46,9 +53,9 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
         <div className={CARD}>
           <div className="overflow-x-auto">
             <table className="border-collapse w-full">
-              <thead><tr>{["신청일", "이름", "연락처", "관심 방식 · 들어온 경로", "성향 결과", "가능 시간", "유입 광고", "콜 결과", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
+              <thead><tr>{["신청일", "이름", "연락처", "관심 방식 · 들어온 경로", "직업 · 학력 · 거주지", "성향 결과", "가능 시간", "유입 광고", "콜 결과", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>
-                {rows.length === 0 && <EmptyRow colSpan={9}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. 홈 상담 신청(/fit-check)이나 상담 전 설문(/apply)이 제출되면 여기에 표시됩니다."}</EmptyRow>}
+                {rows.length === 0 && <EmptyRow colSpan={10}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. 홈 상담 신청(/fit-check)이나 상담 전 설문(/apply)이 제출되면 여기에 표시됩니다."}</EmptyRow>}
                 {rows.map((r) => {
                   const active = selected?.id === r.id;
                   return (
@@ -60,6 +67,7 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
                         {inquiryTrack(r) ? <Badge style={trackBadge(r)}>{trackLabel(r)}</Badge> : <span className="text-[rgba(55,56,60,.28)]">—</span>}
                         {entryLabel(r) && <div className="text-[11px] text-[rgba(55,56,60,.61)] mt-[3px] whitespace-nowrap">{entryLabel(r)}</div>}
                       </td>
+                      <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{profileSummary(r) || "—"}</td>
                       <td className={TD}>{r.result_type || (isApply(r) ? <span className="text-[rgba(55,56,60,.61)]">{applySummary(r) || "설문"}</span> : "—")}</td>
                       <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{r.answers?.slot || "—"}</td>
                       <td className={`${TD} text-[rgba(55,56,60,.61)]`}>{utmLabel(r.utm)}</td>
@@ -112,7 +120,7 @@ export function CouponsView({ invites }: { invites: InviteRow[] }) {
           <table className="border-collapse w-full">
             <thead><tr>{["코드", "발급 대상", "연락처", "상담 연결", "발급일", "만료", "사용", "상태", ""].map((h, i) => <th key={i} className={TH}>{h}</th>)}</tr></thead>
             <tbody>
-              {invites.length === 0 && <EmptyRow colSpan={9}>발급된 초대코드가 없습니다.</EmptyRow>}
+              {invites.length === 0 && <EmptyRow colSpan={10}>발급된 초대코드가 없습니다.</EmptyRow>}
               {invites.map((r) => {
                 const st = stateOf(r);
                 return (
