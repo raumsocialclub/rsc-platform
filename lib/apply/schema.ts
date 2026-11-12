@@ -61,7 +61,9 @@ export const STEPS: Step[] = [
       { key: "mbti", label: "MBTI", type: "select", options: MBTI },
       { key: "height", label: "키", type: "number", unit: "cm", placeholder: "키를 입력해 주세요", hint: HEIGHT_HINT },
       { key: "weight", label: "체중", type: "number", unit: "kg", placeholder: "체중을 입력해 주세요" },
-      { key: "marital", label: "결혼여부", type: "radio", options: ["미혼", "사실혼", "무출산 재혼", "출산 재혼"] },
+      // 2026-11-12: 「결혼여부」(미혼·사실혼·무출산 재혼·출산 재혼) → 혼인 상태 + 자녀 유무. 기혼·사실혼은 가입 제한 안내만 하고 제출은 막지 않는다(상담에서 확인)
+      { key: "marital", label: "현재 혼인 상태", type: "radio", options: ["미혼", "이혼", "사별", "기혼", "사실혼"], hint: "라움소셜클럽은 현재 배우자가 없는 싱글을 위한 서비스입니다. 기혼 또는 사실혼 관계에 있는 분은 가입이 제한됩니다." },
+      { key: "children", label: "자녀 유무", type: "radio", options: ["없음", "있음"] },
       ...region("home", "거주지역"),
       ...region("origin", "본가"),
       { key: "drinking", label: "주량", type: "radio", options: ["안마셔요", "어쩔 수 없을 때만 마셔요", "가끔마셔요", "어느정도 즐겨요", "즐기는 편이에요"] },
