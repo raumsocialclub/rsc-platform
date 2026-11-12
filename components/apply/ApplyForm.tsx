@@ -34,6 +34,7 @@ export function ApplyForm({ token }: { token: string }) {
   const [answers, setAnswers] = useState<Answers>({});
   const [agreed, setAgreed] = useState(false);
   const [sensitiveAgreed, setSensitiveAgreed] = useState(false);
+  const [sensitiveOpen, setSensitiveOpen] = useState(false); // 종교(민감정보) 동의 안내 접기/펼치기 — 기본 접힘
   const [error, setError] = useState<string | null>(null);
   const [invalid, setInvalid] = useState<string | null>(null); // 비어 있는 필수 칸 key
   const [submitting, setSubmitting] = useState(false);
@@ -154,16 +155,21 @@ export function ApplyForm({ token }: { token: string }) {
               </p>
             </div>
             <div id="apply-sensitive" className={`mb-[24px] border p-[18px] rounded-ds ${invalid === "sensitive" ? "border-negative bg-[rgba(255,66,66,.04)]" : "border-lineNeutral bg-white"}`}>
-              <label className="flex items-start gap-[14px] cursor-pointer min-h-[44px]">
-                <input type="checkbox" checked={sensitiveAgreed} onChange={(e) => { setSensitiveAgreed(e.target.checked); if (e.target.checked && invalid === "sensitive") { setInvalid(null); setError(null); } }} className="w-[20px] h-[20px] mt-[2px] accent-primary cursor-pointer flex-none" data-testid="apply-sensitive-check" />
-                <span className="t-body-2 font-semibold text-label">종교(민감정보) 수집·이용 동의 <span className="text-labelAlt font-normal">(선택)</span></span>
-              </label>
-              <dl className="mt-[12px] ml-[34px] grid gap-[4px] t-label-1-reading text-labelAlt">
-                <div><dt className="inline font-medium text-label">수집 항목: </dt><dd className="inline">종교 (개인정보 보호법 제23조의 민감정보)</dd></div>
-                <div><dt className="inline font-medium text-label">이용 목적: </dt><dd className="inline">대면 상담에서 희망 조건(종교)과의 적합성 확인</dd></div>
-                <div><dt className="inline font-medium text-label">보관 기간: </dt><dd className="inline">상담 전 설문 응답과 함께 접수일로부터 최대 180일</dd></div>
-                <div><dt className="inline font-medium text-label">거부 시: </dt><dd className="inline">동의하지 않아도 설문 제출과 상담에 제한이 없습니다. 동의하지 않으면 종교 답변은 저장되지 않습니다.</dd></div>
-              </dl>
+              <div className="flex items-start gap-[12px]">
+                <label className="flex items-start gap-[14px] cursor-pointer min-h-[44px] flex-1 min-w-0">
+                  <input type="checkbox" checked={sensitiveAgreed} onChange={(e) => { setSensitiveAgreed(e.target.checked); if (e.target.checked && invalid === "sensitive") { setInvalid(null); setError(null); } }} className="w-[20px] h-[20px] mt-[2px] accent-primary cursor-pointer flex-none" data-testid="apply-sensitive-check" />
+                  <span className="t-body-2 font-semibold text-label">종교(민감정보) 수집·이용 동의 <span className="text-labelAlt font-normal">(선택)</span></span>
+                </label>
+                <button type="button" onClick={() => setSensitiveOpen((v) => !v)} aria-expanded={sensitiveOpen} aria-controls="apply-sensitive-detail" className="flex-none mt-[12px] t-caption-1 text-labelAlt underline hover:text-label">{sensitiveOpen ? "접기" : "펼치기"}</button>
+              </div>
+              {sensitiveOpen && (
+                <dl id="apply-sensitive-detail" className="mt-[12px] ml-[34px] grid gap-[4px] t-label-1-reading text-labelAlt">
+                  <div><dt className="inline font-medium text-label">수집 항목: </dt><dd className="inline">종교 (개인정보 보호법 제23조의 민감정보)</dd></div>
+                  <div><dt className="inline font-medium text-label">이용 목적: </dt><dd className="inline">대면 상담에서 희망 조건(종교)과의 적합성 확인</dd></div>
+                  <div><dt className="inline font-medium text-label">보관 기간: </dt><dd className="inline">상담 전 설문 응답과 함께 접수일로부터 최대 180일</dd></div>
+                  <div><dt className="inline font-medium text-label">거부 시: </dt><dd className="inline">동의하지 않아도 설문 제출과 상담에 제한이 없습니다. 동의하지 않으면 종교 답변은 저장되지 않습니다.</dd></div>
+                </dl>
+              )}
             </div>
             <p className="mb-[20px] t-label-1-reading text-labelAlt"><span className="text-negative">*</span> 표시만 필수입니다. 나머지는 비워 두어도 됩니다.</p>
           </>
