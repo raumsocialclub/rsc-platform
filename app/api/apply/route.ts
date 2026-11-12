@@ -19,6 +19,8 @@ const BodySchema = z.object({
   token: z.string().regex(TOKEN_RE, "유효하지 않은 설문 링크입니다."),
   answers: z.record(z.string(), z.unknown()),
   consent: z.literal(true, { message: "개인정보 수집·이용에 동의해 주세요." }),
+  /** 종교(민감정보) 수집·이용 별도 동의(선택). 없으면 religion 답변을 저장하지 않는다 (개인정보 보호법 제23조) */
+  sensitiveConsent: z.boolean().optional().default(false),
 });
 
 export async function POST(req: Request) {
@@ -40,6 +42,7 @@ export async function POST(req: Request) {
   if (!link || status !== "active") return NextResponse.json({ ok: false, message: LINK_MESSAGE[status === "active" ? "invalid" : status] }, { status: 403 });
 
   const a = sanitizeAnswers(parsed.data.answers);
+  if (!parsed.data.sensitiveConsent) { delete a.religion; delete a.religionOther; }
   const name = String(a.name ?? "").trim();
   if (!name) return NextResponse.json({ ok: false, message: "이름을 입력해 주세요." }, { status: 400 });
   const phone = normalizePhone(String(a.phone ?? ""));
@@ -62,6 +65,7 @@ export async function POST(req: Request) {
       ref: String(a.refCode ?? ""),
       consentAt: new Date().toISOString(),
       consentVersion: PRIVACY_CONSENT_VERSION,
+      ...(parsed.data.sensitiveConsent && a.religion ? { sensitiveConsentAt: new Date().toISOString() } : {}),
       answers: flattenAnswers(a),
       apply: rest,
     },

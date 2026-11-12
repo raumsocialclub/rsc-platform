@@ -67,6 +67,9 @@ export const STEPS: Step[] = [
       ...region("home", "거주지역"),
       ...region("origin", "본가"),
       { key: "drinking", label: "주량", type: "radio", options: ["안마셔요", "어쩔 수 없을 때만 마셔요", "가끔마셔요", "어느정도 즐겨요", "즐기는 편이에요"] },
+      { key: "smoking", label: "흡연", type: "radio", options: ["비흡연", "흡연", "금연 중"] },
+      // 종교는 개인정보 보호법 제23조 민감정보 — 첫 단계의 「종교(민감정보) 수집·이용 동의(선택)」에 체크한 경우에만 서버가 저장한다 (app/api/apply/route.ts)
+      { key: "religion", label: "종교", type: "select", options: ["무교", "기독교", "천주교", "불교", "기타"], other: true, hint: "선택 항목입니다. 첫 단계의 종교(민감정보) 수집·이용 동의에 체크한 경우에만 저장됩니다." },
     ],
   },
   {

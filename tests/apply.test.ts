@@ -107,3 +107,25 @@ describe("POST /api/apply (비밀 링크)", () => {
     expect((db.tables.apply_links[0] as { uses: number }).uses).toBe(2);
   });
 });
+
+describe("종교(민감정보) 별도 동의", () => {
+  beforeEach(() => { db.calls.length = 0; db.tables.apply_links = [link()]; db.tables.inquiries = []; });
+  it("별도 동의 없이 보낸 종교·흡연: 흡연은 저장, 종교는 버린다", async () => {
+    const { POST } = await import("@/app/api/apply/route");
+    const res = await POST(post({ answers: { ...base, smoking: "비흡연", religion: "불교" }, consent: true }));
+    expect(res.status).toBe(200);
+    const row = db.calls.find((c) => c.table === "inquiries")!.payload as { answers: { apply: Record<string, unknown>; sensitiveConsentAt?: string } };
+    expect(row.answers.apply.smoking).toBe("비흡연");
+    expect(row.answers.apply).not.toHaveProperty("religion");
+    expect(row.answers.sensitiveConsentAt).toBeUndefined();
+  });
+  it("별도 동의가 있으면 종교를 저장하고 동의 시각을 남긴다", async () => {
+    const { POST } = await import("@/app/api/apply/route");
+    const res = await POST(post({ answers: { ...base, religion: "기타", religionOther: "원불교" }, consent: true, sensitiveConsent: true }));
+    expect(res.status).toBe(200);
+    const row = db.calls.find((c) => c.table === "inquiries")!.payload as { answers: { apply: Record<string, unknown>; sensitiveConsentAt?: string } };
+    expect(row.answers.apply.religion).toBe("기타");
+    expect(row.answers.apply.religionOther).toBe("원불교");
+    expect(row.answers.sensitiveConsentAt).toMatch(/^\d{4}-/);
+  });
+});

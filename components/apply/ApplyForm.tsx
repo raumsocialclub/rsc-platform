@@ -33,6 +33,7 @@ export function ApplyForm({ token }: { token: string }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [agreed, setAgreed] = useState(false);
+  const [sensitiveAgreed, setSensitiveAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [invalid, setInvalid] = useState<string | null>(null); // 비어 있는 필수 칸 key
   const [submitting, setSubmitting] = useState(false);
@@ -64,6 +65,12 @@ export function ApplyForm({ token }: { token: string }) {
     });
   };
 
+  const requireSensitive = () => {
+    if (sensitiveAgreed || !String(answers.religion ?? "").trim()) return true;
+    setError("종교를 입력하려면 종교(민감정보) 수집·이용에 동의해 주세요. 동의하지 않으려면 종교 칸을 비워 주세요."); setInvalid("sensitive"); setStep(0);
+    document.getElementById("apply-sensitive")?.scrollIntoView({ block: "center", behavior: "smooth" });
+    return false;
+  };
   const requireConsent = () => {
     if (agreed) return true;
     setError("개인정보 수집·이용에 동의해 주세요."); setInvalid("consent");
@@ -72,6 +79,7 @@ export function ApplyForm({ token }: { token: string }) {
   };
   const next = () => {
     if (step === 0 && !requireConsent()) return;
+    if (step === 0 && !requireSensitive()) return;
     const miss = missingRequired(cur, answers);
     if (miss) { setError(`「${miss.label}」을(를) 입력해 주세요.`); focusField(miss.key); return; }
     go(step + 1);
@@ -83,9 +91,10 @@ export function ApplyForm({ token }: { token: string }) {
       if (miss) { setStep(STEPS.indexOf(s)); setError(`「${s.title} · ${miss.label}」을(를) 입력해 주세요.`); focusField(miss.key); return; }
     }
     if (!agreed) { setStep(0); requireConsent(); return; }
+    if (!requireSensitive()) return;
     setSubmitting(true); setError(null);
     try {
-      const res = await fetch("/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, answers, consent: true }) });
+      const res = await fetch("/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, answers, consent: true, sensitiveConsent: sensitiveAgreed }) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !j?.ok) throw new Error(j?.message ?? "설문을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
       try { sessionStorage.removeItem(store); } catch {}
@@ -135,7 +144,7 @@ export function ApplyForm({ token }: { token: string }) {
               </label>
               <dl className="mt-[12px] ml-[34px] grid gap-[4px] t-label-1-reading text-labelAlt">
                 <div><dt className="inline font-medium text-label">처리하는 회사: </dt><dd className="inline">주식회사 레벤스토리 (라움소셜클럽 운영)</dd></div>
-                <div><dt className="inline font-medium text-label">수집 항목: </dt><dd className="inline">이름, 성별, 생년월일, 휴대폰 번호(필수) · 이메일, 추천인 코드, 가입 경로, MBTI, 키·체중, 결혼 여부, 거주지역·본가, 주량, 학력, 직업·소득·직장, 자산·차량, 가족관계, 이상형 조건·우선순위·기피사항, 연애성향 답변(선택)</dd></div>
+                <div><dt className="inline font-medium text-label">수집 항목: </dt><dd className="inline">이름, 성별, 생년월일, 휴대폰 번호(필수) · 이메일, 추천인 코드, 가입 경로, MBTI, 키·체중, 혼인 상태·자녀 유무, 거주지역·본가, 주량·흡연, 학력, 직업·소득·직장, 자산·차량, 가족관계, 이상형 조건·우선순위·기피사항, 연애성향 답변(선택) · 종교는 아래 별도 동의 시에만</dd></div>
                 <div><dt className="inline font-medium text-label">이용 목적: </dt><dd className="inline">대면 상담의 준비와 일정 조율, 상담 전 기본 정보·희망 조건 확인, 문의 응대</dd></div>
                 <div><dt className="inline font-medium text-label">보관 기간: </dt><dd className="inline">접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)</dd></div>
                 <div><dt className="inline font-medium text-label">거부 시: </dt><dd className="inline">필수 항목 동의를 거부하면 설문이 접수되지 않습니다. 선택 항목은 비워 두어도 됩니다.</dd></div>
@@ -143,6 +152,18 @@ export function ApplyForm({ token }: { token: string }) {
               <p className="mt-[10px] ml-[34px] t-caption-1 text-labelAlt">
                 자세한 내용은 <Link href="/privacy" target="_blank" className="underline text-primary">개인정보처리방침</Link>에서 확인하실 수 있습니다. 사이트 이용 조건은 <Link href="/terms" target="_blank" className="underline text-primary">이용약관</Link>을 참고해 주세요. 개인정보 및 상담 내용은 철저히 보안이 유지됩니다.
               </p>
+            </div>
+            <div id="apply-sensitive" className={`mb-[24px] border p-[18px] rounded-ds ${invalid === "sensitive" ? "border-negative bg-[rgba(255,66,66,.04)]" : "border-lineNeutral bg-white"}`}>
+              <label className="flex items-start gap-[14px] cursor-pointer min-h-[44px]">
+                <input type="checkbox" checked={sensitiveAgreed} onChange={(e) => { setSensitiveAgreed(e.target.checked); if (e.target.checked && invalid === "sensitive") { setInvalid(null); setError(null); } }} className="w-[20px] h-[20px] mt-[2px] accent-primary cursor-pointer flex-none" data-testid="apply-sensitive-check" />
+                <span className="t-body-2 font-semibold text-label">종교(민감정보) 수집·이용 동의 <span className="text-labelAlt font-normal">(선택)</span></span>
+              </label>
+              <dl className="mt-[12px] ml-[34px] grid gap-[4px] t-label-1-reading text-labelAlt">
+                <div><dt className="inline font-medium text-label">수집 항목: </dt><dd className="inline">종교 (개인정보 보호법 제23조의 민감정보)</dd></div>
+                <div><dt className="inline font-medium text-label">이용 목적: </dt><dd className="inline">대면 상담에서 희망 조건(종교)과의 적합성 확인</dd></div>
+                <div><dt className="inline font-medium text-label">보관 기간: </dt><dd className="inline">상담 전 설문 응답과 함께 접수일로부터 최대 180일</dd></div>
+                <div><dt className="inline font-medium text-label">거부 시: </dt><dd className="inline">동의하지 않아도 설문 제출과 상담에 제한이 없습니다. 동의하지 않으면 종교 답변은 저장되지 않습니다.</dd></div>
+              </dl>
             </div>
             <p className="mb-[20px] t-label-1-reading text-labelAlt"><span className="text-negative">*</span> 표시만 필수입니다. 나머지는 비워 두어도 됩니다.</p>
           </>
