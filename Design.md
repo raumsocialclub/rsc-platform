@@ -1,81 +1,122 @@
-# Design.md — RSC 디자인 규칙
+# Design.md — RSC 디자인 규칙 (Wanted Design System 기반)
 
-이 문서는 모든 화면에 **고정**으로 적용한다. `design/` 폴더의 HTML을 브라우저로 열어 실제 렌더를 확인하고 픽셀 수준으로 재현한다. 새 화면(에러·로딩·빈 상태 등)도 이 규칙 안에서만 만든다.
+2026-11 전면 개편. 원티드 디자인 시스템(Figma Community "Wanted Design System")의 토큰·타입 스케일·컴포넌트 규격을 그대로 가져와 적용한다. 모든 공개 화면은 `components/ui/ds.tsx` 의 프리미티브와 아래 토큰만 사용한다. 새 화면(에러·로딩·빈 상태 등)도 이 규칙 안에서만 만든다.
 
 ## 무드
-크림 종이 위 짙은 브라운 잉크. 여백 넉넉, 각진 카드(radius 0), 그림자 없음, 얇은 선. 럭셔리 멤버십 클럽의 인쇄물 느낌. 화려한 그라데이션·이모지·둥근 큰 카드 금지.
+흰 바탕, 또렷한 검정 텍스트, 파란 포인트 하나. 12px 라운드 카드, 얇은 선, 그림자는 입력·호버에서만 아주 약하게. 과한 그라데이션·이모지·장식용 아이콘·큰 글자 그림자 금지. "채용 서비스처럼 담백하게"가 기준.
 
-## 색상 (Tailwind `theme.extend.colors`에 이 이름으로 등록)
+## 색상 토큰 (`app/globals.css` `--ds-*` → `tailwind.config.ts` 이름)
 ```
-cream:      #f2eee5   // 페이지 배경
-card:       #f7f3ec   // 카드 배경
-ink:        #211e19   // 본문 텍스트, 다크 섹션 배경
-brown:      #5a3d24   // 포인트: 주 버튼, GNB 메뉴, 라벨, 링크 hover
-brownHover: #9c6b3e   // 주 버튼 hover, 오버라인 라벨
-gold:       #e2b478   // 다크 배경 위 라벨/강조, 추천 배지
-goldHover:  #f0c98e
-success:    #2e6b3e   (bg rgba(46,107,62,.12))
-warn:       #7a5420   (bg rgba(226,180,120,.25))
-error:      #a3402c
+label         #171719                  본문·제목
+labelNeutral  rgba(46,47,51,.88)       본문 보조
+labelAlt      rgba(55,56,60,.61)       설명·캡션
+labelAssist   rgba(55,56,60,.28)       번호·비활성 라벨
+labelDisable  rgba(55,56,60,.16)
+primary       #0066FF   strong #005EEB   heavy #0054D1   (버튼·링크·라벨)
+line          rgba(112,115,124,.22)  lineNeutral .16  lineAlt .08   (카드·구분선)
+lineSolid     #E1E2E4   lineSolidNeutral #EAEBEC   lineSolidAlt #F4F4F5
+fill          rgba(112,115,124,.08)  fillStrong .16  fillAlt .05    (호버·칩 배경)
+white #FFFFFF (페이지)   sand #F7F7F8 (대체 배경·푸터)   sandDeep #F4F4F5
+inverseBg #1B1C1E   inverseLabel #F7F7F8   inversePrimary #3385FF   (다크 CTA 밴드)
+positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative #FF4242 / #E52222
 ```
-- 보조 텍스트: `rgba(33,30,25,.5)` / `.65` / `.7`
-- 구분선·테두리: `rgba(33,30,25,.1)` / `.14` / 입력 `.24` / 보조 버튼 `.3`
-- 다크 섹션 위 텍스트 `#f7f3ec`, 보조 `rgba(247,243,236,.6~.85)`, 선 `rgba(247,243,236,.15)`
-- 결제수단 브랜드색: 카카오 `#FEE500`, 네이버 `#03C75A`, 토스 `#0064FF`
+- 레거시 이름(cream·ink·brown·gold·success·warn·error 등)은 같은 변수에 매핑된 호환용이며 코드에서는 더 쓰지 않는다 (sand·sandDeep 은 그대로 사용).
+- CMS 테마 문서는 `global.theme2` 를 읽는다. 옛 `global.theme` 는 구버전 배포본용으로 그대로 둔다.
 
 ## 타이포그래피
-- 폰트: **SamsungOne** — `design/assets/fonts/SamsungOne-400.ttf / 500 / 600 / 700`. `next/font/local`로 로드. fallback Arial.
-- 기본 weight **500** (body). 제목 600. 700은 배지에서만.
-- 행간은 촘촘한 편(사용자 요청으로 전체 행간 축소됨).
+- 폰트: **Pretendard Variable** (`app/fonts/PretendardVariable.woff2`, `next/font/local`, `--font-pretendard`). `font-feature-settings: "ss10"`, `word-break: keep-all`.
+- 기본 weight 400. 제목 700, 라벨·버튼 600.
+- 크기는 반드시 아래 유틸리티 클래스(`@utility t-*`, `app/globals.css`)로만 지정한다. 임의 `text-[..px]` 금지(아이콘·배지 예외).
 
-| 용도 | 크기 | weight | 기타 |
-|---|---|---|---|
-| 오버라인 라벨 | 11px | 500 | letter-spacing .3em, 대문자, `brownHover` 또는 ink/.5 |
-| H1 | clamp(30px, 4vw, 52px) | 600 | line-height 1.28, letter-spacing -.01em |
-| H2 | clamp(24px, 2.6vw, 34px) | 600 | line-height 1.3 |
-| 본문 lead | 16.5px | 500 | line-height 1.75, ink/.68 |
-| 본문 | 14.5~15px | 500 | line-height 1.65~1.7 |
-| 캡션 | 12.5~13px | 500 | ink/.5 |
-| 표 헤더 | 11.5px | 600 | letter-spacing .12em, ink/.5 |
-| 표 셀 | 14.5px | 500 | line-height 1.5 |
-| 가격 | 34px | 600 | 단위 "원" 15px/500 |
-| 버튼 | 13.5~14px | 500~600 | |
+| 클래스 | 크기/행간/자간 | 용도 |
+|---|---|---|
+| `t-display-1` | 56 / 1.286 / -0.0319em | 데스크톱 히어로 |
+| `t-display-2` | 40 / 1.3 / -0.0282em | 태블릿 히어로 |
+| `t-display-3` | 36 / 1.334 / -0.027em | 페이지 제목(데스크톱) |
+| `t-title-1` | 32 / 1.375 / -0.0253em | 모바일 히어로·페이지 제목 |
+| `t-title-2` | 28 / 1.358 / -0.0236em | 섹션 제목(데스크톱) |
+| `t-title-3` | 24 / 1.334 / -0.023em | 섹션 제목(모바일) |
+| `t-heading-1` | 22 / 1.364 / -0.0194em | 카드 그룹 제목 |
+| `t-heading-2` | 20 / 1.4 / -0.012em | 카드 제목·탭 |
+| `t-headline-1` | 18 / 1.445 / -0.002em | 소제목 |
+| `t-headline-2` | 17 / 1.412 / 0 | 행 제목 |
+| `t-body-1` (`-reading` 1.625) | 16 / 1.5 / 0.0057em | 리드 문단 |
+| `t-body-2` (`-reading` 1.6) | 15 / 1.467 / 0.0096em | 본문·표 |
+| `t-label-1` (`-reading` 1.571) | 14 / 1.429 / 0.0145em | 라벨·네비·버튼(md) |
+| `t-label-2` | 13 / 1.385 / 0.0194em | 작은 라벨 |
+| `t-caption-1` | 12 / 1.334 / 0.0252em | 캡션·도움말·표 헤더 |
+| `t-caption-2` | 11 / 1.273 / 0.0311em | 배지 |
+
+- 반응형 조합 예: 페이지 제목 `t-title-1 md:t-display-3`, 섹션 제목 `t-title-3 md:t-title-2`.
+- 영어 오버라인(eyebrow)은 `t-label-1 font-semibold text-primary`. 대문자 CMS 텍스트 그대로, 글자 간격 추가 금지.
 
 ## 레이아웃
-- 콘텐츠 max-width **1100px**, 가운데. 페이지 padding: 데스크톱 `72px 40px 140px`, 모바일 `40px 18px 96px`.
-- 섹션 간격 96px(모바일 64px).
-- 그리드: 3열 `repeat(3, minmax(0,1fr))` gap 16px; 760px 이하 1열. 4열은 모바일 2열.
-- 표는 가로 스크롤 컨테이너로 감싸기(`overflow-x:auto`).
-- breakpoint 하나: **760px**.
+- 콘텐츠 max-width **1060px** (`Container`), 넓은 섹션 1200px (`Container wide`). 좌우 padding 20px / md 32px.
+- 간격 단위 4px. 섹션 간격 56px(모바일) / 80~96px(데스크톱). 카드 padding 24px(모바일) / 28~32px.
+- breakpoint: sm 640 · **md 761** · lg 1024.
+- 라운드: 카드·입력·버튼 **12px** (`rounded-ds`), 작은 요소 8px (`rounded-ds-sm`), 칩·배지 pill.
+- 그림자: `shadow-xs`(입력) `shadow-sm` `shadow-md`(호버 카드) `shadow-lg`(토스트·메뉴).
+- GNB 높이 56px(모바일) / 64px. 페이지 래퍼는 `pt-[56px] md:pt-[64px]`.
+- 표는 `Scroll`(overflow-x) 컨테이너로 감싼다.
 
-## 컴포넌트
-**GNB** — sticky top, bg `rgba(242,238,229,.9)` + `backdrop-filter: blur(14px)`, 하단 1px ink/.1, padding `16px 40px`(모바일 `14px 18px`). 좌: 엠블럼 로고(h 32px) + 텍스트 로고(h 15px). 우: 메뉴 텍스트 13px/600 `brown` + "상담신청" pill. 모바일: 햄버거 → 전체화면 오버레이(bg ink, 메뉴 크게 세로 나열).
+## 컴포넌트 (`components/ui/ds.tsx`)
+- **버튼** `btn(variant, size)` / `<Button>` / `<ButtonLink>`  
+  variant: `solid`(primary bg, 흰 글자) · `outlined`(primary 테두리) · `assistive`(lineNeutral 테두리, 검정 글자) · `text` · `inverse`(다크 밴드용 흰 버튼).  
+  size: `lg` 48px/px28/16px · `md` 40px/px20/15px · `sm` 32px/px14/14px. 모두 radius 12, weight 600. disabled: `disable` 배경 + `labelDisable` 글자.
+- **카드** `CARD`(흰 배경 + lineAlt 1px + 12px), `CARD_ALT`(sand 배경), 호버 시 `CARD_HOVER`.
+- **입력** `INPUT`(48px, lineNeutral 1px, 12px, 16px 글자, focus primary 링), `TEXTAREA`, 오류 `INPUT_ERR`. 라벨 `FIELD_LABEL`(14 SemiBold), 도움말 `FIELD_HELP`(12 labelAlt), 오류 `FIELD_ERROR`.
+- **칩(선택지)** `CHIP` + `CHIP_ON`(primary 테두리 + 연파랑 배경) / `CHIP_OFF`.
+- **배지** `<Badge tone>` neutral·primary·positive·cautionary·negative·inverse — pill, 12px SemiBold.
+- **섹션 머리** `<SectionHead eyebrow title lead align>`.
+- **GNB** `SiteHeader` — 흰 배경 95% + blur, 하단 lineAlt. 데스크톱 메뉴(브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식 · FAQ) `t-label-1`(lg `t-body-2`) SemiBold, 로고와 우측 버튼 사이 가운데 정렬 · 간격 24px(lg 48px), 우측 로그인(assistive md) + 상담 신청(solid md). 모바일: 햄버거 → 흰 전체 화면 메뉴(`t-heading-2` 목록, 하단 풀폭 solid 버튼).
+- **푸터** `SiteFooter` — sand 배경, 4열(브랜드·메뉴·서비스 문의·제휴문의) + 사업자 정보 한 줄 + 약관 링크. 제휴문의 열은 `/partner` 로 가는 「제휴문의 →」 제목 링크 하나(연락처는 페이지에서, 2026-11-11 중복 정리). 「패밀리 사이트」 열은 2026-11-11 요청으로 뺐다.
+- **다크 CTA 밴드** `bg-inverseBg rounded-ds`, 라벨 `text-inversePrimary`, 제목 `text-inverseLabel`, 본문 `rgba(247,247,248,.7)`, 버튼 solid + inverse.
+- **플로팅 UP 버튼** 우하단 44px 흰 원 + lineNeutral + shadow-md, 뷰포트 60% 스크롤 후 표시.
+- **탭(법적 고지 등)** 하단 2px 언더라인, 선택 `text-label`/미선택 `text-labelAlt`.
 
-**버튼**
-- 주(primary): bg `brown`, text `cream`, pill `radius 999px`, padding `15px 28px`, hover bg `brownHover`. 다크 배경 위에서는 bg `gold` text `ink`, hover `goldHover`.
-- 보조: 1px ink/.3 border, 투명, hover border+text `brownHover`.
-- 폼 제출(풀폭): radius 0, padding 18px, bg `brown`, text 14px letter-spacing .06em 600.
-- 텍스트 버튼: 13px/600 `brown`.
-- transition 150ms ease. disabled: opacity .6.
+## 움직임 (생동감)
+- **버튼**: 호버 시 색이 진해지고 파란 그림자(solid), 누르면 `scale(.97)`. 모든 변화 200ms ease-out.
+- **사진** `img-live`(globals.css, `ImageBlock` 기본): 대문 히어로 배경·소식·프로그램 사진까지 모든 공개 사진에 적용.
+  - PC 호버: 700ms 동안 5% 확대 + 빛줄기가 한 번 지나간다. 터치 기기는 빛줄기 생략.
+  - 모든 기기 스크롤: 화면에 들어올 때 12% 크게 시작해 제자리로 가라앉는다(`rsc-img-settle`). `animation-timeline: view()` 지원 시 스크롤에 정확히 연동, 아니면 RevealObserver 의 `is-in` 폴백.
+  - 모든 기기 누름(`:active`, 터치 포함): 150ms 동안 2% 로 살짝 가라앉는다. iOS 는 RevealObserver 의 빈 touchstart 리스너가 :active 를 켠다.
+  - 대문 히어로 `img-live-hero`: 배경 상자가 16초 주기로 천천히 확대·이동(켄 번즈) → 모바일에서도 첫 화면이 살아 있다. 켄 번즈는 반드시 상자에(사진 img 에 걸면 호버 확대를 덮어써 대문 호버가 사라진다).
+- **카드** `CARD_HOVER`: 호버 시 4px 떠오름 + `shadow-md` + 테두리 진하게, 누르면 `scale(.985)`, 안의 사진도 함께 움직인다 (`group` → `img-live`).
+- **모바일 스와이프 카드** `swipe-item`(`SWIPE_ITEM`): 화면 가운데 카드만 또렷하고 양옆은 6% 작고 흐리게(`rsc-swipe-focus`, `view(inline)`), 손가락을 따라 바뀐다. 미지원 브라우저는 평소 모습.
+- **스크롤 등장** `data-reveal` (+ `--d` 로 지연): 화면에 들어오면 아래에서 22px 떠오르며 나타난다. `RevealObserver`(루트 레이아웃)가 `html.js` 를 붙인 뒤에만 숨기므로 JS 가 없으면 그대로 보인다. `SectionHead`·`ImageBlock` 은 `reveal` prop.
+- **첫 화면**: `anim-up` / `anim-up-2` / `anim-up-3` 순서 등장, 사진은 `anim-zoom`.
+- **GNB**: 메뉴 밑줄이 왼쪽에서 자라남(`link-grow`), 스크롤하면 그림자. 모바일 메뉴는 `anim-pop` + 항목 순차 등장.
+- **모바일 가로 스와이프** `SWIPE` + `SWIPE_ITEM`: 프로그램·순간 카드는 모바일에서 82% 폭 카드로 옆으로 밀어 보고(스냅), 데스크톱은 그리드. 위에 "옆으로 밀어서 보기 →" 안내.
+- **FAQ**: 열리면 답이 떠오르고(`faq-body`) 질문이 파란색. **표 행**은 호버 시 연파랑.
+- **종이 접기** `data-fold`: 섹션이 화면에 들어올 때 위쪽 모서리를 축으로 -18° 에서 펼쳐진다(위쪽 그늘이 함께 사라짐). `animation-timeline: view()` 를 지원하면 스크롤 위치에 정확히 따라가고, 아니면 RevealObserver 가 한 번 펼친다. 히어로(첫 화면)에는 쓰지 않는다.
+- `prefers-reduced-motion` 이면 스스로 움직이는 효과(등장·폴드·켄 번즈·스크롤 가라앉기·빛줄기·스와이프 포커스)는 끈다. 단 사용자가 직접 일으키는 사진 호버·누름 반응은 0.2s 로 남긴다 — Windows 「애니메이션 효과」를 끈 PC 가 많아, 전부 끄면 "효과가 없다"고 보인다.
 
-**카드** — bg `card`, 1px ink/.14 border, radius 0, padding `36px 32px`(정보 카드) / `30px 28px`(소형). 추천 카드는 bg `ink` + 우상단 `RECOMMENDED` 배지(bg gold, ink, 10px, 700, letter-spacing .2em).
-
-**입력** — bg #fff, 1px ink/.24, radius 0, padding `16px 18px`, 15px; focus border `brown`; placeholder ink/.35. 오류 문구 13px `error` 아래에.
-
-**배지(상태)** — pill, 11px, padding `4px 10px`: 확정/활동 success, 대기 warn, 취소/마감 ink/.5 on ink/.08.
-
-**표** — 헤더 하단 1px ink/.18, 행 하단 1px ink/.1, 마지막 행 선 없음, 셀 padding `18px`(모바일 12px). 강조 행 bg `rgba(226,180,120,.18)`.
-
-**리스트 불릿** — 대시 `—` `brownHover`색, gap 10px.
-
-**어드민 사이드바** — bg `ink`, w 240px, 메뉴 13px `rgba(247,243,236,.7)`, 선택 bg `rgba(247,243,236,.1)` + text `#f7f3ec`. 본문 bg `cream`. KPI 카드 4열.
-
-**플로팅 UP 버튼** — 우하단 44px 원, bg `rgba(33,30,25,.55)`, 화살표 cream, 히어로 지나면 fade-in.
+## 문장 줄바꿈
+- 고유명사(RSC TASTE SOCIAL, RAUM SOLO, SIGNATURE …)와 가운뎃점 목록(아트·와인·웰니스)은 `Txt`/`nowrap()` 이 `whitespace-nowrap` 으로 묶어 줄 중간에서 끊기지 않는다 (`components/cms/Txt.tsx` 의 TERMS 목록에 추가).
+- 모바일에서 4칸 카드(가입 심사·진행 방식)는 아이콘/번호 왼쪽 + 글 오른쪽의 가로 배치로 높이를 줄이고, 멤버십 카드 3장은 프로그램 카드처럼 옆으로 밀어 비교한다.
+- `Txt` 는 마침표·물음표·느낌표 뒤에서 항상 줄을 바꾼다 (PC·모바일 공통, 문장이 중간에 잘려 보이지 않게). 숫자 뒤 점은 제외.
+- CMS 의 `\n` 은 기본(soft) 데스크톱에서만 줄바꿈, 모바일은 띄어쓰기로 이어 붙임. `breaks="hard"` 는 항상 줄바꿈.
+- 안내 문단은 전부 `Txt` 로 렌더하고 `text-pretty` 를 붙인다. 표 셀은 예외.
 
 ## 이미지
-- 비율: 히어로 풀블리드, 프로그램 카드 4:3, 상세 3:2, 공간 카드 3:4 세로.
-- 톤: 채도 낮춤·따뜻한 크림 톤 통일(`06 Spaces` 4장처럼). 어두운 사진 위 텍스트는 `#f7f3ec`/`gold`.
+- 모두 `rounded-ds`(12px) 모서리. 히어로 4:3(모바일) / 4:5(데스크톱), 프로그램 카드 4:3, 상세 3:2.
+- 색 보정 없이 원본 톤 유지. 어두운 사진 위 텍스트는 `inverseLabel`.
 - 원본은 `design/assets/`. 어드민 업로드 이미지는 Supabase Storage, 최대 2000px 리사이즈.
 
 ## 카피 톤
-차분한 존댓말, 짧은 문장, 마침표. "좋은"의 반복 금지. 영어 오버라인 + 한글 제목 조합. 예: `MEMBERS ONLY` / "초대코드를 입력해주세요". 확정 문구는 `design/` HTML의 텍스트를 그대로 사용.
+차분한 존댓말, 짧은 문장, 마침표. 영어 오버라인 + 한글 제목 조합 유지. 문구는 CMS(`site_content`)가 우선이며 코드의 기본값은 CMS 가 비어 있을 때만 쓰인다.
+
+## 정보 구조 (2026-11 · 두 갈래 홈)
+- 홈(`/`)은 **게이트**다. 맨 위 전환형 히어로(`components/site/GateHero.tsx`)에 「소셜클럽 | 1:1 매칭」 탭이 있고, 탭을 누르면 사진·문구·버튼이 바뀐다(모바일은 스와이프, PC 는 ←/→ 도 됨). 버튼은 각 트랙 페이지와 `/fit-check?track=…` 으로 간다. 레퍼런스: emotional oranges 홈의 로테이션/프라이빗 전환.
+- 그 아래 「두 가지 방식」 비교 카드(`TrackCards`) → 브랜드 소개(01) → 브랜드 약속(03) → FAQ → 두 버튼 CTA(`CtaBand`).
+- `/partner` 제휴문의: 상단 소개 → 협업 분야 3카드(브랜드·콘텐츠 / 기업·단체 / 공간·행사, 「이 분야로 제안하기」가 양식의 유형을 미리 고름) → 제휴문의 양식(`PartnerForm`: 유형 4종 라디오 · 회사 · 담당자 · 휴대전화 자동 하이픈 · 이메일 · 내용 3,000자 · 첨부(선택, 최대 3개 · 파일당 10MB · pdf/hwp/word/excel/ppt/jpg/png, 서명 URL 로 비공개 버킷에 직접 업로드) · 개인정보 수집 및 이용 안내(목적·항목·1년 보유·거부 관련) + 동의 체크 · 봇 함정) → 제안서 안내. `POST /api/partner` → `partner_inquiries` → 어드민 `/admin/partners`. 문구 `partner.page`, 첨부 안내 이메일 `global.brand.partnerEmail`.
+- `/matching` 1:1 매칭의 멤버십 섹션(`matching.plans`)은 2026-11-12 부터 **가입비 공개**: 결혼중개업은 가입비를 홈페이지에 명시해야 하므로 등급 이름(RAUM CLASSIC · RAUM SIGNATURE · RAUM PRIVÉ) · 한글 이름 · 가입비(VAT 포함) · 상담 버튼만 보여주고 포함 항목·추가 옵션·금액 비공개 문구는 뺐다. `hasPrice` 필터는 이 페이지와 llms.txt 본문에서 더 이상 쓰지 않는다(리드 모드가 켜져 있어도 1:1 가입비는 보인다). 옛 등급 이름(ACCESS · SIGNATURE · RAUM MERRY)은 공개 문구에서 모두 새 이름으로 바꿨다(숨겨진 /pricing 문서는 예외).
+- 상단 메뉴에 FAQ 항목은 없다(2026-11-12): FAQ 는 소셜클럽·1:1 매칭 페이지 맨 아래 섹션으로만 있고 메인에는 없다. 소셜클럽 FAQ 문서는 id 가 `home.faq` 지만 CMS 「소셜클럽」 탭에 있다(저장값 유지를 위해 id 를 바꾸지 않음).
+- `/social` 소셜클럽: 트랙 전환 바(`TrackSwitch`) + 상단 소개 + 멤버십 구성(가입비 = 회원 자격 + 행사 6회 + 초대권 2매) + 02 포지셔닝 · 04 TASTE SOCIAL · 06 MOMENTS + 가입 심사 + FAQ. `/matching` 1:1 매칭: 가입 심사(`VerifySection`, 「아무나 들어올 수 없습니다」) · 진행 방식 4단계 · 멤버십 구성(ACCESS 5회 · SIGNATURE 10회 · MERRY, 리드 모드면 금액 숨김) · 회원 전용 행사(`MembersOnly`: SOCIAL NIGHT · GRAND BALL · RAUM SOLO) · 다른 점 · 이런 분께 · FAQ. 상품 문구의 기준은 RSC 사업전략(2026.11.03). **가입비·연회비는 비공개(대면 상담에서 안내)** — 공개 페이지·FAQ·llms.txt 에 금액을 쓰지 않으며, `hasPrice` 로 금액이 든 줄은 리드 모드와 무관하게 화면에서 뺀다. `/pricing` 은 리드 모드에서 숨겨진 내부 참고용.
+- 상담 신청(`/fit-check`)은 「관심 있는 방식」 칩(소셜클럽 · 1:1 매칭 · 상담 후 결정)이 맨 위에 있고 `?track=` 으로 미리 선택된다. 값은 `inquiries.answers.route` 에 저장되어 어드민 상담 상세에 「관심 방식」으로 보인다. 입력 항목은 이름 · 휴대폰 · 직업 · 학력 · 거주지역 시/도(필수) + 시/군/구(선택) 5가지(2026-11-12): 직업·학력·시/도는 셀렉트(선택지 `lib/inquiries/profile.ts`, 바꾸면 양식·서버 검증·어드민·CSV 가 함께 바뀜). 저장 값은 고른 글자 그대로 `answers.job · education · region · district` 에 들어가고 어드민 목록·상세·CSV 뒤 4열에 그대로 나온다. 개인정보 동의 카드 아래 「마케팅 정보 수신 동의(선택)」 카드(접기/펼치기, 목적 문구는 관심 방식 칩에 따라 바뀜; CMS apply.form marketing*)가 있고, 체크 여부와 무관하게 신청할 수 있다. 동의는 별도 표 `marketing_consents` 와 어드민 「마케팅 수신」 메뉴(`lib/inquiries/marketing.ts`).
+- 문구·사진은 모두 CMS: 사이트 관리 → 메인 페이지(00 대문 히어로 · 00-1 비교 카드 · 소개 · 약속 · FAQ · 하단 상담 띠) / 소셜클럽 / 1:1 매칭 / 상담 신청 / 소식 탭. **공개 화면에 보이는 문장은 모두 CMS 문서에 있어야 한다** (2026-11-09 M17): 새 섹션이나 버튼을 만들 때 문구를 코드에 직접 쓰지 말고 `lib/cms/schema.ts` 에 필드와 기본값을 추가하고 `s(doc, key) || "기본값"` 으로 읽는다. 메뉴 이름은 `global.nav`, 상담 신청 양식은 `apply.form`. 어드민 「문구 검색」은 모든 문서의 현재 값을 훑으므로(`lib/cms/search.ts`) 코드에만 있는 문구는 찾히지 않는다.
+- **대문(히어로) 문구 원칙**: 짧고 임팩트 있게. 작은 제목은 영문 브랜드 라인(RAUM SOCIAL CLUB · RAUM 1:1 MATCHING), 큰 제목은 2줄, 설명은 1~2문장. 구성·횟수·절차 같은 세부 설명은 아래 섹션(비교 카드·멤버십 구성·진행 방식)에서 하고 히어로에는 넣지 않는다.
+
+## 적용 범위
+- 1단계(완료): 공개 사이트 전체 — 홈, 상담 신청(/fit-check), 상담 전 설문(/apply), 혜택, 멤버십, 소식, 약관·개인정보·환불, 404·에러.
+- 2단계(완료, 2026-11): 어드민(흰 사이드바 + sand 본문, `components/admin/ui.tsx` 의 CARD·TH·TD·FIELD·BTN_*·PageTitle·Badge)·회원·로그인·결제 화면을 같은 토큰으로 교체. 레거시 색 이름(cream·ink·brown·gold 등)은 코드에서 더 쓰지 않으며 tailwind 매핑만 호환용으로 남겨 둔다.

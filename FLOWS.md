@@ -1,11 +1,16 @@
 # RSC 핵심 흐름 (시퀀스)
 
 ## 1. 상담 → 초대 → 가입
-1. 방문자 `/fit-check` 설문 완료 → `POST /api/inquiries` → `inquiries` insert(status=pending).
+1. 방문자 `/fit-check` 간단 신청(관심 방식 · 이름 · 휴대폰 · 직업 · 학력 · 거주지역 시/도(필수) + 시/군/구(선택) · 개인정보 동의; 2026-11-12 부터 5항목) 또는 설문 완료 → `POST /api/inquiries` → `inquiries` insert(status=pending; 직업·학력·거주지는 `answers.job · education · region · district`). 어드민 목록 「직업 · 학력 · 거주지」열 · 상세 · CSV 뒤 4열(job, education, region, district)에 고른 글자 그대로 나온다. 개인정보 동의 아래 「마케팅 정보 수신 동의(선택)」(목적 문구는 관심 방식별)에 체크하면 같은 요청으로 `marketing_consents`(이름·휴대폰·거주지역·관심 방식·동의 일시·동의문 버전)에 따로 저장되고 `answers.marketing · marketingAt` 에도 남는다 → 어드민 `/admin/marketing`(동의 중·철회 탭, 철회/철회 취소 `PATCH /api/admin/marketing/:id`, 주관리자 CSV `/api/admin/marketing/export`, 재확인 예정일 = 동의일 + 2년). 상담 신청이 180일 뒤 지워져도 수신 동의는 철회 전까지 남고(inquiry_id 만 null), 철회 기록은 1년 뒤 크론 삭제.
 2. 어드민 `/admin/inquiries`에서 상담 진행 → "초대코드 발급" → `invite_codes` insert(`RSC-` + 4 + 4 대문자/숫자, 30일 만료) → 알림톡/이메일 발송(코드 + `/join?code=` 링크) → inquiry status=invited.
 3. 방문자 `/join` 코드 입력 → `POST /api/invites/verify` (service role) → 유효하면 `/join/register?code=`.
 4. 가입: Supabase Auth `signUp` (이메일) 또는 `signInWithOAuth` (kakao/google; 네이버는 Supabase 기본 provider 아님 → 네이버는 커스텀 OIDC 또는 2차) — `options.data = {name, phone, invite_code}`.
 5. `on_auth_user_created` 트리거가 `members` 생성 → 서버 콜백 `/auth/callback`에서 `invite_codes.used_by/used_at` 기록. status=active 즉시 활성(승인 대기 없음).
+
+## 1-1. 제휴문의 (2026-11-11)
+1. 방문자 `/partner` 양식(문의 유형 · 회사 · 담당자 · 휴대전화 · 이메일 · 내용 · 첨부 최대 3개 · 개인정보 동의) → 첨부가 있으면 파일마다 `POST /api/partner/upload-url`(확장자·10MB 검사, IP 10분 20회) → 브라우저가 서명 URL 로 비공개 버킷 `partner-files` 의 `inbox/<uuid>/file.<확장자>` 에 직접 업로드(원래 파일명은 files[].name) → `POST /api/partner` (service role, IP 10분 3회; 첨부 경로가 버킷에 실제로 있는지 확인) → `partner_inquiries` insert(status=new, files, consent_at · consent_version 기록) → 제휴 담당 이메일(`global.brand.partnerEmail`)로 접수 알림(Resend 키가 있을 때만).
+2. 어드민 `/admin/partners`(사이드바 「제휴문의」, 접수 건수 배지) 목록·상세 → 첨부는 `GET /api/admin/partners/:id/file?i=`(5분 서명 URL 로 이동) → 상태(접수 · 검토 중 · 진행·완료 · 보류) · 메모 저장 `PATCH /api/admin/partners/:id` → `admin_logs`(partner.update). 「메일 회신」은 담당자 메일 앱을 연다.
+3. 보관 1년 → `purge_expired_partner_inquiries` 크론(매일 03:41 UTC): 행과 첨부를 함께 지우고, 제출되지 않은 채 하루 지난 업로드도 지운다. 상담 신청(inquiries)·CRM·초대코드와는 분리.
 
 ## 2. 프로그램 예약 → 결제 → 확정
 1. `/programs/[id]` "예약하고 결제하기" → `POST /api/bookings { sessionId, qty }`

@@ -1,0 +1,51 @@
+# 운영 배포 게이트 (M13). main 에 코드가 올라오면 CI(테스트)를 다시 돌리고, 통과했을 때만 Vercel Deploy Hook 을 호출해 운영 배포를 만든다.
+# Vercel 쪽은 main 의 자동 배포를 끄고(deploy hook 만 허용) 있어서, 테스트가 실패하면 운영에 올라가지 않는다.
+# 필요한 GitHub Secret: VERCEL_DEPLOY_HOOK_PRODUCTION (SETUP.md 4-5)
+name: Deploy production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: 테스트 (통과해야 배포)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ci.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon
+      NEXT_PUBLIC_SITE_URL: https://ci.example
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    name: Vercel 운영 배포
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Deploy Hook 호출
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_PRODUCTION }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::GitHub Secret VERCEL_DEPLOY_HOOK_PRODUCTION 이 비어 있습니다. SETUP.md 4-5 를 따라 등록해 주세요."
+            exit 1
+          fi
+          curl -fsS -X POST "$HOOK" -o /dev/null -w "deploy hook status %{http_code}\n"
