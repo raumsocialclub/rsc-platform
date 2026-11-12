@@ -12,7 +12,6 @@ import { CtaBand } from "@/components/site/CtaBand";
 import { Txt, lines, nowrap } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
-import { hasPrice } from "@/lib/settings/leadMode";
 import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead, SWIPE, SWIPE_ITEM } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -20,11 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const SECTION = "py-[64px] md:py-[112px]";
-type Plan = { name: string; tag: string; features: string; badge: string; dark?: boolean };
+type Plan = { name: string; sub: string; price: string; badge: string; dark?: boolean };
 
 /**
- * 1:1 매칭(결혼중개 멤버십 ACCESS · SIGNATURE) 트랙 페이지. 사업전략(2026.11.03) 기준.
- * 상단 소개 → 01 가입 심사(아무나 들어올 수 없습니다) → 02 진행 방식 4단계 → 03 멤버십 구성(ACCESS · SIGNATURE · MERRY — 금액은 비공개, 대면 상담 안내)
+ * 1:1 매칭(결혼중개 멤버십 RAUM CLASSIC · SIGNATURE · PRIVÉ) 트랙 페이지. 사업전략(2026.11.03) 기준.
+ * 상단 소개 → 01 가입 심사(아무나 들어올 수 없습니다) → 02 진행 방식 4단계 → 03 멤버십 가입비(등급 이름 · 가입비(VAT 포함) · 상담 버튼만 — 결혼중개업은 가입비를 홈페이지에 공개해야 하므로 2026-11-12 부터 금액을 그대로 보여준다)
  * → 회원 전용 행사(SOCIAL NIGHT · GRAND BALL · RAUM SOLO, home.solo 재사용) → 04 다른 점 → 05 이런 분께 → 06 FAQ → CTA.
  * 문구는 모두 CMS(matching.* + home.solo, 전환 바 이름은 home.gate). 모든 상담 버튼은 /fit-check?track=matching.
  */
@@ -34,12 +33,11 @@ export default async function MatchingPage() {
   const d = await getPageDocs(["matching", "home"]);
   const hero = d["matching.hero"], verify = d["matching.verify"], how = d["matching.how"], plans = d["matching.plans"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"], solo = d["home.solo"], cta = d["matching.cta"], gate = d["home.gate"];
   const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
-  const ctaSuffix = s(plans, "ctaSuffix") || "상담 신청", merryCta = s(plans, "merryCta") || "별도 상담 신청";
-  const planItems = list<Plan>(plans, "items");
-  // 가입비·연회비는 비공개(대면 상담 안내): 리드 모드와 무관하게 금액이 들어간 줄은 모두 뺀다
-  const extras = lines(s(plans, "extras")).filter((x) => !hasPrice(x));
+  const planItems = list<Plan>(plans, "items").filter((p) => p.name);
+  const planCta = s(plans, "ctaLabel") || "상담 신청하기", priceLabel = s(plans, "priceLabel") || "가입비", vatLabel = s(plans, "vatLabel") || "VAT 포함";
   const planNote = s(plans, "note");
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a));
+  // 1:1 매칭 가입비는 공개 항목(결혼중개업)이라 FAQ 의 금액 문구도 숨기지 않는다
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a);
 
   return (
     <div className="pt-[56px] md:pt-[64px]">
@@ -73,7 +71,7 @@ export default async function MatchingPage() {
         </section>
       )}
 
-      {/* 03 MEMBERSHIP (ACCESS · SIGNATURE · MERRY) */}
+      {/* 03 MEMBERSHIP 가입비 (RAUM CLASSIC · SIGNATURE · PRIVÉ) — 이름 · 가입비 · 상담 버튼만 */}
       {on(plans, "visible") && planItems.length > 0 && (
         <section id="plans" data-fold className={`${SECTION} bg-sand`}>
           <Container>
@@ -81,35 +79,23 @@ export default async function MatchingPage() {
             {s(plans, "swipeHint") && <div className="md:hidden mt-[24px] t-caption-1 text-labelAssist">{s(plans, "swipeHint")}</div>}
             <div className={`${SWIPE} mt-[12px] md:grid-cols-3 md:gap-[16px] md:mt-[40px]`}>
               {planItems.map((p, i) => (
-                <article key={i} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${SWIPE_ITEM} ${p.dark ? "bg-inverseBg text-inverseLabel border border-inverseBg" : CARD} ${CARD_HOVER} rounded-ds p-[24px] md:p-[28px] flex flex-col`}>
-                  <div className="flex items-center justify-between gap-[8px] mb-[12px]">
-                    <h3 className={`t-heading-1 ${p.dark ? "text-white" : "text-label"}`}>{p.name}</h3>
-                    {p.badge && <Badge tone={p.dark ? "inverse" : "primary"} className={p.dark ? "!bg-white !text-label" : ""}>{p.badge}</Badge>}
-                  </div>
-                  <p className={`t-body-2 font-medium m-0 mb-[16px] pb-[16px] border-b ${p.dark ? "text-white/80 border-white/20" : "text-labelNeutral border-lineAlt"}`}>{p.tag}</p>
-                  <ul className="list-none p-0 m-0 grid gap-[8px]">
-                    {lines(p.features).filter((f) => !hasPrice(f)).map((f, j) => (
-                      <li key={j} className={`flex gap-[10px] items-start t-label-1-reading ${p.dark ? "text-white/85" : "text-labelAlt"}`}>
-                        <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`flex-none mt-[3px] ${p.dark ? "text-white" : "text-primary"}`}><path d="M5 12l5 5L20 7" /></svg>
-                        <span className="text-pretty">{nowrap(f)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-auto pt-[20px]">
-                    <ButtonLink href="/fit-check?track=matching" variant={p.dark ? "inverse" : "outlined"} size="md" className="w-full">{/MERRY/i.test(p.name) ? merryCta : `${p.name} ${ctaSuffix}`}</ButtonLink>
+                <article key={i} data-reveal data-testid="plan-card" style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className={`${SWIPE_ITEM} ${p.dark ? "bg-inverseBg text-inverseLabel border border-inverseBg" : CARD} ${CARD_HOVER} relative overflow-hidden rounded-ds p-[28px] md:p-[32px] flex flex-col items-center text-center`}>
+                  <span aria-hidden className={`absolute inset-x-0 top-0 h-[3px] ${p.dark ? "bg-inversePrimary" : "bg-primary"}`} />
+                  {p.badge && <Badge tone={p.dark ? "inverse" : "primary"} className={`absolute top-[16px] right-[16px] ${p.dark ? "!bg-white !text-label" : ""}`}>{p.badge}</Badge>}
+                  <div className={`t-caption-1 font-semibold tracking-[.18em] mt-[8px] ${p.dark ? "text-white/60" : "text-primary"}`}>{String(i + 1).padStart(2, "0")}</div>
+                  <h3 className={`t-title-3 tracking-[.04em] mt-[10px] ${p.dark ? "text-white" : "text-label"}`}>{nowrap(p.name)}</h3>
+                  {p.sub && <p className={`t-label-1 m-0 mt-[4px] ${p.dark ? "text-white/70" : "text-labelAlt"}`}>{p.sub}</p>}
+                  <div className={`w-[32px] h-px my-[22px] ${p.dark ? "bg-white/25" : "bg-lineNeutral"}`} />
+                  <div className={`t-caption-1 ${p.dark ? "text-white/60" : "text-labelAlt"}`}>{priceLabel}</div>
+                  <div className={`t-title-2 md:t-title-1 mt-[4px] tabular-nums ${p.dark ? "text-white" : "text-label"}`}>{p.price}</div>
+                  <div className={`t-caption-1 mt-[4px] ${p.dark ? "text-white/60" : "text-labelAlt"}`}>{vatLabel}</div>
+                  <div className="mt-auto pt-[28px] w-full">
+                    <ButtonLink href="/fit-check?track=matching" variant={p.dark ? "inverse" : "outlined"} size="md" className="w-full">{planCta}</ButtonLink>
                   </div>
                 </article>
               ))}
             </div>
-            {extras.length > 0 && (
-              <div data-reveal className={`${CARD} mt-[16px] p-[20px] md:p-[24px] grid grid-cols-1 md:grid-cols-[120px_minmax(0,1fr)] gap-[8px] md:gap-[24px]`}>
-                <div className="t-label-1 font-semibold text-primary">{s(plans, "extrasTitle") || "필요한 만큼 추가"}</div>
-                <ul className="list-none p-0 m-0 grid gap-[6px] md:grid-cols-3 md:gap-[12px]">
-                  {extras.map((x, i) => <li key={i} className="t-label-1-reading text-labelNeutral text-pretty">{nowrap(x)}</li>)}
-                </ul>
-              </div>
-            )}
-            {planNote && !hasPrice(planNote) && <p data-reveal className="t-label-1-reading text-labelAlt mt-[16px] text-pretty max-w-[800px]"><Txt v={planNote} /></p>}
+            {planNote && <p data-reveal className="t-label-1-reading text-labelAlt mt-[16px] text-pretty max-w-[800px]"><Txt v={planNote} /></p>}
           </Container>
         </section>
       )}

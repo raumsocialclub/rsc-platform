@@ -16,7 +16,7 @@ const TERMS = [
   "RSC GRAND SOCIAL BALL", "GRAND SOCIAL BALL", "RAUM SOCIAL NIGHT", "RSC TASTE SOCIAL", "TASTE SOCIAL", "SOCIAL NIGHT",
   "RAUM SOCIAL CLUB", "RAUM ART WALK", "ONE QUESTION SALON", "RAUM AFTER HOURS", "SUNDAY RESET", "TASTE TABLE", "RUN & BRUNCH",
   "PRIVATE CONNECTION", "Relationship Concierge", "Relationship Director", "Second Date Benefit", "Founding Member", "Private Choice",
-  "RAUM WEDDING", "RAUM ORIGIN", "RAUM MERRY", "RAUM SOLO", "SOLO BALL", "SIGNATURE", "PREVIEW", "ACCESS", "1:1 매칭", "1:1 만남", "1:1 소개",
+  "RAUM WEDDING", "RAUM ORIGIN", "RAUM MERRY", "RAUM CLASSIC", "RAUM SIGNATURE", "RAUM PRIVÉ", "RAUM SOLO", "SOLO BALL", "SIGNATURE", "CLASSIC", "PRIVÉ", "PREVIEW", "ACCESS", "1:1 매칭", "1:1 만남", "1:1 소개",
 ];
 const TERM_RE = new RegExp(`(${TERMERS()})`, "g");
 function TERMERS() { return TERMS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"); }

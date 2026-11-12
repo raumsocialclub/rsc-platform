@@ -13,7 +13,7 @@ describe("어드민 문구 검색 (searchDocs)", () => {
     expect(hits.some((h) => h.docId === "matching.verify" && h.pageLabel === "1:1 매칭")).toBe(true);
   });
   it("목록 항목(FAQ 답변) 안의 문장도 찾고 몇 번째 항목인지 알려준다", () => {
-    const hits = searchDocs(all, "Founding Member 선착순 100명");
+    const hits = searchDocs(all, "소셜클럽 가입비는 상담을 신청해 주시면");
     const faq = hits.find((h) => h.docId === "home.faq");
     expect(faq).toBeDefined();
     expect(faq!.field).toMatch(/^질문 \d+ · 답변$/);
