@@ -39,7 +39,7 @@ export async function SiteFooter() {
               <Link href="/matching" className={LINK}>{L("navMatching", "1:1 매칭")}</Link>
               {!lead && <Link href="/pricing" className={LINK}>{L("navMembership", "멤버십")}</Link>}
               <Link href="/news" className={LINK}>{L("navNews", "소식")}</Link>
-              <Link href="/#faq" className={LINK}>{L("footerFaq", "자주 묻는 질문")}</Link>
+              <Link href="/social#faq" className={LINK}>{L("footerFaq", "자주 묻는 질문")}</Link>
               <Link href="/fit-check" className={LINK}>{L("footerApply", "상담 신청")}</Link>
             </nav>
           </div>

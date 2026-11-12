@@ -28,7 +28,7 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
  */
 export default async function SocialPage() {
   const d = await getPageDocs(["home", "social"]);
-  const hero = d["social.hero"], membership = d["social.membership"], verify = d["social.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"], cta = d["social.cta"], gate = d["home.gate"];
+  const hero = d["social.hero"], membership = d["social.membership"], verify = d["social.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"] /* 소셜클럽 전용 FAQ (CMS 소셜클럽 탭) */, cta = d["social.cta"], gate = d["home.gate"];
   const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
   const memberItems = list<{ label: string; title: string; body: string }>(membership, "items");
   const memberNote = s(membership, "note");

@@ -12,12 +12,12 @@ export type HeaderUser = { name: string; initial: string };
 export type HeaderBrand = { ctaLabel: string; ctaHref: string; logoEmblem: string; logoText: string };
 const DEFAULT_BRAND: HeaderBrand = { ctaLabel: "RSC 상담 신청", ctaHref: "/fit-check", logoEmblem: "/images/logo-emblem.png", logoText: "/images/logo-text-nav.png" };
 /** 메뉴 이름 (CMS global.nav). 비어 있으면 기본 이름 */
-export type NavLabels = Partial<Record<"navSocial" | "navMatching" | "navAbout" | "navPrograms" | "navMembership" | "navNews" | "navFaq" | "navMy" | "navLogin" | "navLogout", string>>;
-const DEFAULT_NAV: Required<NavLabels> = { navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식", navFaq: "FAQ", navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃" };
+export type NavLabels = Partial<Record<"navSocial" | "navMatching" | "navAbout" | "navPrograms" | "navMembership" | "navNews" | "navMy" | "navLogin" | "navLogout", string>>;
+const DEFAULT_NAV: Required<NavLabels> = { navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식", navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃" };
 const NAV = "link-grow t-label-1 lg:t-body-2 font-semibold text-labelNeutral hover:text-primary py-[4px] whitespace-nowrap";
 
 /**
- * 공통 GNB (Wanted DS). 흰 배경 64px(모바일 56px) 고정 바 · 로고 · 메뉴(브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식 · FAQ, 가운데 정렬 · 넓은 간격) · 주요 버튼. "혜택" 메뉴는 내용 확정 전이라 2026-11 요청으로 뺐다(페이지 /benefits 는 유지). 모바일은 햄버거 → 전체 화면 메뉴.
+ * 공통 GNB (Wanted DS). 흰 배경 64px(모바일 56px) 고정 바 · 로고 · 메뉴(브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식, 가운데 정렬 · 넓은 간격; FAQ 메뉴는 각 페이지에 FAQ 섹션이 있어 2026-11-12 에 뺐다) · 주요 버튼. "혜택" 메뉴는 내용 확정 전이라 2026-11 요청으로 뺐다(페이지 /benefits 는 유지). 모바일은 햄버거 → 전체 화면 메뉴.
  * 로그인 상태(user)면 "프로그램 · 내 예약 · 이니셜 아바타". leadMode(리드 모드)면 예약·로그인 링크를 숨기고 상담 신청만 남긴다.
  */
 export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = false, labels }: { user?: HeaderUser | null; brand?: HeaderBrand; leadMode?: boolean; labels?: NavLabels }) {
@@ -49,7 +49,6 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
             {!leadMode && <Link href="/programs" className={NAV}>{L.navPrograms}</Link>}
             {!leadMode && <Link href="/pricing" className={NAV}>{L.navMembership}</Link>}
             <Link href="/news" className={NAV}>{L.navNews}</Link>
-            <Link href="/#faq" className={NAV}>{L.navFaq}</Link>
           </nav>
           <div className="flex items-center gap-[8px] md:gap-[12px]">
             {loggedIn ? (
@@ -96,7 +95,6 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
               ...(!leadMode ? [{ href: "/programs", label: loggedIn ? L.navPrograms : `${L.navPrograms} 예약` }] : []),
               ...(!leadMode ? [{ href: "/pricing", label: L.navMembership }] : []),
               { href: "/news", label: L.navNews },
-              { href: "/#faq", label: L.navFaq },
               ...(loggedIn ? [{ href: "/my", label: L.navMy }] : []),
             ].map((n, i) => (
               <Link key={n.href} href={n.href} onClick={close} style={{ animationDelay: `${60 + i * 40}ms` }} className="anim-up t-heading-2 text-label py-[14px] border-b border-lineAlt flex items-center justify-between active:text-primary">{n.label}<span className="text-labelAssist" aria-hidden>→</span></Link>

@@ -6,13 +6,11 @@ import { ImageBlock } from "@/components/site/ImageBlock";
 import { SitePopups } from "@/components/site/SitePopups";
 import { GateHero, type GateTrack } from "@/components/site/GateHero";
 import { TrackCards } from "@/components/site/TrackCards";
-import { FaqSection } from "@/components/site/FaqSection";
 import { CtaBand } from "@/components/site/CtaBand";
 import { listLivePopups } from "@/lib/popups/queries";
 import { Txt } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
-import { hasPrice } from "@/lib/settings/leadMode";
 import { CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,13 +24,12 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
 
 /**
  * 메인 = 게이트. 맨 위 전환형 히어로(소셜클럽 | 1:1 매칭)에서 방식을 고르면 각 트랙 페이지(/social, /matching)로 간다.
- * 그 아래는 두 방식 비교 카드 → 브랜드 소개(01) → 브랜드 약속(03) → FAQ → 두 버튼 CTA. 프로그램 상세(02·04·05·06)는 /social 로 옮겼다.
+ * 그 아래는 두 방식 비교 카드 → 브랜드 소개(01) → 브랜드 약속(03) → 두 버튼 CTA. (FAQ 는 2026-11-12 부터 소셜클럽·1:1 매칭 페이지에만) 프로그램 상세(02·04·05·06)는 /social 로 옮겼다.
  * 모든 문구·사진은 CMS(site_content home.*) — 기본값은 lib/cms/schema.ts
  */
 export default async function HomePage() {
   const [d, popups] = await Promise.all([getPageDocs("home"), listLivePopups()]);
-  const gate = d["home.gate"], tracks = d["home.tracks"], about = d["home.about"], promise = d["home.promise"], faq = d["home.faq"], cta = d["home.cta"];
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
+  const gate = d["home.gate"], tracks = d["home.tracks"], about = d["home.about"], promise = d["home.promise"], cta = d["home.cta"];
 
   const gateTracks: GateTrack[] = [
     { key: "social", tab: s(gate, "tabSocial") || "소셜클럽", image: s(gate, "socialImage"), overline: s(gate, "socialOverline"), title: s(gate, "socialTitle"), body: s(gate, "socialBody"), cta: s(gate, "socialCta") || "자세히 보기", href: "/social", applyHref: "/fit-check?track=social" },
@@ -90,8 +87,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* FAQ */}
-      {on(faq, "visible") && <FaqSection eyebrow={eyebrow(s(faq, "label"))} title={s(faq, "title")} lead={s(faq, "lead")} items={faqItems} tone="white" />}
 
       <CtaBand title={s(cta, "title")} body={s(cta, "body")} socialLabel={s(cta, "socialLabel")} matchingLabel={s(cta, "matchingLabel")} />
 

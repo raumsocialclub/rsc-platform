@@ -110,13 +110,13 @@ export const DOCS: DocDef[] = [
     label: "메뉴 이름 (상단 메뉴 · 푸터)",
     description: "상단 메뉴(GNB)와 푸터에 보이는 메뉴 이름입니다. 푸터 3열은 「제휴문의 →」 링크 하나(연락처는 제휴문의 페이지에서). 링크 주소는 바뀌지 않고 이름만 바뀝니다. 「프로그램」「멤버십」「내 예약」「로그인」은 리드 모드에서는 보이지 않습니다.",
     fields: [
-      t("navSocial", "메뉴: 소셜클럽"), t("navMatching", "메뉴: 1:1 매칭"), t("navAbout", "메뉴: 브랜드소개"), t("navPrograms", "메뉴: 프로그램"), t("navMembership", "메뉴: 멤버십"), t("navNews", "메뉴: 소식"), t("navFaq", "메뉴: FAQ"),
+      t("navSocial", "메뉴: 소셜클럽"), t("navMatching", "메뉴: 1:1 매칭"), t("navAbout", "메뉴: 브랜드소개"), t("navPrograms", "메뉴: 프로그램"), t("navMembership", "메뉴: 멤버십"), t("navNews", "메뉴: 소식"),
       t("navMy", "메뉴: 내 예약"), t("navLogin", "메뉴: 로그인"), t("navLogout", "메뉴: 로그아웃"),
       t("footerMenuTitle", "푸터 1열 제목"), t("footerFaq", "푸터: 자주 묻는 질문"), t("footerApply", "푸터: 상담 신청"), t("footerContactTitle", "푸터 2열 제목 (서비스 문의)"), t("footerPartnerTitle", "푸터 3열 제휴문의 링크 문구", undefined, "제휴문의 페이지(/partner)로 가는 링크. 화살표는 자동으로 붙습니다"),
       t("legalTerms", "푸터: 이용약관"), t("legalPrivacy", "푸터: 개인정보처리방침"), t("legalRefund", "푸터: 환불규정"),
     ],
     defaults: {
-      navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식", navFaq: "FAQ",
+      navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식",
       navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃",
       footerMenuTitle: "메뉴", footerFaq: "자주 묻는 질문", footerApply: "상담 신청", footerContactTitle: "서비스 문의", footerPartnerTitle: "제휴문의",
       legalTerms: "이용약관", legalPrivacy: "개인정보처리방침", legalRefund: "환불규정",
@@ -286,11 +286,11 @@ export const DOCS: DocDef[] = [
   },
 
   {
-    id: "home.faq",
-    page: "home",
+    id: "home.faq", // id 는 이전 이름 그대로(저장값 유지). 2026-11-12 부터 메인에서는 빼고 소셜클럽 페이지에만 나온다
+    page: "social",
     anchor: "#faq",
-    label: "03 자주 묻는 질문 (FAQ · 소셜클럽 페이지에도 표시)",
-    description: "메인과 소셜클럽 페이지에 함께 나오는 FAQ 입니다. 1:1 매칭 페이지의 FAQ 는 「1:1 매칭」 탭에 따로 있습니다. 금액(원)이 들어간 질문·답변은 화면에서 자동으로 빠집니다. 검색엔진·AI 검색이 '가입 조건·회비·환불' 같은 질문에 답할 때 인용하는 섹션입니다. 질문은 방문자가 실제로 검색할 문장으로 쓰는 것이 좋습니다.",
+    label: "FAQ 자주 묻는 질문",
+    description: "소셜클럽 페이지 맨 아래 FAQ 입니다(메인 페이지에는 2026-11-12 부터 나오지 않습니다). 1:1 매칭 페이지의 FAQ 는 「1:1 매칭」 탭에 따로 있습니다. 금액(원)이 들어간 질문·답변은 화면에서 자동으로 빠집니다. 검색엔진·AI 검색이 '가입 조건·회비·환불' 같은 질문에 답할 때 인용하는 섹션입니다. 질문은 방문자가 실제로 검색할 문장으로 쓰는 것이 좋습니다.",
     fields: [bool("visible", "표시"), t("label", "섹션 라벨"), ta("title", "제목", "hard"), ta("lead", "설명", "soft")],
     lists: [{ key: "items", label: "질문", itemLabel: "질문", fields: [t("q", "질문"), ta("a", "답변", "hard")], min: 1, max: 20 }],
     defaults: {
