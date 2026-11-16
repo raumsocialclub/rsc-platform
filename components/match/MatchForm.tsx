@@ -31,7 +31,7 @@ export type MatchCopy = {
   submitLabel: string; submittingLabel: string; submitNote: string; doneTitle: string; doneBody: string; doneHome: string;
 };
 export const DEFAULT_MATCH_COPY: MatchCopy = {
-  title: "내게 맞는 인연 알아보기", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
+  title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
   photoPick: "사진 선택하기", photoChange: "다른 사진 고르기", photoLater: "나중에 올릴게요", photoNote: "사진이 있으면 매칭이 훨씬 빨라져요.\n지금 어렵다면 나중에 매니저에게 보내주셔도 괜찮아요.", photoRule: "jpg · png · webp · heic / 10MB 이하",
   consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 만남 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인·부모님 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 이성을 볼 때 중요한 요소와 상세, 알게 된 경로, 사진(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
   consentPurpose: "1:1 매칭 가입 상담의 준비(담당 매니저가 기본 정보와 희망 조건을 미리 확인)와 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 제출되지 않습니다. 선택 항목은 비워 두어도 됩니다.",

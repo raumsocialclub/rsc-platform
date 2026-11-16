@@ -131,7 +131,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
 
   return (
     <div className="bg-white border border-[rgba(112,115,124,.08)] p-[26px]">
-      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : inquiry.answers?.form === "match" ? "프로필 진단 응답 (내게 맞는 인연 알아보기)" : "신청 상세"}</div>
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : inquiry.answers?.form === "match" ? "프로필 진단 응답 (3분 프로필 진단)" : "신청 상세"}</div>
       <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}</div>
       <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
 

@@ -557,16 +557,16 @@ export const DOCS: DocDef[] = [
   {
     id: "match.cta",
     page: "matching",
-    label: "「내게 맞는 인연 알아보기」 플로팅 버튼",
-    description: "공개 페이지 아래에 떠 있는 프로필 진단(/match-check) 버튼과 그 위 말풍선. 말풍선은 몇 초마다 다음 문구로 바뀝니다. 상담 신청·설문·진단 화면과 어드민에서는 보이지 않습니다.",
-    fields: [bool("visible", "버튼 보이기"), t("label", "버튼 문구"), link("href", "버튼 링크"), t("hint", "버튼 아래 작은 안내(비우면 없음)")],
-    lists: [{ key: "hooks", label: "말풍선 문구", itemLabel: "문구", min: 1, max: 6, fields: [t("title", "굵은 줄"), t("body", "작은 줄")] }],
+    label: "프로필 진단 플로팅 버튼",
+    description: "공개 페이지 아래에 떠 있는 프로필 진단(/match-check) 버튼과 그 위 말풍선. 「문구 세트」는 버튼 문구 + 말풍선 두 줄이 한 묶음이며 몇 초마다 다음 세트로 함께 바뀝니다. 세트의 버튼 문구를 비우면 아래 기본 버튼 문구가 쓰입니다. 상담 신청·설문·진단 화면과 어드민에서는 보이지 않습니다.",
+    fields: [bool("visible", "버튼 보이기"), t("label", "기본 버튼 문구 (세트에 버튼 문구가 없을 때)"), link("href", "버튼 링크"), t("hint", "버튼 아래 작은 안내(비우면 없음)")],
+    lists: [{ key: "hooks", label: "문구 세트", itemLabel: "세트", min: 1, max: 6, fields: [t("label", "버튼 문구"), t("title", "말풍선 굵은 줄"), t("body", "말풍선 작은 줄")] }],
     defaults: {
-      visible: true, label: "내게 맞는 인연 알아보기", href: "/match-check", hint: "",
+      visible: true, label: "프로필 남기고 소개 받기", href: "/match-check", hint: "",
       hooks: [
-        { title: "지금의 나로, 내 인연을 만나보세요", body: "3분이면 충분해요 · 담당 매니저가 직접 연락드려요" },
-        { title: "프로필 한 장이 만남으로 이어져요", body: "검증된 싱글 회원 중 어울리는 한 분을 소개합니다" },
-        { title: "한 살이라도 빠를 때가 유리해요", body: "가입비 공개 · 실제로 만난 경우에만 차감" },
+        { label: "나에게 맞는 소개 받기", title: "3분 프로필로 시작하는 1:1 소개", body: "검증된 회원 중 어울리는 한 분을 디렉터가 직접 소개합니다" },
+        { label: "내 매칭 방향 알아보기", title: "지금 나와 어울리는 분은 누구일까요?", body: "프로필을 남기면 담당 디렉터가 매칭 방향을 안내해 드려요" },
+        { label: "프로필 남기고 상담 받기", title: "라움의 공간에서 시작하는 진지한 만남", body: "가입비 공개 · 실제로 만난 경우에만 차감 · 성혼사례금 없음" },
       ],
     },
   },
@@ -576,7 +576,7 @@ export const DOCS: DocDef[] = [
     label: "프로필 진단 화면 (/match-check)",
     description: "한 화면에 한 질문씩 묻는 프로필 진단의 공통 문구. 질문과 선택지 자체는 코드(lib/match/schema.ts)에서 관리합니다. 동의 문구는 개인정보처리방침과 내용이 맞아야 합니다.",
     fields: [
-      t("title", "화면 이름(브라우저 제목·메타)"), t("closeLabel", "오른쪽 위 닫기 문구"), t("prevLabel", "이전 버튼"), t("nextLabel", "다음 버튼"), t("confirmLabel", "복수 선택 확인 버튼"), t("skipLabel", "건너뛰기 문구"), t("enterHint", "입력칸 아래 Enter 안내(데스크톱)"),
+      t("title", "화면 이름(완료 화면 등 공통)"), t("closeLabel", "오른쪽 위 닫기 문구"), t("prevLabel", "이전 버튼"), t("nextLabel", "다음 버튼"), t("confirmLabel", "복수 선택 확인 버튼"), t("skipLabel", "건너뛰기 문구"), t("enterHint", "입력칸 아래 Enter 안내(데스크톱)"),
       t("photoPick", "사진 선택 버튼"), t("photoChange", "다른 사진 고르기 버튼"), t("photoLater", "사진 건너뛰기 문구"), ta("photoNote", "사진 화면 아래 안내", "hard"), t("photoRule", "사진 형식·용량 안내"),
       t("consentTitle", "개인정보 동의 체크 문구"), ta("consentCollect", "동의: 수집 항목"), ta("consentPurpose", "동의: 이용 목적"), t("consentRetention", "동의: 보관 기간"), t("consentRefuse", "동의: 거부 시"), ta("consentMore", "동의 아래 안내", undefined, "{privacy} 자리에 개인정보처리방침 링크, {terms} 자리에 이용약관 링크가 들어갑니다"),
       t("sensitiveTitle", "민감정보 동의 체크 문구"), ta("sensitiveItems", "민감정보: 수집 항목"), t("sensitivePurpose", "민감정보: 이용 목적"), t("sensitiveRetention", "민감정보: 보관 기간"), ta("sensitiveRefuse", "민감정보: 거부 시"),
@@ -585,7 +585,7 @@ export const DOCS: DocDef[] = [
       t("doneTitle", "접수 완료 제목"), ta("doneBody", "접수 완료 안내", "soft"), t("doneHome", "접수 완료 버튼 문구"),
     ],
     defaults: {
-      title: "내게 맞는 인연 알아보기", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
+      title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
       photoPick: "사진 선택하기", photoChange: "다른 사진 고르기", photoLater: "나중에 올릴게요", photoNote: "사진이 있으면 매칭이 훨씬 빨라져요.\n지금 어렵다면 나중에 매니저에게 보내주셔도 괜찮아요.", photoRule: "jpg · png · webp · heic / 10MB 이하",
       consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 만남 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인·부모님 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 이성을 볼 때 중요한 요소와 상세, 알게 된 경로, 사진(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
       consentPurpose: "1:1 매칭 가입 상담의 준비(담당 매니저가 기본 정보와 희망 조건을 미리 확인)와 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 제출되지 않습니다. 선택 항목은 비워 두어도 됩니다.",
