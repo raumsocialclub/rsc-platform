@@ -57,7 +57,7 @@ export function MatchCta({ visible, label, href, hint, hooks }: MatchCtaProps) {
               </span>
               <span className="min-w-0">
                 {hook.title && <b className="block t-label-1 font-bold text-label truncate">{hook.title}</b>}
-                {hook.body && <span className="block t-caption-1 text-labelAlt truncate">{hook.body}</span>}
+                {hook.body && <span className="block t-caption-1 text-labelAlt line-clamp-2 text-pretty">{hook.body}</span>}
               </span>
             </div>
             <span aria-hidden className="absolute left-1/2 -bottom-[7px] -translate-x-1/2 w-[14px] h-[14px] rotate-45 bg-white border-r border-b border-lineAlt" />
