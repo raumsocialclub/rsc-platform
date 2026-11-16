@@ -553,6 +553,51 @@ export const DOCS: DocDef[] = [
   },
 
   /* ---------- 상담 신청 (/fit-check) ---------- */
+  /* ---------- 프로필 진단 (/match-check) + 플로팅 버튼 (2026-11-16, 1:1 매칭 DB 수집) ---------- */
+  {
+    id: "match.cta",
+    page: "matching",
+    label: "「내게 맞는 인연 알아보기」 플로팅 버튼",
+    description: "공개 페이지 아래에 떠 있는 프로필 진단(/match-check) 버튼과 그 위 말풍선. 말풍선은 몇 초마다 다음 문구로 바뀝니다. 상담 신청·설문·진단 화면과 어드민에서는 보이지 않습니다.",
+    fields: [bool("visible", "버튼 보이기"), t("label", "버튼 문구"), link("href", "버튼 링크"), t("hint", "버튼 아래 작은 안내(비우면 없음)")],
+    lists: [{ key: "hooks", label: "말풍선 문구", itemLabel: "문구", min: 1, max: 6, fields: [t("title", "굵은 줄"), t("body", "작은 줄")] }],
+    defaults: {
+      visible: true, label: "내게 맞는 인연 알아보기", href: "/match-check", hint: "",
+      hooks: [
+        { title: "지금의 나로, 내 인연을 만나보세요", body: "3분이면 충분해요 · 담당 매니저가 직접 연락드려요" },
+        { title: "프로필 한 장이 만남으로 이어져요", body: "검증된 싱글 회원 중 어울리는 한 분을 소개합니다" },
+        { title: "한 살이라도 빠를 때가 유리해요", body: "가입비 공개 · 실제로 만난 경우에만 차감" },
+      ],
+    },
+  },
+  {
+    id: "match.form",
+    page: "matching",
+    label: "프로필 진단 화면 (/match-check)",
+    description: "한 화면에 한 질문씩 묻는 프로필 진단의 공통 문구. 질문과 선택지 자체는 코드(lib/match/schema.ts)에서 관리합니다. 동의 문구는 개인정보처리방침과 내용이 맞아야 합니다.",
+    fields: [
+      t("title", "화면 이름(브라우저 제목·메타)"), t("closeLabel", "오른쪽 위 닫기 문구"), t("prevLabel", "이전 버튼"), t("nextLabel", "다음 버튼"), t("confirmLabel", "복수 선택 확인 버튼"), t("skipLabel", "건너뛰기 문구"), t("enterHint", "입력칸 아래 Enter 안내(데스크톱)"),
+      t("photoPick", "사진 선택 버튼"), t("photoChange", "다른 사진 고르기 버튼"), t("photoLater", "사진 건너뛰기 문구"), ta("photoNote", "사진 화면 아래 안내", "hard"), t("photoRule", "사진 형식·용량 안내"),
+      t("consentTitle", "개인정보 동의 체크 문구"), ta("consentCollect", "동의: 수집 항목"), ta("consentPurpose", "동의: 이용 목적"), t("consentRetention", "동의: 보관 기간"), t("consentRefuse", "동의: 거부 시"), ta("consentMore", "동의 아래 안내", undefined, "{privacy} 자리에 개인정보처리방침 링크, {terms} 자리에 이용약관 링크가 들어갑니다"),
+      t("sensitiveTitle", "민감정보 동의 체크 문구"), ta("sensitiveItems", "민감정보: 수집 항목"), t("sensitivePurpose", "민감정보: 이용 목적"), t("sensitiveRetention", "민감정보: 보관 기간"), ta("sensitiveRefuse", "민감정보: 거부 시"),
+      t("marketingTitle", "마케팅 수신 동의 체크 문구"), ta("marketingPurpose", "마케팅 목적"), t("marketingMethod", "마케팅 수신 방법"), ta("marketingItems", "마케팅 이용 항목"), ta("marketingRetention", "마케팅 보유·이용 기간"), ta("marketingNote", "마케팅 안내 아래 설명"),
+      t("submitLabel", "제출 버튼 문구"), t("submittingLabel", "제출 중 버튼 문구"), ta("submitNote", "제출 버튼 아래 안내", "soft"),
+      t("doneTitle", "접수 완료 제목"), ta("doneBody", "접수 완료 안내", "soft"), t("doneHome", "접수 완료 버튼 문구"),
+    ],
+    defaults: {
+      title: "내게 맞는 인연 알아보기", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
+      photoPick: "사진 선택하기", photoChange: "다른 사진 고르기", photoLater: "나중에 올릴게요", photoNote: "사진이 있으면 매칭이 훨씬 빨라져요.\n지금 어렵다면 나중에 매니저에게 보내주셔도 괜찮아요.", photoRule: "jpg · png · webp · heic / 10MB 이하",
+      consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 만남 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인·부모님 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 이성을 볼 때 중요한 요소와 상세, 알게 된 경로, 사진(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
+      consentPurpose: "1:1 매칭 가입 상담의 준비(담당 매니저가 기본 정보와 희망 조건을 미리 확인)와 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 제출되지 않습니다. 선택 항목은 비워 두어도 됩니다.",
+      consentMore: "자세한 내용은 {privacy}에서 확인하실 수 있습니다. 사이트 이용 조건은 {terms}을 참고해 주세요.",
+      sensitiveTitle: "종교·건강 정보(민감정보) 수집·이용 동의", sensitiveItems: "종교, 신체적 특이사항(질병·장애 여부 등) — 개인정보 보호법 제23조의 민감정보", sensitivePurpose: "1:1 매칭 상담에서 희망 조건과의 적합성 확인", sensitiveRetention: "프로필 진단 응답과 함께 접수일로부터 최대 180일", sensitiveRefuse: "동의하지 않아도 제출과 상담에 제한이 없습니다. 동의하지 않으면 종교·건강 답변은 저장되지 않습니다.",
+      marketingTitle: "마케팅 정보 수신 동의", marketingPurpose: "1:1 매칭 서비스의 맞춤 제안, 이벤트·프로모션 안내, 재상담 안내", marketingMethod: "전화, 문자, 카카오톡", marketingItems: "이름, 휴대폰 번호, 거주지역, 관심 방식·상담 이력", marketingRetention: "수신 동의 철회 시까지 (법령에 따라 2년마다 수신 동의 여부를 확인합니다)",
+      marketingNote: "동의하지 않아도 상담 및 기본 서비스 이용에는 제한이 없습니다. 수신 동의는 전화(02-6925-4786)나 이메일로 언제든 철회할 수 있습니다.",
+      submitLabel: "제출하고 매니저 연락 받기", submittingLabel: "보내는 중…", submitNote: "제출은 회원 가입이 아니며, 담당 매니저가 연락드린 뒤 상담이 진행됩니다.",
+      doneTitle: "프로필이 접수되었습니다", doneBody: "담당 매니저가 남겨주신 번호로 연락드려 어울리는 만남의 방향을 안내해 드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.", doneHome: "홈으로 돌아가기",
+    },
+  },
+
   {
     id: "apply.form",
     page: "apply",

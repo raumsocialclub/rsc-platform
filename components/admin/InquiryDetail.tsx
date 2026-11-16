@@ -21,7 +21,11 @@ export type InquiryRow = {
   created_at: string;
   /** 저장 항목은 route·slot 뿐. answers 배열은 설문 원본을 저장하던 이전 신청에만 남아 있다. */
   answers: {
-    form?: string;          // "apply" = 상담 전 설문(/apply) 응답
+    form?: string;          // "apply" = 상담 전 설문(/apply) 응답 · "match" = 프로필 진단(/match-check) 응답 (2026-11-16)
+    match?: Record<string, string | string[]>;  // 프로필 진단 응답 원본(키-값)
+    photo?: string;         // 프로필 진단 사진의 버킷 경로(match-photos). 어드민은 /api/admin/inquiries/:id/photo 로 본다
+    source?: string;        // 프로필 진단의 「알게 된 경로」
+    sensitiveConsentAt?: string; // 종교·건강(민감정보) 별도 동의 시각
     linkId?: string;        // 응답이 들어온 설문 링크(apply_links.id)
     ref?: string;           // /apply?ref=코드 (추천인·직접 전달 링크)
     apply?: Record<string, string | string[]>;  // 상담 전 설문 응답 원본(키-값). CSV·목록 요약에 쓴다
@@ -112,10 +116,12 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   const rows: { q: string; a: string }[] = [
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
     ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : inquiryTrack(inquiry) ? [{ q: "관심 방식", a: trackLabel(inquiry) }] : a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
+    ...(a.form === "match" ? [{ q: "사진", a: a.photo ? "올림 (아래 「사진 보기」)" : "없음 (나중에 받기로 함)" }] : []),
     ...(entryLabel(inquiry) ? [{ q: "들어온 경로", a: entryLabel(inquiry) }] : []),
     ...profileRows(a),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
     ...(a.consentAt ? [{ q: "개인정보 동의", a: `${fmtDate(a.consentAt, true)}${a.consentVersion ? ` · 동의문 ${a.consentVersion}` : ""}` }] : []),
+    ...(a.sensitiveConsentAt ? [{ q: "민감정보 동의", a: fmtDate(a.sensitiveConsentAt, true) }] : []),
     ...(a.marketing === true ? [{ q: "마케팅 수신", a: `동의${a.marketingAt ? ` · ${fmtDate(a.marketingAt, true)}` : ""}${a.marketingVersion ? ` · 동의문 ${a.marketingVersion}` : ""}` }] : a.marketing === false ? [{ q: "마케팅 수신", a: "미동의" }] : []),
     ...(inquiry.utm?.utm_source ? [{ q: "유입 광고", a: [inquiry.utm.utm_source, inquiry.utm.utm_medium].filter(Boolean).join(" / ") }] : []),
     ...(inquiry.utm?.utm_campaign ? [{ q: "캠페인", a: inquiry.utm.utm_campaign }] : []),
@@ -125,7 +131,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
 
   return (
     <div className="bg-white border border-[rgba(112,115,124,.08)] p-[26px]">
-      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : "신청 상세"}</div>
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : inquiry.answers?.form === "match" ? "프로필 진단 응답 (내게 맞는 인연 알아보기)" : "신청 상세"}</div>
       <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}</div>
       <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
 
@@ -164,6 +170,12 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
         </div>
       )}
       {issued && <div className="mb-[16px]"><IssuedCodeBox code={issued.code} expiresAt={issued.expiresAt} notify={issued.notify} /></div>}
+      {inquiry.answers?.form === "match" && inquiry.answers.photo && (
+        <div className="bg-white p-[14px] mb-[16px] text-[13px] flex items-center gap-[10px]">
+          <span className="text-[11px] tracking-[.02em] text-primaryStrong">사진</span>
+          <a href={`/api/admin/inquiries/${inquiry.id}/photo`} target="_blank" rel="noreferrer" className={`${BTN_SECONDARY} !h-[32px] !px-[12px] text-[12px]`}>사진 보기 (새 창 · 5분 링크)</a>
+        </div>
+      )}
       {inquiry.answers?.form === "apply" && (
         <div className="bg-white p-[14px] mb-[16px] text-[13px]">
           <span className="text-[11px] tracking-[.02em] text-primaryStrong mr-[8px]">설문 링크</span>

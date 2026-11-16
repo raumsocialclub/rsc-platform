@@ -53,6 +53,9 @@
 /* 채널톡 버튼(우하단 48~60px)이 떠 있으면 「맨 위로」 버튼을 그 위로 올린다 — components/site/ChannelTalk.tsx 가 html[data-chat] 을 켠다 */
 html[data-chat] .up-button { bottom: 92px; }
 @media (min-width: 761px) { html[data-chat] .up-button { bottom: 104px; } }
+/* 「내게 맞는 인연 알아보기」 플로팅 버튼(components/site/MatchCta.tsx, html[data-match-cta])이 떠 있으면 좁은 화면에서 「맨 위로」 버튼을 그 위로 올린다 */
+html[data-match-cta] .up-button { bottom: 150px; }
+html[data-match-cta][data-chat] .up-button { bottom: 150px; }
 
 @layer base {
   html {

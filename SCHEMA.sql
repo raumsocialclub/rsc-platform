@@ -746,3 +746,21 @@ create or replace function purge_withdrawn_marketing_consents() returns void lan
 $$;
 revoke all on function purge_withdrawn_marketing_consents() from public, anon, authenticated;
 select cron.schedule('purge-withdrawn-marketing-consents', '47 3 * * *', $$select public.purge_withdrawn_marketing_consents()$$);
+
+-- ---------- 2026-11-16: 프로필 진단 「내게 맞는 인연 알아보기」(/match-check, 1:1 매칭 DB 수집). 응답은 inquiries 에 answers.form = 'match' 행으로 쌓인다(별도 표 없음).
+-- 사진 1장은 비공개 버킷 match-photos(파일당 10MB · jpg/png/webp/heic), 경로 inbox/<uuid>/photo.<확장자>. 브라우저가 /api/match/upload-url 의 서명 URL 로 직접 올리고
+-- 제출 때 경로만 보내면 서버(/api/match)가 버킷에 실제로 있는지 확인한 뒤 answers.photo 에 기록. 어드민은 /api/admin/inquiries/:id/photo 로 5분짜리 서명 URL 을 받아 본다.
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('match-photos', 'match-photos', false, 10485760)
+on conflict (id) do update set public = false, file_size_limit = 10485760;
+create policy "match photos admin read" on storage.objects for select using (bucket_id = 'match-photos' and public.is_admin());
+create policy "match photos admin delete" on storage.objects for delete using (bucket_id = 'match-photos' and public.is_admin());
+-- 보관 180일: 상담 신청 행과 함께 사진도 지운다. 제출되지 않은 채 하루 지난 업로드(inbox 고아 파일)도 지운다. (크론 purge-expired-inquiries 는 그대로)
+create or replace function purge_expired_inquiries() returns void language sql security definer set search_path = public as $$
+  delete from storage.objects o where o.bucket_id = 'match-photos' and exists (
+    select 1 from inquiries i where i.answers->>'photo' = o.name and i.created_at < now() - interval '180 days');
+  delete from inquiries where created_at < now() - interval '180 days';
+  delete from storage.objects o where o.bucket_id = 'match-photos' and o.created_at < now() - interval '1 day' and not exists (
+    select 1 from inquiries i where i.answers->>'photo' = o.name);
+$$;
+revoke all on function purge_expired_inquiries() from public, anon, authenticated;

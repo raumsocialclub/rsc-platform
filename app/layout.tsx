@@ -4,10 +4,11 @@ import { PageTracker } from "@/components/site/PageTracker";
 import { EnvBanner } from "@/components/site/EnvBanner";
 import { MetaPixel } from "@/components/site/MetaPixel";
 import { ChannelTalk } from "@/components/site/ChannelTalk";
+import { MatchCta } from "@/components/site/MatchCta";
 import { RevealObserver } from "@/components/site/RevealObserver";
 import { getSettings } from "@/lib/settings/get";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getBrand, getTheme, hexToRgb } from "@/lib/cms/get";
+import { getBrand, getDoc, getTheme, hexToRgb, list, on, s as str } from "@/lib/cms/get";
 import { getSeo, robotsFor, siteUrl, absUrl } from "@/lib/seo/get";
 import { organizationJsonLd } from "@/lib/seo/jsonld";
 import "./globals.css";
@@ -41,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * 어드민은 app/admin/layout.tsx 에서 기본 파랑으로 되돌려 운영 화면은 테마와 무관하게 유지한다.
  */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [t, org, settings] = await Promise.all([getTheme(), organizationJsonLd(), getSettings()]);
+  const [t, org, settings, cta] = await Promise.all([getTheme(), organizationJsonLd(), getSettings(), getDoc("match.cta")]);
   const css = `:root{--c-cream:${t.cream};--c-ink:${t.ink};--c-brown:${t.brown};--c-brownHover:${t.brownHover};--c-gold:${t.gold};--c-goldHover:${t.goldHover};--c-sand:${t.sand};--c-sandDeep:${t.sandDeep};--ds-primary:${t.brown};--ds-primary-strong:${t.brownHover};--ds-primary-heavy:${t.brownHover};--ds-primary-rgb:${hexToRgb(t.brown)};--ds-inverse-primary:${t.gold};--ds-label:${t.ink}}`;
   return (
     <html lang="ko" className={`${pretendard.variable} h-full antialiased`}>
@@ -56,6 +57,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <RevealObserver />
         <MetaPixel pixelId={settings.metaPixelId} />
         <ChannelTalk pluginKey={settings.channelTalkPluginKey} />
+        {/* 「내게 맞는 인연 알아보기」 플로팅 버튼 (CMS match.cta, 2026-11-16) — 공개 페이지에서만 그려진다 */}
+        <MatchCta visible={on(cta, "visible")} label={str(cta, "label")} href={str(cta, "href")} hint={str(cta, "hint")} hooks={list<{ title: string; body: string }>(cta, "hooks")} />
       </body>
     </html>
   );
