@@ -53,9 +53,12 @@
 /* 채널톡 버튼(우하단 48~60px)이 떠 있으면 「맨 위로」 버튼을 그 위로 올린다 — components/site/ChannelTalk.tsx 가 html[data-chat] 을 켠다 */
 html[data-chat] .up-button { bottom: 92px; }
 @media (min-width: 761px) { html[data-chat] .up-button { bottom: 104px; } }
-/* 「내게 맞는 인연 알아보기」 플로팅 버튼(components/site/MatchCta.tsx, html[data-match-cta])이 떠 있으면 좁은 화면에서 「맨 위로」 버튼을 그 위로 올린다 */
-html[data-match-cta] .up-button { bottom: 150px; }
-html[data-match-cta][data-chat] .up-button { bottom: 150px; }
+/* 프로필 진단 플로팅 버튼(components/site/MatchCta.tsx, html[data-match-cta]): 좁은 화면에서는 버튼이 가로를 거의 다 차지하므로
+   「맨 위로」 버튼은 숨기고, 채널톡 버튼(html[data-chat], 우하단)이 있으면 플로팅 버튼을 그 위로 올린다. 데스크톱은 가운데 배치라 서로 겹치지 않는다 */
+@media (max-width: 760px) {
+  html[data-match-cta] .up-button { display: none; }
+  html[data-chat] .match-cta { padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important; }
+}
 
 @layer base {
   html {
