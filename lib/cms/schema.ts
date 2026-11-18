@@ -20,7 +20,7 @@ export type Field = {
 export type ListDef = { key: string; label: string; itemLabel: string; fields: Field[]; min?: number; max?: number };
 export type DocDef = {
   id: string;
-  page: "global" | "home" | "social" | "matching" | "apply" | "news" | "partner" | "pricing" | "benefits" | "legal" | "settings" | "seo";
+  page: "global" | "home" | "social" | "matching" | "apply" | "survey" | "news" | "partner" | "pricing" | "benefits" | "legal" | "settings" | "seo";
   label: string;
   description?: string;
   /** 「사이트에서 보기」가 이동할 섹션 앵커 (예: "#faq") */
@@ -552,6 +552,45 @@ export const DOCS: DocDef[] = [
     defaults: { title: "1:1 매칭, 상담으로 시작해 보세요", body: "이름과 연락처만 남기면 담당자가 직접 연락드립니다. 가입이 아닌 상담 신청이며, 비용은 없습니다.", ctaLabel: "1:1 매칭 상담 신청" },
   },
 
+  /* ---------- 회원 설문조사 (/s/<토큰>, 2026-11-18 문자 발송용 비밀 링크) ---------- */
+  {
+    id: "survey.form",
+    page: "survey",
+    label: "설문 화면 공통 문구",
+    description: "모든 회원 설문조사 화면의 버튼·마지막 화면(이름·휴대폰 뒤 4자리 선택 입력)·동의·완료 문구. 질문과 선택지는 코드(lib/survey/definitions.ts)에서 관리합니다. 동의 문구는 개인정보처리방침 제2조 제5-5호와 내용이 맞아야 합니다.",
+    fields: [
+      t("closeLabel", "오른쪽 위 닫기 문구"), t("startLabel", "첫 화면 시작 버튼"), t("prevLabel", "이전 버튼"), t("nextLabel", "다음 버튼"), t("otherPlaceholder", "「기타」 입력칸 안내"), t("periodLabel", "첫 화면 응답 기간 라벨"), t("minutesLabel", "시작 버튼 아래 소요시간 안내", undefined, "{minutes} 자리에 분 수가 들어갑니다"),
+      t("finalTitle", "마지막 화면 제목"), ta("finalSub", "마지막 화면 설명"), t("nameLabel", "이름 칸 라벨"), t("namePlaceholder", "이름 칸 예시"), t("phone4Label", "휴대폰 뒤 4자리 칸 라벨"), t("phone4Placeholder", "뒤 4자리 칸 예시"), t("identifyNote", "입력칸 아래 안내"),
+      t("consentTitle", "개인정보 동의 체크 문구"), ta("consentCollect", "동의: 수집 항목"), ta("consentPurpose", "동의: 이용 목적"), ta("consentRetention", "동의: 보관 기간"), ta("consentRefuse", "동의: 거부 시"), ta("consentMore", "동의 아래 안내", undefined, "{privacy} 자리에 개인정보처리방침 링크가 들어갑니다"),
+      t("submitLabel", "제출 버튼"), t("submittingLabel", "제출 중 버튼"), ta("submitNote", "제출 버튼 아래 안내", "soft"), t("doneHome", "완료 화면 버튼"), t("againLabel", "다시 응답하기 문구"), t("alreadyTitle", "이미 응답한 기기 제목"), ta("alreadyBody", "이미 응답한 기기 안내", "hard"),
+    ],
+    defaults: {
+      closeLabel: "닫기 ✕", startLabel: "시작하기", prevLabel: "이전", nextLabel: "다음", otherPlaceholder: "직접 적어 주세요", periodLabel: "응답 기간", minutesLabel: "약 {minutes}분이면 충분해요",
+      finalTitle: "마지막이에요. 응답자 확인을 도와주세요.", finalSub: "이름과 휴대폰 뒤 4자리는 선택 사항이에요. 남겨 주시면 응답자 혜택 안내와 중복 응답 확인에만 쓰고, 개별 응답 내용은 다른 회원에게 공개되지 않아요.",
+      nameLabel: "이름 (선택)", namePlaceholder: "예) 김라움", phone4Label: "휴대폰 뒤 4자리 (선택)", phone4Placeholder: "예) 1234", identifyNote: "비워 두면 무기명으로 제출돼요.",
+      consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 휴대폰 번호 뒤 4자리(선택)", consentPurpose: "설문 응답자 확인(응답자 혜택 안내, 중복 응답 확인)과 회원별 선호 파악", consentRetention: "응답일로부터 1년, 이후 이름·뒤 4자리는 자동 삭제(응답 내용은 통계로만 남습니다)", consentRefuse: "동의하지 않으면 이름·뒤 4자리 없이 무기명으로 제출할 수 있습니다.",
+      consentMore: "자세한 내용은 {privacy}에서 확인하실 수 있습니다.",
+      submitLabel: "제출하기", submittingLabel: "보내는 중…", submitNote: "제출 후에는 답을 수정할 수 없어요. 문의: 02-6925-4786", doneHome: "홈으로 돌아가기", againLabel: "다시 응답하기",
+      alreadyTitle: "이미 응답해 주셨어요", alreadyBody: "이 기기에서 이미 설문을 제출하셨습니다. 감사합니다!\n다른 분의 응답이라면 아래 「다시 응답하기」를 눌러 주세요.",
+    },
+  },
+  {
+    id: "survey.demand2027",
+    page: "survey",
+    label: "2027 프로그램 수요조사 — 첫 화면 · 완료 · 문자 문구",
+    description: "문자로 보내는 「2027 프로그램 수요조사」의 첫 화면 안내와 완료 문구, 어드민 「문자 문구 복사」에 쓰이는 발송 문구 초안. 질문 5개(관심 분야 1·2순위, 네트워킹 방식, 규모, 참여비, 중요 요소)는 코드에 있습니다.",
+    fields: [
+      t("eyebrow", "첫 화면 작은 제목"), t("title", "첫 화면 제목"), ta("intro", "첫 화면 안내", "hard"), t("note1", "안내 항목 1"), t("note2", "안내 항목 2"),
+      t("thanksTitle", "완료 제목"), ta("thanksBody", "완료 안내", "hard"), ta("sms", "문자 발송 문구 초안", "hard", "{link} 자리에 설문 주소가 들어갑니다. (광고) 표기와 무료수신거부 번호는 실제 번호로 바꿔 두세요"),
+    ],
+    defaults: {
+      eyebrow: "RAUM SOCIAL CLUB", title: "2027 프로그램 수요조사",
+      intro: "안녕하세요, RAUM SOCIAL CLUB입니다.\n아름다운 공간에서, 서로의 특별함을 발견하는 곳 — 2027년에도 라움의 공간에서 와인, 미식, 웰니스, 공연, 아트를 함께 즐기는 모임을 이어갑니다.\n모든 모임은 마지막에 함께 이야기 나누는 네트워킹 타임으로 마무리되고, 간단한 사전 확인을 거친 멤버들만 함께해요.\n어떤 모임이 가장 기대되는지 알려주세요.",
+      note1: "소요시간 약 1분 · 5문항", note2: "모든 응답은 통계 목적으로만 사용되며, 개별 응답 내용은 다른 회원에게 공개되지 않습니다.",
+      thanksTitle: "응답해 주셔서 감사합니다", thanksBody: "남겨주신 의견은 2027년 프로그램을 준비하는 데 소중하게 쓰겠습니다.\n라움의 공간에서 곧 다시 뵙겠습니다.",
+      sms: "(광고) [RAUM SOCIAL CLUB] 2027년, 어떤 모임을 열까요?\n\n▶ 소요시간: 1분 (5문항)\n▶ 참여링크: {link}\n\n*응답은 프로그램 기획 목적으로만 사용돼요.\n\n무료수신거부 080-000-0000",
+    },
+  },
   /* ---------- 상담 신청 (/fit-check) ---------- */
   /* ---------- 프로필 진단 (/match-check) + 플로팅 버튼 (2026-11-16, 1:1 매칭 DB 수집) ---------- */
   {
@@ -858,6 +897,7 @@ export const PAGES: { key: DocDef["page"]; label: string; preview: string }[] = 
   { key: "social", label: "소셜클럽", preview: "/social" },
   { key: "matching", label: "1:1 매칭", preview: "/matching" },
   { key: "apply", label: "상담 신청", preview: "/fit-check" },
+  { key: "survey", label: "회원 설문조사", preview: "/s" },
   { key: "news", label: "소식", preview: "/news" },
   { key: "partner", label: "제휴문의", preview: "/partner" },
   { key: "pricing", label: "가격 안내 (리드 모드에선 숨김)", preview: "/pricing" },

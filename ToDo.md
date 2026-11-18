@@ -164,5 +164,13 @@
 - [x] 플로팅 버튼 문구를 레퍼런스와 다르게 라움 톤으로 재작성 — 「문구 세트」(버튼 문구 + 말풍선 두 줄) 3종이 약 3초마다 함께 순환(CMS match.cta 세트마다 버튼 문구), 화면 이름·SEO·방침 표기 「3분 프로필 진단」. 모바일 가독성: 말풍선 두 줄 허용, ≤760px 에서 채널톡 위로 올리고 「맨 위로」 숨김 (360·390·430·768·1280px 확인)
 - [x] 운영 배포 (2026-11-16, 98ed887 · dpl_BJy7vd938wyaFcm9sA6XS5EzsKG4) — /match-check 200, 홈 플로팅 버튼 확인
 
+## M19. 회원 설문조사 — 문자 발송용 비밀 링크 「2027 프로그램 수요조사」 (사용자 요청, 2026-11-18)
+- [x] 문항 정의 `lib/survey/definitions.ts`(종류별, 첫 설문 demand2027): 기획 PDF 의 PART 1 기본 정보는 제외, PART 1 관심 프로그램 분야(TASTE TABLE · SOCIAL WELLNESS · ART WALK · ONE QUESTION SALON · AFTER HOURS · SOCIAL TIME · 기타, 1·2순위) + PART 2 모임 방식(네트워킹 방식 최대 2 · 규모 · 1회 참여비 · 중요 요소 최대 3 + 기타). 정제·집계(순위 점수)·CSV `lib/survey/export.ts`
+- [x] `/s/<토큰>` 한 화면 한 질문(`components/survey/SurveyForm.tsx`): 첫 화면 안내 → 순위형 배지 · 단일 자동 다음 · 복수 최대 수/배타(상관없음) · 「기타」 직접 입력 → 마지막 이름·휴대폰 뒤 4자리(선택, 적으면 동의 필수) → 완료. 임시 저장(sessionStorage) · 응답한 기기 표시(localStorage, 다시 응답하기). `/s` 단독·마감·잘못된 주소는 안내만. robots `/s` 제외 · noindex
+- [x] `POST /api/survey`(IP 10분 10회) → `survey_responses`. 어드민 `/admin/surveys`(링크 만들기 · 문자 문구 복사 · 마감/다시 열기 · 응답 수) · `/admin/surveys/:id`(문항별 비율 막대 · 순위 점수 · 기타 입력 · 응답 목록 · 중복 표시 · 주관리자 CSV). 사이드바 「설문조사」. CMS `survey.form`(공통 문구) · `survey.demand2027`(첫 화면·완료·문자 문구)
+- [x] DB: `surveys` · `survey_responses` + 관리자 RLS + `purge_expired_survey_identities`(1년 뒤 이름·뒤 4자리 삭제, 매일 03:52 UTC) — 운영 DB 적용 완료(2026-11-18, 마이그레이션 member_surveys). 개인정보처리방침 제1조·제2조 제5-5호·제3조·제4조 제1-2호·제9조·개정 이력 2026-11-18, 동의 버전 2026-11-18 (운영 DB `legal.privacy` 저장본도 md5 확인 후 갱신)
+- [x] 테스트 `tests/survey.test.ts`(12) — 총 244 통과. 스테이징 푸시(운영 배포는 지시 후)
+- [ ] 발송 전 확인: 문자 문구의 무료수신거부 번호(080) 실제 번호로, 응답자 혜택 문구 확정, 회원별 고유 링크(응답자 자동 식별)가 필요하면 별도 작업
+
 ## 2차 (별도 지시 후)
 - 멤버십 결제/분납(빌링키), 네이버 로그인, 지인 초대권 사용, 알림톡(솔라피) 전환, 사이트 이미지 CMS, 리마인더 자동 발송

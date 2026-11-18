@@ -764,3 +764,40 @@ create or replace function purge_expired_inquiries() returns void language sql s
     select 1 from inquiries i where i.answers->>'photo' = o.name);
 $$;
 revoke all on function purge_expired_inquiries() from public, anon, authenticated;
+
+-- ---------- 2026-11-18: 회원 설문조사 (/s/<토큰> 비밀 링크 → /admin/surveys). 문자로 회원에게 보내는 프로그램·행사 선호 조사. 문항은 코드(lib/survey/definitions.ts, kind 별).
+-- 응답은 survey_responses (문항 답 jsonb + 선택 입력한 이름·휴대폰 뒤 4자리). 저장은 /api/survey (service role) 만. 이름·뒤 4자리는 1년 뒤 자동 삭제(익명화), 답변은 통계로 남긴다 (개인정보처리방침 제4조 제1-2호).
+create table surveys (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null,                         -- 설문 정의 키 (예: demand2027)
+  token text not null unique,                 -- /s/<token> (22자 base64url 난수)
+  name text not null default '',              -- 설문 이름(용도, 예: 2027 수요조사 · 11월 발송)
+  memo text,
+  created_by uuid references members(id),
+  created_at timestamptz not null default now(),
+  closes_at timestamptz,                      -- 마감일(없으면 null = 관리자가 직접 마감)
+  closed_at timestamptz,                      -- 관리자 마감
+  last_response_at timestamptz
+);
+create table survey_responses (
+  id uuid primary key default gen_random_uuid(),
+  survey_id uuid not null references surveys(id) on delete cascade,
+  answers jsonb not null default '{}'::jsonb, -- 문항 키 → 값(문자열 또는 문자열 배열, 순위형은 배열 순서 = 순위)
+  name text,                                  -- 선택 입력. 1년 뒤 자동 삭제
+  phone_last4 text,                           -- 선택 입력(숫자 4자리). 1년 뒤 자동 삭제
+  consent_at timestamptz,                     -- 이름·뒤 4자리를 적은 경우의 개인정보 동의 시각
+  consent_version text,
+  created_at timestamptz not null default now()
+);
+create index survey_responses_survey_idx on survey_responses(survey_id, created_at desc);
+alter table surveys enable row level security;
+alter table survey_responses enable row level security;
+create policy "admin surveys" on surveys for all using (is_admin()) with check (is_admin());
+create policy "admin survey responses" on survey_responses for all using (is_admin()) with check (is_admin());
+-- 방문자 쪽 토큰 확인·제출 처리는 서버(service role)만 한다 (app/api/survey, app/(public)/s/[token])
+create or replace function purge_expired_survey_identities() returns void language sql security definer set search_path = public as $$
+  update survey_responses set name = null, phone_last4 = null, consent_at = null, consent_version = null
+  where created_at < now() - interval '1 year' and (name is not null or phone_last4 is not null or consent_at is not null);
+$$;
+revoke all on function purge_expired_survey_identities() from public, anon, authenticated;
+select cron.schedule('purge-expired-survey-identities', '52 3 * * *', $$select public.purge_expired_survey_identities()$$);
