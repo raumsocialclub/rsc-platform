@@ -169,7 +169,7 @@
 - [x] `/s/<토큰>` 한 화면 한 질문(`components/survey/SurveyForm.tsx`): 첫 화면 안내 → 순위형 배지 · 단일 자동 다음 · 복수 최대 수/배타(상관없음) · 「기타」 직접 입력 → 마지막 이름·휴대폰 뒤 4자리(선택, 적으면 동의 필수) → 완료. 임시 저장(sessionStorage) · 응답한 기기 표시(localStorage, 다시 응답하기). `/s` 단독·마감·잘못된 주소는 안내만. robots `/s` 제외 · noindex
 - [x] `POST /api/survey`(IP 10분 10회) → `survey_responses`. 어드민 `/admin/surveys`(링크 만들기 · 문자 문구 복사 · 마감/다시 열기 · 응답 수) · `/admin/surveys/:id`(문항별 비율 막대 · 순위 점수 · 기타 입력 · 응답 목록 · 중복 표시 · 주관리자 CSV). 사이드바 「설문조사」. CMS `survey.form`(공통 문구) · `survey.demand2027`(첫 화면·완료·문자 문구)
 - [x] DB: `surveys` · `survey_responses` + 관리자 RLS + `purge_expired_survey_identities`(1년 뒤 이름·뒤 4자리 삭제, 매일 03:52 UTC) — 운영 DB 적용 완료(2026-11-18, 마이그레이션 member_surveys). 개인정보처리방침 제1조·제2조 제5-5호·제3조·제4조 제1-2호·제9조·개정 이력 2026-11-18, 동의 버전 2026-11-18 (운영 DB `legal.privacy` 저장본도 md5 확인 후 갱신)
-- [x] 테스트 `tests/survey.test.ts`(12) — 총 244 통과. 스테이징 푸시(운영 배포는 지시 후)
+- [x] 테스트 `tests/survey.test.ts`(12) — 총 244 통과. 스테이징 확인 후 운영 배포 (2026-11-18, 195ab1c · dpl_4Hg7cE7X7KgzsjniXz96YqwEv4q2) — /s/<토큰> 200 · robots /s/ 제외 확인
 - [ ] 발송 전 확인: 문자 문구의 무료수신거부 번호(080) 실제 번호로, 응답자 혜택 문구 확정, 회원별 고유 링크(응답자 자동 식별)가 필요하면 별도 작업
 
 ## 2차 (별도 지시 후)
