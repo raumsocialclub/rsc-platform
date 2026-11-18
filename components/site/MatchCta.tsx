@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 
 /**
  * 프로필 진단 플로팅 버튼 (2026-11-16, 1:1 매칭 DB 수집). 공개 페이지 아래 가운데에 떠 있고, 위에 말풍선이 붙는다.
- * 「문구 세트」(버튼 문구 + 말풍선 두 줄)가 약 3초마다 함께 바뀐다(페이드 0.26초 포함) — 레퍼런스 문구를 그대로 쓰지 않도록 라움 톤으로 다시 쓴 세트 3개가 기본값(CMS match.cta).
- * 세트에 버튼 문구가 없으면 기본 버튼 문구(label)를 쓴다. 문구·링크·보이기는 CMS(match.cta). 상담 신청·설문·진단·회원 설문조사(/s) 화면, 어드민·로그인·결제 등에서는 보이지 않는다. 스크롤을 조금 내린 뒤 나타난다(첫 화면의 히어로를 가리지 않도록).
+ * 「문구 세트」(버튼 문구 + 말풍선 두 줄 + 선택 링크)가 약 3초마다 함께 바뀐다(페이드 0.26초 포함) — 소셜클럽 톤의 세트 3개(행사·공간 / 사람·분위기 / 자격·입회, 2026-11-18)가 기본값(CMS match.cta).
+ * 세트에 버튼 문구가 없으면 기본 버튼 문구(label)를, 세트에 링크가 없으면 기본 링크(href)를 쓴다(「이번 달 행사 보기」만 /social#social, 나머지는 /match-check). 문구·링크·보이기는 CMS(match.cta). 상담 신청·설문·진단·회원 설문조사(/s) 화면, 어드민·로그인·결제 등에서는 보이지 않는다. 스크롤을 조금 내린 뒤 나타난다(첫 화면의 히어로를 가리지 않도록).
  * 좁은 화면(≤760px)에서는 버튼이 거의 가로를 다 차지하므로 채널톡 버튼(html[data-chat])이 있으면 그 위로 올리고, 「맨 위로」 버튼은 숨긴다 (html[data-match-cta] — app/globals.css). 데스크톱은 가운데 배치라 겹치지 않는다.
  */
-export type MatchCtaProps = { visible: boolean; label: string; href: string; hint?: string; hooks: { label?: string; title: string; body: string }[] };
+export type MatchCtaProps = { visible: boolean; label: string; href: string; hint?: string; hooks: { label?: string; title: string; body: string; href?: string }[] };
 
 const HIDE = [/^\/match-check/, /^\/fit-check/, /^\/apply/, /^\/s(\/|$)/, /^\/admin/, /^\/login/, /^\/admin-invite/, /^\/checkout/, /^\/join/, /^\/auth/, /^\/api/, /^\/partner/];
 
@@ -46,6 +46,7 @@ export function MatchCta({ visible, label, href, hint, hooks }: MatchCtaProps) {
   if (!on) return null;
   const hook = list[i % Math.max(1, list.length)];
   const text = hook?.label || label;
+  const to = hook?.href || href;
   return (
     <div className={`match-cta fixed inset-x-0 bottom-0 z-[55] flex justify-center px-[16px] pointer-events-none transition-[opacity,transform] duration-500 ${shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[16px]"}`} style={{ paddingBottom: "calc(16px + env(safe-area-inset-bottom))" }} data-testid="match-cta">
       <div className="w-full max-w-[520px] pointer-events-auto">
@@ -63,7 +64,7 @@ export function MatchCta({ visible, label, href, hint, hooks }: MatchCtaProps) {
             <span aria-hidden className="absolute left-1/2 -bottom-[7px] -translate-x-1/2 w-[14px] h-[14px] rotate-45 bg-white border-r border-b border-lineAlt" />
           </div>
         )}
-        <Link href={href} className="group flex items-center justify-between gap-[12px] h-[60px] pl-[26px] pr-[8px] rounded-full text-white shadow-[0_12px_32px_rgba(var(--ds-primary-rgb),.38)] hover:shadow-[0_14px_36px_rgba(var(--ds-primary-rgb),.5)] hover:-translate-y-[2px] active:scale-[.985] transition-[transform,box-shadow] duration-200" style={{ background: "linear-gradient(100deg, var(--ds-primary) 0%, var(--ds-primary-strong) 55%, var(--c-gold) 130%)" }}>
+        <Link href={to} className="group flex items-center justify-between gap-[12px] h-[60px] pl-[26px] pr-[8px] rounded-full text-white shadow-[0_12px_32px_rgba(var(--ds-primary-rgb),.38)] hover:shadow-[0_14px_36px_rgba(var(--ds-primary-rgb),.5)] hover:-translate-y-[2px] active:scale-[.985] transition-[transform,box-shadow] duration-200" style={{ background: "linear-gradient(100deg, var(--ds-primary) 0%, var(--ds-primary-strong) 55%, var(--c-gold) 130%)" }}>
           <span className={`t-body-1 font-bold text-[18px] tracking-[-0.01em] truncate transition-opacity duration-300 ${fade ? "opacity-100" : "opacity-0"}`}>{text}</span>
           <span className="flex-none w-[44px] h-[44px] rounded-full bg-white/15 border border-white/40 flex items-center justify-center transition-[background-color] duration-200 group-hover:bg-white/25" aria-hidden>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>

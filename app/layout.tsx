@@ -58,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <MetaPixel pixelId={settings.metaPixelId} />
         <ChannelTalk pluginKey={settings.channelTalkPluginKey} />
         {/* 프로필 진단 플로팅 버튼 (CMS match.cta, 2026-11-16) — 공개 페이지에서만 그려진다 */}
-        <MatchCta visible={on(cta, "visible")} label={str(cta, "label")} href={str(cta, "href")} hint={str(cta, "hint")} hooks={list<{ label?: string; title: string; body: string }>(cta, "hooks")} />
+        <MatchCta visible={on(cta, "visible")} label={str(cta, "label")} href={str(cta, "href")} hint={str(cta, "hint")} hooks={list<{ label?: string; title: string; body: string; href?: string }>(cta, "hooks")} />
       </body>
     </html>
   );
