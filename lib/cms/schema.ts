@@ -616,7 +616,7 @@ export const DOCS: DocDef[] = [
     description: "한 화면에 한 질문씩 묻는 프로필 진단의 공통 문구. 질문과 선택지 자체는 코드(lib/match/schema.ts)에서 관리합니다. 동의 문구는 개인정보처리방침과 내용이 맞아야 합니다.",
     fields: [
       t("title", "화면 이름(완료 화면 등 공통)"), t("closeLabel", "오른쪽 위 닫기 문구"), t("prevLabel", "이전 버튼"), t("nextLabel", "다음 버튼"), t("confirmLabel", "복수 선택 확인 버튼"), t("skipLabel", "건너뛰기 문구"), t("enterHint", "입력칸 아래 Enter 안내(데스크톱)"),
-      t("photoPick", "사진 선택 버튼"), t("photoChange", "다른 사진 고르기 버튼"), t("photoLater", "사진 건너뛰기 문구"), ta("photoNote", "사진 화면 아래 안내", "hard"), t("photoRule", "사진 형식·용량 안내"),
+      t("photoPick", "사진 선택 버튼"), t("photoAdd", "사진 추가 버튼(1장 이상 올린 뒤)"), t("photoChange", "사진 삭제 버튼"), t("photoLater", "사진 건너뛰기 문구"), ta("photoNote", "사진 화면 아래 안내(비우면 없음)", "hard"), t("photoRule", "사진 형식·용량 안내"),
       t("consentTitle", "개인정보 동의 체크 문구"), ta("consentCollect", "동의: 수집 항목"), ta("consentPurpose", "동의: 이용 목적"), t("consentRetention", "동의: 보관 기간"), t("consentRefuse", "동의: 거부 시"), ta("consentMore", "동의 아래 안내", undefined, "{privacy} 자리에 개인정보처리방침 링크, {terms} 자리에 이용약관 링크가 들어갑니다"),
       t("sensitiveTitle", "민감정보 동의 체크 문구"), ta("sensitiveItems", "민감정보: 수집 항목"), t("sensitivePurpose", "민감정보: 이용 목적"), t("sensitiveRetention", "민감정보: 보관 기간"), ta("sensitiveRefuse", "민감정보: 거부 시"),
       t("marketingTitle", "마케팅 수신 동의 체크 문구"), ta("marketingPurpose", "마케팅 목적"), t("marketingMethod", "마케팅 수신 방법"), ta("marketingItems", "마케팅 이용 항목"), ta("marketingRetention", "마케팅 보유·이용 기간"), ta("marketingNote", "마케팅 안내 아래 설명"),
@@ -625,8 +625,8 @@ export const DOCS: DocDef[] = [
     ],
     defaults: {
       title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
-      photoPick: "사진 선택하기", photoChange: "다른 사진 고르기", photoLater: "나중에 올릴게요", photoNote: "사진이 있으면 매칭이 훨씬 빨라져요.\n지금 어렵다면 나중에 매니저에게 보내주셔도 괜찮아요.", photoRule: "jpg · png · webp · heic / 10MB 이하",
-      consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 만남 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인·부모님 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 이성을 볼 때 중요한 요소와 상세, 알게 된 경로, 사진(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
+      photoPick: "사진 선택하기", photoAdd: "사진 추가하기", photoChange: "삭제", photoLater: "나중에 올릴게요", photoNote: "", photoRule: "jpg · png · webp · heic / 장당 10MB 이하 · 최대 3장",
+      consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 활동 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 만남에서 중요하게 생각하는 항목, 알게 된 경로, 사진 최대 3장(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
       consentPurpose: "1:1 매칭 가입 상담의 준비(담당 매니저가 기본 정보와 희망 조건을 미리 확인)와 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 제출되지 않습니다. 선택 항목은 비워 두어도 됩니다.",
       consentMore: "자세한 내용은 {privacy}에서 확인하실 수 있습니다. 사이트 이용 조건은 {terms}을 참고해 주세요.",
       sensitiveTitle: "종교·건강 정보(민감정보) 수집·이용 동의", sensitiveItems: "종교, 신체적 특이사항(질병·장애 여부 등) — 개인정보 보호법 제23조의 민감정보", sensitivePurpose: "1:1 매칭 상담에서 희망 조건과의 적합성 확인", sensitiveRetention: "프로필 진단 응답과 함께 접수일로부터 최대 180일", sensitiveRefuse: "동의하지 않아도 제출과 상담에 제한이 없습니다. 동의하지 않으면 종교·건강 답변은 저장되지 않습니다.",

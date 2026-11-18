@@ -23,7 +23,8 @@ export type InquiryRow = {
   answers: {
     form?: string;          // "apply" = 상담 전 설문(/apply) 응답 · "match" = 프로필 진단(/match-check) 응답 (2026-11-16)
     match?: Record<string, string | string[]>;  // 프로필 진단 응답 원본(키-값)
-    photo?: string;         // 프로필 진단 사진의 버킷 경로(match-photos). 어드민은 /api/admin/inquiries/:id/photo 로 본다
+    photo?: string;         // 프로필 진단 사진의 버킷 경로(match-photos, 첫 장). 어드민은 /api/admin/inquiries/:id/photo?n= 로 본다
+    photos?: string[];      // 사진 경로 전체(최대 3장, 2026-11-18)
     source?: string;        // 프로필 진단의 「알게 된 경로」
     sensitiveConsentAt?: string; // 종교·건강(민감정보) 별도 동의 시각
     linkId?: string;        // 응답이 들어온 설문 링크(apply_links.id)
@@ -116,7 +117,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   const rows: { q: string; a: string }[] = [
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
     ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : inquiryTrack(inquiry) ? [{ q: "관심 방식", a: trackLabel(inquiry) }] : a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
-    ...(a.form === "match" ? [{ q: "사진", a: a.photo ? "올림 (아래 「사진 보기」)" : "없음 (나중에 받기로 함)" }] : []),
+    ...(a.form === "match" ? [{ q: "사진", a: (a.photos?.length ?? (a.photo ? 1 : 0)) ? `${a.photos?.length ?? 1}장 올림 (아래 「사진 보기」)` : "없음 (나중에 받기로 함)" }] : []),
     ...(entryLabel(inquiry) ? [{ q: "들어온 경로", a: entryLabel(inquiry) }] : []),
     ...profileRows(a),
     ...(a.slot ? [{ q: "상담 가능 시간", a: a.slot }] : []),
@@ -171,9 +172,11 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
       )}
       {issued && <div className="mb-[16px]"><IssuedCodeBox code={issued.code} expiresAt={issued.expiresAt} notify={issued.notify} /></div>}
       {inquiry.answers?.form === "match" && inquiry.answers.photo && (
-        <div className="bg-white p-[14px] mb-[16px] text-[13px] flex items-center gap-[10px]">
+        <div className="bg-white p-[14px] mb-[16px] text-[13px] flex items-center gap-[10px] flex-wrap">
           <span className="text-[11px] tracking-[.02em] text-primaryStrong">사진</span>
-          <a href={`/api/admin/inquiries/${inquiry.id}/photo`} target="_blank" rel="noreferrer" className={`${BTN_SECONDARY} !h-[32px] !px-[12px] text-[12px]`}>사진 보기 (새 창 · 5분 링크)</a>
+          {(inquiry.answers.photos?.length ? inquiry.answers.photos : [inquiry.answers.photo]).map((_, i, arr) => (
+            <a key={i} href={`/api/admin/inquiries/${inquiry.id}/photo?n=${i}`} target="_blank" rel="noreferrer" className={`${BTN_SECONDARY} !h-[32px] !px-[12px] text-[12px]`}>{arr.length > 1 ? `사진 ${i + 1} 보기` : "사진 보기"} (새 창 · 5분 링크)</a>
+          ))}
         </div>
       )}
       {inquiry.answers?.form === "apply" && (

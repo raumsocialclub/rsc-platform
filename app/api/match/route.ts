@@ -7,14 +7,14 @@ import { UTM_KEYS } from "@/lib/utm/client";
 import { MARKETING_CONSENT_VERSION, PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 import { MARKETING_CHANNELS } from "@/lib/inquiries/marketing";
 import { cleanEntryPath } from "@/lib/inquiries/track";
-import { SENSITIVE_KEYS, flattenMatchAnswers, missingMatchRequired, sanitizeMatchAnswers } from "@/lib/match/schema";
+import { MATCH_PHOTO_COUNT, SENSITIVE_KEYS, flattenMatchAnswers, missingMatchRequired, sanitizeMatchAnswers } from "@/lib/match/schema";
 import { isPhotoPath, verifyPhoto } from "@/lib/match/photo";
 
 /**
- * POST /api/match { answers, consent, sensitiveConsent?, marketing?, photo?, entryPath?, utm? } — 프로필 진단(/match-check) 제출.
+ * POST /api/match { answers, consent, sensitiveConsent?, marketing?, photos?, entryPath?, utm? } — 프로필 진단(/match-check) 제출.
  * 로그인 없이 누구나. 저장은 inquiries(서버 service role 전용) 한 행: 이름·휴대폰은 컬럼, 나머지는 answers 에
  *   form: "match" · track: "matching"(1:1 매칭 관심) · job/education/region/district(어드민 목록·CSV 의 「직업 · 학력 · 거주지」열이 그대로 읽음)
- *   · answers[](어드민 상세가 그대로 보여주는 질문·답 목록) · match(원본 키-값) · photo(버킷 경로) · 동의 시각·버전.
+ *   · answers[](어드민 상세가 그대로 보여주는 질문·답 목록) · match(원본 키-값) · photos(버킷 경로 최대 3장, photo 는 첫 장) · 동의 시각·버전.
  * 종교·건강(민감정보)은 sensitiveConsent 가 true 일 때만 남긴다 (개인정보 보호법 제23조). 사진은 버킷에 실제로 있어야 기록한다.
  * 마케팅 수신 동의(선택)는 /api/inquiries 와 같이 marketing_consents 에 따로 저장. 보관 180일(purge_expired_inquiries 가 사진도 함께 지움).
  * 요청 제한: 같은 IP 10분에 5번.
@@ -25,6 +25,8 @@ const BodySchema = z.object({
   consent: z.literal(true, { message: "개인정보 수집·이용에 동의해 주세요." }),
   sensitiveConsent: z.boolean().optional().default(false),
   marketing: z.boolean().optional().default(false),
+  /** 사진 경로(최대 3장). 옛 클라이언트의 photo(한 장)도 받는다 */
+  photos: z.array(z.string().max(200)).max(MATCH_PHOTO_COUNT).optional().default([]),
   photo: z.string().max(200).optional().nullable(),
   entryPath: z.string().max(200).optional().default(""),
   utm: UtmSchema.nullable().optional(),
@@ -59,11 +61,13 @@ export async function POST(req: Request) {
   const name = String(a.name).trim();
 
   const admin = createAdminClient();
-  let photo: string | null = null;
-  if (body.photo) {
-    if (!isPhotoPath(body.photo) || !(await verifyPhoto(admin, body.photo))) return NextResponse.json({ ok: false, message: "사진이 올라가지 않았습니다. 다시 올리거나 「나중에 올릴게요」로 넘어가 주세요." }, { status: 400 });
-    photo = body.photo;
+  const photos: string[] = [];
+  for (const p of [...body.photos, ...(body.photo ? [body.photo] : [])]) {
+    if (photos.includes(p)) continue;
+    if (!isPhotoPath(p) || !(await verifyPhoto(admin, p))) return NextResponse.json({ ok: false, message: "사진이 올라가지 않았습니다. 다시 올리거나 「나중에 올릴게요」로 넘어가 주세요." }, { status: 400 });
+    photos.push(p);
   }
+  const photo = photos[0] ?? null;
 
   const { name: _n, phone: _p, ...rest } = a;
   void _n; void _p;
@@ -91,7 +95,7 @@ export async function POST(req: Request) {
       ...(hasSensitive ? { sensitiveConsentAt: now } : {}),
       marketing: body.marketing,
       ...(body.marketing ? { marketingAt: now, marketingVersion: MARKETING_CONSENT_VERSION } : {}),
-      ...(photo ? { photo } : {}),
+      ...(photo ? { photo, photos } : {}),
       answers: flattenMatchAnswers(a),
       match: rest,
     },

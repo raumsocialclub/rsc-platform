@@ -7,7 +7,7 @@ import { Logo } from "@/components/site/Logo";
 import { Txt } from "@/components/cms/Txt";
 import { trackLead } from "@/components/site/MetaPixel";
 import { createClient } from "@/lib/supabase/client";
-import { QUESTIONS, ageOf, formatBirthInput, parseBirth, questionTitle, type MatchAnswers, type Question } from "@/lib/match/schema";
+import { MATCH_PHOTO_COUNT, QUESTIONS, ageOf, formatBirthInput, isBlockedAnswer, parseBirth, questionTitle, type MatchAnswers, type Question } from "@/lib/match/schema";
 import { MATCH_PHOTO_ACCEPT, MATCH_PHOTO_BUCKET, photoProblem } from "@/lib/match/photo";
 import { formatPhoneInput, normalizePhone } from "@/lib/phone";
 import { entryPathFromReferrer } from "@/lib/inquiries/track";
@@ -18,13 +18,14 @@ import { readUtm } from "@/lib/utm/client";
  * - 선택형(single)은 고르면 잠깐 뒤 자동으로 다음 화면. 복수 선택(multi)은 「확인」, 입력형은 「다음」(Enter 로도 넘어감).
  * - 필수(이름·성별·생년월일·혼인 상태·거주 시/도·휴대폰) 외에는 「이 질문 건너뛰기」.
  * - 종교·건강 화면에는 민감정보 별도 동의(선택) 체크가 있고, 체크 없이 고르면 안내만 하고 저장하지 않는다 (서버도 sensitiveConsent 없으면 버림).
- * - 사진은 고르는 즉시 /api/match/upload-url → 비공개 버킷에 직접 올리고 경로만 들고 간다. 「나중에 올릴게요」로 건너뛸 수 있다.
+ * - 사진(최대 3장)은 고르는 즉시 /api/match/upload-url → 비공개 버킷에 직접 올리고 경로만 들고 간다. 「나중에 올릴게요」로 건너뛸 수 있다.
+ * - 혼인 상태 「기혼」을 고르면 안내문이 빨갛게 바뀌고 다음으로 넘어가지 않는다(blocked). 「상담 시 확인 서류 안내」(info)는 답 없이 읽고 넘어가는 화면.
  * - 마지막(휴대폰) 화면에서 개인정보 동의(필수)·마케팅 수신 동의(선택, 기본 접힘) 후 제출 → POST /api/match. 그 전에는 서버로 아무것도 보내지 않는다(브라우저 sessionStorage 임시 저장).
  * 문구(제목·완료 안내·버튼)는 CMS(match.form)에서 copy 로 넘어온다.
  */
 export type MatchCopy = {
   title: string; closeLabel: string; prevLabel: string; nextLabel: string; confirmLabel: string; skipLabel: string; enterHint: string;
-  photoPick: string; photoChange: string; photoLater: string; photoNote: string; photoRule: string;
+  photoPick: string; photoAdd: string; photoChange: string; photoLater: string; photoNote: string; photoRule: string;
   consentTitle: string; consentCollect: string; consentPurpose: string; consentRetention: string; consentRefuse: string; consentMore: string;
   sensitiveTitle: string; sensitiveItems: string; sensitivePurpose: string; sensitiveRetention: string; sensitiveRefuse: string;
   marketingTitle: string; marketingPurpose: string; marketingMethod: string; marketingItems: string; marketingRetention: string; marketingNote: string;
@@ -32,8 +33,8 @@ export type MatchCopy = {
 };
 export const DEFAULT_MATCH_COPY: MatchCopy = {
   title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
-  photoPick: "사진 선택하기", photoChange: "다른 사진 고르기", photoLater: "나중에 올릴게요", photoNote: "사진이 있으면 매칭이 훨씬 빨라져요.\n지금 어렵다면 나중에 매니저에게 보내주셔도 괜찮아요.", photoRule: "jpg · png · webp · heic / 10MB 이하",
-  consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 만남 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인·부모님 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 이성을 볼 때 중요한 요소와 상세, 알게 된 경로, 사진(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
+  photoPick: "사진 선택하기", photoAdd: "사진 추가하기", photoChange: "삭제", photoLater: "나중에 올릴게요", photoNote: "", photoRule: "jpg · png · webp · heic / 장당 10MB 이하 · 최대 3장",
+  consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 활동 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 만남에서 중요하게 생각하는 항목, 알게 된 경로, 사진 최대 3장(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
   consentPurpose: "1:1 매칭 가입 상담의 준비(담당 매니저가 기본 정보와 희망 조건을 미리 확인)와 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 제출되지 않습니다. 선택 항목은 비워 두어도 됩니다.",
   consentMore: "자세한 내용은 {privacy}에서 확인하실 수 있습니다. 사이트 이용 조건은 {terms}을 참고해 주세요.",
   sensitiveTitle: "종교·건강 정보(민감정보) 수집·이용 동의", sensitiveItems: "종교, 신체적 특이사항(질병·장애 여부 등) — 개인정보 보호법 제23조의 민감정보", sensitivePurpose: "1:1 매칭 상담에서 희망 조건과의 적합성 확인", sensitiveRetention: "프로필 진단 응답과 함께 접수일로부터 최대 180일", sensitiveRefuse: "동의하지 않아도 제출과 상담에 제한이 없습니다. 동의하지 않으면 종교·건강 답변은 저장되지 않습니다.",
@@ -68,7 +69,7 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
   const C: MatchCopy = { ...DEFAULT_MATCH_COPY, ...Object.fromEntries(Object.entries(copy ?? {}).filter(([, v]) => !!v)) } as MatchCopy;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<MatchAnswers>({});
-  const [photo, setPhoto] = useState<Photo | null>(null);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [uploading, setUploading] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [sensitiveAgreed, setSensitiveAgreed] = useState(false);
@@ -96,9 +97,10 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
       try {
         const raw = sessionStorage.getItem(STORE);
         if (raw) {
-          const j = JSON.parse(raw) as { step?: number; answers?: MatchAnswers; photo?: Photo | null; sensitiveAgreed?: boolean };
+          const j = JSON.parse(raw) as { step?: number; answers?: MatchAnswers; photo?: Photo | null; photos?: Photo[]; sensitiveAgreed?: boolean };
           if (j.answers) setAnswers(j.answers);
-          if (j.photo?.path) setPhoto({ path: j.photo.path, name: j.photo.name });
+          const saved = (j.photos ?? (j.photo?.path ? [j.photo] : [])).filter((x) => x?.path).slice(0, MATCH_PHOTO_COUNT);
+          if (saved.length) setPhotos(saved.map((x) => ({ path: x.path, name: x.name })));
           if (j.sensitiveAgreed) setSensitiveAgreed(true);
           if (typeof j.step === "number") setStep(Math.min(Math.max(0, j.step), total - 1));
         }
@@ -109,8 +111,8 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
   }, [total]);
   useEffect(() => {
     if (!restored) return;
-    try { sessionStorage.setItem(STORE, JSON.stringify({ step, answers, photo: photo ? { path: photo.path, name: photo.name } : null, sensitiveAgreed })); } catch {}
-  }, [restored, step, answers, photo, sensitiveAgreed]);
+    try { sessionStorage.setItem(STORE, JSON.stringify({ step, answers, photos: photos.map((x) => ({ path: x.path, name: x.name })), sensitiveAgreed })); } catch {}
+  }, [restored, step, answers, photos, sensitiveAgreed]);
   /* 화면이 바뀌면 입력칸에 포커스(데스크톱) · 맨 위로 */
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -121,16 +123,20 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
   const set = (key: string, v: string | string[]) => { setAnswers((a) => ({ ...a, [key]: v })); setError(null); };
   const go = (n: number) => { setError(null); setStep(Math.min(Math.max(0, n), total - 1)); };
   const filled = (qq: Question): boolean => {
-    if (qq.type === "photo") return !!photo;
+    if (qq.type === "photo") return photos.length > 0;
+    if (qq.type === "info") return true;
     const v = answers[qq.key];
     if (Array.isArray(v)) return qq.exact ? v.length === qq.exact : v.length > 0;
     const s = String(v ?? "").trim();
     if (!s) return false;
+    if (isBlockedAnswer(qq, s)) return false;
     if (qq.type === "date") return parseBirth(s) !== null;
     if (qq.type === "tel") return normalizePhone(s) !== null;
     return true;
   };
+  const blocked = isBlockedAnswer(q, value);
   const next = () => {
+    if (blocked) { setError(q.sub ?? "지금은 진행할 수 없어요."); return; }
     if (q.required && !filled(q)) {
       setError(q.type === "date" ? "생년월일을 YYYY.MM.DD 형식으로 입력해 주세요." : q.type === "tel" ? "휴대폰 번호는 010-1234-5678 형식으로 입력해 주세요." : "이 질문은 꼭 답해 주세요.");
       input.current?.focus();
@@ -139,10 +145,11 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
     if (q.sensitive && filled(q) && !sensitiveAgreed) { setError("답을 저장하려면 아래 민감정보 동의에 체크해 주세요. 동의하지 않으려면 「이 질문 건너뛰기」를 눌러 주세요."); return; }
     go(step + 1);
   };
-  const skip = () => { if (q.type === "photo") setPhoto(null); else set(q.key, q.type === "multi" ? [] : ""); go(step + 1); };
+  const skip = () => { if (q.type === "photo") setPhotos([]); else set(q.key, q.type === "multi" ? [] : ""); go(step + 1); };
   const pick = (o: string) => {
     if (q.sensitive && !sensitiveAgreed) { set(q.key, o); setError("저장하려면 아래 민감정보 동의에 체크해 주세요. 체크하지 않으면 이 답은 저장되지 않아요."); return; }
     set(q.key, o);
+    if (isBlockedAnswer(q, o)) { if (advanceTimer.current) window.clearTimeout(advanceTimer.current); return; } // 기혼: 안내만 빨갛게, 다음으로 안 넘어감
     if (!last) advanceTimer.current = window.setTimeout(() => go(step + 1), 240);
   };
   const toggle = (o: string) => {
@@ -151,34 +158,40 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
     set(q.key, on ? list.filter((x) => x !== o) : [...list, o]);
   };
 
-  const onFile = async (f: File | null) => {
-    if (!f) return;
-    const problem = photoProblem(f.name, f.size);
-    if (problem) { setError(problem); return; }
+  /** 고른 파일들을 차례로 올린다(남은 자리만큼). 하나라도 실패하면 거기서 멈추고 안내 */
+  const onFiles = async (files: FileList | null) => {
+    const list = Array.from(files ?? []).slice(0, Math.max(0, MATCH_PHOTO_COUNT - photos.length));
+    if (!list.length) { if (files?.length) setError(`사진은 최대 ${MATCH_PHOTO_COUNT}장까지 올릴 수 있어요.`); return; }
     setError(null); setUploading(true);
-    const preview = URL.createObjectURL(f);
     try {
-      const res = await fetch("/api/match/upload-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: f.name, size: f.size }) });
-      const j = (await res.json().catch(() => null)) as { ok?: boolean; path?: string; token?: string; message?: string } | null;
-      if (!res.ok || !j?.ok || !j.path || !j.token) throw new Error(j?.message ?? "사진을 올리지 못했습니다.");
-      const { error: upErr } = await createClient().storage.from(MATCH_PHOTO_BUCKET).uploadToSignedUrl(j.path, j.token, f, { contentType: f.type || "application/octet-stream", upsert: false });
-      if (upErr) throw new Error(`사진을 올리지 못했습니다 (${upErr.message}). 잠시 후 다시 시도해 주세요.`);
-      setPhoto({ path: j.path, name: f.name, preview });
+      for (const f of list) {
+        const problem = photoProblem(f.name, f.size);
+        if (problem) throw new Error(problem);
+        const preview = URL.createObjectURL(f);
+        try {
+          const res = await fetch("/api/match/upload-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: f.name, size: f.size }) });
+          const j = (await res.json().catch(() => null)) as { ok?: boolean; path?: string; token?: string; message?: string } | null;
+          if (!res.ok || !j?.ok || !j.path || !j.token) throw new Error(j?.message ?? "사진을 올리지 못했습니다.");
+          const { error: upErr } = await createClient().storage.from(MATCH_PHOTO_BUCKET).uploadToSignedUrl(j.path, j.token, f, { contentType: f.type || "application/octet-stream", upsert: false });
+          if (upErr) throw new Error(`사진을 올리지 못했습니다 (${upErr.message}). 잠시 후 다시 시도해 주세요.`);
+          setPhotos((prev) => (prev.length >= MATCH_PHOTO_COUNT ? prev : [...prev, { path: j.path!, name: f.name, preview }]));
+        } catch (e) { URL.revokeObjectURL(preview); throw e; }
+      }
     } catch (e) {
-      URL.revokeObjectURL(preview);
       setError(e instanceof Error ? e.message : "사진을 올리지 못했습니다.");
     } finally {
       setUploading(false);
       if (fileInput.current) fileInput.current.value = "";
     }
   };
+  const removePhoto = (i: number) => setPhotos((prev) => { const x = prev[i]; if (x?.preview) URL.revokeObjectURL(x.preview); return prev.filter((_, k) => k !== i); });
 
   const submit = async () => {
     if (!filled(q)) { next(); return; }
     if (!agreed) { setError("개인정보 수집·이용에 동의해 주세요."); return; }
     setSubmitting(true); setError(null);
     try {
-      const body = { answers: { ...answers, phone: normalizePhone(str) ?? str }, consent: true, sensitiveConsent: sensitiveAgreed, marketing, photo: photo?.path ?? null, entryPath: entryPathFromReferrer(document.referrer, window.location.origin), utm: readUtm() };
+      const body = { answers: { ...answers, phone: normalizePhone(str) ?? str }, consent: true, sensitiveConsent: sensitiveAgreed, marketing, photos: photos.map((x) => x.path), entryPath: entryPathFromReferrer(document.referrer, window.location.origin), utm: readUtm() };
       const res = await fetch("/api/match", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !j?.ok) throw new Error(j?.message ?? "제출하지 못했습니다. 잠시 후 다시 시도해 주세요.");
@@ -223,7 +236,7 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
         </button>
         <div key={q.key} className="anim-up mt-[22px]">
           <h1 className="t-title-2 md:t-title-1 text-label text-pretty">{title}{q.required && <span className="text-negative"> *</span>}</h1>
-          {q.sub && <p className="mt-[10px] t-body-1-reading text-labelAlt text-pretty">{q.sub}</p>}
+          {q.sub && <p className={`mt-[10px] t-body-1-reading text-pretty ${blocked ? "text-negativeFg font-semibold" : "text-labelAlt"}`} role={blocked ? "alert" : undefined} data-testid={blocked ? "match-blocked" : undefined}>{q.sub}</p>}
 
           <div className="mt-[28px]">
             {q.sensitive && (
@@ -261,14 +274,26 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
 
             {q.type === "multi" && (
               <>
-                <div role="group" aria-label={title} className="flex flex-wrap gap-[10px]">
+                <div role="group" aria-label={title} className={q.layout === "list" ? "grid gap-[10px]" : "flex flex-wrap gap-[10px]"}>
                   {(q.options ?? []).map((o) => {
                     const on = list.includes(o);
                     const full = !!q.exact && !on && list.length >= q.exact;
+                    const rank = q.exact ? list.indexOf(o) : -1;
+                    if (q.layout === "list") {
+                      return (
+                        <button key={o} type="button" aria-pressed={on} disabled={full} onClick={() => toggle(o)} className={`${OPT} ${on ? OPT_ON : OPT_OFF} disabled:opacity-40 disabled:cursor-not-allowed`} data-testid={`match-opt-${o}`}>
+                          <span className="min-w-0">
+                            <span className="block text-[17px] font-semibold">{o}</span>
+                            {q.optionDesc?.[o] && <span className={`block mt-[3px] text-[14px] leading-[1.5] text-pretty ${on ? "text-primary/80" : "text-labelAlt"}`}>{q.optionDesc[o]}</span>}
+                          </span>
+                          {q.exact ? (rank >= 0 ? <span className="flex-none h-[28px] px-[12px] rounded-full text-[13px] font-bold inline-flex items-center justify-center bg-primary text-white" aria-hidden>{rank + 1}순위</span> : <span className="flex-none w-[22px] h-[22px] rounded-full border-2 border-lineNeutral bg-white" aria-hidden />) : on ? <Check /> : null}
+                        </button>
+                      );
+                    }
                     return <button key={o} type="button" aria-pressed={on} disabled={full} onClick={() => toggle(o)} className={`${CHIP} ${on ? OPT_ON : OPT_OFF} disabled:opacity-40 disabled:cursor-not-allowed`}>{o}</button>;
                   })}
                 </div>
-                {q.exact && <p className="mt-[14px] t-label-1 text-labelAlt">{list.length} / {q.exact}개 선택</p>}
+                {q.exact && <p className="mt-[14px] t-label-1 text-labelAlt">{list.length} / {q.exact}개 선택{list.length ? ` · ${list.map((x, i) => `${i + 1}순위 ${x}`).join(" · ")}` : ""}</p>}
                 <button type="button" onClick={next} disabled={!canProceed} className={`${BIG} mt-[22px]`}>{C.confirmLabel}</button>
               </>
             )}
@@ -351,34 +376,50 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
 
             {q.type === "photo" && (
               <>
-                <div className="rounded-[16px] border-2 border-dashed border-lineNeutral p-[24px] md:p-[32px] text-center">
-                  {photo ? (
-                    <div className="flex flex-col items-center gap-[12px]">
-                      {photo.preview ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={photo.preview} alt="올린 사진 미리보기" className="w-[160px] h-[160px] object-cover rounded-[16px]" />
-                      ) : (
-                        <div className="w-[160px] h-[160px] rounded-[16px] bg-fill flex items-center justify-center text-positiveFg"><Check /></div>
-                      )}
-                      <p className="t-label-1 text-labelNeutral break-all">{photo.name}</p>
-                      <button type="button" onClick={() => fileInput.current?.click()} disabled={uploading} className={`${PILL} h-[40px] px-[18px]`}>{C.photoChange}</button>
-                    </div>
-                  ) : (
-                    <>
-                      <button type="button" onClick={() => fileInput.current?.click()} disabled={uploading} className="w-full max-w-[420px] mx-auto h-[56px] rounded-full bg-inverseBg text-inverseLabel text-[17px] font-bold hover:opacity-90 active:scale-[.985] transition-[opacity,transform] duration-150 disabled:opacity-60 cursor-pointer">{uploading ? "올리는 중…" : C.photoPick}</button>
-                      <p className="mt-[12px] t-caption-1 text-labelAlt">{C.photoRule}</p>
-                    </>
+                <div className="rounded-[16px] border-2 border-dashed border-lineNeutral p-[20px] md:p-[28px] text-center">
+                  {photos.length > 0 && (
+                    <ul className="flex flex-wrap justify-center gap-[12px] mb-[16px]">
+                      {photos.map((p, i) => (
+                        <li key={p.path} className="w-[128px]">
+                          {p.preview ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.preview} alt={`올린 사진 ${i + 1} 미리보기`} className="w-[128px] h-[128px] object-cover rounded-[16px]" />
+                          ) : (
+                            <div className="w-[128px] h-[128px] rounded-[16px] bg-fill flex items-center justify-center text-positiveFg"><Check /></div>
+                          )}
+                          <p className="mt-[6px] t-caption-1 text-labelNeutral truncate" title={p.name}>{p.name}</p>
+                          <button type="button" onClick={() => removePhoto(i)} disabled={uploading} className="mt-[4px] t-caption-1 text-labelAlt underline underline-offset-4 hover:text-negativeFg cursor-pointer" data-testid={`match-photo-remove-${i}`}>{C.photoChange}</button>
+                        </li>
+                      ))}
+                    </ul>
                   )}
-                  <input ref={fileInput} type="file" accept={MATCH_PHOTO_ACCEPT} className="sr-only" onChange={(e) => void onFile(e.target.files?.[0] ?? null)} data-testid="match-photo-input" />
+                  {photos.length < MATCH_PHOTO_COUNT && (
+                    <button type="button" onClick={() => fileInput.current?.click()} disabled={uploading} className="w-full max-w-[420px] mx-auto h-[56px] rounded-full bg-inverseBg text-inverseLabel text-[17px] font-bold hover:opacity-90 active:scale-[.985] transition-[opacity,transform] duration-150 disabled:opacity-60 cursor-pointer">{uploading ? "올리는 중…" : photos.length ? `${C.photoAdd} (${photos.length}/${MATCH_PHOTO_COUNT})` : C.photoPick}</button>
+                  )}
+                  <p className="mt-[12px] t-caption-1 text-labelAlt">{C.photoRule}</p>
+                  <input ref={fileInput} type="file" accept={MATCH_PHOTO_ACCEPT} multiple className="sr-only" onChange={(e) => void onFiles(e.target.files)} data-testid="match-photo-input" />
                 </div>
-                <button type="button" onClick={next} disabled={!photo || uploading} className={`${BIG} mt-[22px]`}>{C.nextLabel}</button>
-                <p className="mt-[14px] t-label-1-reading text-labelAlt whitespace-pre-line text-pretty">{C.photoNote}</p>
+                <button type="button" onClick={next} disabled={!photos.length || uploading} className={`${BIG} mt-[22px]`}>{C.nextLabel}</button>
+                {C.photoNote && <p className="mt-[14px] t-label-1-reading text-labelAlt whitespace-pre-line text-pretty">{C.photoNote}</p>}
+              </>
+            )}
+
+            {q.type === "info" && (
+              <>
+                {q.body && <p className="t-body-1-reading text-labelNeutral text-pretty whitespace-pre-line"><Txt v={q.body} breaks="hard" /></p>}
+                {q.table && (
+                  <table className="mt-[18px] w-full border-collapse text-[15px]" data-testid="match-info-table">
+                    <thead><tr>{q.table.head.map((h) => <th key={h} className="text-left font-semibold text-labelNeutral px-[14px] py-[10px] bg-fill border-b border-lineNeutral first:rounded-tl-[12px] last:rounded-tr-[12px]">{h}</th>)}</tr></thead>
+                    <tbody>{q.table.rows.map(([a, b]) => <tr key={a}><td className="px-[14px] py-[12px] border-b border-lineAlt text-label">{a}</td><td className="px-[14px] py-[12px] border-b border-lineAlt font-semibold text-label">{b}</td></tr>)}</tbody>
+                  </table>
+                )}
+                <button type="button" onClick={next} className={`${BIG} mt-[26px]`} data-testid="match-info-next">{C.confirmLabel}</button>
               </>
             )}
 
             {error && <p role="alert" className="mt-[16px] px-[14px] py-[10px] bg-[rgba(255,66,66,.08)] rounded-[12px] t-label-1-reading text-negativeFg">{error}</p>}
 
-            {!q.required && (
+            {!q.required && q.type !== "info" && (
               <div className="mt-[18px] text-center">
                 <button type="button" onClick={skip} className="t-body-2 text-labelAlt underline underline-offset-4 hover:text-label cursor-pointer" data-testid="match-skip">{q.type === "photo" ? C.photoLater : C.skipLabel}</button>
               </div>

@@ -757,11 +757,12 @@ create policy "match photos admin read" on storage.objects for select using (buc
 create policy "match photos admin delete" on storage.objects for delete using (bucket_id = 'match-photos' and public.is_admin());
 -- 보관 180일: 상담 신청 행과 함께 사진도 지운다. 제출되지 않은 채 하루 지난 업로드(inbox 고아 파일)도 지운다. (크론 purge-expired-inquiries 는 그대로)
 create or replace function purge_expired_inquiries() returns void language sql security definer set search_path = public as $$
+  -- 사진은 answers.photo(첫 장) 또는 answers.photos(배열, 2026-11-18 최대 3장)로 참조된다
   delete from storage.objects o where o.bucket_id = 'match-photos' and exists (
-    select 1 from inquiries i where i.answers->>'photo' = o.name and i.created_at < now() - interval '180 days');
+    select 1 from inquiries i where (i.answers->>'photo' = o.name or (jsonb_typeof(i.answers->'photos') = 'array' and i.answers->'photos' ? o.name)) and i.created_at < now() - interval '180 days');
   delete from inquiries where created_at < now() - interval '180 days';
   delete from storage.objects o where o.bucket_id = 'match-photos' and o.created_at < now() - interval '1 day' and not exists (
-    select 1 from inquiries i where i.answers->>'photo' = o.name);
+    select 1 from inquiries i where i.answers->>'photo' = o.name or (jsonb_typeof(i.answers->'photos') = 'array' and i.answers->'photos' ? o.name));
 $$;
 revoke all on function purge_expired_inquiries() from public, anon, authenticated;
 
