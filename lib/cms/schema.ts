@@ -415,7 +415,7 @@ export const DOCS: DocDef[] = [
     defaults: {
       label: "VERIFIED MEMBERS", title: "아무나,\n들어올 수 없습니다", lead: "가입 전 모든 회원의 신원·혼인 관계·직업·진정성을 확인합니다. 기준을 통과한 검증된 분들끼리만, 철저히 프라이빗하게 소개합니다.", visible: true,
       criteriaVisible: true,
-      criteriaTitle: "라움 멤버 기준",
+      criteriaTitle: "라움소셜클럽 멤버 가입 기준",
       criteriaLead: "아래 기준 중 하나 이상에 해당하고 서류로 증빙할 수 있는 분을 모십니다. 「기준보기」를 누르면 세부 기준과 제출 서류를 볼 수 있습니다.",
       criteriaButton: "기준보기",
       criteriaNote: "제출 서류는 최근 3개월 이내 발급분만 인정됩니다. 서류 제출 방법은 상담 시 담당자가 안내해 드립니다.",
