@@ -84,7 +84,7 @@ export const DOCS: DocDef[] = [
       partnerPhone: "010-9272-7783",
       partnerEmail: "se.na@theraum.co.kr",
       copyright: "© 2026 RAUM SOCIAL CLUB",
-      bizName: "주식회사 레벤스토리", bizRep: "김기태", bizNumber: "629-87-01795", bizMailOrder: "", bizAddress: "서울특별시 강남구 언주로 564, 비동 2층 (역삼동, 라움)",
+      bizName: "주식회사 트라움에스앤씨", bizRep: "김진민", bizNumber: "220-88-09054", bizMailOrder: "", bizAddress: "서울특별시 강남구 언주로 564 (역삼동)",
     },
   },
   {
@@ -429,6 +429,28 @@ export const DOCS: DocDef[] = [
 
   /* ---------- 1:1 매칭 ---------- */
   {
+    id: "matching.preview",
+    page: "matching",
+    label: "00-P 사전등록 화면 (1:1 매칭 사전등록 모드일 때 /matching 전체)",
+    description:
+      "일반 설정 → 사이트 상태 → 「1:1 매칭 사전등록 모드」가 켜져 있으면(2026-11-20 정책, 기본 켬) /matching 은 아래 01~06 섹션 대신 이 화면 하나만 보입니다: 간단 소개 + 「사전등록하기」 버튼(→ /match-check 3분 프로필 설문, 어드민에 「1:1 매칭 사전등록하기」 경로로 기록). 홈 대문·비교 카드·하단 띠의 1:1 매칭 버튼도 같은 문구·링크를 씁니다. 모드를 끄면 예전 1:1 매칭 페이지가 그대로 돌아옵니다.",
+    fields: [img("image", "배경 사진", "가로 1920px 이상 권장"), t("badge", "작은 배지 (예: 사전등록 접수 중)"), t("overline", "작은 영문 제목"), ta("title", "큰 제목", "hard"), ta("body", "설명", "soft"), t("ctaLabel", "사전등록 버튼 문구"), ta("footnote", "버튼 아래 작은 안내", "soft"), t("pointsTitle", "소개 항목 제목"), ta("points", "소개 항목 (줄마다 「항목: 내용」)"), t("cardDesc", "홈 비교 카드 한 줄 설명"), t("seoTitle", "검색 제목"), ta("seoDescription", "검색 결과 설명")],
+    defaults: {
+      image: "/images/after-hours.jpg",
+      badge: "사전등록 접수 중",
+      overline: "RAUM 1:1 MATCHING",
+      title: "한 사람을 깊이 알고 만나는,\n라움의 1:1 매칭을 준비하고 있습니다.",
+      body: "라움이 검증한 회원 중 한 분을 전담 매니저가 직접 소개하는 프라이빗 1:1 매칭.\n정식 오픈 전 사전등록을 받고 있습니다. 프로필을 남겨 주시면 오픈 소식과 어울리는 만남의 방향을 가장 먼저 안내드립니다.",
+      ctaLabel: "사전등록하기",
+      footnote: "사전등록은 가입이 아니며 비용이 없습니다. 3분 프로필 설문 뒤 담당 매니저가 연락드립니다.",
+      pointsTitle: "라움의 1:1 매칭은",
+      points: "검증된 회원: 신분증·혼인관계증명서·직업 확인을 거친 싱글 회원만 소개합니다\n직접 소개: 프로필 열람이 아닌, 전담 매니저가 어울리는 한 분을 직접 소개합니다\n라움에서의 만남: 서울 강남 라움아트센터의 라운지·다이닝 공간에서 만납니다",
+      cardDesc: "정식 오픈 전 사전등록을 받고 있습니다. 프로필을 남기면 오픈 소식을 가장 먼저 안내드립니다.",
+      seoTitle: "1:1 매칭 사전등록",
+      seoDescription: "라움소셜클럽 1:1 매칭 정식 오픈 전 사전등록. 검증된 회원 중 한 분을 전담 매니저가 직접 소개하는 프라이빗 1:1 매칭, 프로필을 남기면 오픈 소식과 어울리는 만남의 방향을 먼저 안내드립니다.",
+    },
+  },
+  {
     id: "matching.hero",
     page: "matching",
     label: "00 상단 소개",
@@ -623,6 +645,7 @@ export const DOCS: DocDef[] = [
       t("marketingTitle", "마케팅 수신 동의 체크 문구"), ta("marketingPurpose", "마케팅 목적"), t("marketingMethod", "마케팅 수신 방법"), ta("marketingItems", "마케팅 이용 항목"), ta("marketingRetention", "마케팅 보유·이용 기간"), ta("marketingNote", "마케팅 안내 아래 설명"),
       t("submitLabel", "제출 버튼 문구"), t("submittingLabel", "제출 중 버튼 문구"), ta("submitNote", "제출 버튼 아래 안내", "soft"),
       t("doneTitle", "접수 완료 제목"), ta("doneBody", "접수 완료 안내", "soft"), t("doneHome", "접수 완료 버튼 문구"),
+      t("preregTitle", "[1:1 매칭 사전등록으로 들어왔을 때] 화면 이름", undefined, "/matching 의 「사전등록하기」로 들어오면(/match-check?src=prereg) 화면 이름을 이걸로 바꿉니다"), t("preregDoneTitle", "[사전등록] 접수 완료 제목"), ta("preregDoneBody", "[사전등록] 접수 완료 안내", "soft"),
     ],
     defaults: {
       title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
@@ -635,6 +658,7 @@ export const DOCS: DocDef[] = [
       marketingNote: "동의하지 않아도 상담 및 기본 서비스 이용에는 제한이 없습니다. 수신 동의는 전화(02-6925-4786)나 이메일로 언제든 철회할 수 있습니다.",
       submitLabel: "제출하고 매니저 연락 받기", submittingLabel: "보내는 중…", submitNote: "제출은 회원 가입이 아니며, 담당 매니저가 연락드린 뒤 상담이 진행됩니다.",
       doneTitle: "프로필이 접수되었습니다", doneBody: "담당 매니저가 남겨주신 번호로 연락드려 어울리는 만남의 방향을 안내해 드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.", doneHome: "홈으로 돌아가기",
+      preregTitle: "1:1 매칭 사전등록", preregDoneTitle: "사전등록이 접수되었습니다", preregDoneBody: "1:1 매칭 정식 오픈 소식과 어울리는 만남의 방향을 담당 매니저가 남겨주신 번호로 안내드립니다. 문의나 취소는 전화(02-6925-4786)나 이메일로 알려 주세요.",
     },
   },
 

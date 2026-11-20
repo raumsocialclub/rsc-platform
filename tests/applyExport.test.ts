@@ -15,7 +15,9 @@ const fit: InquiryRow = { id: "66666666-7777-8888-9999-000000000000", name: "김
 
 describe("종류 필터", () => {
   it("apply 는 설문만, fit 은 홈 상담 신청만, 빈 값은 전체", () => {
-    expect(parseKind("apply")).toBe("apply"); expect(parseKind("x")).toBe(""); expect(parseKind(null)).toBe("");
+    expect(parseKind("apply")).toBe("apply"); expect(parseKind("x")).toBe(""); expect(parseKind(null)).toBe(""); expect(parseKind("prereg")).toBe("prereg");
+    const prereg = { answers: { form: "match", entrySource: "prereg" } };
+    expect(matchesKind(prereg, "prereg")).toBe(true); expect(matchesKind(fit, "prereg")).toBe(false); expect(matchesKind(prereg, "fit")).toBe(true);
     expect(matchesKind(apply, "apply")).toBe(true); expect(matchesKind(fit, "apply")).toBe(false);
     expect(matchesKind(apply, "fit")).toBe(false); expect(matchesKind(fit, "fit")).toBe(true);
     expect(matchesKind(fit, "")).toBe(true);

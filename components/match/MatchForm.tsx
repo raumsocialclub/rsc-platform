@@ -65,7 +65,10 @@ function ConsentMore({ text }: { text: string }) {
 
 type Photo = { path: string; name: string; preview?: string };
 
-export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
+/** 들어온 버튼: "prereg" = /matching 「1:1 매칭 사전등록하기」(/match-check?src=prereg). 서버가 answers.entrySource 로 남겨 어드민에 「1:1 매칭 사전등록하기 버튼」 경로로 보인다 */
+export type MatchSource = "prereg";
+
+export function MatchForm({ copy, source }: { copy?: Partial<MatchCopy>; source?: MatchSource }) {
   const C: MatchCopy = { ...DEFAULT_MATCH_COPY, ...Object.fromEntries(Object.entries(copy ?? {}).filter(([, v]) => !!v)) } as MatchCopy;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<MatchAnswers>({});
@@ -191,7 +194,7 @@ export function MatchForm({ copy }: { copy?: Partial<MatchCopy> }) {
     if (!agreed) { setError("개인정보 수집·이용에 동의해 주세요."); return; }
     setSubmitting(true); setError(null);
     try {
-      const body = { answers: { ...answers, phone: normalizePhone(str) ?? str }, consent: true, sensitiveConsent: sensitiveAgreed, marketing, photos: photos.map((x) => x.path), entryPath: entryPathFromReferrer(document.referrer, window.location.origin), utm: readUtm() };
+      const body = { answers: { ...answers, phone: normalizePhone(str) ?? str }, consent: true, sensitiveConsent: sensitiveAgreed, marketing, photos: photos.map((x) => x.path), entryPath: entryPathFromReferrer(document.referrer, window.location.origin), ...(source ? { entrySource: source } : {}), utm: readUtm() };
       const res = await fetch("/api/match", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !j?.ok) throw new Error(j?.message ?? "제출하지 못했습니다. 잠시 후 다시 시도해 주세요.");

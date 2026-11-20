@@ -106,12 +106,12 @@ describe("POST /api/match", () => {
   });
   it("저장: 이름·휴대폰은 컬럼, form=match · track=matching · 직업/학력/거주지 · answers[] · 원본. 민감정보는 동의 없으면 버림, 사진 없음", async () => {
     const { POST } = await import("@/app/api/match/route");
-    const res = await POST(post({ answers: { ...base, jobCategory: "전문직", education: "대학(4년제) 졸업", homeGugun: "강남구", religion: "불교", health: "없음", source: "인스타그램", priorities: ["키", "나이", "생활권과 거리"] }, consent: true, marketing: false, entryPath: "/matching", utm: { utm_source: "ig" } }));
+    const res = await POST(post({ answers: { ...base, jobCategory: "전문직", education: "대학(4년제) 졸업", homeGugun: "강남구", religion: "불교", health: "없음", source: "인스타그램", priorities: ["키", "나이", "생활권과 거리"] }, consent: true, marketing: false, entryPath: "/matching", entrySource: "prereg", utm: { utm_source: "ig" } }));
     expect(res.status).toBe(200);
     const row = db.tables.inquiries[0] as { name: string; phone: string; answers: Record<string, unknown>; utm: unknown };
     expect(row.name).toBe("김라움");
     expect(row.phone).toBe("010-1234-5678");
-    expect(row.answers).toMatchObject({ form: "match", track: "matching", entryTrack: "matching", entryPath: "/matching", job: "전문직", education: "대학(4년제) 졸업", region: "서울특별시", district: "강남구", source: "인스타그램", marketing: false, consentVersion: expect.any(String) });
+    expect(row.answers).toMatchObject({ form: "match", track: "matching", entryTrack: "matching", entryPath: "/matching", entrySource: "prereg", job: "전문직", education: "대학(4년제) 졸업", region: "서울특별시", district: "강남구", source: "인스타그램", marketing: false, consentVersion: expect.any(String) });
     expect(row.answers.religion).toBeUndefined();
     expect(row.answers.photo).toBeUndefined();
     expect(row.answers.sensitiveConsentAt).toBeUndefined();
@@ -138,6 +138,13 @@ describe("POST /api/match", () => {
     expect(storageList).toHaveBeenCalledWith("inbox/123e4567-e89b-12d3-a456-426614174000", { limit: 5 });
     expect(db.tables.marketing_consents).toHaveLength(1);
     expect(db.tables.marketing_consents[0]).toMatchObject({ name: "김라움", phone: "010-1234-5678", region: "서울특별시", track: "matching" });
+  });
+  it("entrySource 는 prereg 만 받고(그 밖은 400), 없으면 answers 에 남기지 않는다", async () => {
+    const { POST } = await import("@/app/api/match/route");
+    expect((await POST(post({ answers: base, consent: true, entrySource: "banner" }))).status).toBe(400);
+    expect(db.tables.inquiries).toHaveLength(0);
+    expect((await POST(post({ answers: base, consent: true }))).status).toBe(200);
+    expect((db.tables.inquiries[0] as { answers: Record<string, unknown> }).answers.entrySource).toBeUndefined();
   });
   it("버킷에 없는 사진 경로·이상한 경로는 400", async () => {
     const { POST } = await import("@/app/api/match/route");

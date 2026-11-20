@@ -107,6 +107,7 @@ positive #00BF40 / positiveFg #009632   cautionary #FF9200 / #D17600   negative 
 차분한 존댓말, 짧은 문장, 마침표. 영어 오버라인 + 한글 제목 조합 유지. 문구는 CMS(`site_content`)가 우선이며 코드의 기본값은 CMS 가 비어 있을 때만 쓰인다.
 
 ## 정보 구조 (2026-11 · 두 갈래 홈)
+- **1:1 매칭 사전등록 모드**(2026-11-20, 기본 켬): `/matching` 은 `MatchPreview`(사진 위 짧은 소개 + 「사전등록하기」 → `/match-check?src=prereg`) 하나만, 홈·소셜·제휴의 1:1 매칭 상세 문구는 숨김. 아래 1:1 매칭 설명은 모드를 꺼서 복원했을 때의 모습이다 (FLOWS 1-4).
 - 홈(`/`)은 **게이트**다. 맨 위 전환형 히어로(`components/site/GateHero.tsx`)에 「소셜클럽 | 1:1 매칭」 탭이 있고, 탭을 누르면 사진·문구·버튼이 바뀐다(모바일은 스와이프, PC 는 ←/→ 도 됨). 버튼은 각 트랙 페이지와 `/fit-check?track=…` 으로 간다. 레퍼런스: emotional oranges 홈의 로테이션/프라이빗 전환.
 - 그 아래 「두 가지 방식」 비교 카드(`TrackCards`) → 브랜드 소개(01) → 브랜드 약속(03) → FAQ → 두 버튼 CTA(`CtaBand`).
 - `/partner` 제휴문의: 상단 소개 → 협업 분야 3카드(브랜드·콘텐츠 / 기업·단체 / 공간·행사, 「이 분야로 제안하기」가 양식의 유형을 미리 고름) → 제휴문의 양식(`PartnerForm`: 유형 4종 라디오 · 회사 · 담당자 · 휴대전화 자동 하이픈 · 이메일 · 내용 3,000자 · 첨부(선택, 최대 3개 · 파일당 10MB · pdf/hwp/word/excel/ppt/jpg/png, 서명 URL 로 비공개 버킷에 직접 업로드) · 개인정보 수집 및 이용 안내(목적·항목·1년 보유·거부 관련) + 동의 체크 · 봇 함정) → 제안서 안내. `POST /api/partner` → `partner_inquiries` → 어드민 `/admin/partners`. 문구 `partner.page`, 첨부 안내 이메일 `global.brand.partnerEmail`.

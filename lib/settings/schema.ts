@@ -15,9 +15,9 @@ export const SETTINGS_DOCS: DocDef[] = [
     page: "settings",
     label: "사이트 상태",
     description:
-      "리드 모드를 켜면 사이트가 '광고 → 상담 신청' 용도로만 동작합니다. 로그인·가입·프로그램 예약·결제·멤버십 가격·환불규정이 숨겨지고(직접 접속하면 메인으로 이동), 예약·결제·초대코드 API 가 닫힙니다. 서비스 소개·혜택·소식·상담 신청은 그대로입니다. 관리자 화면(/admin, /login)은 링크만 숨기고 계속 열립니다. 끄면 모두 원래대로 돌아옵니다. 점검 모드를 켜면 관리자 화면(/admin, /login)만 열리고 나머지는 안내 문구가 표시됩니다.",
-    fields: [b("leadMode", "리드 모드 (상담 신청 전용 사이트)"), b("maintenance", "점검 모드 켜기"), ta("maintenanceMessage", "점검 안내 문구"), ta("maintenanceAllowIps", "점검 중에도 접속 허용 IP", "줄마다 하나. 1.2.3.4 / 1.2.3.* / 1.2.3.0/24")],
-    defaults: { leadMode: false, maintenance: false, maintenanceMessage: "잠시 사이트를 점검하고 있습니다.\n곧 다시 찾아뵙겠습니다.", maintenanceAllowIps: "" },
+      "리드 모드를 켜면 사이트가 '광고 → 상담 신청' 용도로만 동작합니다. 로그인·가입·프로그램 예약·결제·멤버십 가격·환불규정이 숨겨지고(직접 접속하면 메인으로 이동), 예약·결제·초대코드 API 가 닫힙니다. 서비스 소개·혜택·소식·상담 신청은 그대로입니다. 관리자 화면(/admin, /login)은 링크만 숨기고 계속 열립니다. 끄면 모두 원래대로 돌아옵니다. 점검 모드를 켜면 관리자 화면(/admin, /login)만 열리고 나머지는 안내 문구가 표시됩니다. 1:1 매칭 사전등록 모드를 켜면(기본 켬, 2026-11-20 정책) 1:1 매칭 소개·플랜·FAQ 등 상세 내용을 사이트 전체에서 숨기고 /matching 은 간단 소개 + 「사전등록하기」(→ /match-check 설문) 화면만 보입니다. 끄면 예전 1:1 매칭 페이지와 문구가 그대로 복원됩니다.",
+    fields: [b("leadMode", "리드 모드 (상담 신청 전용 사이트)"), b("matchPreview", "1:1 매칭 사전등록 모드 (1:1 매칭 내용은 숨기고 간단 소개 + 사전등록 버튼만)"), b("maintenance", "점검 모드 켜기"), ta("maintenanceMessage", "점검 안내 문구"), ta("maintenanceAllowIps", "점검 중에도 접속 허용 IP", "줄마다 하나. 1.2.3.4 / 1.2.3.* / 1.2.3.0/24")],
+    defaults: { leadMode: false, matchPreview: true, maintenance: false, maintenanceMessage: "잠시 사이트를 점검하고 있습니다.\n곧 다시 찾아뵙겠습니다.", maintenanceAllowIps: "" },
   },
   {
     id: "settings.inquiry",

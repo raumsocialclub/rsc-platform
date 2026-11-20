@@ -12,6 +12,8 @@ import { Txt, nowrap } from "@/components/cms/Txt";
 import { getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
 import { hasPrice } from "@/lib/settings/leadMode";
+import { getSettings } from "@/lib/settings/get";
+import { mentionsMatching, scrubDoc } from "@/lib/settings/matchPreview";
 import { ButtonLink, CARD, CARD_HOVER, Container, SectionHead, SWIPE, SWIPE_ITEM } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,12 +29,15 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
  * SOCIAL NIGHT · RAUM SOLO 는 1:1 매칭 멤버십 전용이라 /matching 으로 옮겼다. 모든 상담 버튼은 /fit-check?track=social.
  */
 export default async function SocialPage() {
-  const d = await getPageDocs(["home", "social"]);
+  const [d0, { matchPreview }] = await Promise.all([getPageDocs(["home", "social"]), getSettings()]);
+  // 1:1 매칭 사전등록 모드면 「1:1 매칭으로 전환」 항목·플랜명이 든 문구·FAQ 를 숨기고, 본문의 1:1 매칭 문장을 뺀다 (끄면 복원). 전환 바 이름(home.gate)은 그대로
+  const d = Object.fromEntries(Object.entries(d0).map(([k, v]) => [k, k === "home.gate" ? v : scrubDoc(v, matchPreview)]));
+  const hide = (text: string) => matchPreview && mentionsMatching(text);
   const hero = d["social.hero"], membership = d["social.membership"], verify = d["social.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"] /* 소셜클럽 전용 FAQ (CMS 소셜클럽 탭) */, cta = d["social.cta"], gate = d["home.gate"];
   const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
-  const memberItems = list<{ label: string; title: string; body: string }>(membership, "items");
-  const memberNote = s(membership, "note");
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
+  const memberItems = list<{ label: string; title: string; body: string }>(membership, "items").filter((c) => !hide(`${c.label} ${c.title} ${c.body}`));
+  const memberNote = hide(s(membership, "note")) ? "" : s(membership, "note");
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)).filter((x) => !hide(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
 
   return (
     <div className="pt-[56px] md:pt-[64px]">

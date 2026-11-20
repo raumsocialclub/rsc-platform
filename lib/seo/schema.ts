@@ -54,7 +54,7 @@ const DEFAULT_LLMS = `# 라움소셜클럽 (RAUM SOCIAL CLUB, RSC)
 > 라움(RAUM)이 검증한 싱글 회원들이 서울 강남 라움아트센터의 공간에서 문화·미식·운동·회복 프로그램을 함께 경험하고 관계를 이어가는 프라이빗 소셜 커뮤니티입니다. 두 가지 방식으로 만납니다 — 소셜클럽(/social: 함께 경험하며 가까워지는 커뮤니티)과 1:1 매칭(/matching: 전담 디렉터가 검증된 회원 중 한 분을 직접 소개). 상담 후 초대제로 가입합니다.
 
 ## 핵심 사실
-- 운영: 주식회사 레벤스토리(대표 김기태) · 서울특별시 강남구 언주로 564, 비동 2층 (역삼동, 라움)
+- 운영: 주식회사 트라움에스앤씨(대표 김진민) · 서울특별시 강남구 언주로 564 (역삼동)
 - 가입: 법률상 배우자가 없는 싱글. 사이트에서 상담을 신청하고 가입 심사(신분증·혼인관계증명서·재직 증빙) 후 초대코드로 가입
 - 멤버십: 소셜클럽(가입비 · 1년 회원 자격 · 행사 6회 · 초대권 2매 · 결혼중개 아님) · 1:1 매칭(결혼중개) RAUM CLASSIC 가입비 4,400,000원 · RAUM SIGNATURE 8,800,000원 · RAUM PRIVÉ 22,000,000원(모두 VAT 포함, /matching 에 공개) · RSC PREVIEW(가입 전 행사 1회). 소셜클럽 가입비는 상담에서 안내, 자동 갱신 없음, 1:1 만남은 실제 대면 시에만 차감, 성혼사례금 없음
 - 프로그램: 월 1회 RSC TASTE SOCIAL(ART WALK, SUNDAY RESET, TASTE TABLE, ONE QUESTION SALON, AFTER HOURS, RUN & BRUNCH) · 1:1 매칭 회원 전용 분기 RAUM SOCIAL NIGHT 와 연말 GRAND SOCIAL BALL · 1:1 매칭 회원 연 6회(1·3·6·8·10·12월) 프리미엄 미팅 파티 RAUM SOLO(1회 참여권 포함)
@@ -112,7 +112,7 @@ export const SEO_DOCS: DocDef[] = [
       ta("sameAs", "공식 채널 링크", "줄마다 하나. 인스타그램은 자동 포함"),
       img("logo", "로고 (정사각형 · 배경 있는 PNG 권장)", "비우면 엠블럼"),
     ],
-    defaults: { name: "라움소셜클럽", alternateName: "RAUM SOCIAL CLUB", legalName: "주식회사 레벤스토리", description: "라움이 검증한 멤버가 모이는 싱글 라이프스타일 커뮤니티", streetAddress: "언주로 564", addressLocality: "강남구", addressRegion: "서울특별시", postalCode: "", openingHours: "", priceRange: "₩₩₩₩", sameAs: "", logo: "" },
+    defaults: { name: "라움소셜클럽", alternateName: "RAUM SOCIAL CLUB", legalName: "주식회사 트라움에스앤씨", description: "라움이 검증한 멤버가 모이는 싱글 라이프스타일 커뮤니티", streetAddress: "언주로 564", addressLocality: "강남구", addressRegion: "서울특별시", postalCode: "", openingHours: "", priceRange: "₩₩₩₩", sameAs: "", logo: "" },
   },
   ...PUBLIC_PAGES.map<DocDef>((p) => ({
     id: `seo.${p.key}`,

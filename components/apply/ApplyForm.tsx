@@ -144,7 +144,7 @@ export function ApplyForm({ token }: { token: string }) {
                 <span className="t-body-2 font-semibold text-label">개인정보 수집·이용 동의 <span className="text-negative">(필수)</span></span>
               </label>
               <dl className="mt-[12px] ml-[34px] grid gap-[4px] t-label-1-reading text-labelAlt">
-                <div><dt className="inline font-medium text-label">처리하는 회사: </dt><dd className="inline">주식회사 레벤스토리 (라움소셜클럽 운영)</dd></div>
+                <div><dt className="inline font-medium text-label">처리하는 회사: </dt><dd className="inline">주식회사 트라움에스앤씨 (라움소셜클럽 운영)</dd></div>
                 <div><dt className="inline font-medium text-label">수집 항목: </dt><dd className="inline">이름, 성별, 생년월일, 휴대폰 번호(필수) · 이메일, 추천인 코드, 가입 경로, MBTI, 키·체중, 혼인 상태·자녀 유무, 거주지역·본가, 주량·흡연, 학력, 직업·소득·직장, 자산·차량, 가족관계, 이상형 조건·우선순위·기피사항, 연애성향 답변(선택) · 종교는 아래 별도 동의 시에만</dd></div>
                 <div><dt className="inline font-medium text-label">이용 목적: </dt><dd className="inline">대면 상담의 준비와 일정 조율, 상담 전 기본 정보·희망 조건 확인, 문의 응대</dd></div>
                 <div><dt className="inline font-medium text-label">보관 기간: </dt><dd className="inline">접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)</dd></div>

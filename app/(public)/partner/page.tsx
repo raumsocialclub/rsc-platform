@@ -8,6 +8,8 @@ import { CARD, Container } from "@/components/ui/ds";
 import { PartnerForm } from "@/components/partner/PartnerForm";
 import type { PartnerKind } from "@/lib/partner/types";
 import { getBrand, getDoc, list, s } from "@/lib/cms/get";
+import { getSettings } from "@/lib/settings/get";
+import { stripMatching } from "@/lib/settings/matchPreview";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("partner");
@@ -23,10 +25,12 @@ type Track = { title: string; body: string; examples: string };
 const KINDS = ["brand", "corporate", "venue", "other"] as const;
 
 export default async function PartnerPage({ searchParams }: { searchParams: Promise<{ kind?: string }> }) {
-  const [{ kind: kindParam }, d, b] = await Promise.all([searchParams, getDoc("partner.page"), getBrand()]);
+  const [{ kind: kindParam }, d, b, { matchPreview }] = await Promise.all([searchParams, getDoc("partner.page"), getBrand(), getSettings()]);
   const initialKind = (KINDS as readonly string[]).includes(kindParam ?? "") ? (kindParam as PartnerKind) : undefined;
-  const tracks = list<Track>(d, "tracks");
-  const guide = lines(s(d, "guideItems"));
+  // 1:1 매칭 사전등록 모드면 「소셜클럽과 1:1 매칭 …」 식 문구에서 1:1 매칭 짝만 지운다 (끄면 복원)
+  const strip = (v: string) => (matchPreview ? stripMatching(v) : v);
+  const tracks = list<Track>(d, "tracks").map((t) => ({ ...t, body: strip(t.body) }));
+  const guide = lines(s(d, "guideItems")).map(strip).filter(Boolean);
   const partnerEmail = b.partnerEmail || "";
   const F = (k: string) => s(d, k);
   const copy = {
@@ -45,7 +49,7 @@ export default async function PartnerPage({ searchParams }: { searchParams: Prom
           <section className="text-center max-w-[680px] mx-auto mb-[40px] md:mb-[56px]">
             <div className="anim-up t-eyebrow text-primary mb-[10px]">{s(d, "eyebrow")}</div>
             <h1 className="anim-up t-title-1 md:t-display-3 text-label mb-[14px] text-pretty"><Txt v={s(d, "title")} /></h1>
-            <p className="anim-up-2 t-body-1-reading text-labelAlt text-pretty"><Txt v={s(d, "body")} /></p>
+            <p className="anim-up-2 t-body-1-reading text-labelAlt text-pretty"><Txt v={strip(s(d, "body"))} /></p>
           </section>
 
           {tracks.length > 0 && (
@@ -82,7 +86,7 @@ export default async function PartnerPage({ searchParams }: { searchParams: Prom
                     </li>
                   ))}
                 </ol>
-                {s(d, "guideNote") && <p className="mt-[16px] t-caption-1 text-labelAlt text-pretty"><Txt v={s(d, "guideNote")} /></p>}
+                {strip(s(d, "guideNote")) && <p className="mt-[16px] t-caption-1 text-labelAlt text-pretty"><Txt v={strip(s(d, "guideNote"))} /></p>}
               </div>
             </section>
           )}

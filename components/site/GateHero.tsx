@@ -16,6 +16,8 @@ export type GateTrack = {
   cta: string;
   href: string;
   applyHref: string;
+  /** 이 트랙만 다른 파란 버튼 문구 (예: 1:1 매칭 사전등록 모드의 「사전등록하기」) */
+  applyLabel?: string;
 };
 
 /**
@@ -89,7 +91,7 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
           <p className="t-body-2-reading md:t-body-1-reading md:text-[18px] md:leading-[1.6] text-white/85 text-pretty max-w-[560px] mb-[24px] md:mb-[32px]"><Txt v={cur.body} /></p>
           <div className="flex gap-[10px] flex-wrap">
             <Link href={cur.href} className={btn("inverse", "lg")}>{cur.cta}</Link>
-            <Link href={cur.applyHref} className={btn("solid", "lg")}>{applyLabel}</Link>
+            <Link href={cur.applyHref} className={btn("solid", "lg")}>{cur.applyLabel || applyLabel}</Link>
           </div>
         </div>
       </div>

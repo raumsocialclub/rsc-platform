@@ -4,8 +4,9 @@ import { ImageBlock } from "@/components/site/ImageBlock";
 import { ButtonLink, CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 import type { DocData } from "@/lib/cms/get";
 import { s } from "@/lib/cms/get";
+import { PREREG_HREF, mentionsMatching } from "@/lib/settings/matchPreview";
 
-type Card = { key: "social" | "matching"; eyebrow: string; title: string; desc: string; points: string; image: string; href: string; applyHref: string };
+type Card = { key: "social" | "matching"; eyebrow: string; title: string; desc: string; points: string; image: string; href: string; applyHref: string; applyLabel?: string };
 
 /** "항목: 내용" 줄 → [항목, 내용] */
 function parsePoints(v: string): [string, string][] {
@@ -19,12 +20,17 @@ function parsePoints(v: string): [string, string][] {
  * 홈 「두 가지 방식」 비교 카드. 소셜클럽 / 1:1 매칭 각각 사진 · 한 줄 설명 · 특징 표(대상·방식·주기·관계) · 자세히 보기 · 상담 신청.
  * 문구는 CMS home.tracks, 사진은 home.gate 의 트랙 사진을 같이 쓴다.
  */
-export function TrackCards({ doc, gate }: { doc: DocData; gate: DocData }) {
+/** 1:1 매칭 사전등록 모드일 때 매칭 카드에 쓰는 문구 (CMS matching.preview). 특징 표(플랜명·가입비)는 숨기고 설명 한 줄 + 「사전등록하기」 */
+export type TrackCardPreview = { desc: string; ctaLabel: string };
+
+export function TrackCards({ doc, gate, preview }: { doc: DocData; gate: DocData; preview?: TrackCardPreview }) {
   const cards: Card[] = [
     { key: "social", eyebrow: s(doc, "socialEyebrow") || "01 · SOCIAL CLUB", title: s(doc, "socialTitle"), desc: s(doc, "socialDesc"), points: s(doc, "socialPoints"), image: s(gate, "socialImage"), href: "/social", applyHref: "/fit-check?track=social" },
-    { key: "matching", eyebrow: s(doc, "matchingEyebrow") || "02 · 1:1 MATCHING", title: s(doc, "matchingTitle"), desc: s(doc, "matchingDesc"), points: s(doc, "matchingPoints"), image: s(gate, "matchingImage"), href: "/matching", applyHref: "/fit-check?track=matching" },
+    preview
+      ? { key: "matching", eyebrow: s(doc, "matchingEyebrow") || "02 · 1:1 MATCHING", title: s(doc, "matchingTitle"), desc: preview.desc || s(doc, "matchingDesc"), points: "", image: s(gate, "matchingImage"), href: "/matching", applyHref: PREREG_HREF, applyLabel: preview.ctaLabel || "사전등록하기" }
+      : { key: "matching", eyebrow: s(doc, "matchingEyebrow") || "02 · 1:1 MATCHING", title: s(doc, "matchingTitle"), desc: s(doc, "matchingDesc"), points: s(doc, "matchingPoints"), image: s(gate, "matchingImage"), href: "/matching", applyHref: "/fit-check?track=matching" },
   ];
-  const note = s(doc, "note");
+  const note = preview && mentionsMatching(s(doc, "note")) ? "" : s(doc, "note");
   const detailCta = s(doc, "detailCta") || "자세히 보기", applyCta = s(doc, "applyCta") || "상담 신청";
   return (
     <section id="tracks" data-fold className="py-[64px] md:py-[112px] bg-sand">
@@ -40,17 +46,17 @@ export function TrackCards({ doc, gate }: { doc: DocData; gate: DocData }) {
                 <div className="t-caption-1 font-semibold text-primary mb-[8px]">{c.eyebrow}</div>
                 <h3 className="t-title-3 text-label mb-[6px]">{c.title}</h3>
                 <p className="t-body-2-reading text-labelAlt text-pretty m-0 mb-[18px]"><Txt v={c.desc} /></p>
-                <dl className="grid gap-[8px] border-t border-lineAlt pt-[16px] mb-[22px]">
+                {c.points && <dl className="grid gap-[8px] border-t border-lineAlt pt-[16px] mb-[22px]">
                   {parsePoints(c.points).map(([k, v], j) => (
                     <div key={j} className="grid grid-cols-[48px_minmax(0,1fr)] md:grid-cols-[56px_minmax(0,1fr)] gap-[10px] t-label-1-reading">
                       <dt className="font-semibold text-labelNeutral">{k}</dt>
                       <dd className="text-labelAlt m-0 text-pretty">{nowrap(v)}</dd>
                     </div>
                   ))}
-                </dl>
+                </dl>}
                 <div className="mt-auto flex gap-[8px] flex-wrap">
                   <ButtonLink href={c.href} variant="outlined" size="md">{detailCta}</ButtonLink>
-                  <ButtonLink href={c.applyHref} size="md">{applyCta}</ButtonLink>
+                  <ButtonLink href={c.applyHref} size="md">{c.applyLabel || applyCta}</ButtonLink>
                 </div>
               </div>
             </article>

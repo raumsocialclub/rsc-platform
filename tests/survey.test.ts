@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { PRIVACY_CONSENT_VERSION } from "@/lib/legal/content";
 import { fakeDb } from "./helpers/fakeDb";
 import { DEMAND_2027, OTHER, displaySurveyAnswer, missingSurveyAnswer, sanitizeSurveyAnswers, summarizeSurvey, surveyDef } from "@/lib/survey/definitions";
 import { surveyCsv, surveyCsvColumns, surveySummary, type SurveyResponseRow } from "@/lib/survey/export";
@@ -120,7 +121,7 @@ describe("POST /api/survey", () => {
     expect((r1.answers as Record<string, unknown>).hacked).toBeUndefined();
     expect((await POST(post({ answers: good, name: " 김라움 ", phone4: "1234", consent: true }))).status).toBe(200);
     const r2 = db.tables.survey_responses[1] as Record<string, unknown>;
-    expect(r2).toMatchObject({ name: "김라움", phone_last4: "1234", consent_version: "2026-11-18" });
+    expect(r2).toMatchObject({ name: "김라움", phone_last4: "1234", consent_version: PRIVACY_CONSENT_VERSION });
     expect(r2.consent_at).toBeTruthy();
     expect((db.tables.surveys[0] as { last_response_at: string | null }).last_response_at).toBeTruthy();
   });

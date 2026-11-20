@@ -9,13 +9,18 @@ import { VerifySection } from "@/components/site/VerifySection";
 import { MembersOnly } from "@/components/site/MembersOnly";
 import { FaqSection } from "@/components/site/FaqSection";
 import { CtaBand } from "@/components/site/CtaBand";
+import { MatchPreview } from "@/components/site/MatchPreview";
 import { Txt, lines, nowrap } from "@/components/cms/Txt";
-import { getPageDocs, list, on, s } from "@/lib/cms/get";
+import { getDoc, getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
+import { getSettings } from "@/lib/settings/get";
 import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead, SWIPE, SWIPE_ITEM } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return pageMetadata("matching");
+  const { matchPreview } = await getSettings();
+  if (!matchPreview) return pageMetadata("matching");
+  const pv = await getDoc("matching.preview");
+  return pageMetadata("matching", { title: s(pv, "seoTitle") || "1:1 매칭 사전등록", description: s(pv, "seoDescription") || undefined, image: s(pv, "image") || undefined });
 }
 
 const SECTION = "py-[64px] md:py-[112px]";
@@ -26,11 +31,14 @@ type Plan = { name: string; sub: string; price: string; badge: string; dark?: bo
  * 상단 소개 → 01 가입 심사(아무나 들어올 수 없습니다) → 02 진행 방식 4단계 → 03 멤버십 가입비(등급 이름 · 가입비(VAT 포함) · 상담 버튼만 — 결혼중개업은 가입비를 홈페이지에 공개해야 하므로 2026-11-12 부터 금액을 그대로 보여준다)
  * → 회원 전용 행사(SOCIAL NIGHT · GRAND BALL · RAUM SOLO, home.solo 재사용) → 04 다른 점 → 05 이런 분께 → 06 FAQ → CTA.
  * 문구는 모두 CMS(matching.* + home.solo, 전환 바 이름은 home.gate). 모든 상담 버튼은 /fit-check?track=matching.
+ *
+ * 2026-11-20 정책: 일반 설정 「1:1 매칭 사전등록 모드」(settings.site.matchPreview, 기본 켬)가 켜져 있으면 위 섹션은 모두 숨기고
+ * 사전등록 화면(components/site/MatchPreview.tsx, 문구 CMS matching.preview)만 보인다. 모드를 끄면 아래 전체 페이지가 그대로 복원된다.
  */
 const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/").trim() : v.trim());
 
 export default async function MatchingPage() {
-  const d = await getPageDocs(["matching", "home"]);
+  const [d, { matchPreview }] = await Promise.all([getPageDocs(["matching", "home"]), getSettings()]);
   const hero = d["matching.hero"], verify = d["matching.verify"], how = d["matching.how"], plans = d["matching.plans"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"], solo = d["home.solo"], cta = d["matching.cta"], gate = d["home.gate"];
   const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
   const planItems = list<Plan>(plans, "items").filter((p) => p.name);
@@ -38,6 +46,18 @@ export default async function MatchingPage() {
   const planNote = s(plans, "note");
   // 1:1 매칭 가입비는 공개 항목(결혼중개업)이라 FAQ 의 금액 문구도 숨기지 않는다
   const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a);
+
+  if (matchPreview) {
+    return (
+      <div className="pt-[56px] md:pt-[64px]">
+        <Header />
+        <TrackSwitch current="matching" labels={switchLabels} />
+        <MatchPreview doc={d["matching.preview"]} />
+        <SiteFooter />
+        <UpButton />
+      </div>
+    );
+  }
 
   return (
     <div className="pt-[56px] md:pt-[64px]">

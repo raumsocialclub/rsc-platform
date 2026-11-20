@@ -4,7 +4,13 @@ import type { InquiryRow } from "@/components/admin/InquiryDetail";
  * 상담 신청의 「관심 방식」(소셜클럽 · 1:1 매칭 · 상담 후 결정)과 「들어온 경로」(어느 페이지에서 상담 신청으로 넘어왔는지).
  * 간단 상담 신청(/fit-check)이 answers.track · answers.entryTrack · answers.entryPath 로 저장하고, 어드민 목록·상세·필터·CSV 가 같은 규칙으로 읽는다.
  * 2026-11-09 이전 신청은 answers.route 의 한글 라벨만 있으므로 라벨에서 방식을 되짚는다.
+ * 2026-11-20 사전등록 모드: /matching 「1:1 매칭 사전등록하기」 → /match-check?src=prereg 로 들어온 프로필 진단 응답은 answers.entrySource="prereg" 로 남고
+ * 「들어온 경로」에 「1:1 매칭 사전등록하기 버튼」으로 보인다.
  */
+export const PREREG_SOURCE = "prereg";
+export const PREREG_LABEL = "1:1 매칭 사전등록하기";
+/** /matching 「1:1 매칭 사전등록하기」 버튼으로 들어온 프로필 진단 응답인지 */
+export const isPrereg = (r: Pick<InquiryRow, "answers">): boolean => r.answers?.entrySource === PREREG_SOURCE;
 export const TRACKS = ["social", "matching", "undecided"] as const;
 export type Track = (typeof TRACKS)[number];
 export const TRACK_KO: Record<Track, string> = { social: "소셜클럽", matching: "1:1 매칭", undecided: "상담 후 결정" };
@@ -51,7 +57,7 @@ export function entryLabel(r: Pick<InquiryRow, "answers">): string {
   let where = "";
   if (path.startsWith("ext:")) where = `외부 링크 (${path.slice(4)})`;
   else if (path) where = PAGE_KO.find(([re]) => re.test(path))?.[1] ?? path;
-  const button = btn && btn !== "undecided" ? `${TRACK_KO[btn]} 상담 버튼` : "";
+  const button = isPrereg(r) ? `${PREREG_LABEL} 버튼` : btn && btn !== "undecided" ? `${TRACK_KO[btn]} 상담 버튼` : "";
   if (!where && !button) return a.track ? "직접 접속 · 링크" : "";
   return [where, button].filter(Boolean).join(" · ");
 }

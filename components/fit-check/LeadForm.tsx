@@ -63,7 +63,7 @@ function ConsentMore({ text }: { text: string }) {
   );
 }
 
-export function LeadForm({ title, note, track: initialTrack = "undecided", copy }: { title: string; note: string; /** 어느 트랙에서 들어왔는지 (/fit-check?track=social|matching). 폼에서 바꿀 수 있고 inquiries.answers.route 로 저장된다 */ track?: LeadTrack; copy?: Partial<LeadCopy> }) {
+export function LeadForm({ title, note, track: initialTrack = "undecided", copy, hideMatching = false }: { title: string; note: string; /** 어느 트랙에서 들어왔는지 (/fit-check?track=social|matching). 폼에서 바꿀 수 있고 inquiries.answers.route 로 저장된다 */ track?: LeadTrack; copy?: Partial<LeadCopy>; /** 1:1 매칭 사전등록 모드: 「1:1 매칭」 선택지를 숨긴다 (1:1 매칭은 /match-check 사전등록으로만 받음) */ hideMatching?: boolean }) {
   const C: LeadCopy = { ...DEFAULT_LEAD_COPY, ...Object.fromEntries(Object.entries(copy ?? {}).filter(([, v]) => !!v)) } as LeadCopy;
   const chipLabel: Record<LeadTrack, string> = { social: C.chipSocial, matching: C.chipMatching, undecided: C.chipUndecided };
   const [track, setTrack] = useState<LeadTrack>(initialTrack);
@@ -132,8 +132,8 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy 
       <div className="grid gap-[20px]">
         <fieldset className="border-0 p-0 m-0 min-w-0">
           <legend className={FIELD_LABEL}>{C.trackLegend}</legend>
-          <div className="grid grid-cols-3 gap-[8px]">
-            {(Object.keys(TRACK_LABEL) as LeadTrack[]).map((k) => (
+          <div className={`grid ${hideMatching ? "grid-cols-2" : "grid-cols-3"} gap-[8px]`}>
+            {(Object.keys(TRACK_LABEL) as LeadTrack[]).filter((k) => !(hideMatching && k === "matching")).map((k) => (
               <button key={k} type="button" aria-pressed={track === k} onClick={() => setTrack(k)} className={`${CHIP} ${track === k ? CHIP_ON : CHIP_OFF} px-[8px]`}>{chipLabel[k]}</button>
             ))}
           </div>

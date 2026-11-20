@@ -16,8 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
  * 흰 배경에 얇은 상단 바(로고 + 닫기)만 두고 양식을 가운데 카드로 보여준다. 문구는 모두 CMS(apply.form).
  */
 export default async function FitCheckPage({ searchParams }: { searchParams: Promise<{ track?: string }> }) {
-  const [{ surveyMode }, sp, doc] = await Promise.all([getSettings(), searchParams, getDoc("apply.form")]);
-  const track: LeadTrack = sp.track === "social" || sp.track === "matching" ? sp.track : "undecided";
+  const [{ surveyMode, matchPreview }, sp, doc] = await Promise.all([getSettings(), searchParams, getDoc("apply.form")]);
+  // 1:1 매칭 사전등록 모드면 ?track=matching 으로 들어와도 「상담 후 결정」으로 받고 1:1 매칭 선택지를 숨긴다 (1:1 매칭은 /match-check 사전등록으로만)
+  const track: LeadTrack = sp.track === "social" || (sp.track === "matching" && !matchPreview) ? sp.track : "undecided";
   const copy: Partial<LeadCopy> = {};
   for (const [k, v] of Object.entries(doc)) if (typeof v === "string" && v) (copy as Record<string, string>)[k] = v;
   const title = (track === "social" ? copy.titleSocial : track === "matching" ? copy.titleMatching : copy.titleDefault) || "RSC 상담 신청";
@@ -29,7 +30,7 @@ export default async function FitCheckPage({ searchParams }: { searchParams: Pro
       </header>
       <main className="flex-1 flex flex-col justify-center px-[16px] py-[32px] md:px-[32px] md:py-[64px]">
         <div className="w-full max-w-[640px] mx-auto bg-white border border-lineAlt rounded-ds p-[24px] md:p-[48px]">
-          {surveyMode ? <FitCheck /> : <LeadForm title={title} note={copy.note || "남겨주신 연락처로 담당자가 직접 연락드립니다."} track={track} copy={copy} />}
+          {surveyMode ? <FitCheck /> : <LeadForm title={title} note={copy.note || "남겨주신 연락처로 담당자가 직접 연락드립니다."} track={track} copy={copy} hideMatching={matchPreview} />}
         </div>
       </main>
     </div>

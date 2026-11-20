@@ -9,7 +9,7 @@ import { applySummary, isApply, type InquiryKind } from "@/lib/apply/export";
 import type { InquiryCrm } from "@/lib/crm/inquiries";
 import { STATUS_KO, type CallStatus } from "@/lib/crm/types";
 import { PROFILES } from "@/lib/fit-check/questions";
-import { entryLabel, inquiryTrack, trackLabel, type TrackFilter } from "@/lib/inquiries/track";
+import { entryLabel, inquiryTrack, trackLabel, type TrackFilter, isPrereg } from "@/lib/inquiries/track";
 import { residenceLabel, type ProfileAnswers } from "@/lib/inquiries/profile";
 
 /* ---------- 상담 신청 ---------- */
@@ -61,7 +61,7 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
                   return (
                     <tr key={r.id} className={active ? "bg-[rgba(0,102,255,.06)]" : "hover:bg-[rgba(112,115,124,.05)]"}>
                       <td className={`${TD} text-[rgba(55,56,60,.61)]`}><Link href={`/admin/inquiries?id=${r.id}`} className="block">{fmtShortDate(r.created_at)}</Link></td>
-                      <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}{r.answers?.form === "apply" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[11px] font-semibold align-middle" style={badgeStyle("brand")}>설문</span>}{r.answers?.form === "match" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[11px] font-semibold align-middle" style={badgeStyle("brand")}>진단</span>}</Link></td>
+                      <td className={TD}><Link href={`/admin/inquiries?id=${r.id}`} className="block font-bold">{r.name || "—"}{r.answers?.form === "apply" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[11px] font-semibold align-middle" style={badgeStyle("brand")}>설문</span>}{isPrereg(r) && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[11px] font-semibold align-middle" style={badgeStyle("brand")}>사전등록</span>}{r.answers?.form === "match" && <span className="ml-[6px] inline-block px-[6px] py-[1px] text-[11px] font-semibold align-middle" style={badgeStyle("brand")}>진단</span>}</Link></td>
                       <td className={TD}>{r.phone || "—"}</td>
                       <td className={TD}>
                         {inquiryTrack(r) ? <Badge style={trackBadge(r)}>{trackLabel(r)}</Badge> : <span className="text-[rgba(55,56,60,.28)]">—</span>}

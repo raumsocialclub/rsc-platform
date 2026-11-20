@@ -11,7 +11,8 @@ import { MATCH_PHOTO_COUNT, SENSITIVE_KEYS, flattenMatchAnswers, missingMatchReq
 import { isPhotoPath, verifyPhoto } from "@/lib/match/photo";
 
 /**
- * POST /api/match { answers, consent, sensitiveConsent?, marketing?, photos?, entryPath?, utm? } — 프로필 진단(/match-check) 제출.
+ * POST /api/match { answers, consent, sensitiveConsent?, marketing?, photos?, entryPath?, entrySource?, utm? } — 프로필 진단(/match-check) 제출.
+ *   entrySource "prereg" = /matching 「1:1 매칭 사전등록하기」 버튼으로 들어온 응답(2026-11-20 사전등록 모드) → answers.entrySource, 어드민 「들어온 경로」에 표시.
  * 로그인 없이 누구나. 저장은 inquiries(서버 service role 전용) 한 행: 이름·휴대폰은 컬럼, 나머지는 answers 에
  *   form: "match" · track: "matching"(1:1 매칭 관심) · job/education/region/district(어드민 목록·CSV 의 「직업 · 학력 · 거주지」열이 그대로 읽음)
  *   · answers[](어드민 상세가 그대로 보여주는 질문·답 목록) · match(원본 키-값) · photos(버킷 경로 최대 3장, photo 는 첫 장) · 동의 시각·버전.
@@ -29,6 +30,7 @@ const BodySchema = z.object({
   photos: z.array(z.string().max(200)).max(MATCH_PHOTO_COUNT).optional().default([]),
   photo: z.string().max(200).optional().nullable(),
   entryPath: z.string().max(200).optional().default(""),
+  entrySource: z.enum(["prereg"]).optional(),
   utm: UtmSchema.nullable().optional(),
 });
 
@@ -84,6 +86,7 @@ export async function POST(req: Request) {
       route: "1:1 매칭",
       entryTrack: "matching",
       ...(cleanEntryPath(body.entryPath) ? { entryPath: cleanEntryPath(body.entryPath) } : {}),
+      ...(body.entrySource ? { entrySource: body.entrySource } : {}),
       slot: "",
       ...(a.jobCategory ? { job: a.jobCategory } : {}),
       ...(a.education ? { education: a.education } : {}),
