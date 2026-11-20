@@ -47,7 +47,9 @@ describe("1:1 매칭 사전등록 모드", () => {
     const mem = DOC_BY_ID.get("social.membership")!.defaults as Record<string, unknown>;
     const m2 = scrubDoc(mem);
     expect(String(m2.lead)).not.toMatch(/1:1/);
-    expect((m2.items as unknown[]).length).toBe((mem.items as unknown[]).length - 1); // 04 UPGRADE(1:1 매칭으로 전환) 항목이 빠진다
+    expect((m2.items as unknown[]).length).toBe(4); // 2026-11-20 부터 4번째 카드는 「제휴 혜택」이라 그대로 남는다
+    const withUpgrade = { ...mem, items: [...(mem.items as unknown[]), { label: "04 UPGRADE", title: "1:1 매칭으로 전환", body: "소셜클럽으로 시작한 뒤 1:1 매칭 멤버십(RAUM CLASSIC)으로 전환할 수 있습니다." }] };
+    expect((scrubDoc(withUpgrade).items as unknown[]).length).toBe(4); // 1:1 매칭 전용 항목은 빠진다
   });
   it("dropMatchingSegments: 「 · 」 조각 중 매칭 조각만 뺀다", () => {
     expect(dropMatchingSegments("- 멤버십: 소셜클럽(가입비 · 1년) · 1:1 매칭(결혼중개) RAUM CLASSIC 4,400,000원")).toBe("- 멤버십: 소셜클럽(가입비 · 1년)");
