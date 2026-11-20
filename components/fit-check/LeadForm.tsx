@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { InstagramButton } from "@/components/site/InstagramButton";
-import { Button, ButtonLink, CARD, CHIP, CHIP_OFF, CHIP_ON, FIELD_HELP, FIELD_LABEL, INPUT } from "@/components/ui/ds";
+import { Button, ButtonLink, CARD, FIELD_HELP, FIELD_LABEL, INPUT } from "@/components/ui/ds";
 import { DISTRICT_MAX, EDUCATION_OPTIONS, JOB_OPTIONS, REGION_OPTIONS } from "@/lib/inquiries/profile";
 import { formatPhoneInput, normalizePhone } from "@/lib/phone";
 import { readUtm } from "@/lib/utm/client";
@@ -63,10 +63,9 @@ function ConsentMore({ text }: { text: string }) {
   );
 }
 
-export function LeadForm({ title, note, track: initialTrack = "undecided", copy, hideMatching = false }: { title: string; note: string; /** 어느 트랙에서 들어왔는지 (/fit-check?track=social|matching). 폼에서 바꿀 수 있고 inquiries.answers.route 로 저장된다 */ track?: LeadTrack; copy?: Partial<LeadCopy>; /** 1:1 매칭 사전등록 모드: 「1:1 매칭」 선택지를 숨긴다 (1:1 매칭은 /match-check 사전등록으로만 받음) */ hideMatching?: boolean }) {
+export function LeadForm({ title, note, track: initialTrack = "undecided", copy }: { title: string; note: string; /** 어느 트랙에서 들어왔는지 (/fit-check?track=social|matching). inquiries.answers.route 로 저장된다. 2026-11-20 부터 화면의 「관심 있는 방식」 선택 칩은 없앴다(사용자 요청) — 값은 링크(?track=)로만 정해진다 */ track?: LeadTrack; copy?: Partial<LeadCopy> }) {
   const C: LeadCopy = { ...DEFAULT_LEAD_COPY, ...Object.fromEntries(Object.entries(copy ?? {}).filter(([, v]) => !!v)) } as LeadCopy;
-  const chipLabel: Record<LeadTrack, string> = { social: C.chipSocial, matching: C.chipMatching, undecided: C.chipUndecided };
-  const [track, setTrack] = useState<LeadTrack>(initialTrack);
+  const track: LeadTrack = initialTrack;
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [job, setJob] = useState("");
@@ -130,15 +129,6 @@ export function LeadForm({ title, note, track: initialTrack = "undecided", copy,
       <p className="t-body-1-reading text-labelAlt mb-[32px] text-pretty"><Txt v={note} /></p>
 
       <div className="grid gap-[20px]">
-        <fieldset className="border-0 p-0 m-0 min-w-0">
-          <legend className={FIELD_LABEL}>{C.trackLegend}</legend>
-          <div className={`grid ${hideMatching ? "grid-cols-2" : "grid-cols-3"} gap-[8px]`}>
-            {(Object.keys(TRACK_LABEL) as LeadTrack[]).filter((k) => !(hideMatching && k === "matching")).map((k) => (
-              <button key={k} type="button" aria-pressed={track === k} onClick={() => setTrack(k)} className={`${CHIP} ${track === k ? CHIP_ON : CHIP_OFF} px-[8px]`}>{chipLabel[k]}</button>
-            ))}
-          </div>
-          <span className={FIELD_HELP}>{track === "social" ? C.helpSocial : track === "matching" ? C.helpMatching : C.helpUndecided}</span>
-        </fieldset>
         <label className="block">
           <span className={FIELD_LABEL}>{C.nameLabel} <span className="text-negative">*</span></span>
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder={C.namePlaceholder} autoComplete="name" maxLength={50} required className={INPUT} />

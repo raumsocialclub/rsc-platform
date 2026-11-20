@@ -328,7 +328,7 @@ export const DOCS: DocDef[] = [
     defaults: {
       tabSocial: "소셜클럽", tabSocialSub: "함께 경험하며 가까워지는", tabMatching: "1:1 매칭", tabMatchingSub: "한 사람을 깊이 알고 만나는", defaultTrack: "social",
       socialImage: "/images/hero.jpg", socialOverline: "RAUM SOCIAL CLUB", socialTitle: "취향으로 만나,\n함께하는 일상이 넓어지는 곳.", socialBody: "싱글을 위한 라이프스타일 커뮤니티.\n좋아하는 것을 함께하며, 서로를 알아갑니다.", socialCta: "소셜클럽 자세히 보기",
-      matchingImage: "/images/after-hours.jpg", matchingOverline: "RAUM 1:1 MATCHING", matchingTitle: "한 사람을,\n깊이 알고 만나는 곳.", matchingBody: "검증된 멤버를 위한 프라이빗 1:1 소개.\n전담 컨시어지가 직접 소개하고, 만남은 라움에서 이루어집니다.", matchingCta: "1:1 매칭 자세히 보기",
+      matchingImage: "/images/after-hours.jpg", matchingOverline: "RAUM 1:1 MATCHING", matchingTitle: "당신과 어울리는 만남,\n라움이 준비합니다.", matchingBody: "검증된 멤버를 위한 프라이빗 1:1 소개.\n전담 컨시어지가 직접 소개하고, 만남은 라움에서 이루어집니다.", matchingCta: "1:1 매칭 자세히 보기",
       applyCta: "상담 신청",
     },
   },
@@ -394,7 +394,7 @@ export const DOCS: DocDef[] = [
         { label: "01 MEMBERSHIP", title: "RSC 회원 자격 1년", body: "가입 심사를 통과한 검증된 싱글 멤버. 라움아트센터 라운지와 회원 전용 프로그램 안내를 받습니다." },
         { label: "02 EVENTS", title: "RSC TASTE SOCIAL 6회 참여권", body: "월 1회 열리는 아트·와인·웰니스·러닝·토크·다이닝 행사 중 6회. 실제 참석 시에만 차감되고, 7회차부터는 회당 실비로 참여합니다." },
         { label: "03 INVITATION", title: "지인 초대권 2매", body: "좋은 사람을 라움으로 초대할 수 있는 초대권 2매. 함께 온 지인도 같은 기준의 가입 심사를 거쳐 회원이 될 수 있습니다." },
-        { label: "04 UPGRADE", title: "1:1 매칭으로 전환", body: "소셜클럽으로 시작한 뒤, 1:1 매칭 멤버십(RAUM CLASSIC · SIGNATURE · PRIVÉ)으로 전환할 수 있습니다." },
+        { label: "04 BENEFITS", title: "제휴 혜택", body: "회원에게 열리는 라움의 제휴 혜택. 프리미엄 호텔·리조트·여행, 골프·테니스·피트니스, 미식·와인·파인다이닝, 공연·전시·문화예술, 뷰티·웰니스·헬스케어, 비즈니스 네트워킹 및 투자 커뮤니티, 프라이빗 파티와 특별한 만남까지." },
       ],
       note: "가입 자격은 법률상 배우자가 없는 싱글입니다. 가입비는 대면 상담에서 안내해 드리며, 가입 후 14일 이내 전액 환불, 이후에는 계약서의 월별 환불표를 따릅니다.",
     },
