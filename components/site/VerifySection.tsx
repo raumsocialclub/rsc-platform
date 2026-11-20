@@ -1,4 +1,5 @@
 import { Txt, nowrap } from "@/components/cms/Txt";
+import { MemberCriteria } from "@/components/site/MemberCriteria";
 import { CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 import type { DocData } from "@/lib/cms/get";
 import { list, s } from "@/lib/cms/get";
@@ -13,6 +14,7 @@ const ICONS: Record<string, React.ReactNode> = {
 /**
  * 가입 심사 섹션 「아무나, 들어올 수 없습니다」. 검정 원 안의 선 아이콘 + 제목 + 한 줄 설명 카드.
  * 사업전략: 가입 심사(신분증·혼인관계증명서·재직 증빙) + 프로필·취향 인터뷰·매너 서약 + 실제 커뮤니티 활동으로 2차 검증.
+ * 카드 아래에 멤버 기준표(MemberCriteria, CMS criteria*)가 붙는다 — 문서에 criteria 가 있는 소셜클럽(social.verify)에서만 보인다 (2026-11-20).
  */
 export function VerifySection({ doc, tone = "sand" }: { doc: DocData; tone?: "sand" | "white" }) {
   const items = list<{ icon: string; title: string; body: string }>(doc, "items");
@@ -33,6 +35,7 @@ export function VerifySection({ doc, tone = "sand" }: { doc: DocData; tone?: "sa
             </div>
           ))}
         </div>
+        <MemberCriteria doc={doc} />
       </Container>
     </section>
   );
