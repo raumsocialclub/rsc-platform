@@ -153,7 +153,7 @@ export function MatchForm({ copy, source }: { copy?: Partial<MatchCopy>; source?
     if (q.sensitive && !sensitiveAgreed) { set(q.key, o); setError("저장하려면 아래 민감정보 동의에 체크해 주세요. 체크하지 않으면 이 답은 저장되지 않아요."); return; }
     set(q.key, o);
     if (isBlockedAnswer(q, o)) { if (advanceTimer.current) window.clearTimeout(advanceTimer.current); return; } // 기혼: 안내만 빨갛게, 다음으로 안 넘어감
-    if (!last) advanceTimer.current = window.setTimeout(() => go(step + 1), 240);
+    if (!last && !q.extra) advanceTimer.current = window.setTimeout(() => go(step + 1), 240); // 덧붙는 입력칸(초대코드)이 있으면 자동으로 넘기지 않고 「확인」을 누르게 한다
   };
   const toggle = (o: string) => {
     const on = list.includes(o);
@@ -273,6 +273,25 @@ export function MatchForm({ copy, source }: { copy?: Partial<MatchCopy>; source?
                   );
                 })}
               </div>
+            )}
+            {q.type === "single" && q.extra && (
+              <form className="mt-[22px]" onSubmit={(e) => { e.preventDefault(); next(); }}>
+                <label className="block">
+                  <span className="block t-label-1 font-semibold text-labelNeutral mb-[8px]">{q.extra.title}</span>
+                  <input
+                    value={String(answers[q.extra.key] ?? "")}
+                    onChange={(e) => set(q.extra!.key, (q.extra!.normalize ?? ((x: string) => x))(e.target.value).slice(0, q.extra!.max ?? 40))}
+                    placeholder={q.extra.placeholder}
+                    autoComplete="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    maxLength={q.extra.max ?? 40}
+                    className={`${FIELD} !text-[18px] tracking-[.04em]`}
+                    data-testid={`match-${q.extra.key}`}
+                  />
+                </label>
+                <button type="submit" className={`${BIG} mt-[14px]`} data-testid="match-extra-next">{C.confirmLabel}</button>
+              </form>
             )}
 
             {q.type === "multi" && (

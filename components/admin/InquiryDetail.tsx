@@ -26,6 +26,7 @@ export type InquiryRow = {
     photo?: string;         // 프로필 진단 사진의 버킷 경로(match-photos, 첫 장). 어드민은 /api/admin/inquiries/:id/photo?n= 로 본다
     photos?: string[];      // 사진 경로 전체(최대 3장, 2026-11-18)
     source?: string;        // 프로필 진단의 「알게 된 경로」
+    inviteCode?: string;    // 프로필 진단 「알게 된 경로」 아래 적은 초대코드(선택, 2026-11-20). 어드민 목록·상세에 표시
     sensitiveConsentAt?: string; // 종교·건강(민감정보) 별도 동의 시각
     linkId?: string;        // 응답이 들어온 설문 링크(apply_links.id)
     ref?: string;           // /apply?ref=코드 (추천인·직접 전달 링크)
@@ -134,7 +135,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   return (
     <div className="bg-white border border-[rgba(112,115,124,.08)] p-[26px]">
       <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : inquiry.answers?.form === "match" ? (isPrereg(inquiry) ? "1:1 매칭 사전등록 응답 (3분 프로필 설문)" : "프로필 진단 응답 (3분 프로필 진단)") : "신청 상세"}</div>
-      <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}</div>
+      <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}{a.inviteCode && <span className="ml-[8px] inline-block px-[8px] py-[2px] text-[12px] font-semibold align-middle tracking-[.04em]" style={badgeStyle("brand")} title="프로필 진단에서 입력한 초대코드">초대코드 {a.inviteCode}</span>}</div>
       <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
 
       {inquiry.result_type && (

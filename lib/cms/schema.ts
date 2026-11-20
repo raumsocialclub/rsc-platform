@@ -650,7 +650,7 @@ export const DOCS: DocDef[] = [
     defaults: {
       title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
       photoPick: "사진 선택하기", photoAdd: "사진 추가하기", photoChange: "삭제", photoLater: "나중에 올릴게요", photoNote: "", photoRule: "jpg · png · webp · heic / 장당 10MB 이하 · 최대 3장",
-      consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 활동 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 만남에서 중요하게 생각하는 항목, 알게 된 경로, 사진 최대 3장(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
+      consentTitle: "개인정보 수집·이용 동의", consentCollect: "이름, 성별, 생년월일, 휴대폰 번호, 혼인 상태, 거주지역(필수) · 자녀 유무, 활동 가능 지역, 키·체중, 학력·대학명, 직업·고용형태·연 소득, 본인 자산 규모, 외모 자기평가, MBTI, 흡연·주량, 만남에서 중요하게 생각하는 항목, 알게 된 경로·초대코드, 사진 최대 3장(선택) · 광고 링크로 들어온 경우 광고 유입 정보(utm 값)",
       consentPurpose: "1:1 매칭 가입 상담의 준비(담당 매니저가 기본 정보와 희망 조건을 미리 확인)와 일정 조율, 문의 응대", consentRetention: "접수일로부터 최대 180일, 이후 자동 삭제 (요청 시 그 전에도 삭제)", consentRefuse: "필수 항목 동의를 거부하면 제출되지 않습니다. 선택 항목은 비워 두어도 됩니다.",
       consentMore: "자세한 내용은 {privacy}에서 확인하실 수 있습니다. 사이트 이용 조건은 {terms}을 참고해 주세요.",
       sensitiveTitle: "종교·건강 정보(민감정보) 수집·이용 동의", sensitiveItems: "종교, 신체적 특이사항(질병·장애 여부 등) — 개인정보 보호법 제23조의 민감정보", sensitivePurpose: "1:1 매칭 상담에서 희망 조건과의 적합성 확인", sensitiveRetention: "프로필 진단 응답과 함께 접수일로부터 최대 180일", sensitiveRefuse: "동의하지 않아도 제출과 상담에 제한이 없습니다. 동의하지 않으면 종교·건강 답변은 저장되지 않습니다.",

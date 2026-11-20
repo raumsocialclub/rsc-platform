@@ -30,7 +30,9 @@ export const UTM_RAW_COLUMNS = ["utm_source", "utm_medium", "utm_campaign", "utm
 export const TRACK_COLUMNS = ["interest", "entry"] as const;
 export const PROFILE_COLUMNS = ["job", "education", "region", "district"] as const;
 export const MARKETING_COLUMNS = ["marketing", "marketing_at"] as const;
-export const CSV_COLUMNS = [...LEAD_COLUMNS, ...UTM_RAW_COLUMNS, ...TRACK_COLUMNS, ...PROFILE_COLUMNS, ...MARKETING_COLUMNS] as const;
+/** 프로필 진단 「알게 된 경로」 아래 적은 초대코드 (2026-11-20) */
+export const INVITE_COLUMNS = ["invite_code"] as const;
+export const CSV_COLUMNS = [...LEAD_COLUMNS, ...UTM_RAW_COLUMNS, ...TRACK_COLUMNS, ...PROFILE_COLUMNS, ...MARKETING_COLUMNS, ...INVITE_COLUMNS] as const;
 export type LeadRow = Record<(typeof CSV_COLUMNS)[number], string>;
 
 /** 메타 리드 파일의 form_id 는 메타 양식 번호라 우리 사이트 신청에는 고정 식별자를 넣는다. */
@@ -141,6 +143,7 @@ export function toLeadRow(r: LeadSource): LeadRow {
     district: (r.answers as ProfileAnswers | null | undefined)?.district ?? "",
     marketing: r.answers?.marketing === true ? "동의" : r.answers?.marketing === false ? "미동의" : "",
     marketing_at: r.answers?.marketingAt ? toKstIso(r.answers.marketingAt) : "",
+    invite_code: r.answers?.inviteCode ?? "",
   };
 }
 

@@ -84,6 +84,18 @@ describe("정제·평탄화", () => {
     expect(rows[4].answer).toBe("165cm");
     expect(rows[5].answer).toBe("6,000만원");
   });
+  it("초대코드(2026-11-20): 「알게 된 경로」 아래 덧붙는 입력칸 — 대문자·공백 제거·영문숫자하이픈만, 20자, 평탄화에 「초대코드」로 경로 뒤에 붙는다", () => {
+    const q = QUESTIONS.find((x) => x.key === "source")!;
+    expect(q.extra?.key).toBe("inviteCode");
+    expect(sanitizeMatchAnswers({ ...base, inviteCode: " rsc-ab12 cd34!! " }).inviteCode).toBe("RSC-AB12CD34");
+    expect(sanitizeMatchAnswers({ ...base, inviteCode: "x".repeat(40) }).inviteCode).toHaveLength(20);
+    expect(sanitizeMatchAnswers({ ...base, inviteCode: "   " }).inviteCode).toBeUndefined();
+    expect(sanitizeMatchAnswers({ ...base, inviteCode: 123 }).inviteCode).toBeUndefined();
+    const rows = flattenMatchAnswers(sanitizeMatchAnswers({ ...base, source: "지인 소개", inviteCode: "RSC-AB12-CD34" }));
+    expect(rows.slice(-2).map((r) => [r.key, r.label, r.answer])).toEqual([["source", "알게 된 경로", "지인 소개"], ["inviteCode", "초대코드", "RSC-AB12-CD34"]]);
+    const only = flattenMatchAnswers(sanitizeMatchAnswers({ ...base, inviteCode: "RSC-AB12-CD34" }));
+    expect(only.map((r) => r.key)).toContain("inviteCode"); // 경로를 고르지 않고 코드만 적어도 남는다
+  });
   it("사진 규칙: 확장자·크기·경로", () => {
     expect(photoProblem("a.jpg", 100)).toBeNull();
     expect(photoProblem("a.heic", 100)).toBeNull();
@@ -138,6 +150,14 @@ describe("POST /api/match", () => {
     expect(storageList).toHaveBeenCalledWith("inbox/123e4567-e89b-12d3-a456-426614174000", { limit: 5 });
     expect(db.tables.marketing_consents).toHaveLength(1);
     expect(db.tables.marketing_consents[0]).toMatchObject({ name: "김라움", phone: "010-1234-5678", region: "서울특별시", track: "matching" });
+  });
+  it("초대코드를 적으면 answers.inviteCode 에 남고 상세 목록(answers[])에도 「초대코드」 줄이 생긴다", async () => {
+    const { POST } = await import("@/app/api/match/route");
+    expect((await POST(post({ answers: { ...base, source: "지인 소개", inviteCode: "rsc-ab12-cd34" }, consent: true }))).status).toBe(200);
+    const row = db.tables.inquiries[0] as { answers: Record<string, unknown> };
+    expect(row.answers.inviteCode).toBe("RSC-AB12-CD34");
+    expect((row.answers.answers as { key: string; answer: string }[]).find((r) => r.key === "inviteCode")?.answer).toBe("RSC-AB12-CD34");
+    expect((row.answers.match as Record<string, unknown>).inviteCode).toBe("RSC-AB12-CD34");
   });
   it("entrySource 는 prereg 만 받고(그 밖은 400), 없으면 answers 에 남기지 않는다", async () => {
     const { POST } = await import("@/app/api/match/route");

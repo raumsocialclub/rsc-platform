@@ -41,7 +41,13 @@ export type Question = {
   table?: { head: [string, string]; rows: [string, string][] };
   /** 어드민 상세에 보일 짧은 이름 */
   label: string;
+  /** 선택지 아래 덧붙는 짧은 입력칸 (예: 「알게 된 경로」 아래 초대코드). 답은 answers[extra.key] 에 따로 저장되고 어드민 상세에 label 로 보인다 (2026-11-20) */
+  extra?: { key: string; label: string; title: string; placeholder?: string; max?: number; normalize?: (s: string) => string };
 };
+
+/** 초대코드 입력 정리: 대문자, 공백 제거, 영문·숫자·하이픈만 */
+export const normalizeInviteCode = (s: string) => s.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9-]/g, "");
+export const INVITE_CODE_EXTRA: NonNullable<Question["extra"]> = { key: "inviteCode", label: "초대코드", title: "초대코드가 있다면 입력해주세요.", placeholder: "예) RSC-AB12-CD34", max: 20, normalize: normalizeInviteCode };
 
 export const EMPLOYMENT_OPTIONS = ["정규직", "계약직", "개인사업자 (대표)", "법인사업자 (대표)", "프리랜서", "가업승계", "위촉직", "기타"];
 export const ASSET_OPTIONS = ["5천만원 미만", "5천만원 ~ 1억", "1억 ~ 3억", "3억 ~ 5억", "5억 ~ 10억", "10억 ~ 30억", "30억 이상", "답하고 싶지 않음"];
@@ -97,7 +103,7 @@ export const QUESTIONS: Question[] = [
   { key: "religion", type: "single", title: "종교가 있으신가요?", sub: "종교는 민감정보예요. 아래 별도 동의에 체크한 경우에만 저장돼요.", options: ["무교", "기독교", "천주교", "불교", "기타"], sensitive: true, label: "종교" },
   { key: "health", type: "textarea", title: "신체적 특이사항이 있으시면 알려주세요.", sub: "질병이나 장애 여부 등 · 건강 정보는 민감정보라 아래 별도 동의에 체크한 경우에만 저장돼요.", placeholder: "없으시면 건너뛰어도 돼요.", max: 500, sensitive: true, label: "신체적 특이사항" },
   { key: "priorities", type: "multi", title: "싱글 멤버와의 만남에서 중요하게 생각하는 항목 3가지를 선택해주세요.", sub: "우선순위를 선택해주세요. (정확히 3개 · 누른 순서가 우선순위예요)", options: PRIORITY_OPTIONS, optionDesc: PRIORITY_DESC, layout: "list", exact: 3, label: "중요하게 생각하는 항목 3가지" },
-  { key: "source", type: "single", title: "라움소셜클럽을 알게 된 경로는?", options: SOURCE_OPTIONS, label: "알게 된 경로" },
+  { key: "source", type: "single", title: "라움소셜클럽을 알게 된 경로는?", options: SOURCE_OPTIONS, label: "알게 된 경로", extra: INVITE_CODE_EXTRA },
   { key: "photo", type: "photo", title: "{name} 님의 사진을 올려주세요.", sub: "얼굴이 잘 나온 사진 3장을 올려주세요. (마스크 X, 측면 X). 상담 시 추가 사진을 별도로 요청드릴 수 있습니다.", max: MATCH_PHOTO_COUNT, label: "사진" },
   { key: "docs", type: "info", title: "상담 시 확인 서류 안내", body: "라움소셜클럽은 멤버들이 서로를 신뢰하며 만날 수 있도록, 상담 과정에서 필요한 정보를 확인합니다. 확인이 필요한 항목에 따라 아래 서류의 제출을 요청드릴 수 있습니다.\n제출이 필요한 경우, 해당 서류와 제출 방법을 상담 시 개별적으로 안내드립니다.", table: DOCS_TABLE, label: "확인 서류 안내" },
   { key: "phone", type: "tel", title: "마지막으로, 연락받을 휴대폰 번호를 알려주세요.", sub: "담당 매니저가 이 번호로 연락드려요. 입력한 내용은 지금까지 전송되지 않았고, 아래 동의 후 제출할 때 한 번에 보내져요.", placeholder: "010-0000-0000", required: true, label: "휴대폰 번호" },
@@ -163,8 +169,9 @@ export function flattenMatchAnswers(answers: MatchAnswers): { key: string; label
   for (const q of QUESTIONS) {
     if (SEPARATE.has(q.key)) continue;
     const answer = displayMatchAnswer(q, answers);
-    if (!answer) continue;
-    out.push({ key: q.key, label: q.label, question: q.title, answer });
+    if (answer) out.push({ key: q.key, label: q.label, question: q.title, answer });
+    const ex = q.extra ? String(answers[q.extra.key] ?? "").trim() : "";
+    if (q.extra && ex) out.push({ key: q.extra.key, label: q.extra.label, question: q.extra.title, answer: ex });
   }
   return out;
 }
@@ -176,6 +183,10 @@ export function sanitizeMatchAnswers(input: unknown): MatchAnswers {
   const src = input as Record<string, unknown>;
   for (const q of QUESTIONS) {
     if (q.type === "photo" || q.type === "info") continue; // 사진은 answers 가 아니라 photos 경로로 따로 받고, 안내 화면은 답이 없다
+    if (q.extra && typeof src[q.extra.key] === "string") {
+      const ex = (q.extra.normalize ?? ((x: string) => x.trim()))(src[q.extra.key] as string).slice(0, q.extra.max ?? 40);
+      if (ex) out[q.extra.key] = ex;
+    }
     const raw = src[q.key];
     const max = q.max ?? (q.type === "textarea" ? 1000 : 200);
     if (q.type === "multi") {

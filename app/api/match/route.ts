@@ -93,6 +93,7 @@ export async function POST(req: Request) {
       ...(region ? { region } : {}),
       ...(region && a.homeGugun ? { district: a.homeGugun } : {}),
       ...(a.source ? { source: a.source } : {}),
+      ...(a.inviteCode ? { inviteCode: a.inviteCode } : {}), // 「알게 된 경로」 아래 초대코드(선택, 2026-11-20). 어드민 목록·상세에 표시
       consentAt: now,
       consentVersion: PRIVACY_CONSENT_VERSION,
       ...(hasSensitive ? { sensitiveConsentAt: now } : {}),
