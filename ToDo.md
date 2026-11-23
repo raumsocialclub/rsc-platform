@@ -174,6 +174,7 @@
 - [x] 승인: 카드 머리의 「가입 승인」(확인창) → `POST /api/admin/inquiries/:id/approve {approve}` → `inquiries.approved_at`·`approved_by`(관리자) 기록, 「가입완료」 배지 + 승인일·승인자 표시, 「승인 취소」로 되돌리기. 관리자 활동 로그 `join.approve`/`join.unapprove`. 상담 상태(status)와는 별개.
 - [x] DB: `inquiries.approved_at timestamptz`, `approved_by uuid → members`, 인덱스 `inquiries_join_idx` — 운영 DB 적용 완료(2026-11-23, 마이그레이션 inquiries_join_approval, 추가 컬럼이라 기존 화면에 영향 없음). `SCHEMA.sql` 동기화.
 - [x] 테스트 `tests/join.test.ts`(9) + 종류 필터 테스트 갱신 — 총 272 통과. tsc·eslint 통과.
+- [x] 운영 배포 (2026-11-23, 2efec82 · dpl_GYXJUm6FAGhL8ngLC959k8kBhGsv) — 공개 화면 변화 없음(플로팅 버튼·메뉴 4개·1:1 매칭 0건 유지), /admin/join 은 비로그인 시 로그인으로 이동 확인
 - [ ] 다음 단계 후보(지시 시): 가입완료 회원만 모은 「회원 프로필」 메뉴·CSV, 카드 인쇄용 보기, 승인 시 가입 안내 문자/알림톡, 승인 회원과 회원 DB(계정) 연결.
 
 ## M21. 1:1 매칭 전체 숨김 — 카카오 비즈니스 채널 심사 대응 (사용자 요청, 2026-11-23)
