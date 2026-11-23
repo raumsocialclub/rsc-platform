@@ -176,6 +176,7 @@
 - [x] 상단 메뉴 4개로 변경 (2026-11-23, 사용자 요청): 브랜드소개(/#about) · 멤버십(/social) · 프로그램(/news) · 자주묻는질문(/social#faq). CMS `global.nav` 기본값(navSocial 「멤버십」, navNews 「프로그램」, 새 키 navFaq)으로 바꿔 어드민에서 이름을 계속 수정할 수 있다. 푸터 1열도 같은 키라 「멤버십」「프로그램」으로 함께 바뀜(푸터 FAQ 링크 문구 footerFaq 는 그대로). 페이지 주소는 그대로(/social, /news).
 - [x] 프로필 진단·플로팅 버튼 복구 (2026-11-23, 사용자 수정 요청: "1:1 매칭 사전등록하기 버튼이 아니라 소셜클럽 사전등록하기 버튼"): 전체 숨김 중에도 `/match-check` 와 플로팅 버튼 세 세트(이번 달 행사 보기 · RSC 멤버십 문의하기 · 프로필 남기고 상담받기)는 그대로 열리고, 기본 링크는 `/match-check?src=prereg`(CMS match.cta 기본값). 숨김 중에는 동의 목적·완료 안내·사전등록 이름을 `MATCH_FORM_HIDDEN`(소셜클럽 톤)으로, 검색 제목을 `MATCHCHECK_HIDDEN_SEO` 로 바꾼다. `/api/match` 가드 제거(`matchHiddenGuard.ts` 삭제). 어드민 「들어온 경로」 라벨 「1:1 매칭 사전등록하기」 → 「사전등록하기」, 종류 필터 「사전등록」. 테스트 264.
 - [x] 운영 배포 (2026-11-23, 99c81b4 · dpl_GzxS8iDz6jXNpdPMSZsvTWUajSm1) — 운영 홈 1:1 매칭 흔적 0건, /matching·/match-check → 메인, llms.txt·robots 제외, 상단 메뉴 4개 확인. 카카오 비즈니스 채널 재심사는 이 상태로 신청 가능
+- [x] 운영 배포 (2026-11-23, 84d85a3 · dpl_7SYi1hYgCDiQwZjWErPASYToCZtE) — 운영 홈 플로팅 버튼 표시(세 세트 → /match-check?src=prereg), /match-check 제목 「3분 프로필 진단 · 소셜클럽 사전등록」·본문 1:1 매칭 0건, /matching → 메인, llms.txt 1:1 매칭 없음 확인
 
 ## M20. 1:1 매칭 사전등록 모드 + 운영 주체 변경 (사용자 요청, 2026-11-20)
 - [x] 정책 변경: 1:1 매칭 내용은 전부 숨기고 사전등록만 받는다 — 일반 설정 「1:1 매칭 사전등록 모드」(`settings.site.matchPreview`, 기본 켬). 끄면 예전 1:1 매칭 페이지·문구·링크가 그대로 복원(코드·CMS 문서 보존).
