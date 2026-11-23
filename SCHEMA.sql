@@ -138,8 +138,13 @@ create table inquiries (
   crm_status text,
   crm_attempts smallint,
   crm_applied inquiry_status,
-  crm_synced_at timestamptz
+  crm_synced_at timestamptz,
+  -- 가입 신청 승인 (2026-11-23, 마이그레이션 inquiries_join_approval): 프로필 진단 응답(answers->>'form' = 'match') = 라움소셜클럽 가입 요청자.
+  -- 어드민 「가입 신청」(/admin/join)에서 승인하면 approved_at·approved_by 가 적히고 「가입완료」. null 이면 승인 대기. 상담 상태(status)와 별개
+  approved_at timestamptz,
+  approved_by uuid references members(id) on delete set null
 );
+create index inquiries_join_idx on inquiries ((answers->>'form'), approved_at);
 
 create table invite_codes (
   id uuid primary key default gen_random_uuid(),

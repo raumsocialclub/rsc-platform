@@ -53,6 +53,8 @@ export type DashboardStats = {
   activeMembers: number;
   newMembers: number;
   pendingInquiries: number;
+  /** 가입 신청(프로필 진단 응답) 중 승인 대기 (2026-11-23) */
+  pendingJoin: number;
   /** 상담 신청 수집 현황: 기간 내 건수(설문/홈 상담 신청)와 최근 5건. 설문 = 상담 전 설문(/apply) 응답 */
   inquiries: { total: number; applies: number; applyPending: number; recent: InquiryBrief[] };
   bars: { label: string; value: number }[];
@@ -74,16 +76,17 @@ export async function dashboardStats(range: Range, now = new Date()): Promise<Da
   const hi = cur.to.toISOString();
   const in14d = new Date(now.getTime() + 14 * 86_400_000).toISOString();
 
-  const [{ data: pays }, { data: books }, active, fresh, pending, { data: avail }, recent, { data: inqs }, { data: inqRecent }] = await Promise.all([
+  const [{ data: pays }, { data: books }, active, fresh, pending, { data: avail }, recent, { data: inqs }, { data: inqRecent }, pendingJoin] = await Promise.all([
     supabase.from("payments").select("member_id, booking_id, amount, status, approved_at, cancelled_at, raw").in("status", ["paid", "partial_cancelled", "cancelled"]).gte("approved_at", lo).lt("approved_at", hi),
     supabase.from("bookings").select("id, program_id, created_at, status").gte("created_at", lo).lt("created_at", hi),
     supabase.from("members").select("id", { count: "exact", head: true }).eq("status", "active"),
     supabase.from("members").select("id", { count: "exact", head: true }).gte("created_at", cur.from.toISOString()).lt("created_at", hi),
-    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending").or("answers->>form.is.null,answers->>form.neq.match"),
     supabase.from("session_availability").select("session_id, program_id, starts_at, capacity, remaining").gte("starts_at", now.toISOString()).lte("starts_at", in14d).order("starts_at").limit(8),
     listOrders({ limit: 5 }),
-    supabase.from("inquiries").select("id, name, created_at, status, answers").gte("created_at", cur.from.toISOString()).lt("created_at", hi).order("created_at", { ascending: false }).limit(1000),
-    supabase.from("inquiries").select("id, name, created_at, status, answers").order("created_at", { ascending: false }).limit(5),
+    supabase.from("inquiries").select("id, name, created_at, status, answers").or("answers->>form.is.null,answers->>form.neq.match").gte("created_at", cur.from.toISOString()).lt("created_at", hi).order("created_at", { ascending: false }).limit(1000),
+    supabase.from("inquiries").select("id, name, created_at, status, answers").or("answers->>form.is.null,answers->>form.neq.match").order("created_at", { ascending: false }).limit(5),
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("answers->>form", "match").is("approved_at", null),
   ]);
 
   const inCur = (iso: string | null) => !!iso && new Date(iso) >= cur.from && new Date(iso) < cur.to;
@@ -128,6 +131,7 @@ export async function dashboardStats(range: Range, now = new Date()): Promise<Da
     activeMembers: active.count ?? 0,
     newMembers: fresh.count ?? 0,
     pendingInquiries: pending.count ?? 0,
+    pendingJoin: pendingJoin.count ?? 0,
     inquiries: {
       total: (inqs ?? []).length,
       applies: ((inqs ?? []) as InqRow[]).filter(isApply).length,

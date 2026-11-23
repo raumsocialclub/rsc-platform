@@ -17,7 +17,7 @@ describe("종류 필터", () => {
   it("apply 는 설문만, fit 은 홈 상담 신청만, 빈 값은 전체", () => {
     expect(parseKind("apply")).toBe("apply"); expect(parseKind("x")).toBe(""); expect(parseKind(null)).toBe(""); expect(parseKind("prereg")).toBe("prereg");
     const prereg = { answers: { form: "match", entrySource: "prereg" } };
-    expect(matchesKind(prereg, "prereg")).toBe(true); expect(matchesKind(fit, "prereg")).toBe(false); expect(matchesKind(prereg, "fit")).toBe(true);
+    expect(matchesKind(prereg, "prereg")).toBe(true); expect(matchesKind(fit, "prereg")).toBe(false); expect(matchesKind(prereg, "fit")).toBe(false); // 2026-11-23 부터 프로필 진단 응답은 「가입 신청」
     expect(matchesKind(apply, "apply")).toBe(true); expect(matchesKind(fit, "apply")).toBe(false);
     expect(matchesKind(apply, "fit")).toBe(false); expect(matchesKind(fit, "fit")).toBe(true);
     expect(matchesKind(fit, "")).toBe(true);

@@ -7,6 +7,7 @@ import { getCurrentMember, isOwnerRole } from "@/lib/auth/session";
 import { matchInquiries, syncInquiriesFromSheet, type InquiryCrm } from "@/lib/crm/inquiries";
 import { loadCallsDataSafe } from "@/lib/crm/load";
 import { crmConfigured } from "@/lib/crm/sheet";
+import { isJoinRequest } from "@/lib/inquiries/join";
 import { matchesTrack, parseTrackFilter } from "@/lib/inquiries/track";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,7 @@ export const maxDuration = 30;
 
 /**
  * /admin/inquiries?id=&source=&campaign=&kind= — 좌 목록 / 우 상세. RLS "admin inquiries" 정책으로 조회.
+ * 프로필 진단(/match-check) 응답은 2026-11-23 부터 「가입 신청」(/admin/join)에서 따로 본다 — 여기서는 뺀다.
  * kind 는 종류(apply=상담 전 설문 응답, fit=홈 상담 신청), track 은 관심 방식(social·matching·undecided, "-" 기록 없음), link 는 설문 링크 id(그 링크로 들어온 응답만), source·campaign 은 광고 유입(UTM) 필터. 선택지는 최근 200건에 실제로 있는 값으로 만든다.
  * CSV 내려받기(주관리자만)는 같은 필터 + 기간(from/to, 한국 날짜)으로 /api/admin/inquiries/export — 화면의 200건 제한 없음.
  * CRM 시트 연동: 화면을 열 때 CRM관리 탭의 콜 결과를 읽어 같은 전화번호 신청의 상태를 맞추고(lib/crm/inquiries.ts), 콜 결과·메모를 목록·상세에 보여준다.
@@ -42,7 +44,7 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
     .select("id, name, phone, email, result_type, status, memo, created_at, answers, utm, crm_status, crm_attempts, crm_applied")
     .order("created_at", { ascending: false })
     .limit(200);
-  const all = (data ?? []) as InquiryRow[];
+  const all = ((data ?? []) as InquiryRow[]).filter((r) => !isJoinRequest(r));
   const uniq = (k: "utm_source" | "utm_campaign") => Array.from(new Set(all.map((r) => r.utm?.[k]).filter((v): v is string => !!v))).sort();
   const options = { sources: uniq("utm_source"), campaigns: uniq("utm_campaign") };
   const rows = all.filter((r) => matchesUtmFilter(r, { source, campaign }) && matchesKind(r, link ? "apply" : kind) && matchesTrack(r, track) && (!link || r.answers?.linkId === link));

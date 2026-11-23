@@ -20,11 +20,12 @@ export function DashboardView({ s }: { s: DashboardStats }) {
   const prevLabel = s.range === "year" ? "작년" : "지난 달";
   const rev = delta(s.revenue, s.prevRevenue, "원", prevLabel);
   const bk = delta(s.bookings, s.prevBookings, "건", prevLabel);
-  const cards = [
+  const cards: { label: string; value: string; delta: string; color: string; href?: string }[] = [
     { label: s.range === "year" ? "올해 매출" : "이번 달 매출", value: won(s.revenue), delta: s.refunds ? `${rev.text} · 환불 ${won(s.refunds)}` : rev.text, color: rev.color },
     { label: "예약 건수", value: `${s.bookings}건`, delta: bk.text, color: bk.color },
     { label: "활동 회원", value: `${s.activeMembers}명`, delta: `신규 ${s.newMembers}명`, color: "rgba(55,56,60,.61)" },
     { label: "상담 대기", value: `${s.pendingInquiries}건`, delta: s.pendingInquiries ? (s.inquiries.applyPending ? `확인 필요 · 설문 ${s.inquiries.applyPending}건 포함` : "확인이 필요합니다") : "대기 없음", color: s.pendingInquiries ? "#d17600" : "rgba(55,56,60,.61)" },
+    { label: "가입 승인 대기", value: `${s.pendingJoin}명`, delta: s.pendingJoin ? "가입 신청에서 프로필 확인 후 승인" : "대기 없음", color: s.pendingJoin ? "#d17600" : "rgba(55,56,60,.61)", href: "/admin/join?state=pending" },
   ];
   const max = Math.max(1, ...s.bars.map((b) => b.value));
   const lastIdx = s.bars.length - 1;
@@ -43,14 +44,21 @@ export function DashboardView({ s }: { s: DashboardStats }) {
         </div>
       </PageTitle>
 
-      <div className="grid grid-cols-2 min-[1201px]:grid-cols-4 gap-[16px] mb-[28px]">
-        {cards.map((c) => (
-          <div key={c.label} className={`${CARD} px-[24px] py-[22px]`}>
-            <div className="text-[12px] tracking-[.01em] text-[rgba(55,56,60,.61)] mb-[12px]">{c.label}</div>
-            <div className="text-[clamp(18px,1.6vw,26px)] font-semibold tracking-[-.01em] whitespace-nowrap">{c.value}</div>
-            <div className="text-[12px] mt-[8px]" style={{ color: c.color }}>{c.delta}</div>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 min-[1201px]:grid-cols-5 gap-[16px] mb-[28px]">
+        {cards.map((c) => {
+          const body = (
+            <>
+              <div className="text-[12px] tracking-[.01em] text-[rgba(55,56,60,.61)] mb-[12px]">{c.label}</div>
+              <div className="text-[clamp(18px,1.6vw,26px)] font-semibold tracking-[-.01em] whitespace-nowrap">{c.value}</div>
+              <div className="text-[12px] mt-[8px]" style={{ color: c.color }}>{c.delta}</div>
+            </>
+          );
+          return c.href ? (
+            <Link key={c.label} href={c.href} className={`${CARD} px-[24px] py-[22px] block hover:border-primary transition-colors`}>{body}</Link>
+          ) : (
+            <div key={c.label} className={`${CARD} px-[24px] py-[22px]`}>{body}</div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 min-[1201px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-[16px] mb-[28px]">

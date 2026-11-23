@@ -55,7 +55,7 @@ export function InquiriesView({ rows, selected, filter, options, canExport = fal
             <table className="border-collapse w-full">
               <thead><tr>{["신청일", "이름", "연락처", "관심 방식 · 들어온 경로", "직업 · 학력 · 거주지", "성향 결과", "가능 시간", "유입 광고", "콜 결과", "상태"].map((h) => <th key={h} className={TH}>{h}</th>)}</tr></thead>
               <tbody>
-                {rows.length === 0 && <EmptyRow colSpan={10}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. 홈 상담 신청(/fit-check)이나 상담 전 설문(/apply)이 제출되면 여기에 표시됩니다."}</EmptyRow>}
+                {rows.length === 0 && <EmptyRow colSpan={10}>{filtered ? "조건에 맞는 상담 신청이 없습니다." : "아직 상담 신청이 없습니다. 홈 상담 신청(/fit-check)이나 상담 전 설문(/apply)이 제출되면 여기에 표시됩니다. 프로필 진단(가입 신청)은 「가입 신청」 메뉴에 있습니다."}</EmptyRow>}
                 {rows.map((r) => {
                   const active = selected?.id === r.id;
                   return (

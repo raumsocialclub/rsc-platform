@@ -23,8 +23,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const owner = isOwnerRole(me);
 
   const supabase = await createClient();
-  const [{ count: pendingInquiries }, { count: newPartners }] = await Promise.all([
-    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending"),
+  // 상담 대기 = 상담 신청·상담 전 설문 중 대기(프로필 진단 응답 제외) · 가입 승인 대기 = 프로필 진단 응답 중 approved_at 없는 것 (2026-11-23)
+  const [{ count: pendingInquiries }, { count: pendingJoin }, { count: newPartners }] = await Promise.all([
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending").or("answers->>form.is.null,answers->>form.neq.match"),
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("answers->>form", "match").is("approved_at", null),
     supabase.from("partner_inquiries").select("id", { count: "exact", head: true }).eq("status", "new"),
   ]);
 
@@ -34,6 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/programs", label: "프로그램" },
     { href: "/admin/orders", label: "예약 · 결제" },
     { href: "/admin/inquiries", label: "상담 신청", badge: pendingInquiries ?? 0 },
+    { href: "/admin/join", label: "가입 신청", badge: pendingJoin ?? 0 },
     { href: "/admin/calls", label: "콜 현황" },
     { href: "/admin/partners", label: "제휴문의", badge: newPartners ?? 0 },
     { href: "/admin/marketing", label: "마케팅 수신" },

@@ -6,18 +6,18 @@ import { isPrereg } from "@/lib/inquiries/track";
 
 /**
  * 상담 신청 목록의 「종류」 필터 + 상담 전 설문(/apply) 응답 CSV.
- * kind: "" 전체 · "apply" 상담 전 설문 응답만 · "fit" 홈 상담 신청(핏체크·프로필 진단 포함)만 · "prereg" 사전등록하기 링크(/match-check?src=prereg)로 들어온 프로필 진단만 (2026-11-20)
+ * kind: "" 전체 · "apply" 상담 전 설문 응답만 · "fit" 홈 상담 신청(/fit-check)만 · "prereg" 사전등록하기 링크(/match-check?src=prereg)로 들어온 프로필 진단만 (2026-11-20, CSV 용).
+ * 프로필 진단 응답은 2026-11-23 부터 「가입 신청」(/admin/join, lib/inquiries/join.ts)에서 따로 보므로 상담 신청 목록의 종류 선택지에는 없고 "fit" 에도 들어가지 않는다.
  */
 export type InquiryKind = "" | "apply" | "fit" | "prereg";
 export const INQUIRY_KINDS: { value: InquiryKind; label: string }[] = [
   { value: "", label: "전체 종류" },
   { value: "apply", label: "상담 전 설문(/apply)" },
   { value: "fit", label: "홈 상담 신청" },
-  { value: "prereg", label: "사전등록" },
 ];
 export const parseKind = (v: string | null | undefined): InquiryKind => (v === "apply" || v === "fit" || v === "prereg" ? v : "");
 export const isApply = (r: Pick<InquiryRow, "answers">): boolean => r.answers?.form === "apply";
-export const matchesKind = (r: Pick<InquiryRow, "answers">, kind: InquiryKind): boolean => (kind === "" ? true : kind === "apply" ? isApply(r) : kind === "prereg" ? isPrereg(r) : !isApply(r));
+export const matchesKind = (r: Pick<InquiryRow, "answers">, kind: InquiryKind): boolean => (kind === "" ? true : kind === "apply" ? isApply(r) : kind === "prereg" ? isPrereg(r) : !isApply(r) && r.answers?.form !== "match");
 
 /** 설문 응답 원본(answers.apply). 원본이 없는 옛 행은 평탄화 목록(answers.answers[])에서 키별 답을 되살린다 */
 export function applyAnswers(r: Pick<InquiryRow, "answers">): Answers {
