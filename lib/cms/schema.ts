@@ -108,15 +108,15 @@ export const DOCS: DocDef[] = [
     id: "global.nav",
     page: "global",
     label: "메뉴 이름 (상단 메뉴 · 푸터)",
-    description: "상단 메뉴(GNB)와 푸터에 보이는 메뉴 이름입니다. 푸터 3열은 「제휴문의 →」 링크 하나(연락처는 제휴문의 페이지에서). 링크 주소는 바뀌지 않고 이름만 바뀝니다. 「프로그램」「멤버십」「내 예약」「로그인」은 리드 모드에서는 보이지 않습니다.",
+    description: "상단 메뉴(GNB)와 푸터에 보이는 메뉴 이름입니다. 2026-11-23 부터 상단 메뉴는 브랜드소개(/#about) · 멤버십(/social) · 프로그램(/news) · 자주묻는질문(/social#faq) 네 개입니다(사용자 요청). 푸터 3열은 「제휴문의 →」 링크 하나(연락처는 제휴문의 페이지에서). 링크 주소는 바뀌지 않고 이름만 바뀝니다. 「프로그램 예약(/programs)」「멤버십 안내(/pricing)」「내 예약」「로그인」은 리드 모드에서는 보이지 않습니다.",
     fields: [
-      t("navSocial", "메뉴: 소셜클럽"), t("navMatching", "메뉴: 1:1 매칭"), t("navAbout", "메뉴: 브랜드소개"), t("navPrograms", "메뉴: 프로그램"), t("navMembership", "메뉴: 멤버십"), t("navNews", "메뉴: 소식"),
+      t("navSocial", "메뉴: 소셜클럽 페이지(/social) 이름", undefined, "2026-11-23 부터 기본 「멤버십」"), t("navMatching", "메뉴: 1:1 매칭"), t("navAbout", "메뉴: 브랜드소개"), t("navPrograms", "메뉴: 프로그램 예약(/programs, 리드 모드에서 숨김)"), t("navMembership", "메뉴: 멤버십 안내(/pricing, 리드 모드에서 숨김)"), t("navNews", "메뉴: 소식 페이지(/news) 이름", undefined, "2026-11-23 부터 기본 「프로그램」"), t("navFaq", "메뉴: 자주묻는질문(/social#faq)"),
       t("navMy", "메뉴: 내 예약"), t("navLogin", "메뉴: 로그인"), t("navLogout", "메뉴: 로그아웃"),
       t("footerMenuTitle", "푸터 1열 제목"), t("footerFaq", "푸터: 자주 묻는 질문"), t("footerApply", "푸터: 상담 신청"), t("footerContactTitle", "푸터 2열 제목 (서비스 문의)"), t("footerPartnerTitle", "푸터 3열 제휴문의 링크 문구", undefined, "제휴문의 페이지(/partner)로 가는 링크. 화살표는 자동으로 붙습니다"),
       t("legalTerms", "푸터: 이용약관"), t("legalPrivacy", "푸터: 개인정보처리방침"), t("legalRefund", "푸터: 환불규정"),
     ],
     defaults: {
-      navSocial: "소셜클럽", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "소식",
+      navSocial: "멤버십", navMatching: "1:1 매칭", navAbout: "브랜드소개", navPrograms: "프로그램", navMembership: "멤버십", navNews: "프로그램", navFaq: "자주묻는질문",
       navMy: "내 예약", navLogin: "로그인", navLogout: "로그아웃",
       footerMenuTitle: "메뉴", footerFaq: "자주 묻는 질문", footerApply: "상담 신청", footerContactTitle: "서비스 문의", footerPartnerTitle: "제휴문의",
       legalTerms: "이용약관", legalPrivacy: "개인정보처리방침", legalRefund: "환불규정",

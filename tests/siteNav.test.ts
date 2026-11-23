@@ -12,14 +12,24 @@ describe("GNB 메뉴 순서·간격", () => {
 
   it("데스크톱 메뉴는 브랜드소개 → 소셜클럽 → 1:1 매칭 → 소식 → FAQ", () => {
     const desktop = header.slice(header.indexOf('<nav className="hidden md:flex'), header.indexOf("</nav>"));
-    expect(sorted(order(desktop, ["/#about", "/social", "/matching", "/news"]))).toBe(true);
+    expect(sorted(order(desktop, ["/#about", "/social", "/matching", "/news", "/social#faq"]))).toBe(true);
   });
   it("모바일 메뉴도 같은 순서", () => {
     const mobile = header.slice(header.indexOf('<nav className="flex flex-col">'));
-    expect(sorted(order(mobile, ["/#about", "/social", "/matching", "/news"]))).toBe(true);
+    expect(sorted(order(mobile, ["/#about", "/social", "/matching", "/news", "/social#faq"]))).toBe(true);
   });
   it("푸터 메뉴도 같은 순서", () => {
     expect(sorted(order(footer, ["/#about", "/social", "/matching", "/news"]))).toBe(true);
+  });
+  it("2026-11-23 메뉴 이름: 멤버십(/social) · 프로그램(/news) · 자주묻는질문(/social#faq) — 헤더 기본값과 CMS 기본값이 같다", () => {
+    expect(header).toContain('navSocial: "멤버십"');
+    expect(header).toContain('navNews: "프로그램"');
+    expect(header).toContain('navFaq: "자주묻는질문"');
+    expect(schema).toContain('navSocial: "멤버십"');
+    expect(schema).toContain('navNews: "프로그램"');
+    expect(schema).toContain('navFaq: "자주묻는질문"');
+    expect(footer).toContain('L("navSocial", "멤버십")');
+    expect(footer).toContain('L("navNews", "프로그램")');
   });
   it("메뉴 이름 기본값은 「브랜드소개」 (헤더·푸터·CMS)", () => {
     expect(header).toContain('navAbout: "브랜드소개"');
