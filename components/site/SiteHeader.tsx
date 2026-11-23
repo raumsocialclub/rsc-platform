@@ -18,9 +18,9 @@ const NAV = "link-grow t-label-1 lg:t-body-2 font-semibold text-labelNeutral hov
 
 /**
  * 공통 GNB (Wanted DS). 흰 배경 64px(모바일 56px) 고정 바 · 로고 · 메뉴(브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식, 가운데 정렬 · 넓은 간격; FAQ 메뉴는 각 페이지에 FAQ 섹션이 있어 2026-11-12 에 뺐다) · 주요 버튼. "혜택" 메뉴는 내용 확정 전이라 2026-11 요청으로 뺐다(페이지 /benefits 는 유지). 모바일은 햄버거 → 전체 화면 메뉴.
- * 로그인 상태(user)면 "프로그램 · 내 예약 · 이니셜 아바타". leadMode(리드 모드)면 예약·로그인 링크를 숨기고 상담 신청만 남긴다.
+ * 로그인 상태(user)면 "프로그램 · 내 예약 · 이니셜 아바타". leadMode(리드 모드)면 예약·로그인 링크를 숨기고 상담 신청만 남긴다. matchHidden(1:1 매칭 전체 숨김, 2026-11-23)이면 「1:1 매칭」 메뉴를 뺀다.
  */
-export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = false, labels }: { user?: HeaderUser | null; brand?: HeaderBrand; leadMode?: boolean; labels?: NavLabels }) {
+export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = false, matchHidden = false, labels }: { user?: HeaderUser | null; brand?: HeaderBrand; leadMode?: boolean; matchHidden?: boolean; labels?: NavLabels }) {
   const L = { ...DEFAULT_NAV, ...Object.fromEntries(Object.entries(labels ?? {}).filter(([, v]) => !!v)) } as Required<NavLabels>;
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -45,7 +45,7 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
           <nav className="hidden md:flex items-center gap-[24px] lg:gap-[48px] mx-auto px-[16px] lg:px-[24px]">
             <Link href="/#about" className={NAV}>{L.navAbout}</Link>
             <Link href="/social" className={NAV}>{L.navSocial}</Link>
-            <Link href="/matching" className={NAV}>{L.navMatching}</Link>
+            {!matchHidden && <Link href="/matching" className={NAV}>{L.navMatching}</Link>}
             {!leadMode && <Link href="/programs" className={NAV}>{L.navPrograms}</Link>}
             {!leadMode && <Link href="/pricing" className={NAV}>{L.navMembership}</Link>}
             <Link href="/news" className={NAV}>{L.navNews}</Link>
@@ -91,7 +91,7 @@ export function SiteHeader({ user = null, brand = DEFAULT_BRAND, leadMode = fals
             {[
               { href: "/#about", label: L.navAbout },
               { href: "/social", label: L.navSocial },
-              { href: "/matching", label: L.navMatching },
+              ...(!matchHidden ? [{ href: "/matching", label: L.navMatching }] : []),
               ...(!leadMode ? [{ href: "/programs", label: loggedIn ? L.navPrograms : `${L.navPrograms} 예약` }] : []),
               ...(!leadMode ? [{ href: "/pricing", label: L.navMembership }] : []),
               { href: "/news", label: L.navNews },

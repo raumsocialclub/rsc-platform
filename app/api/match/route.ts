@@ -9,6 +9,7 @@ import { MARKETING_CHANNELS } from "@/lib/inquiries/marketing";
 import { cleanEntryPath } from "@/lib/inquiries/track";
 import { MATCH_PHOTO_COUNT, SENSITIVE_KEYS, flattenMatchAnswers, missingMatchRequired, sanitizeMatchAnswers } from "@/lib/match/schema";
 import { isPhotoPath, verifyPhoto } from "@/lib/match/photo";
+import { matchHiddenGuard } from "@/lib/settings/matchHiddenGuard";
 
 /**
  * POST /api/match { answers, consent, sensitiveConsent?, marketing?, photos?, entryPath?, entrySource?, utm? } — 프로필 진단(/match-check) 제출.
@@ -42,6 +43,8 @@ function cleanUtm(utm: z.infer<typeof UtmSchema> | null | undefined): Record<str
 }
 
 export async function POST(req: Request) {
+  const closed = await matchHiddenGuard(); // 1:1 매칭 전체 숨김이면 접수도 닫는다 (2026-11-23)
+  if (closed) return closed;
   const limited = await limitByIp(req, "match", 5, 600);
   if (!limited.ok) return tooManyResponse(limited);
   if (!hasServiceRoleKey()) {

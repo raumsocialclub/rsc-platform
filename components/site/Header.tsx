@@ -13,5 +13,5 @@ export async function Header() {
     user = null;
   }
   const [b, nav, settings] = await Promise.all([getBrand(), getNav(), getSettings()]);
-  return <SiteHeader user={user} leadMode={settings.leadMode} labels={nav} brand={{ ctaLabel: b.ctaLabel || "RSC 상담 신청", ctaHref: b.ctaHref || "/fit-check", logoEmblem: b.logoEmblem || "/images/logo-emblem.png", logoText: b.logoText || "/images/logo-text-nav.png" }} />;
+  return <SiteHeader user={user} leadMode={settings.leadMode} matchHidden={settings.matchHidden} labels={nav} brand={{ ctaLabel: b.ctaLabel || "RSC 상담 신청", ctaHref: b.ctaHref || "/fit-check", logoEmblem: b.logoEmblem || "/images/logo-emblem.png", logoText: b.logoText || "/images/logo-text-nav.png" }} />;
 }

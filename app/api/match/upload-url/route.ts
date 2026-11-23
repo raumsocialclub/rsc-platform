@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { limitByIp, tooManyResponse } from "@/lib/ratelimit";
 import { MATCH_PHOTO_BUCKET, photoPathFor, photoProblem } from "@/lib/match/photo";
+import { matchHiddenGuard } from "@/lib/settings/matchHiddenGuard";
 
 /**
  * POST /api/match/upload-url { name, size } — 프로필 진단 사진의 서명 업로드 URL 발급 (lib/match/photo.ts).
@@ -12,6 +13,8 @@ import { MATCH_PHOTO_BUCKET, photoPathFor, photoProblem } from "@/lib/match/phot
 const Body = z.object({ name: z.string().trim().min(1).max(200), size: z.number().int().positive() });
 
 export async function POST(req: Request) {
+  const closed = await matchHiddenGuard();
+  if (closed) return closed;
   const limited = await limitByIp(req, "match-upload", 10, 600);
   if (!limited.ok) return tooManyResponse(limited);
   const parsed = Body.safeParse(await req.json().catch(() => null));

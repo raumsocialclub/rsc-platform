@@ -25,10 +25,10 @@ type Track = { title: string; body: string; examples: string };
 const KINDS = ["brand", "corporate", "venue", "other"] as const;
 
 export default async function PartnerPage({ searchParams }: { searchParams: Promise<{ kind?: string }> }) {
-  const [{ kind: kindParam }, d, b, { matchPreview }] = await Promise.all([searchParams, getDoc("partner.page"), getBrand(), getSettings()]);
+  const [{ kind: kindParam }, d, b, { matchPreview, matchHidden }] = await Promise.all([searchParams, getDoc("partner.page"), getBrand(), getSettings()]);
   const initialKind = (KINDS as readonly string[]).includes(kindParam ?? "") ? (kindParam as PartnerKind) : undefined;
-  // 1:1 매칭 사전등록 모드면 「소셜클럽과 1:1 매칭 …」 식 문구에서 1:1 매칭 짝만 지운다 (끄면 복원)
-  const strip = (v: string) => (matchPreview ? stripMatching(v) : v);
+  // 1:1 매칭 사전등록 모드·전체 숨김이면 「소셜클럽과 1:1 매칭 …」 식 문구에서 1:1 매칭 짝만 지운다 (둘 다 끄면 복원)
+  const strip = (v: string) => (matchPreview || matchHidden ? stripMatching(v) : v);
   const tracks = list<Track>(d, "tracks").map((t) => ({ ...t, body: strip(t.body) }));
   const guide = lines(s(d, "guideItems")).map(strip).filter(Boolean);
   const partnerEmail = b.partnerEmail || "";

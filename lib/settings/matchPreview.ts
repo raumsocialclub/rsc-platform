@@ -5,6 +5,7 @@
  * - 사전등록하기 → /match-check?src=prereg (3분 프로필 설문). src 로 어드민에 「1:1 매칭 사전등록하기 버튼」 경로가 남는다
  * - 홈 게이트·비교 카드·CTA 띠·소셜 멤버십·제휴·fit-check 관심 방식·llms.txt 에서 1:1 매칭 상세 문구를 숨긴다
  * - 끄면(/admin/settings → 사이트 상태) 모든 화면·문구가 예전 그대로 복원된다. 코드·CMS 문서는 지우지 않는다.
+ * 2026-11-23 부터는 더 강한 「1:1 매칭 전체 숨김」(settings.site.matchHidden, lib/settings/matchHidden.ts)이 위에 있다 — 켜져 있으면 사전등록 화면·링크까지 모두 숨긴다.
  */
 export const PREREG_SRC = "prereg";
 export const PREREG_HREF = `/match-check?src=${PREREG_SRC}`;

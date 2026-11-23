@@ -11,13 +11,14 @@ const LINK = "t-label-1 text-labelAlt hover:text-label hover:translate-x-[2px] i
 
 /**
  * 푸터 (Wanted DS): 연회색 배경, 브랜드 한 줄 + 메뉴·연락처·제휴문의 열, 맨 아래 약관 링크·사업자 정보.
- * 연락처·제휴 담당 연락처는 CMS(global.brand), 메뉴 이름·열 제목은 CMS(global.nav). 리드 모드면 멤버십·환불규정 링크를 숨긴다.
+ * 연락처·제휴 담당 연락처는 CMS(global.brand), 메뉴 이름·열 제목은 CMS(global.nav). 리드 모드면 멤버십·환불규정 링크를, 1:1 매칭 전체 숨김이면 「1:1 매칭」 링크를 숨긴다.
  * 「패밀리 사이트」 열은 2026-11 요청으로 「제휴문의 →」(/partner 로 가는 제목 링크 하나, 연락처는 페이지에서)로 바꿨다. 2열 제목은 「서비스 문의」.
  */
 export async function SiteFooter() {
   const [b, n, settings] = await Promise.all([getBrand(), getNav(), getSettings()]);
   const L = (k: string, fb: string) => n[k] || fb;
   const lead = settings.leadMode;
+  const matchHidden = settings.matchHidden;
   const biz = businessInfo(b);
   return (
     <footer className="bg-sand border-t border-lineAlt">
@@ -36,7 +37,7 @@ export async function SiteFooter() {
             <nav className="flex flex-col gap-[10px]">
               <Link href="/#about" className={LINK}>{L("navAbout", "브랜드소개")}</Link>
               <Link href="/social" className={LINK}>{L("navSocial", "소셜클럽")}</Link>
-              <Link href="/matching" className={LINK}>{L("navMatching", "1:1 매칭")}</Link>
+              {!matchHidden && <Link href="/matching" className={LINK}>{L("navMatching", "1:1 매칭")}</Link>}
               {!lead && <Link href="/pricing" className={LINK}>{L("navMembership", "멤버십")}</Link>}
               <Link href="/news" className={LINK}>{L("navNews", "소식")}</Link>
               <Link href="/social#faq" className={LINK}>{L("footerFaq", "자주 묻는 질문")}</Link>

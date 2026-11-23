@@ -13,6 +13,7 @@ import { getDoc, getPageDocs, list, on, s } from "@/lib/cms/get";
 import { pageMetadata } from "@/lib/seo/get";
 import { getSettings } from "@/lib/settings/get";
 import { PREREG_HREF, scrubDoc } from "@/lib/settings/matchPreview";
+import { matchVisibility } from "@/lib/settings/matchHidden";
 import { CARD, CARD_HOVER, Container, SectionHead } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,22 +29,25 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
  * 메인 = 게이트. 맨 위 전환형 히어로(소셜클럽 | 1:1 매칭)에서 방식을 고르면 각 트랙 페이지(/social, /matching)로 간다.
  * 그 아래는 두 방식 비교 카드 → 브랜드 소개(01) → 브랜드 약속(03) → 두 버튼 CTA. (FAQ 는 2026-11-12 부터 소셜클럽·1:1 매칭 페이지에만) 프로그램 상세(02·04·05·06)는 /social 로 옮겼다.
  * 모든 문구·사진은 CMS(site_content home.*) — 기본값은 lib/cms/schema.ts
+ * 1:1 매칭 전체 숨김(settings.site.matchHidden, 2026-11-23): 대문은 소셜클럽 탭 하나(전환 탭 없음), 두 방식 비교 카드 섹션은 통째로 숨기고, 하단 띠는 소셜클럽 버튼 하나. 본문 1:1 매칭 문장은 사전등록 모드와 같은 규칙으로 뺀다.
  */
 export default async function HomePage() {
-  const [d0, popups, { matchPreview }, preview] = await Promise.all([getPageDocs("home"), listLivePopups(), getSettings(), getDoc("matching.preview")]);
+  const [d0, popups, settings, preview] = await Promise.all([getPageDocs("home"), listLivePopups(), getSettings(), getDoc("matching.preview")]);
+  const { hidden: matchHidden, preview: matchPreview, scrub } = matchVisibility(settings);
   // 사전등록 모드면 본문의 1:1 매칭 문장(「연회비만 더해 1:1 매칭으로 전환」 등)을 뺀 복사본을 쓴다 — 대문 탭 이름·버튼은 그대로
-  const d = Object.fromEntries(Object.entries(d0).map(([k, v]) => [k, k === "home.gate" ? v : scrubDoc(v, matchPreview)]));
+  const d = Object.fromEntries(Object.entries(d0).map(([k, v]) => [k, k === "home.gate" && !matchHidden ? v : scrubDoc(v, scrub)]));
   // 비교 카드의 「1:1 매칭」 카드 이름·작은 제목은 이름이라 지우지 않는다 (설명은 사전등록 모드면 matching.preview 의 한 줄로 바뀜)
   const gate = d["home.gate"], tracks = { ...d["home.tracks"], matchingTitle: d0["home.tracks"].matchingTitle, matchingEyebrow: d0["home.tracks"].matchingEyebrow }, about = d["home.about"], promise = d["home.promise"], cta = d["home.cta"];
   // 1:1 매칭 사전등록 모드(settings.site.matchPreview): 매칭 쪽 파란 버튼은 모두 「사전등록하기」 → /match-check?src=prereg (lib/settings/matchPreview.ts)
   const preregLabel = s(preview, "ctaLabel") || "사전등록하기";
   const matchingApply = matchPreview ? { applyHref: PREREG_HREF, applyLabel: preregLabel } : { applyHref: "/fit-check?track=matching" };
 
-  const gateTracks: GateTrack[] = [
+  const allTracks: GateTrack[] = [
     { key: "social", tab: s(gate, "tabSocial") || "소셜클럽", image: s(gate, "socialImage"), overline: s(gate, "socialOverline"), title: s(gate, "socialTitle"), body: s(gate, "socialBody"), cta: s(gate, "socialCta") || "자세히 보기", href: "/social", applyHref: "/fit-check?track=social" },
     { key: "matching", tab: s(gate, "tabMatching") || "1:1 매칭", image: s(gate, "matchingImage"), overline: s(gate, "matchingOverline"), title: s(gate, "matchingTitle"), body: s(gate, "matchingBody"), cta: s(gate, "matchingCta") || "자세히 보기", href: "/matching", ...matchingApply },
   ];
-  const defaultTrack = s(gate, "defaultTrack") === "matching" ? "matching" : "social";
+  const gateTracks = allTracks.filter((t) => !(matchHidden && t.key === "matching")); // 전체 숨김이면 소셜클럽 탭만
+  const defaultTrack = !matchHidden && s(gate, "defaultTrack") === "matching" ? "matching" : "social";
 
   return (
     <div className="pt-[56px] md:pt-[64px]">
@@ -57,7 +61,7 @@ export default async function HomePage() {
       </section>
 
       {/* 00-1 두 가지 방식 */}
-      {on(tracks, "visible") && <TrackCards doc={tracks} gate={gate} preview={matchPreview ? { desc: s(preview, "cardDesc"), ctaLabel: preregLabel } : undefined} />}
+      {on(tracks, "visible") && !matchHidden && <TrackCards doc={tracks} gate={gate} preview={matchPreview ? { desc: s(preview, "cardDesc"), ctaLabel: preregLabel } : undefined} />}
 
       {/* 01 NEW DEFINITION */}
       {on(about, "visible") && (
@@ -96,7 +100,7 @@ export default async function HomePage() {
       )}
 
 
-      <CtaBand title={s(cta, "title")} body={s(cta, "body")} socialLabel={s(cta, "socialLabel")} matchingLabel={matchPreview ? `1:1 매칭 ${preregLabel}` : s(cta, "matchingLabel")} matchingHref={matchPreview ? PREREG_HREF : undefined} />
+      <CtaBand title={s(cta, "title")} body={s(cta, "body")} socialLabel={s(cta, "socialLabel")} matchingLabel={matchPreview ? `1:1 매칭 ${preregLabel}` : s(cta, "matchingLabel")} matchingHref={matchPreview ? PREREG_HREF : undefined} hideMatching={matchHidden} />
 
       <SiteFooter />
       <UpButton />

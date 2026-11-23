@@ -14,6 +14,7 @@ import { pageMetadata } from "@/lib/seo/get";
 import { hasPrice } from "@/lib/settings/leadMode";
 import { getSettings } from "@/lib/settings/get";
 import { mentionsMatching, scrubDoc } from "@/lib/settings/matchPreview";
+import { matchVisibility } from "@/lib/settings/matchHidden";
 import { ButtonLink, CARD, CARD_HOVER, Container, SectionHead, SWIPE, SWIPE_ITEM } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,22 +28,26 @@ const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/"
  * 소셜클럽 트랙 페이지 (사업전략 2026.11.03: 가입비 멤버십 = 회원 자격 + 행사 6회 + 초대권 2매, 결혼중개 아님).
  * 상단 소개 → 01 멤버십 구성(social.membership — 금액은 비공개, 대면 상담 안내) → 02 포지셔닝 → 04 TASTE SOCIAL 프로그램 → 06 MOMENTS → 가입 심사(social.verify, 1:1 매칭과 별도 문서) → FAQ → CTA.
  * SOCIAL NIGHT · RAUM SOLO 는 1:1 매칭 멤버십 전용이라 /matching 으로 옮겼다. 모든 상담 버튼은 /fit-check?track=social.
+ * 1:1 매칭 전체 숨김(settings.site.matchHidden, 2026-11-23)이면 상단 전환 바(소셜클럽 | 1:1 매칭)도 뺀다.
  */
 export default async function SocialPage() {
-  const [d0, { matchPreview }] = await Promise.all([getPageDocs(["home", "social"]), getSettings()]);
+  const [d0, settings] = await Promise.all([getPageDocs(["home", "social"]), getSettings()]);
+  const { hidden: matchHidden, scrub } = matchVisibility(settings);
   // 1:1 매칭 사전등록 모드면 「1:1 매칭으로 전환」 항목·플랜명이 든 문구·FAQ 를 숨기고, 본문의 1:1 매칭 문장을 뺀다 (끄면 복원). 전환 바 이름(home.gate)은 그대로
-  const d = Object.fromEntries(Object.entries(d0).map(([k, v]) => [k, k === "home.gate" ? v : scrubDoc(v, matchPreview)]));
-  const hide = (text: string) => matchPreview && mentionsMatching(text);
+  const d = Object.fromEntries(Object.entries(d0).map(([k, v]) => [k, k === "home.gate" && !matchHidden ? v : scrubDoc(v, scrub)]));
+  const hide = (text: string) => scrub && mentionsMatching(text);
   const hero = d["social.hero"], membership = d["social.membership"], verify = d["social.verify"], why = d["home.why"], social = d["home.social"], spaces = d["home.spaces"], faq = d["home.faq"] /* 소셜클럽 전용 FAQ (CMS 소셜클럽 탭) */, cta = d["social.cta"], gate = d["home.gate"];
   const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
   const memberItems = list<{ label: string; title: string; body: string }>(membership, "items").filter((c) => !hide(`${c.label} ${c.title} ${c.body}`));
   const memberNote = hide(s(membership, "note")) ? "" : s(membership, "note");
-  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)).filter((x) => !hide(x.q + x.a)); // 금액은 비공개(대면 상담 안내)
+  // 금액은 비공개(대면 상담 안내). 전체 숨김이면 원문(정리 전)에 1:1 매칭이 든 질문·답변(「소개팅·매칭 서비스인가요? 두 가지 방식이 있습니다…」)은 통째로 뺀다
+  const faqRaw = list<{ q: string; a: string }>(d0["home.faq"], "items");
+  const faqItems = list<{ q: string; a: string }>(faq, "items").filter((x) => x.q && x.a).filter((x) => !hasPrice(x.q + x.a)).filter((x) => !hide(x.q + x.a)).filter((x) => !(matchHidden && faqRaw.some((r) => r.q === x.q && mentionsMatching(r.q + r.a))));
 
   return (
     <div className="pt-[56px] md:pt-[64px]">
       <Header />
-      <TrackSwitch current="social" labels={switchLabels} />
+      {!matchHidden && <TrackSwitch current="social" labels={switchLabels} />}
       <TrackHero doc={hero} />
 
       {/* 01 SOCIAL CLUB MEMBERSHIP */}

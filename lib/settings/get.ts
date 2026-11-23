@@ -3,6 +3,7 @@ import { SETTINGS_DOCS } from "./schema";
 
 export type Settings = {
   leadMode: boolean;
+  matchHidden: boolean;
   matchPreview: boolean;
   surveyMode: boolean; metaPixelId: string; channelTalkPluginKey: string;
   maintenance: boolean; maintenanceMessage: string; maintenanceAllowIps: string;

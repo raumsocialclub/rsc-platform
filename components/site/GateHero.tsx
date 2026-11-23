@@ -24,6 +24,7 @@ export type GateTrack = {
  * 메인 게이트 히어로: 「소셜클럽 | 1:1 매칭」 전환 탭이 달린 사진 카드.
  * 탭·키보드(←/→)·모바일 스와이프로 트랙을 바꾸면 사진·문구·버튼이 함께 바뀐다. 각 트랙의 버튼은 /social·/matching 과 상담 신청(?track=)으로 간다.
  * 레퍼런스: emotional oranges 홈의 로테이션/프라이빗 전환 히어로. 사진은 두 장을 모두 미리 그려 두고 opacity 로 교차한다(깜빡임 없음).
+ * 트랙이 하나뿐이면(1:1 매칭 전체 숨김) 전환 탭·카운터·점 표시를 그리지 않는다.
  */
 export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTrack[]; defaultTrack: GateTrack["key"]; applyLabel: string }) {
   const start = Math.max(0, tracks.findIndex((t) => t.key === defaultTrack));
@@ -41,6 +42,7 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
   }, [i, go]);
   const cur = tracks[i];
   if (!cur) return null;
+  const single = tracks.length < 2;
 
   return (
     <section
@@ -64,8 +66,8 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
         </div>
       ))}
 
-      {/* 전환 탭 */}
-      <div className="relative z-10 p-[16px] md:p-[24px] flex items-start justify-between gap-[12px]">
+      {/* 전환 탭 (트랙이 둘 이상일 때만) */}
+      {!single && <div className="relative z-10 p-[16px] md:p-[24px] flex items-start justify-between gap-[12px]">
         <div role="tablist" aria-label="만남 방식 선택" className="inline-flex p-[4px] rounded-pill bg-white/90 backdrop-blur-[10px] shadow-[0_6px_20px_rgba(0,0,0,.18)]">
           {tracks.map((t, k) => (
             <button
@@ -81,7 +83,7 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
           ))}
         </div>
         <div className="hidden md:block t-label-2 text-white/70 tabular-nums pt-[10px]">{i + 1} / {tracks.length}</div>
-      </div>
+      </div>}
 
       {/* 문구 */}
       <div className="relative z-10 mt-auto p-[20px] pb-[24px] md:p-[48px] md:pb-[48px] max-w-[720px]">
@@ -97,9 +99,9 @@ export function GateHero({ tracks, defaultTrack, applyLabel }: { tracks: GateTra
       </div>
 
       {/* 모바일 점 표시 */}
-      <div className="md:hidden relative z-10 flex gap-[6px] justify-center pb-[16px]" aria-hidden>
+      {!single && <div className="md:hidden relative z-10 flex gap-[6px] justify-center pb-[16px]" aria-hidden>
         {tracks.map((t, k) => <span key={t.key} className={`h-[6px] rounded-pill transition-[width,background-color] duration-300 ${k === i ? "w-[22px] bg-white" : "w-[6px] bg-white/45"}`} />)}
-      </div>
+      </div>}
     </section>
   );
 }

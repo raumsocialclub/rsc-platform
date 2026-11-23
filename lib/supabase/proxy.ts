@@ -3,11 +3,13 @@ import { NextResponse, type NextRequest } from "next/server";
 import { loadSettingsEdge, noticeHtml } from "@/lib/settings/edge";
 import { clientIp, ipMatches, parseList } from "@/lib/settings/ip";
 import { isLeadHiddenPath } from "@/lib/settings/leadMode";
+import { isMatchHiddenPath } from "@/lib/settings/matchHidden";
 
 /**
  * 요청마다: (1) 일반 설정에 따른 접근 차단·점검 모드·관리자 IP 제한 → (2) Supabase 세션 쿠키 갱신 + 보호 라우트
  * → (3) 보안 헤더·공개 페이지 CDN 캐시 헤더. (proxy.ts 에서 호출)
  * 리드 모드(settings.site.leadMode)면 (1) 과 (2) 사이에서 숨김 페이지(가격·가입·예약·내 예약·결제·환불규정·네이버 로그인)를 메인으로 보낸다.
+ * 1:1 매칭 전체 숨김(settings.site.matchHidden, 2026-11-23)이면 /matching·/match-check 도 메인으로 보낸다.
  * API(/api/*) 는 proxy 매처 밖이므로 각 Route Handler 가 leadModeGuard 로 직접 닫는다.
  */
 const PROTECTED = [/^\/programs(\/|$)/, /^\/my(\/|$)/, /^\/checkout(\/|$)/, /^\/admin(\/|$)/];
@@ -34,7 +36,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // (1-b) 리드 모드: 숨김 페이지는 메인으로
-  if (settings.leadMode && isLeadHiddenPath(pathname)) {
+  if ((settings.leadMode && isLeadHiddenPath(pathname)) || (settings.matchHidden && isMatchHiddenPath(pathname))) {
     const home = request.nextUrl.clone();
     home.pathname = "/";
     home.search = "";

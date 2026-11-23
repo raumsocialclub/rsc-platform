@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { Header } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { UpButton } from "@/components/site/UpButton";
@@ -17,8 +18,8 @@ import { getSettings } from "@/lib/settings/get";
 import { Badge, ButtonLink, CARD, CARD_HOVER, Container, SectionHead, SWIPE, SWIPE_ITEM } from "@/components/ui/ds";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { matchPreview } = await getSettings();
-  if (!matchPreview) return pageMetadata("matching");
+  const { matchPreview, matchHidden } = await getSettings();
+  if (matchHidden || !matchPreview) return pageMetadata("matching");
   const pv = await getDoc("matching.preview");
   return pageMetadata("matching", { title: s(pv, "seoTitle") || "1:1 매칭 사전등록", description: s(pv, "seoDescription") || undefined, image: s(pv, "image") || undefined });
 }
@@ -34,11 +35,13 @@ type Plan = { name: string; sub: string; price: string; badge: string; dark?: bo
  *
  * 2026-11-20 정책: 일반 설정 「1:1 매칭 사전등록 모드」(settings.site.matchPreview, 기본 켬)가 켜져 있으면 위 섹션은 모두 숨기고
  * 사전등록 화면(components/site/MatchPreview.tsx, 문구 CMS matching.preview)만 보인다. 모드를 끄면 아래 전체 페이지가 그대로 복원된다.
+ * 2026-11-23 「1:1 매칭 전체 숨김」(settings.site.matchHidden, 기본 켬)이 켜져 있으면 이 페이지는 메인으로 보낸다 (proxy 에서도 같은 처리).
  */
 const eyebrow = (v: string) => (v.includes("/") ? v.split("/").slice(1).join("/").trim() : v.trim());
 
 export default async function MatchingPage() {
-  const [d, { matchPreview }] = await Promise.all([getPageDocs(["matching", "home"]), getSettings()]);
+  const [d, { matchPreview, matchHidden }] = await Promise.all([getPageDocs(["matching", "home"]), getSettings()]);
+  if (matchHidden) redirect("/");
   const hero = d["matching.hero"], verify = d["matching.verify"], how = d["matching.how"], plans = d["matching.plans"], diff = d["matching.diff"], who = d["matching.who"], faq = d["matching.faq"], solo = d["home.solo"], cta = d["matching.cta"], gate = d["home.gate"];
   const switchLabels = { socialLabel: s(gate, "tabSocial"), socialSub: s(gate, "tabSocialSub"), matchingLabel: s(gate, "tabMatching"), matchingSub: s(gate, "tabMatchingSub") };
   const planItems = list<Plan>(plans, "items").filter((p) => p.name);

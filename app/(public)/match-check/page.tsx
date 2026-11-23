@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { pageMetadata } from "@/lib/seo/get";
 import { MatchForm, type MatchCopy, type MatchSource } from "@/components/match/MatchForm";
 import { PREREG_SRC } from "@/lib/settings/matchPreview";
 import { getDoc } from "@/lib/cms/get";
+import { getSettings } from "@/lib/settings/get";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("matchcheck");
@@ -13,9 +15,11 @@ export async function generateMetadata(): Promise<Metadata> {
  * 플로팅 버튼(components/site/MatchCta.tsx)에서 들어오며, 한 화면에 한 질문씩(lib/match/schema.ts) 묻고 마지막에 휴대폰·동의를 받아 POST /api/match 로 저장한다.
  * 공통 문구는 CMS(match.form). 헤더·푸터 없이 흰 화면에 로고·진행률·닫기만 둔다.
  * ?src=prereg — /matching 의 「1:1 매칭 사전등록하기」(2026-11-20 사전등록 모드)로 들어온 경우. 화면 이름·완료 문구를 사전등록용으로 바꾸고 서버에 entrySource 로 남긴다.
+ * 1:1 매칭 전체 숨김(settings.site.matchHidden, 2026-11-23)이면 메인으로 보낸다 (proxy 에서도 같은 처리, API 도 닫힘).
  */
 export default async function MatchCheckPage({ searchParams }: { searchParams: Promise<{ src?: string }> }) {
-  const [doc, sp] = await Promise.all([getDoc("match.form"), searchParams]);
+  const [doc, sp, { matchHidden }] = await Promise.all([getDoc("match.form"), searchParams, getSettings()]);
+  if (matchHidden) redirect("/");
   const source: MatchSource | undefined = sp.src === PREREG_SRC ? PREREG_SRC : undefined;
   const copy: Partial<MatchCopy> = {};
   for (const [k, v] of Object.entries(doc)) if (typeof v === "string" && v) (copy as Record<string, string>)[k] = v;

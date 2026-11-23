@@ -3,8 +3,9 @@ import { getSeo, siteUrl } from "@/lib/seo/get";
 import { AI_BOTS } from "@/lib/seo/schema";
 import { getSettings } from "@/lib/settings/get";
 import { LEAD_HIDDEN_PREFIXES } from "@/lib/settings/leadMode";
+import { MATCH_HIDDEN_PREFIXES } from "@/lib/settings/matchHidden";
 
-/** 회원·관리자·결제·API 영역은 항상 크롤링 제외. 리드 모드면 숨김 페이지(가격·환불규정)도 제외 */
+/** 회원·관리자·결제·API 영역은 항상 크롤링 제외. 리드 모드면 숨김 페이지(가격·환불규정)도, 1:1 매칭 전체 숨김이면 /matching·/match-check 도 제외 */
 const PRIVATE = ["/admin", "/admin-invite", "/admin-reset", "/my", "/checkout", "/api", "/auth", "/login", "/join", "/programs", "/apply", "/s/"];
 
 /**
@@ -14,7 +15,7 @@ const PRIVATE = ["/admin", "/admin-invite", "/admin-reset", "/my", "/checkout", 
  */
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const [seo, settings] = await Promise.all([getSeo(), getSettings()]);
-  const disallow = settings.leadMode ? Array.from(new Set([...PRIVATE, ...LEAD_HIDDEN_PREFIXES])) : PRIVATE;
+  const disallow = Array.from(new Set([...PRIVATE, ...(settings.leadMode ? LEAD_HIDDEN_PREFIXES : []), ...(settings.matchHidden ? MATCH_HIDDEN_PREFIXES : [])]));
   const rules: MetadataRoute.Robots["rules"] = [];
   if (seo.aiCrawlers) rules.push({ userAgent: AI_BOTS, allow: "/", disallow });
   else rules.push({ userAgent: AI_BOTS, disallow: "/" });

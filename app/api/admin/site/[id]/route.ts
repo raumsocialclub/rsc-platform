@@ -50,7 +50,7 @@ function pathsFor(id: string): string[] {
   if (page === "pricing") return ["/pricing"];
   if (page === "benefits") return ["/benefits"];
   if (page === "legal") return [`/${id.split(".")[1]}`];
-  if (page === "settings") return ["/", "/pricing", "/benefits", "/programs", "/my", "/login"];
+  if (page === "settings") return ["/", "/social", "/matching", "/match-check", "/fit-check", "/partner", "/pricing", "/benefits", "/programs", "/my", "/login", "/robots.txt", "/sitemap.xml", "/llms.txt"]; // 리드 모드·1:1 매칭 숨김 스위치가 바꾸는 화면
   if (page === "seo") return ["/", "/pricing", "/benefits", "/fit-check", "/news", "/partner", "/terms", "/privacy", "/refund", "/robots.txt", "/sitemap.xml", "/llms.txt"];
   return [];
 }
