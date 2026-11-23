@@ -6,14 +6,14 @@ import { isPrereg } from "@/lib/inquiries/track";
 
 /**
  * 상담 신청 목록의 「종류」 필터 + 상담 전 설문(/apply) 응답 CSV.
- * kind: "" 전체 · "apply" 상담 전 설문 응답만 · "fit" 홈 상담 신청(핏체크·프로필 진단 포함)만 · "prereg" 1:1 매칭 사전등록하기 버튼으로 들어온 프로필 진단만 (2026-11-20)
+ * kind: "" 전체 · "apply" 상담 전 설문 응답만 · "fit" 홈 상담 신청(핏체크·프로필 진단 포함)만 · "prereg" 사전등록하기 링크(/match-check?src=prereg)로 들어온 프로필 진단만 (2026-11-20)
  */
 export type InquiryKind = "" | "apply" | "fit" | "prereg";
 export const INQUIRY_KINDS: { value: InquiryKind; label: string }[] = [
   { value: "", label: "전체 종류" },
   { value: "apply", label: "상담 전 설문(/apply)" },
   { value: "fit", label: "홈 상담 신청" },
-  { value: "prereg", label: "1:1 매칭 사전등록" },
+  { value: "prereg", label: "사전등록" },
 ];
 export const parseKind = (v: string | null | undefined): InquiryKind => (v === "apply" || v === "fit" || v === "prereg" ? v : "");
 export const isApply = (r: Pick<InquiryRow, "answers">): boolean => r.answers?.form === "apply";

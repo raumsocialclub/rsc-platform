@@ -80,7 +80,7 @@ export const MARITAL_HINT = "라움소셜클럽은 현재 배우자가 없는 �
 export const QUESTIONS: Question[] = [
   { key: "name", type: "text", title: "이름을 알려주세요.", sub: "상담에서 부를 이름이에요.", placeholder: "예) 김라움", required: true, max: 50, label: "이름" },
   { key: "gender", type: "single", title: "성별을 알려주세요.", options: ["남성", "여성"], layout: "grid2", required: true, label: "성별" },
-  { key: "birth", type: "date", title: "생일이 언제예요?", sub: "매칭 조건 확인에 사용돼요.", placeholder: "1989.01.01", required: true, label: "생년월일" },
+  { key: "birth", type: "date", title: "생일이 언제예요?", sub: "가입 조건 확인에 사용돼요.", placeholder: "1989.01.01", required: true, label: "생년월일" },
   { key: "marital", type: "single", title: "현재 혼인 상태를 알려주세요.", sub: `* ${MARITAL_HINT}`, options: MARITAL_OPTIONS, required: true, blocked: ["기혼"], label: "혼인 상태" },
   { key: "children", type: "single", title: "자녀가 있으신가요?", options: ["없음", "있음"], layout: "grid2", label: "자녀 유무" },
   { key: "homeSido", type: "single", title: "지금 어디에 살고 계세요?", options: [...REGION_OPTIONS], layout: "grid2", required: true, label: "거주지역 · 시/도" },

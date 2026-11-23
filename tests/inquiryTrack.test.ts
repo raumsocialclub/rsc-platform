@@ -35,8 +35,8 @@ describe("들어온 경로 (entryLabel)", () => {
     // 2026-11-20 사전등록 모드: /matching 「사전등록하기」(→ /match-check?src=prereg) 로 들어온 프로필 진단 응답
     const prereg = row({ form: "match", track: "matching", entryTrack: "matching", entryPath: "/matching", entrySource: "prereg" });
     expect(isPrereg(prereg)).toBe(true);
-    expect(entryLabel(prereg)).toBe("1:1 매칭 페이지 · 1:1 매칭 사전등록하기 버튼");
-    expect(entryLabel(row({ form: "match", track: "matching", entryTrack: "matching", entryPath: "/", entrySource: "prereg" }))).toBe("메인 · 1:1 매칭 사전등록하기 버튼");
+    expect(entryLabel(prereg)).toBe("1:1 매칭 페이지 · 사전등록하기 버튼");
+    expect(entryLabel(row({ form: "match", track: "matching", entryTrack: "matching", entryPath: "/", entrySource: "prereg" }))).toBe("메인 · 사전등록하기 버튼");
     expect(isPrereg(row({ form: "match", track: "matching", entryTrack: "matching" }))).toBe(false);
     expect(entryLabel(row({ track: "social", entryTrack: "social", entryPath: "/" }))).toBe("메인 · 소셜클럽 상담 버튼");
     expect(entryLabel(row({ track: "undecided", entryPath: "/news/2026-11-event" }))).toBe("소식");

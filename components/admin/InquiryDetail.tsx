@@ -37,7 +37,7 @@ export type InquiryRow = {
     job?: string; education?: string; region?: string; district?: string; // 직업·학력·거주지역(시/도)·시/군/구 (2026-11-12~, lib/inquiries/profile.ts)
     entryTrack?: string;    // 어느 상담 버튼으로 들어왔는지: social | matching (/fit-check?track=)
     entryPath?: string;     // 직전 페이지 경로("/social") 또는 외부 호스트("ext:instagram.com")
-    entrySource?: string;   // "prereg" = /matching 「1:1 매칭 사전등록하기」 버튼으로 들어온 프로필 진단 응답 (2026-11-20~)
+    entrySource?: string;   // "prereg" = 「사전등록하기」 링크(/match-check?src=prereg)로 들어온 프로필 진단 응답 (2026-11-20~, 2026-11-23 부터 플로팅 버튼 포함)
     slot?: string;
     consentAt?: string;
     consentVersion?: string;
@@ -134,7 +134,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
 
   return (
     <div className="bg-white border border-[rgba(112,115,124,.08)] p-[26px]">
-      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : inquiry.answers?.form === "match" ? (isPrereg(inquiry) ? "1:1 매칭 사전등록 응답 (3분 프로필 설문)" : "프로필 진단 응답 (3분 프로필 진단)") : "신청 상세"}</div>
+      <div className="text-[12px] tracking-[.02em] text-[rgba(55,56,60,.61)] mb-[16px]">{inquiry.answers?.form === "apply" ? "상담 전 설문 응답" : inquiry.answers?.form === "match" ? (isPrereg(inquiry) ? "사전등록 응답 (3분 프로필 설문)" : "프로필 진단 응답 (3분 프로필 진단)") : "신청 상세"}</div>
       <div className="text-[20px] font-semibold mb-[4px]">{inquiry.name || "이름 없음"}{a.inviteCode && <span className="ml-[8px] inline-block px-[8px] py-[2px] text-[12px] font-semibold align-middle tracking-[.04em]" style={badgeStyle("brand")} title="프로필 진단에서 입력한 초대코드">초대코드 {a.inviteCode}</span>}</div>
       <div className="text-[13px] text-[rgba(55,56,60,.61)] mb-[20px]">{inquiry.phone || "—"} · {fmtDate(inquiry.created_at, true)}</div>
 

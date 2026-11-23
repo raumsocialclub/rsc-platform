@@ -5,11 +5,11 @@ import type { InquiryRow } from "@/components/admin/InquiryDetail";
  * 간단 상담 신청(/fit-check)이 answers.track · answers.entryTrack · answers.entryPath 로 저장하고, 어드민 목록·상세·필터·CSV 가 같은 규칙으로 읽는다.
  * 2026-11-09 이전 신청은 answers.route 의 한글 라벨만 있으므로 라벨에서 방식을 되짚는다.
  * 2026-11-20 사전등록 모드: /matching 「1:1 매칭 사전등록하기」 → /match-check?src=prereg 로 들어온 프로필 진단 응답은 answers.entrySource="prereg" 로 남고
- * 「들어온 경로」에 「1:1 매칭 사전등록하기 버튼」으로 보인다.
+ * 「들어온 경로」에 「사전등록하기 버튼」으로 보인다. 2026-11-23 부터는 플로팅 버튼(소셜클럽 사전등록) 세 세트도 같은 경로를 쓰므로 이름에서 「1:1 매칭」을 뺐다.
  */
 export const PREREG_SOURCE = "prereg";
-export const PREREG_LABEL = "1:1 매칭 사전등록하기";
-/** /matching 「1:1 매칭 사전등록하기」 버튼으로 들어온 프로필 진단 응답인지 */
+export const PREREG_LABEL = "사전등록하기";
+/** 「사전등록하기」 링크(/match-check?src=prereg)로 들어온 프로필 진단 응답인지 */
 export const isPrereg = (r: Pick<InquiryRow, "answers">): boolean => r.answers?.entrySource === PREREG_SOURCE;
 export const TRACKS = ["social", "matching", "undecided"] as const;
 export type Track = (typeof TRACKS)[number];

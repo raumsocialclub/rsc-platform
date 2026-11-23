@@ -638,13 +638,13 @@ export const DOCS: DocDef[] = [
     id: "match.cta",
     page: "matching",
     label: "프로필 진단 플로팅 버튼",
-    description: "공개 페이지 아래에 떠 있는 프로필 진단(/match-check) 버튼과 그 위 말풍선. 「문구 세트」는 버튼 문구 + 말풍선 두 줄이 한 묶음이며 몇 초마다 다음 세트로 함께 바뀝니다. 세트의 버튼 문구를 비우면 아래 기본 버튼 문구가, 세트의 링크를 비우면 아래 기본 링크가 쓰입니다. 상담 신청·설문·진단 화면과 어드민에서는 보이지 않습니다.",
+    description: "공개 페이지 아래에 떠 있는 소셜클럽 사전등록(프로필 진단, /match-check?src=prereg) 버튼과 그 위 말풍선. 1:1 매칭 전체 숨김 중에도 보입니다. 「문구 세트」는 버튼 문구 + 말풍선 두 줄이 한 묶음이며 몇 초마다 다음 세트로 함께 바뀝니다. 세트의 버튼 문구를 비우면 아래 기본 버튼 문구가, 세트의 링크를 비우면 아래 기본 링크가 쓰입니다. 상담 신청·설문·진단 화면과 어드민에서는 보이지 않습니다.",
     fields: [bool("visible", "버튼 보이기"), t("label", "기본 버튼 문구 (세트에 버튼 문구가 없을 때)"), link("href", "버튼 링크"), t("hint", "버튼 아래 작은 안내(비우면 없음)")],
     lists: [{ key: "hooks", label: "문구 세트", itemLabel: "세트", min: 1, max: 6, fields: [t("label", "버튼 문구"), t("title", "말풍선 굵은 줄"), t("body", "말풍선 작은 줄"), link("href", "이 세트의 버튼 링크(비우면 아래 기본 링크)")] }],
     defaults: {
-      visible: true, label: "프로필 남기고 소개 받기", href: "/match-check", hint: "",
+      visible: true, label: "프로필 남기고 상담받기", href: "/match-check?src=prereg", hint: "",
       hooks: [
-        /* 2026-11-18 소셜클럽 톤으로 교체. 세 세트 모두 기본 링크(/match-check)로 간다 — 사용자 결정(2026-11-19): 행사 보기도 정보부터 입력 */
+        /* 2026-11-18 소셜클럽 톤으로 교체. 세 세트 모두 기본 링크로 간다 — 사용자 결정(2026-11-19): 행사 보기도 정보부터 입력. 2026-11-23 부터 기본 링크는 /match-check?src=prereg(소셜클럽 사전등록하기 버튼, 어드민에 「사전등록」으로 기록) */
         { label: "이번 달 행사 보기", title: "라움의 공간에서 시작되는 싱글 소셜클럽", body: "검증된 멤버 · 매월 행사 · 행사 후 네트워킹", href: "" },
         { label: "RSC 멤버십 문의하기", title: "취향이 통하는 싱글들의 사교 모임", body: "파티·공연·클래스, 그 뒤엔 자연스러운 네트워킹 시간", href: "" },
         { label: "프로필 남기고 상담받기", title: "이번 달, 라움에서 어떤 분들을 만날까요?", body: "사전 검증을 거친 싱글 멤버들과 함께하는 행사", href: "" },
@@ -664,7 +664,7 @@ export const DOCS: DocDef[] = [
       t("marketingTitle", "마케팅 수신 동의 체크 문구"), ta("marketingPurpose", "마케팅 목적"), t("marketingMethod", "마케팅 수신 방법"), ta("marketingItems", "마케팅 이용 항목"), ta("marketingRetention", "마케팅 보유·이용 기간"), ta("marketingNote", "마케팅 안내 아래 설명"),
       t("submitLabel", "제출 버튼 문구"), t("submittingLabel", "제출 중 버튼 문구"), ta("submitNote", "제출 버튼 아래 안내", "soft"),
       t("doneTitle", "접수 완료 제목"), ta("doneBody", "접수 완료 안내", "soft"), t("doneHome", "접수 완료 버튼 문구"),
-      t("preregTitle", "[1:1 매칭 사전등록으로 들어왔을 때] 화면 이름", undefined, "/matching 의 「사전등록하기」로 들어오면(/match-check?src=prereg) 화면 이름을 이걸로 바꿉니다"), t("preregDoneTitle", "[사전등록] 접수 완료 제목"), ta("preregDoneBody", "[사전등록] 접수 완료 안내", "soft"),
+      t("preregTitle", "[사전등록으로 들어왔을 때] 화면 이름", undefined, "「사전등록하기」 링크(/match-check?src=prereg: 플로팅 버튼, 1:1 매칭 사전등록 화면)로 들어오면 화면 이름을 이걸로 바꿉니다. 1:1 매칭 전체 숨김 중에는 「소셜클럽 사전등록」 문구가 대신 쓰입니다"), t("preregDoneTitle", "[사전등록] 접수 완료 제목"), ta("preregDoneBody", "[사전등록] 접수 완료 안내", "soft"),
     ],
     defaults: {
       title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
