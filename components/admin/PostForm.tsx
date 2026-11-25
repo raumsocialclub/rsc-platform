@@ -13,7 +13,9 @@ type FormState = { title: string; slug: string; slugTouched: boolean; category: 
 const LABEL = "grid gap-[6px] text-[13px] text-[rgba(55,56,60,.61)]";
 const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(112,115,124,.22)] outline-none text-label bg-white rounded-ds-sm focus:border-primary w-full min-w-0";
 const SECTION = "text-[15px] font-semibold text-label";
-const MAX_SIDE = 2000;
+/** 업로드 전 브라우저에서 줄이는 상한. 가로는 1600px(본문 폭 760px 의 2배)면 충분하고, 세로로 긴 상세 페이지 이미지는 세로를 따로 넉넉히 둔다 */
+const MAX_W = 1600;
+const MAX_H = 8000;
 
 const HELP = [
   ["# 큰 제목", "## 중간 제목"],
@@ -25,7 +27,7 @@ const HELP = [
 
 async function shrink(file: File): Promise<Blob> {
   const bmp = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+  const scale = Math.min(1, MAX_W / bmp.width, MAX_H / bmp.height);
   if (scale === 1 && file.type !== "image/png") return file;
   const c = document.createElement("canvas");
   c.width = Math.round(bmp.width * scale);
@@ -138,6 +140,7 @@ export function PostForm({ post }: { post?: Post }) {
                 </div>
               </div>
               <textarea ref={bodyRef} value={f.body} onChange={(e) => set("body", e.target.value)} rows={22} className={`${INPUT} font-mono text-[14px] leading-[1.7]`} placeholder={"빈 줄로 문단을 나눕니다.\n\n## 소제목\n본문 내용…"} />
+              <div className="text-[12px] text-[rgba(55,56,60,.61)]">본문 사진은 원본 비율 그대로 폭에 맞춰 보입니다. 권장: 가로 1200px(최대 1600px), 세로는 자유(한 장 8000px 이내, 더 길면 여러 장으로 나눠 넣기), JPG·PNG·WEBP 10MB 이하.</div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-[6px] text-[12px] text-[rgba(55,56,60,.61)]">
                 {HELP.map(([a, b], i) => <div key={i}><code className="text-label">{a}</code><br /><code className="text-label">{b}</code></div>)}
               </div>

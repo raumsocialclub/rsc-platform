@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 
@@ -103,9 +102,9 @@ export function Markdown({ source }: { source: string }) {
             if (!safe) return <Fragment key={k} />;
             return (
               <figure key={k} className="my-[32px]">
-                <div className="relative w-full aspect-[3/2] overflow-hidden bg-[#f4f4f5]">
-                  <Image src={b.src} alt={b.alt} fill sizes="(min-width: 761px) 760px, 100vw" className="object-cover" unoptimized={b.src.startsWith("http")} />
-                </div>
+                {/* 원본 비율 그대로(세로로 긴 상세 페이지 이미지 포함) — 고정 비율 상자·object-cover 로 잘라내지 않는다 */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={b.src} alt={b.alt} loading="lazy" decoding="async" className="block w-full h-auto bg-[#f4f4f5]" />
                 {b.alt && <figcaption className="text-[13px] text-[rgba(55,56,60,.61)] mt-[10px] text-center">{b.alt}</figcaption>}
               </figure>
             );
