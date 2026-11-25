@@ -20,6 +20,8 @@ export function toRow(input: PostInput, existingPublishedAt?: string | null) {
     cover_image: input.cover_image || null,
     published: input.published,
     published_at,
+    event_date: input.event_date || null, // 2026-11-25: 그동안 저장에서 빠져 있던 행사 일자(어드민 입력이 DB 에 남지 않던 버그) 수정
+    apply_open: input.apply_open,
   };
 }
 

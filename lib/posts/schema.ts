@@ -12,6 +12,8 @@ export const PostInputSchema = z.object({
   published: z.boolean().default(false),
   published_at: z.string().trim().default(""),
   event_date: z.string().trim().regex(/^(\d{4}-\d{2}-\d{2})?$/, "행사 일자 형식이 올바르지 않습니다.").default(""),
+  /** 「참여하기」 버튼 표시 (M24). 기본 켬 — 공지처럼 참여를 받지 않는 글은 끈다 */
+  apply_open: z.boolean().default(true),
 });
 export type PostInput = z.infer<typeof PostInputSchema>;
 

@@ -14,6 +14,7 @@ import { fmtPostDate } from "@/lib/posts/calendar";
 import { pageMetadata } from "@/lib/seo/get";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
 import { Badge, ButtonLink } from "@/components/ui/ds";
+import { applyHref, canApply } from "@/lib/posts/apply";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -33,6 +34,9 @@ export default async function NewsDetailPage({ params }: Params) {
   const { slug } = await params;
   const [p, org, copy] = await Promise.all([getPostBySlug(decode(slug)), getDoc("seo.org"), getDoc("news.page")]);
   if (!p || !p.published) notFound();
+  const apply = canApply(p);
+  const applyLabel = s(copy, "applyLabel") || "참여하기";
+  const applyHint = s(copy, "applyHint");
 
   return (
     <div className="min-h-screen flex flex-col pt-[56px] md:pt-[64px]">
@@ -45,9 +49,15 @@ export default async function NewsDetailPage({ params }: Params) {
             <Badge tone="primary">{p.category}</Badge>
           </div>
           <h1 className="t-title-2 md:t-title-1 text-label mb-[12px] text-pretty">{p.title}</h1>
-          <div className="t-label-1 text-labelAlt mb-[32px]">
+          <div className={`t-label-1 text-labelAlt ${apply ? "mb-[18px]" : "mb-[32px]"}`}>
             {p.event_date ? <>행사일 {fmtPostDate(p)}<span className="mx-[10px] text-labelAssist">|</span>{fmtDate(p.published_at)} 게시</> : fmtDate(p.published_at)}
           </div>
+          {apply && (
+            <div className="mb-[32px] flex items-center gap-[14px] flex-wrap" data-testid="news-apply">
+              <ButtonLink href={applyHref(p.slug)} size="lg">{applyLabel}</ButtonLink>
+              {applyHint && <span className="t-label-1 text-labelAlt text-pretty">{applyHint}</span>}
+            </div>
+          )}
           {p.cover_image && (
             <div className="relative w-full overflow-hidden rounded-ds bg-fill mb-[36px] img-live">
               {/* 인스타그램 피드 비율(1080×1350) 원본 그대로 — 잘라내지 않는다 */}
@@ -58,7 +68,10 @@ export default async function NewsDetailPage({ params }: Params) {
           <Markdown source={p.body} />
           <div className="mt-[48px] pt-[24px] border-t border-lineAlt flex justify-between items-center gap-[16px] flex-wrap">
             <ButtonLink href="/news" variant="text" size="md">{s(copy, "backLabel") || "← 소식 목록"}</ButtonLink>
-            <ButtonLink href="/fit-check" size="md">{s(copy, "ctaLabel") || "RSC 상담 신청하기"}</ButtonLink>
+            <div className="flex gap-[8px] flex-wrap">
+              {apply && <ButtonLink href={applyHref(p.slug)} size="md">{applyLabel}</ButtonLink>}
+              <ButtonLink href="/fit-check" size="md" variant={apply ? "assistive" : "solid"}>{s(copy, "ctaLabel") || "RSC 상담 신청하기"}</ButtonLink>
+            </div>
           </div>
         </article>
         <JsonLd data={[articleJsonLd(p, s(org, "name") || "라움소셜클럽"), breadcrumbJsonLd([{ name: "홈", path: "/" }, { name: "소식", path: "/news" }, { name: p.title, path: `/news/${encodeURIComponent(p.slug)}` }])]} />

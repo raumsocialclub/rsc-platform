@@ -177,6 +177,14 @@
 - [x] 운영 배포 (2026-11-23, 2efec82 · dpl_GYXJUm6FAGhL8ngLC959k8kBhGsv) — 공개 화면 변화 없음(플로팅 버튼·메뉴 4개·1:1 매칭 0건 유지), /admin/join 은 비로그인 시 로그인으로 이동 확인
 - [ ] 다음 단계 후보(지시 시): 가입완료 회원만 모은 「회원 프로필」 메뉴·CSV, 카드 인쇄용 보기, 승인 시 가입 안내 문자/알림톡, 승인 회원과 회원 DB(계정) 연결.
 
+## M24. 소식 「참여하기」 → 사전등록 설문으로 참여 신청 (사용자 요청, 2026-11-25)
+- [x] 소식 목록 카드·상세에 「참여하기」 버튼(`posts.apply_open`, 기본 켬, 소식 편집 「참여하기 버튼 표시」로 글마다 끔) → `/match-check?src=prereg&event=<글 주소>` (`lib/posts/apply.ts`). 운영 DB 마이그레이션 `posts_apply_open` 적용(2026-11-25).
+- [x] 이미 설문을 낸 사람(어드민에 있는 사람)은 첫 화면 「이미 프로필을 남기셨나요?」에서 휴대폰 번호만 입력 → `POST /api/events/apply` 가 같은 번호의 최근 프로필 설문 행 `answers.events[]` 에 `{slug,title,at}` 를 붙여 바로 접수(같은 행사면 「이미 신청됨」 안내). 없으면 3분 프로필 설문으로 이어지고 제출 때 `POST /api/match` 가 같은 자리에 기록(`entrySource` prereg). 이 기기에서 제출한 번호는 다음 참여하기 첫 화면에 미리 채움(localStorage).
+- [x] 어드민: 「가입 신청」 배지 「참여 신청 · 글 제목(외 n건)」, 상세·프로필 카드 「참여 신청 행사」 줄, 검색에 행사 제목, 들어온 경로 「「제목」 참여하기 버튼」. 문구는 CMS `news.page`(applyLabel·applyHint) · `match.form`(eventBanner · eventGateTitle/Body/Submit/New/Note · eventDoneTitle/Body/Back · eventDoneAlready).
+- [x] 함께 고침: 소식 편집의 「행사 일자」가 저장 코드(`lib/posts/admin.ts` toRow)에서 빠져 DB 에 기록되지 않던 버그 — 이제 저장된다(기존 글은 한 번 다시 저장해야 월 탭 분류에 반영).
+- [x] 테스트 `tests/newsApply.test.ts`(6) — 총 284 통과. FLOWS 1-7.
+- [ ] 후속 후보: 참여 신청 문자/알림톡 자동 안내, 행사별 참여자 목록·CSV(어드민), 휴대폰 본인확인(인증번호) 후 빠른 신청.
+
 ## M23. 소식 본문 사진 — 세로로 긴 상세 페이지 이미지 원본 비율 표시 (사용자 요청, 2026-11-25)
 - [x] 원인: 본문 `![…](주소)` 사진을 3:2 고정 비율 상자 + `object-cover` 로 채워 위아래가 잘렸고, 업로드 시 긴 변 2000px 기준으로 줄여 세로로 긴 이미지는 가로가 크게 줄었음.
 - [x] `components/Markdown.tsx`: 본문 사진을 `<img class="w-full h-auto">` 로 원본 비율 그대로 폭에 맞춰 표시(PC 최대 760px, 모바일 화면 폭-40px). `components/admin/PostForm.tsx`: 업로드 전 축소 기준을 가로 1600px · 세로 8000px 로 분리, 본문 아래 권장 사이즈 안내(가로 1200px 권장·최대 1600px, 세로 자유·한 장 8000px 이내, JPG·PNG·WEBP 10MB 이하). 대표 사진·기존 글은 그대로.

@@ -665,6 +665,8 @@ export const DOCS: DocDef[] = [
       t("submitLabel", "제출 버튼 문구"), t("submittingLabel", "제출 중 버튼 문구"), ta("submitNote", "제출 버튼 아래 안내", "soft"),
       t("doneTitle", "접수 완료 제목"), ta("doneBody", "접수 완료 안내", "soft"), t("doneHome", "접수 완료 버튼 문구"),
       t("preregTitle", "[사전등록으로 들어왔을 때] 화면 이름", undefined, "「사전등록하기」 링크(/match-check?src=prereg: 플로팅 버튼, 1:1 매칭 사전등록 화면)로 들어오면 화면 이름을 이걸로 바꿉니다. 1:1 매칭 전체 숨김 중에는 「소셜클럽 사전등록」 문구가 대신 쓰입니다"), t("preregDoneTitle", "[사전등록] 접수 완료 제목"), ta("preregDoneBody", "[사전등록] 접수 완료 안내", "soft"),
+      t("eventBanner", "[행사 참여로 들어왔을 때] 질문 위 안내", undefined, "소식의 「참여하기」 버튼(/match-check?src=prereg&event=글 주소)으로 들어오면 모든 질문 위에 보입니다. {event} 자리에 소식 제목이 들어갑니다"), t("eventDoneTitle", "[행사 참여] 접수 완료 제목"), ta("eventDoneBody", "[행사 참여] 접수 완료 안내", "soft", "{event} 자리에 소식 제목"), t("eventDoneBack", "[행사 참여] 완료 화면 「소식으로 돌아가기」 버튼"),
+      t("eventGateTitle", "[행사 참여] 첫 화면 제목", undefined, "참여하기로 들어온 사람에게 설문 전에 먼저 보이는 화면. 이미 설문을 제출한 사람은 휴대폰 번호만 넣으면 바로 참여 신청됩니다"), ta("eventGateBody", "[행사 참여] 첫 화면 안내", "soft"), t("eventGateSubmit", "[행사 참여] 바로 신청 버튼"), t("eventGateNew", "[행사 참여] 처음이라 설문으로 가는 버튼"), t("eventGateNote", "[행사 참여] 첫 화면 아래 작은 안내"), ta("eventDoneAlready", "[행사 참여] 이미 신청되어 있을 때 안내", "soft"),
     ],
     defaults: {
       title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
@@ -678,6 +680,8 @@ export const DOCS: DocDef[] = [
       submitLabel: "제출하고 매니저 연락 받기", submittingLabel: "보내는 중…", submitNote: "제출은 회원 가입이 아니며, 담당 매니저가 연락드린 뒤 상담이 진행됩니다.",
       doneTitle: "프로필이 접수되었습니다", doneBody: "담당 매니저가 남겨주신 번호로 연락드려 어울리는 만남의 방향을 안내해 드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.", doneHome: "홈으로 돌아가기",
       preregTitle: "1:1 매칭 사전등록", preregDoneTitle: "사전등록이 접수되었습니다", preregDoneBody: "1:1 매칭 정식 오픈 소식과 어울리는 만남의 방향을 담당 매니저가 남겨주신 번호로 안내드립니다. 문의나 취소는 전화(02-6925-4786)나 이메일로 알려 주세요.",
+      eventBanner: "「{event}」 참여 신청 — 설문을 마치면 참여 신청이 접수됩니다", eventDoneTitle: "참여 신청이 접수되었습니다", eventDoneBody: "「{event}」 참여 신청이 접수되었습니다. 담당 매니저가 확인 후 참석 확정 여부를 남겨주신 번호로 안내드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.", eventDoneBack: "소식으로 돌아가기",
+      eventGateTitle: "이미 프로필을 남기셨나요?", eventGateBody: "3분 프로필 설문을 제출한 적이 있다면 그때 적은 휴대폰 번호만 입력해 주세요. 설문 없이 바로 참여 신청됩니다. 처음이라면 아래 버튼으로 설문을 시작해 주세요.", eventGateSubmit: "바로 참여 신청", eventGateNew: "처음이에요 — 3분 프로필 설문 시작하기", eventGateNote: "입력한 번호는 기존 프로필을 찾는 데만 쓰이며 저장되지 않습니다. 등록된 번호가 없으면 설문 화면으로 이어집니다.", eventDoneAlready: "「{event}」에 이미 참여 신청이 되어 있습니다. 담당 매니저가 참석 확정 여부를 남겨주신 번호로 안내드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.",
     },
   },
 
@@ -721,8 +725,11 @@ export const DOCS: DocDef[] = [
     page: "news",
     label: "소식 목록 · 상세 문구",
     description: "소식 페이지의 제목과 설명은 「SEO」 → 페이지별 설정(소식)에서, 글은 「소식 게시판」에서 관리합니다. 여기서는 그 밖의 고정 문구만 바꿉니다.",
-    fields: [t("eyebrow", "제목 위 작은 영문"), ta("emptyText", "글이 없는 달 안내", undefined, "{y} 자리에 연도, {m} 자리에 월이 들어갑니다"), t("backLabel", "상세 글 하단 「목록으로」 문구"), t("ctaLabel", "상세 글 하단 상담 버튼 문구")],
-    defaults: { eyebrow: "NEWS", emptyText: "{y}년 {m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.", backLabel: "← 소식 목록", ctaLabel: "RSC 상담 신청하기" },
+    fields: [
+      t("eyebrow", "제목 위 작은 영문"), ta("emptyText", "글이 없는 달 안내", undefined, "{y} 자리에 연도, {m} 자리에 월이 들어갑니다"), t("backLabel", "상세 글 하단 「목록으로」 문구"), t("ctaLabel", "상세 글 하단 상담 버튼 문구"),
+      t("applyLabel", "「참여하기」 버튼 문구", undefined, "행사 소식의 참여 신청 버튼(소식 목록 카드·상세). 누르면 사전등록 설문(/match-check?src=prereg&event=글 주소)으로 가고, 설문을 마치면 어드민 「가입 신청」에 참여 신청으로 들어옵니다. 글마다 버튼을 끄려면 소식 편집의 「참여하기 버튼 표시」"), t("applyHint", "상세의 참여하기 버튼 옆 안내"),
+    ],
+    defaults: { eyebrow: "NEWS", emptyText: "{y}년 {m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.", backLabel: "← 소식 목록", ctaLabel: "RSC 상담 신청하기", applyLabel: "참여하기", applyHint: "3분 프로필 설문을 마치면 참여 신청이 접수됩니다." },
   },
 
   /* ---------- 제휴문의 (/partner) ---------- */

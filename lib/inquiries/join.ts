@@ -1,6 +1,6 @@
 import type { InquiryRow } from "@/components/admin/InquiryDetail";
 import { fmtDate } from "@/lib/admin/format";
-import { entryLabel, isPrereg } from "@/lib/inquiries/track";
+import { entryLabel, eventsOf, isPrereg } from "@/lib/inquiries/track";
 import { QUESTION_BY_KEY, PRIORITY_DESC, ageOf, displayMatchAnswer, type MatchAnswers } from "@/lib/match/schema";
 
 /**
@@ -28,6 +28,12 @@ export const parseJoinFilter = (v: string | null | undefined): JoinFilter => (v 
 /** 어떤 경로로 들어온 가입 신청인지 (목록 배지) */
 export function joinSourceLabel(r: Pick<InquiryRow, "answers">): string {
   const code = r.answers?.inviteCode;
+  const evs = eventsOf(r);
+  if (evs.length) {
+    const last = evs[evs.length - 1];
+    const more = evs.length > 1 ? ` 외 ${evs.length - 1}건` : "";
+    return `참여 신청 · ${last.title}${more}${code ? ` · 초대코드 ${code}` : ""}`;
+  }
   if (isPrereg(r)) return code ? `사전등록 · 초대코드 ${code}` : "사전등록";
   return code ? `초대코드 ${code}` : "프로필 진단";
 }
@@ -38,7 +44,7 @@ export function matchesJoin(r: JoinRowFields & Pick<InquiryRow, "name" | "phone"
   if (state && joinState(r) !== state) return false;
   const needle = q.trim().toLowerCase().replace(/-/g, "");
   if (!needle) return true;
-  return [r.name ?? "", (r.phone ?? "").replace(/-/g, ""), r.answers?.inviteCode ?? ""].some((v) => v.toLowerCase().includes(needle));
+  return [r.name ?? "", (r.phone ?? "").replace(/-/g, ""), r.answers?.inviteCode ?? "", ...eventsOf(r).map((e) => e.title)].some((v) => v.toLowerCase().includes(needle));
 }
 
 /** 설문 원본(answers.match). 원본이 없는 옛 행은 평탄화 목록(answers.answers[])에서 키별 답을 되살린다 */
@@ -90,6 +96,7 @@ export function profileCard(r: InquiryRow & { approved_at?: string | null }): Pr
     {
       title: "접수 정보",
       rows: [
+        ...eventsOf(r).map((e) => ({ label: "참여 신청 행사", value: `${e.title}${e.at ? ` · ${fmtDate(e.at, true)}` : ""}` })),
         ...row("알게 된 경로", val(m, "source")),
         ...row("초대코드", a.inviteCode ?? ""),
         ...row("들어온 경로", entryLabel(r)),

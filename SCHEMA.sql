@@ -524,6 +524,7 @@ create table posts (
   published boolean not null default false,
   published_at timestamptz,
   event_date date,                            -- M16: 행사 일자(선택). 소식 목록 연도·월 탭 분류 기준, 비우면 발행일
+  apply_open boolean not null default true,   -- M24: 소식 목록·상세에 「참여하기」 버튼(→ /match-check?src=prereg&event=slug 사전등록 설문으로 참여 신청) 표시
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   created_by uuid references members(id)

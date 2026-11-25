@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { POST_PAGE_SIZE, type Post } from "./types";
 
-const COLS = "id, slug, title, category, summary, body, cover_image, published, published_at, event_date, created_at, updated_at";
+const COLS = "id, slug, title, category, summary, body, cover_image, published, published_at, event_date, apply_open, created_at, updated_at";
 
 /** 공개 목록 (발행된 글만, 최신순). RLS 가 비공개 글을 숨긴다. */
 export async function listPublishedPosts(page = 1, size = POST_PAGE_SIZE): Promise<{ posts: Post[]; total: number; page: number; pages: number }> {

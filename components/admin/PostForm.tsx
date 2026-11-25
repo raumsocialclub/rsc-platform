@@ -10,7 +10,7 @@ import { POST_CATEGORIES, slugify, type Post } from "@/lib/posts/types";
 import { byName, imageLine, MAX_W } from "@/lib/posts/images";
 import { prepareImage } from "@/lib/posts/imageUpload";
 
-type FormState = { title: string; slug: string; slugTouched: boolean; category: string; summary: string; body: string; cover_image: string; published: boolean; published_at: string; event_date: string };
+type FormState = { title: string; slug: string; slugTouched: boolean; category: string; summary: string; body: string; cover_image: string; published: boolean; published_at: string; event_date: string; apply_open: boolean };
 
 const LABEL = "grid gap-[6px] text-[13px] text-[rgba(55,56,60,.61)]";
 const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(112,115,124,.22)] outline-none text-label bg-white rounded-ds-sm focus:border-primary w-full min-w-0";
@@ -25,8 +25,8 @@ const HELP = [
 ];
 
 function initial(p?: Post): FormState {
-  if (!p) return { title: "", slug: "", slugTouched: false, category: POST_CATEGORIES[0], summary: "", body: "", cover_image: "", published: false, published_at: "", event_date: "" };
-  return { title: p.title, slug: p.slug, slugTouched: true, category: p.category, summary: p.summary ?? "", body: p.body, cover_image: p.cover_image ?? "", published: p.published, published_at: p.published_at ? fromKstIso(p.published_at).date : "", event_date: p.event_date ? p.event_date.slice(0, 10) : "" };
+  if (!p) return { title: "", slug: "", slugTouched: false, category: POST_CATEGORIES[0], summary: "", body: "", cover_image: "", published: false, published_at: "", event_date: "", apply_open: true };
+  return { title: p.title, slug: p.slug, slugTouched: true, category: p.category, summary: p.summary ?? "", body: p.body, cover_image: p.cover_image ?? "", published: p.published, published_at: p.published_at ? fromKstIso(p.published_at).date : "", event_date: p.event_date ? p.event_date.slice(0, 10) : "", apply_open: p.apply_open !== false };
 }
 
 /** 소식 작성·편집 폼 (M11). 본문은 간단 마크다운, 사진은 site 버킷에 업로드 */
@@ -89,7 +89,7 @@ export function PostForm({ post }: { post?: Post }) {
   const submit = async (publish?: boolean) => {
     setBusy(true); setErr(null); setMsg(null);
     try {
-      const payload = { title: f.title, slug: f.slug || slugify(f.title), category: f.category, summary: f.summary, body: f.body, cover_image: f.cover_image, published: publish ?? f.published, published_at: f.published_at, event_date: f.event_date };
+      const payload = { title: f.title, slug: f.slug || slugify(f.title), category: f.category, summary: f.summary, body: f.body, cover_image: f.cover_image, published: publish ?? f.published, published_at: f.published_at, event_date: f.event_date, apply_open: f.apply_open };
       const res = await fetch(post ? `/api/admin/posts/${post.id}` : "/api/admin/posts", { method: post ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; id?: string; message?: string } | null;
       if (!j?.ok) throw new Error(j?.message ?? "저장하지 못했습니다.");
@@ -168,6 +168,10 @@ export function PostForm({ post }: { post?: Post }) {
             </label>
             <label className={LABEL}>행사 일자 <span className="text-[11px]">(소식 목록의 연도·월 탭에 들어갈 달. 비우면 발행일로 분류)</span>
               <input type="date" value={f.event_date} onChange={(e) => set("event_date", e.target.value)} className={INPUT} />
+            </label>
+            <label className="flex items-start gap-[10px] text-[14px]">
+              <input type="checkbox" checked={f.apply_open} onChange={(e) => set("apply_open", e.target.checked)} className="mt-[3px]" />
+              <span>「참여하기」 버튼 표시<br /><span className="text-[11px] text-[rgba(55,56,60,.61)]">소식 목록 카드와 상세에 버튼이 보이고, 누르면 사전등록 설문(3분 프로필 설문)으로 갑니다. 설문을 마치면 어드민 「가입 신청」에 「참여 신청 · 이 글 제목」으로 들어옵니다. 공지처럼 참여를 받지 않는 글은 끄세요.</span></span>
             </label>
             <label className={LABEL}>발행일 <span className="text-[11px]">(비우면 발행 시각)</span>
               <input type="date" value={f.published_at} onChange={(e) => set("published_at", e.target.value)} className={INPUT} />

@@ -12,7 +12,8 @@ import { listPublishedPostMonths, listPublishedPostsByIds } from "@/lib/posts/qu
 import { plainText } from "@/lib/posts/types";
 import { getPageSeo, pageMetadata } from "@/lib/seo/get";
 import { breadcrumbJsonLd } from "@/lib/seo/jsonld";
-import { Badge, CARD, CARD_HOVER, Container } from "@/components/ui/ds";
+import { Badge, ButtonLink, CARD, CARD_HOVER, Container } from "@/components/ui/ds";
+import { applyHref, canApply } from "@/lib/posts/apply";
 import { Txt } from "@/components/cms/Txt";
 import { getDoc, s } from "@/lib/cms/get";
 
@@ -38,6 +39,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
   const ids = filterMonth(lite, ym).map((p) => p.id);
   const posts = filterMonth(await listPublishedPostsByIds(ids), ym);
   const years = yearOptions([...months, ym], today);
+  const applyLabel = s(copy, "applyLabel") || "참여하기";
 
   return (
     <div className="min-h-screen flex flex-col pt-[56px] md:pt-[64px]">
@@ -64,8 +66,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
           ) : (
             <div data-fold className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 lg:grid-cols-3 md:gap-[24px]">
               {posts.map((p, i) => (
-                <article key={p.id} data-reveal style={{ "--d": `${(i % 3) * 80}ms` } as React.CSSProperties} className={`min-w-0 ${CARD} ${CARD_HOVER} overflow-hidden`}>
-                  <Link href={`/news/${encodeURIComponent(p.slug)}`} className="block group">
+                <article key={p.id} data-reveal style={{ "--d": `${(i % 3) * 80}ms` } as React.CSSProperties} className={`min-w-0 ${CARD} ${CARD_HOVER} overflow-hidden flex flex-col`}>
+                  <Link href={`/news/${encodeURIComponent(p.slug)}`} className="block group flex-1">
                     {/* 모든 카드를 인스타 피드 비율(4:5) 상자로 통일 */}
                     <div className="relative aspect-[4/5] overflow-hidden bg-fill img-live">
                       {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center" unoptimized={p.cover_image.startsWith("http")} />}
@@ -79,6 +81,12 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
                       {(p.summary || p.body) && <p className="t-body-2-reading text-labelAlt text-pretty m-0">{p.summary || plainText(p.body, 120)}</p>}
                     </div>
                   </Link>
+                  {/* 참여하기 (M24): 사전등록 설문으로 참여 신청. 카드 링크와 별개 버튼 */}
+                  {canApply(p) && (
+                    <div className="px-[18px] pb-[18px] md:px-[20px] md:pb-[20px]">
+                      <ButtonLink href={applyHref(p.slug)} size="md" className="w-full">{applyLabel}</ButtonLink>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>

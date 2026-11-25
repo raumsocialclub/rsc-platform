@@ -12,6 +12,7 @@ import { MATCH_PHOTO_ACCEPT, MATCH_PHOTO_BUCKET, photoProblem } from "@/lib/matc
 import { formatPhoneInput, normalizePhone } from "@/lib/phone";
 import { entryPathFromReferrer } from "@/lib/inquiries/track";
 import { readUtm } from "@/lib/utm/client";
+import { fillEvent, type PostEvent } from "@/lib/posts/apply";
 
 /**
  * 프로필 진단 (/match-check) — 「한 화면에 한 질문」 퍼널. 문항은 lib/match/schema.ts QUESTIONS.
@@ -30,6 +31,8 @@ export type MatchCopy = {
   sensitiveTitle: string; sensitiveItems: string; sensitivePurpose: string; sensitiveRetention: string; sensitiveRefuse: string;
   marketingTitle: string; marketingPurpose: string; marketingMethod: string; marketingItems: string; marketingRetention: string; marketingNote: string;
   submitLabel: string; submittingLabel: string; submitNote: string; doneTitle: string; doneBody: string; doneHome: string;
+  /** 소식 「참여하기」(M24)로 들어왔을 때. {event} 자리에 소식 제목 */
+  eventBanner: string; eventDoneTitle: string; eventDoneBody: string; eventDoneBack: string; eventGateTitle: string; eventGateBody: string; eventGateSubmit: string; eventGateNew: string; eventGateNote: string; eventDoneAlready: string;
 };
 export const DEFAULT_MATCH_COPY: MatchCopy = {
   title: "3분 프로필 진단", closeLabel: "닫기 ✕", prevLabel: "이전", nextLabel: "다음", confirmLabel: "확인", skipLabel: "이 질문 건너뛰기", enterHint: "Enter ↵ 를 눌러도 돼요",
@@ -42,9 +45,13 @@ export const DEFAULT_MATCH_COPY: MatchCopy = {
   marketingNote: "동의하지 않아도 상담 및 기본 서비스 이용에는 제한이 없습니다. 수신 동의는 전화(02-6925-4786)나 이메일로 언제든 철회할 수 있습니다.",
   submitLabel: "제출하고 매니저 연락 받기", submittingLabel: "보내는 중…", submitNote: "제출은 회원 가입이 아니며, 담당 매니저가 연락드린 뒤 상담이 진행됩니다.",
   doneTitle: "프로필이 접수되었습니다", doneBody: "담당 매니저가 남겨주신 번호로 연락드려 어울리는 만남의 방향을 안내해 드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.", doneHome: "홈으로 돌아가기",
+  eventBanner: "「{event}」 참여 신청 — 설문을 마치면 참여 신청이 접수됩니다", eventDoneTitle: "참여 신청이 접수되었습니다", eventDoneBody: "「{event}」 참여 신청이 접수되었습니다. 담당 매니저가 확인 후 참석 확정 여부를 남겨주신 번호로 안내드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.", eventDoneBack: "소식으로 돌아가기",
+  eventGateTitle: "이미 프로필을 남기셨나요?", eventGateBody: "3분 프로필 설문을 제출한 적이 있다면 그때 적은 휴대폰 번호만 입력해 주세요. 설문 없이 바로 참여 신청됩니다. 처음이라면 아래 버튼으로 설문을 시작해 주세요.", eventGateSubmit: "바로 참여 신청", eventGateNew: "처음이에요 — 3분 프로필 설문 시작하기", eventGateNote: "입력한 번호는 기존 프로필을 찾는 데만 쓰이며 저장되지 않습니다. 등록된 번호가 없으면 설문 화면으로 이어집니다.", eventDoneAlready: "「{event}」에 이미 참여 신청이 되어 있습니다. 담당 매니저가 참석 확정 여부를 남겨주신 번호로 안내드립니다. 문의나 취소는 전화(02-6925-4786)로 알려 주세요.",
 };
 
 const STORE = "rsc_match_draft";
+/** 설문을 제출한 휴대폰 번호(이 기기) — 다음에 소식 「참여하기」 첫 화면에 미리 채워 준다 */
+const PHONE_STORE = "rsc_match_phone";
 const OPT = "w-full min-h-[60px] flex items-center justify-between gap-[12px] px-[22px] py-[16px] rounded-[16px] border-2 text-left text-[17px] font-medium transition-[background-color,border-color,color,transform] duration-150 active:scale-[.985] cursor-pointer";
 const OPT_OFF = "bg-fill border-transparent text-label hover:border-[rgba(var(--ds-primary-rgb),.45)]";
 const OPT_ON = "bg-[rgba(var(--ds-primary-rgb),.08)] border-primary text-primary";
@@ -68,8 +75,18 @@ type Photo = { path: string; name: string; preview?: string };
 /** 들어온 버튼: "prereg" = /matching 「1:1 매칭 사전등록하기」(/match-check?src=prereg). 서버가 answers.entrySource 로 남겨 어드민에 「1:1 매칭 사전등록하기 버튼」 경로로 보인다 */
 export type MatchSource = "prereg";
 
-export function MatchForm({ copy, source }: { copy?: Partial<MatchCopy>; source?: MatchSource }) {
+/**
+ * event: 소식 「참여하기」(M24)로 들어온 경우 그 소식. 설문 앞에 「이미 프로필을 남기셨나요?」 화면(휴대폰만 → POST /api/events/apply 로 바로 신청)을 먼저 보여 주고,
+ * 등록된 번호가 없거나 「처음이에요」를 누르면 설문으로 이어진다. 설문 제출 때는 event 를 함께 보내 같은 자리에 기록한다.
+ */
+export function MatchForm({ copy, source, event }: { copy?: Partial<MatchCopy>; source?: MatchSource; event?: PostEvent }) {
   const C: MatchCopy = { ...DEFAULT_MATCH_COPY, ...Object.fromEntries(Object.entries(copy ?? {}).filter(([, v]) => !!v)) } as MatchCopy;
+  const ev = (t: string) => (event ? fillEvent(t, event.title) : t);
+  const [gate, setGate] = useState<"ask" | "survey">(event ? "ask" : "survey");
+  const [gatePhone, setGatePhone] = useState("");
+  const [gateBusy, setGateBusy] = useState(false);
+  const [gateError, setGateError] = useState<string | null>(null);
+  const [already, setAlready] = useState(false);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<MatchAnswers>({});
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -194,11 +211,11 @@ export function MatchForm({ copy, source }: { copy?: Partial<MatchCopy>; source?
     if (!agreed) { setError("개인정보 수집·이용에 동의해 주세요."); return; }
     setSubmitting(true); setError(null);
     try {
-      const body = { answers: { ...answers, phone: normalizePhone(str) ?? str }, consent: true, sensitiveConsent: sensitiveAgreed, marketing, photos: photos.map((x) => x.path), entryPath: entryPathFromReferrer(document.referrer, window.location.origin), ...(source ? { entrySource: source } : {}), utm: readUtm() };
+      const body = { answers: { ...answers, phone: normalizePhone(str) ?? str }, consent: true, sensitiveConsent: sensitiveAgreed, marketing, photos: photos.map((x) => x.path), entryPath: entryPathFromReferrer(document.referrer, window.location.origin), ...(source ? { entrySource: source } : {}), ...(event ? { event: event.slug } : {}), utm: readUtm() };
       const res = await fetch("/api/match", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
       if (!res.ok || !j?.ok) throw new Error(j?.message ?? "제출하지 못했습니다. 잠시 후 다시 시도해 주세요.");
-      try { sessionStorage.removeItem(STORE); } catch {}
+      try { sessionStorage.removeItem(STORE); localStorage.setItem(PHONE_STORE, normalizePhone(str) ?? str); } catch {}
       trackLead();
       setDone(true);
       window.scrollTo({ top: 0 });
@@ -210,6 +227,73 @@ export function MatchForm({ copy, source }: { copy?: Partial<MatchCopy>; source?
   const age = useMemo(() => (q.type === "date" ? ageOf(str) : null), [q.type, str]);
   const title = questionTitle(q, answers);
   const canProceed = filled(q);
+
+  /* 소식 「참여하기」 첫 화면: 이미 설문을 낸 사람은 휴대폰만으로 바로 신청 */
+  useEffect(() => {
+    if (!event) return;
+    const t = setTimeout(() => { try { const p = localStorage.getItem(PHONE_STORE); if (p) setGatePhone(formatPhoneInput(p)); } catch {} }, 0);
+    return () => clearTimeout(t);
+  }, [event]);
+  const quickApply = async () => {
+    if (!event) return;
+    const phone = normalizePhone(gatePhone);
+    if (!phone) { setGateError("휴대폰 번호는 010-1234-5678 형식으로 입력해 주세요."); return; }
+    setGateBusy(true); setGateError(null);
+    try {
+      const res = await fetch("/api/events/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: event.slug, phone }) });
+      const j = (await res.json().catch(() => null)) as { ok?: boolean; found?: boolean; already?: boolean; message?: string } | null;
+      if (!res.ok || !j?.ok) throw new Error(j?.message ?? "잠시 후 다시 시도해 주세요.");
+      if (!j.found) { setAnswers((a) => ({ ...a, phone: formatPhoneInput(phone) })); setGate("survey"); return; }
+      try { localStorage.setItem(PHONE_STORE, phone); } catch {}
+      setAlready(!!j.already);
+      setDone(true);
+      window.scrollTo({ top: 0 });
+    } catch (e) {
+      setGateError(e instanceof Error ? e.message : "잠시 후 다시 시도해 주세요.");
+    } finally { setGateBusy(false); }
+  };
+
+  if (done && event) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <TopBar C={C} />
+        <main className="flex-1 flex items-center justify-center px-[20px] py-[48px]">
+          <div className="w-full max-w-[560px] text-center anim-up" data-testid="event-done">
+            <div className="w-[64px] h-[64px] rounded-full bg-[rgba(0,191,64,.12)] text-positiveFg flex items-center justify-center mx-auto mb-[22px]"><Check /></div>
+            <h1 className="t-title-2 md:t-title-1 text-label mb-[12px] text-pretty">{ev(C.eventDoneTitle)}</h1>
+            <p className="t-body-1-reading text-labelAlt mb-[30px] text-pretty"><Txt v={ev(already ? C.eventDoneAlready : C.eventDoneBody)} /></p>
+            <div className="flex gap-[10px] justify-center flex-wrap">
+              <Link href={`/news/${encodeURIComponent(event.slug)}`} className={`${BIG} w-auto px-[28px] inline-flex items-center`}>{C.eventDoneBack}</Link>
+              <InstagramButton />
+            </div>
+            <Link href="/" className="inline-block mt-[18px] t-label-1 text-labelAlt underline hover:text-label">{C.doneHome}</Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (event && gate === "ask") {
+    return (
+      <div className="min-h-screen bg-white flex flex-col text-label">
+        <TopBar C={C} />
+        <main className="flex-1 w-full max-w-[640px] mx-auto px-[20px] pt-[32px] pb-[48px] md:pt-[56px]" data-testid="event-gate">
+          <div className="anim-up">
+            <div className="inline-flex items-center rounded-full bg-[rgba(var(--ds-primary-rgb),.08)] text-primary px-[14px] py-[8px] t-label-1 font-semibold text-pretty">{ev(C.eventBanner)}</div>
+            <h1 className="t-title-2 md:t-title-1 text-label text-pretty mt-[18px]">{ev(C.eventGateTitle)}</h1>
+            <p className="mt-[10px] t-body-1-reading text-labelAlt text-pretty"><Txt v={ev(C.eventGateBody)} /></p>
+            <form className="mt-[28px]" onSubmit={(e) => { e.preventDefault(); void quickApply(); }}>
+              <input type="tel" inputMode="numeric" autoComplete="tel" value={gatePhone} onChange={(e) => { setGatePhone(formatPhoneInput(e.target.value)); setGateError(null); }} placeholder="010-0000-0000" className={FIELD} aria-label="휴대폰 번호" data-testid="event-gate-phone" />
+              {gateError && <p className="mt-[10px] t-label-1 text-negativeFg" role="alert">{gateError}</p>}
+              <button type="submit" disabled={gateBusy || !normalizePhone(gatePhone)} className={`${BIG} mt-[14px]`} data-testid="event-gate-submit">{gateBusy ? C.submittingLabel : C.eventGateSubmit}</button>
+            </form>
+            <button type="button" onClick={() => setGate("survey")} className="mt-[14px] w-full h-[52px] rounded-[16px] border-2 border-lineNeutral bg-white text-[16px] font-semibold text-label hover:border-primary hover:text-primary transition-colors cursor-pointer" data-testid="event-gate-new">{C.eventGateNew}</button>
+            <p className="mt-[16px] t-caption-1 text-labelAlt text-pretty">{C.eventGateNote}</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (done) {
     return (
@@ -234,6 +318,7 @@ export function MatchForm({ copy, source }: { copy?: Partial<MatchCopy>; source?
     <div className="min-h-screen bg-white flex flex-col text-label">
       <TopBar C={C} step={step} total={total} />
       <main className="flex-1 w-full max-w-[640px] mx-auto px-[20px] pt-[24px] pb-[48px] md:pt-[40px]" data-testid="match-form" data-step={q.key}>
+        {event && <div className="mb-[14px] inline-flex items-center rounded-full bg-[rgba(var(--ds-primary-rgb),.08)] text-primary px-[14px] py-[8px] t-label-1 font-semibold text-pretty" data-testid="match-event">{ev(C.eventBanner)}</div>}
         <button type="button" onClick={() => go(step - 1)} disabled={step === 0} className={PILL} aria-label={C.prevLabel}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M15 18l-6-6 6-6" /></svg>{C.prevLabel}
         </button>

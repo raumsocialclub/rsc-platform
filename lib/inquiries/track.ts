@@ -8,6 +8,13 @@ import type { InquiryRow } from "@/components/admin/InquiryDetail";
  * 「들어온 경로」에 「사전등록하기 버튼」으로 보인다. 2026-11-23 부터는 플로팅 버튼(소셜클럽 사전등록) 세 세트도 같은 경로를 쓰므로 이름에서 「1:1 매칭」을 뺐다.
  */
 export const PREREG_SOURCE = "prereg";
+/** 소식 「참여하기」(M24)로 들어온 참여 신청 기록. 최신 것이 마지막. 없으면 [] */
+export function eventsOf(r: Pick<InquiryRow, "answers">): { slug: string; title: string; at?: string }[] {
+  const list = r.answers?.events;
+  return Array.isArray(list) ? list.filter((e) => e && typeof e.slug === "string" && typeof e.title === "string") : [];
+}
+/** 가장 최근 참여 신청 행사(없으면 null) */
+export const latestEvent = (r: Pick<InquiryRow, "answers">) => { const l = eventsOf(r); return l.length ? l[l.length - 1] : null; };
 export const PREREG_LABEL = "사전등록하기";
 /** 「사전등록하기」 링크(/match-check?src=prereg)로 들어온 프로필 진단 응답인지 */
 export const isPrereg = (r: Pick<InquiryRow, "answers">): boolean => r.answers?.entrySource === PREREG_SOURCE;
@@ -57,7 +64,8 @@ export function entryLabel(r: Pick<InquiryRow, "answers">): string {
   let where = "";
   if (path.startsWith("ext:")) where = `외부 링크 (${path.slice(4)})`;
   else if (path) where = PAGE_KO.find(([re]) => re.test(path))?.[1] ?? path;
-  const button = isPrereg(r) ? `${PREREG_LABEL} 버튼` : btn && btn !== "undecided" ? `${TRACK_KO[btn]} 상담 버튼` : "";
+  const ev = latestEvent(r);
+  const button = ev ? `「${ev.title}」 참여하기 버튼` : isPrereg(r) ? `${PREREG_LABEL} 버튼` : btn && btn !== "undecided" ? `${TRACK_KO[btn]} 상담 버튼` : "";
   if (!where && !button) return a.track ? "직접 접속 · 링크" : "";
   return [where, button].filter(Boolean).join(" · ");
 }
