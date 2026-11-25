@@ -8,6 +8,7 @@ import { INQUIRY_STATUS, badgeStyle, fmtDate } from "@/lib/admin/format";
 import type { InquiryCrm } from "@/lib/crm/inquiries";
 import { STATUS_KO } from "@/lib/crm/types";
 import { entryLabel, eventsOf, inquiryTrack, isPrereg, trackLabel } from "@/lib/inquiries/track";
+import { APPLY_STATUS_KO, type EventEntry } from "@/lib/posts/apply";
 import { profileRows } from "@/lib/inquiries/profile";
 
 export type InquiryRow = {
@@ -38,7 +39,6 @@ export type InquiryRow = {
     entryTrack?: string;    // 어느 상담 버튼으로 들어왔는지: social | matching (/fit-check?track=)
     entryPath?: string;     // 직전 페이지 경로("/social") 또는 외부 호스트("ext:instagram.com")
     entrySource?: string;   // "prereg" = 「사전등록하기」 링크(/match-check?src=prereg)로 들어온 프로필 진단 응답 (2026-11-20~, 2026-11-23 부터 플로팅 버튼 포함)
-    events?: { slug: string; title: string; at?: string }[]; // 소식 「참여하기」(M24)로 신청한 행사들(설문 제출 시 또는 휴대폰 확인 후 바로 신청)
     slot?: string;
     consentAt?: string;
     consentVersion?: string;
@@ -46,6 +46,8 @@ export type InquiryRow = {
     marketingAt?: string; marketingVersion?: string;
     answers?: { key: string; label: string; question: string; answer: string }[];
   } | null;
+  /** 소식 「참여하기」(M24) 참여 신청 기록 — event_applications 를 lib/events/admin.ts attachEvents 로 붙인다(가입 신청 화면). 없으면 빈 배열/미정의 */
+  events?: EventEntry[] | null;
   /** 광고 유입(UTM). 광고 링크 없이 들어온 신청은 null */
   utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string } | null;
   /** 이미 발급된 코드 (있으면) */
@@ -120,7 +122,7 @@ export function InquiryDetail({ inquiry, profileKo, profileBody, crm = null }: P
   const rows: { q: string; a: string }[] = [
     ...(a.answers ?? []).map((x) => ({ q: x.label, a: x.answer })),
     ...(a.form === "apply" && a.route ? [{ q: "가입 경로", a: a.route }] : inquiryTrack(inquiry) ? [{ q: "관심 방식", a: trackLabel(inquiry) }] : a.route ? [{ q: "라움과의 인연", a: a.route }] : []),
-    ...eventsOf(inquiry).map((e) => ({ q: "참여 신청 행사", a: `${e.title}${e.at ? ` · ${fmtDate(e.at, true)}` : ""}` })),
+    ...eventsOf(inquiry).map((e) => ({ q: "참여 신청 행사", a: `${e.title}${e.status ? ` · ${APPLY_STATUS_KO[e.status]}` : ""}${e.at ? ` · ${fmtDate(e.at, true)}` : ""}` })),
     ...(a.form === "match" ? [{ q: "사진", a: (a.photos?.length ?? (a.photo ? 1 : 0)) ? `${a.photos?.length ?? 1}장 올림 (아래 「사진 보기」)` : "없음 (나중에 받기로 함)" }] : []),
     ...(entryLabel(inquiry) ? [{ q: "들어온 경로", a: entryLabel(inquiry) }] : []),
     ...profileRows(a),

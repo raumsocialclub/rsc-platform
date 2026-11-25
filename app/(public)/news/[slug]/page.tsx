@@ -13,8 +13,8 @@ import { fmtDate, plainText } from "@/lib/posts/types";
 import { fmtPostDate } from "@/lib/posts/calendar";
 import { pageMetadata } from "@/lib/seo/get";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
-import { Badge, ButtonLink } from "@/components/ui/ds";
-import { applyHref, canApply } from "@/lib/posts/apply";
+import { Badge, ButtonLink, btn } from "@/components/ui/ds";
+import { applyHref, applyState } from "@/lib/posts/apply";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -34,9 +34,12 @@ export default async function NewsDetailPage({ params }: Params) {
   const { slug } = await params;
   const [p, org, copy] = await Promise.all([getPostBySlug(decode(slug)), getDoc("seo.org"), getDoc("news.page")]);
   if (!p || !p.published) notFound();
-  const apply = canApply(p);
+  const state = applyState(p);
+  const apply = state !== "off";
   const applyLabel = s(copy, "applyLabel") || "참여하기";
   const applyHint = s(copy, "applyHint");
+  const closedLabel = s(copy, "applyClosedLabel") || "참여 종료";
+  const closedBtn = (size: "lg" | "md") => <span aria-disabled="true" data-testid="news-apply-closed" className={btn("assistive", size, "pointer-events-none text-labelDisable border-lineAlt bg-fillAlt")}>{closedLabel}</span>;
 
   return (
     <div className="min-h-screen flex flex-col pt-[56px] md:pt-[64px]">
@@ -54,8 +57,8 @@ export default async function NewsDetailPage({ params }: Params) {
           </div>
           {apply && (
             <div className="mb-[32px] flex items-center gap-[14px] flex-wrap" data-testid="news-apply">
-              <ButtonLink href={applyHref(p.slug)} size="lg">{applyLabel}</ButtonLink>
-              {applyHint && <span className="t-label-1 text-labelAlt text-pretty">{applyHint}</span>}
+              {state === "open" ? <ButtonLink href={applyHref(p.slug)} size="lg">{applyLabel}</ButtonLink> : closedBtn("lg")}
+              {state === "open" && applyHint && <span className="t-label-1 text-labelAlt text-pretty">{applyHint}</span>}
             </div>
           )}
           {p.cover_image && (
@@ -69,7 +72,8 @@ export default async function NewsDetailPage({ params }: Params) {
           <div className="mt-[48px] pt-[24px] border-t border-lineAlt flex justify-between items-center gap-[16px] flex-wrap">
             <ButtonLink href="/news" variant="text" size="md">{s(copy, "backLabel") || "← 소식 목록"}</ButtonLink>
             <div className="flex gap-[8px] flex-wrap">
-              {apply && <ButtonLink href={applyHref(p.slug)} size="md">{applyLabel}</ButtonLink>}
+              {state === "open" && <ButtonLink href={applyHref(p.slug)} size="md">{applyLabel}</ButtonLink>}
+              {state === "closed" && closedBtn("md")}
               <ButtonLink href="/fit-check" size="md" variant={apply ? "assistive" : "solid"}>{s(copy, "ctaLabel") || "RSC 상담 신청하기"}</ButtonLink>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import type { InquiryRow } from "@/components/admin/InquiryDetail";
+import type { EventEntry } from "@/lib/posts/apply";
 
 /**
  * 상담 신청의 「관심 방식」(소셜클럽 · 1:1 매칭 · 상담 후 결정)과 「들어온 경로」(어느 페이지에서 상담 신청으로 넘어왔는지).
@@ -8,13 +9,13 @@ import type { InquiryRow } from "@/components/admin/InquiryDetail";
  * 「들어온 경로」에 「사전등록하기 버튼」으로 보인다. 2026-11-23 부터는 플로팅 버튼(소셜클럽 사전등록) 세 세트도 같은 경로를 쓰므로 이름에서 「1:1 매칭」을 뺐다.
  */
 export const PREREG_SOURCE = "prereg";
-/** 소식 「참여하기」(M24)로 들어온 참여 신청 기록. 최신 것이 마지막. 없으면 [] */
-export function eventsOf(r: Pick<InquiryRow, "answers">): { slug: string; title: string; at?: string }[] {
-  const list = r.answers?.events;
+/** 소식 「참여하기」(M24) 참여 신청 기록(event_applications → lib/events/admin.ts attachEvents 가 행에 events 로 붙인다). 오래된 것부터, 없으면 [] */
+export function eventsOf(r: { events?: EventEntry[] | null }): EventEntry[] {
+  const list = r.events;
   return Array.isArray(list) ? list.filter((e) => e && typeof e.slug === "string" && typeof e.title === "string") : [];
 }
 /** 가장 최근 참여 신청 행사(없으면 null) */
-export const latestEvent = (r: Pick<InquiryRow, "answers">) => { const l = eventsOf(r); return l.length ? l[l.length - 1] : null; };
+export const latestEvent = (r: { events?: EventEntry[] | null }) => { const l = eventsOf(r); return l.length ? l[l.length - 1] : null; };
 export const PREREG_LABEL = "사전등록하기";
 /** 「사전등록하기」 링크(/match-check?src=prereg)로 들어온 프로필 진단 응답인지 */
 export const isPrereg = (r: Pick<InquiryRow, "answers">): boolean => r.answers?.entrySource === PREREG_SOURCE;
@@ -57,7 +58,7 @@ const PAGE_KO: [RegExp, string][] = [
  * 들어온 경로 라벨. entryPath 는 같은 사이트면 "/social" 같은 경로, 다른 사이트에서 바로 왔으면 "ext:instagram.com", 없으면 "".
  * entryTrack 은 /fit-check?track= 으로 미리 선택된 방식(어느 상담 버튼을 눌렀는지).
  */
-export function entryLabel(r: Pick<InquiryRow, "answers">): string {
+export function entryLabel(r: Pick<InquiryRow, "answers" | "events">): string {
   const a = r.answers ?? {};
   const path = a.entryPath ?? "";
   const btn = parseTrack(a.entryTrack);

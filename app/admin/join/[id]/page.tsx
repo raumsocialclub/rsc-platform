@@ -5,6 +5,7 @@ import { JoinProfileCard } from "@/components/admin/JoinProfileCard";
 import { PageTitle } from "@/components/admin/ui";
 import { isJoinRequest, profileCard } from "@/lib/inquiries/join";
 import { createClient } from "@/lib/supabase/server";
+import { attachEvents } from "@/lib/events/admin";
 
 export const metadata: Metadata = { title: "회원 프로필 카드" };
 
@@ -20,8 +21,9 @@ export default async function AdminJoinDetailPage({ params }: { params: Promise<
     .select("id, name, phone, email, result_type, status, memo, created_at, answers, utm, approved_at, approved_by, crm_status, crm_attempts, crm_applied")
     .eq("id", id)
     .maybeSingle();
-  const row = data as (InquiryRow & { approved_at?: string | null; approved_by?: string | null }) | null;
-  if (!row || !isJoinRequest(row)) notFound();
+  const row0 = data as (InquiryRow & { approved_at?: string | null; approved_by?: string | null }) | null;
+  if (!row0 || !isJoinRequest(row0)) notFound();
+  const [row] = await attachEvents(supabase, [row0]);
 
   const [{ data: inv }, approver] = await Promise.all([
     supabase.from("invite_codes").select("code, expires_at, used_at").eq("inquiry_id", row.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),

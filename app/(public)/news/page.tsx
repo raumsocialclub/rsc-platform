@@ -12,8 +12,8 @@ import { listPublishedPostMonths, listPublishedPostsByIds } from "@/lib/posts/qu
 import { plainText } from "@/lib/posts/types";
 import { getPageSeo, pageMetadata } from "@/lib/seo/get";
 import { breadcrumbJsonLd } from "@/lib/seo/jsonld";
-import { Badge, ButtonLink, CARD, CARD_HOVER, Container } from "@/components/ui/ds";
-import { applyHref, canApply } from "@/lib/posts/apply";
+import { Badge, ButtonLink, CARD, CARD_HOVER, Container, btn } from "@/components/ui/ds";
+import { applyHref, applyState, kstToday } from "@/lib/posts/apply";
 import { Txt } from "@/components/cms/Txt";
 import { getDoc, s } from "@/lib/cms/get";
 
@@ -40,6 +40,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
   const posts = filterMonth(await listPublishedPostsByIds(ids), ym);
   const years = yearOptions([...months, ym], today);
   const applyLabel = s(copy, "applyLabel") || "참여하기";
+  const closedLabel = s(copy, "applyClosedLabel") || "참여 종료";
+  const todayKst = kstToday();
 
   return (
     <div className="min-h-screen flex flex-col pt-[56px] md:pt-[64px]">
@@ -81,10 +83,12 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
                       {(p.summary || p.body) && <p className="t-body-2-reading text-labelAlt text-pretty m-0">{p.summary || plainText(p.body, 120)}</p>}
                     </div>
                   </Link>
-                  {/* 참여하기 (M24): 사전등록 설문으로 참여 신청. 카드 링크와 별개 버튼 */}
-                  {canApply(p) && (
+                  {/* 참여하기 (M24): 사전등록 설문으로 참여 신청. 카드 링크와 별개 버튼. 행사 일자가 지나면 「참여 종료」(비활성) */}
+                  {applyState(p, todayKst) !== "off" && (
                     <div className="px-[18px] pb-[18px] md:px-[20px] md:pb-[20px]">
-                      <ButtonLink href={applyHref(p.slug)} size="md" className="w-full">{applyLabel}</ButtonLink>
+                      {applyState(p, todayKst) === "open"
+                        ? <ButtonLink href={applyHref(p.slug)} size="md" className="w-full">{applyLabel}</ButtonLink>
+                        : <span aria-disabled="true" data-testid="news-apply-closed" className={btn("assistive", "md", "w-full pointer-events-none text-labelDisable border-lineAlt bg-fillAlt")}>{closedLabel}</span>}
                     </div>
                   )}
                 </article>

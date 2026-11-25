@@ -530,6 +530,27 @@ create table posts (
   created_by uuid references members(id)
 );
 create index posts_published_idx on posts(published, published_at desc);
+
+-- M24 (2026-11-25): 소식(프로그램) 참여 신청자 DB. 소식 「참여하기」 → 사전등록 설문(또는 이미 설문을 낸 사람은 휴대폰 확인) → 한 사람(inquiries 행)당 소식 하나에 한 건.
+-- inquiries 가 180일 뒤 자동 삭제되면 함께 지워진다(on delete cascade) → 보관 기간이 설문 응답과 같다. 어드민 「프로그램 참여 신청」(/admin/events)에서 참석 확정·취소·메모·CSV.
+create table event_applications (
+  id uuid primary key default gen_random_uuid(),
+  post_id uuid not null references posts(id) on delete cascade,
+  inquiry_id uuid not null references inquiries(id) on delete cascade,
+  status text not null default 'applied' check (status in ('applied','confirmed','cancelled')), -- 신청 | 참석 확정 | 취소
+  source text not null default 'quick' check (source in ('quick','survey')),                   -- quick 휴대폰 확인으로 바로 신청 | survey 설문 제출과 함께
+  memo text,
+  status_at timestamptz,
+  status_by uuid references members(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (post_id, inquiry_id)
+);
+create index event_applications_post_idx on event_applications(post_id, created_at desc);
+create index event_applications_inquiry_idx on event_applications(inquiry_id);
+create trigger event_applications_updated_at before update on event_applications for each row execute function set_updated_at();
+alter table event_applications enable row level security;
+create policy "admin event_applications" on event_applications for all using (is_admin()) with check (is_admin());
 create trigger posts_updated_at before update on posts for each row execute function set_updated_at();
 alter table posts enable row level security;
 create policy "posts public read" on posts for select using (published = true or is_admin());

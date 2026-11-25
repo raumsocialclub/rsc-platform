@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JoinView, type JoinRow } from "@/components/admin/JoinView";
 import { isJoinRequest, joinState, matchesJoin, parseJoinFilter } from "@/lib/inquiries/join";
 import { createClient } from "@/lib/supabase/server";
+import { attachEvents } from "@/lib/events/admin";
 
 export const metadata: Metadata = { title: "가입 신청" };
 
@@ -20,7 +21,7 @@ export default async function AdminJoinPage({ searchParams }: { searchParams: Pr
     .eq("answers->>form", "match")
     .order("created_at", { ascending: false })
     .limit(500);
-  const all = ((data ?? []) as JoinRow[]).filter(isJoinRequest);
+  const all = await attachEvents(supabase, ((data ?? []) as JoinRow[]).filter(isJoinRequest));
   const counts = { pending: all.filter((r) => joinState(r) === "pending").length, approved: all.filter((r) => joinState(r) === "approved").length };
   const rows = all.filter((r) => matchesJoin(r, state, q));
   return <JoinView rows={rows} total={all.length} counts={counts} filter={{ state, q }} />;

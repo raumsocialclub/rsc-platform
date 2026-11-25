@@ -9,12 +9,12 @@ import { MARKETING_CHANNELS } from "@/lib/inquiries/marketing";
 import { cleanEntryPath } from "@/lib/inquiries/track";
 import { MATCH_PHOTO_COUNT, SENSITIVE_KEYS, flattenMatchAnswers, missingMatchRequired, sanitizeMatchAnswers } from "@/lib/match/schema";
 import { isPhotoPath, verifyPhoto } from "@/lib/match/photo";
-import { cleanEventSlug } from "@/lib/posts/apply";
+import { applyState, cleanEventSlug } from "@/lib/posts/apply";
 
 /**
  * POST /api/match { answers, consent, sensitiveConsent?, marketing?, photos?, entryPath?, entrySource?, utm? } — 프로필 진단(/match-check) 제출.
  *   entrySource "prereg" = 「사전등록하기」 경로(/match-check?src=prereg: 2026-11-20 /matching 사전등록 버튼, 2026-11-23 부터는 플로팅 버튼 세 세트도) → answers.entrySource, 어드민 「들어온 경로」에 표시.
- *   event = 소식 「참여하기」(M24, /match-check?src=prereg&event=글 주소)로 들어온 경우 그 글의 주소. 발행 중이고 참여를 받는 글이어야 하며 answers.events[] 에 { slug, title, at } 로 남는다(어드민 「참여 신청 · 제목」).
+ *   event = 소식 「참여하기」(M24, /match-check?src=prereg&event=글 주소)로 들어온 경우 그 글의 주소. 발행 중·참여 받는 중·행사 일자 전이어야 하며, 저장 뒤 event_applications 에 한 건(source=survey) 넣는다(어드민 「프로그램 참여 신청」·「참여 신청 · 제목」).
  * 로그인 없이 누구나. 저장은 inquiries(서버 service role 전용) 한 행: 이름·휴대폰은 컬럼, 나머지는 answers 에
  *   form: "match" · track: "matching"(1:1 매칭 관심) · job/education/region/district(어드민 목록·CSV 의 「직업 · 학력 · 거주지」열이 그대로 읽음)
  *   · answers[](어드민 상세가 그대로 보여주는 질문·답 목록) · match(원본 키-값) · photos(버킷 경로 최대 3장, photo 는 첫 장) · 동의 시각·버전.
@@ -66,13 +66,14 @@ export async function POST(req: Request) {
   const name = String(a.name).trim();
 
   const admin = createAdminClient();
-  let event: { slug: string; title: string; at: string } | null = null;
+  let event: { id: string; slug: string; title: string } | null = null;
   if (body.event) {
     const slug = cleanEventSlug(body.event);
-    const { data: post } = slug ? await admin.from("posts").select("slug, title, published, apply_open").eq("slug", slug).maybeSingle() : { data: null };
-    const p = post as { slug: string; title: string; published: boolean; apply_open?: boolean | null } | null;
-    if (!p || !p.published || p.apply_open === false) return NextResponse.json({ ok: false, message: "지금은 참여 신청을 받지 않는 소식입니다. 소식 목록에서 다시 선택해 주세요." }, { status: 400 });
-    event = { slug: p.slug, title: p.title, at: new Date().toISOString() };
+    const { data: post } = slug ? await admin.from("posts").select("id, slug, title, published, apply_open, event_date").eq("slug", slug).maybeSingle() : { data: null };
+    const p = post as { id: string; slug: string; title: string; published: boolean; apply_open?: boolean | null; event_date?: string | null } | null;
+    const state = p ? applyState(p) : "off";
+    if (!p || state !== "open") return NextResponse.json({ ok: false, message: state === "closed" ? "참여 신청이 마감된 소식입니다." : "지금은 참여 신청을 받지 않는 소식입니다. 소식 목록에서 다시 선택해 주세요." }, { status: 400 });
+    event = { id: p.id, slug: p.slug, title: p.title };
   }
   const photos: string[] = [];
   for (const p of [...body.photos, ...(body.photo ? [body.photo] : [])]) {
@@ -98,7 +99,6 @@ export async function POST(req: Request) {
       entryTrack: "matching",
       ...(cleanEntryPath(body.entryPath) ? { entryPath: cleanEntryPath(body.entryPath) } : {}),
       ...(body.entrySource || event ? { entrySource: body.entrySource ?? "prereg" } : {}),
-      ...(event ? { events: [event] } : {}),
       slot: "",
       ...(a.jobCategory ? { job: a.jobCategory } : {}),
       ...(a.education ? { education: a.education } : {}),
@@ -124,6 +124,11 @@ export async function POST(req: Request) {
     if (error) {
       console.error("[match] insert failed:", error);
       return NextResponse.json({ ok: false, message: "제출을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });
+    }
+    if (event) {
+      const inquiryId = (inserted as { id?: string } | null)?.id;
+      const { error: eErr } = inquiryId ? await admin.from("event_applications").insert({ post_id: event.id, inquiry_id: inquiryId, source: "survey" }) : { error: { message: "no inquiry id" } };
+      if (eErr) console.error("[match] event application insert failed (제출은 저장됨):", eErr);
     }
     if (body.marketing) {
       const { error: mErr } = await admin.from("marketing_consents").insert({

@@ -24,16 +24,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const supabase = await createClient();
   // 상담 대기 = 상담 신청·상담 전 설문 중 대기(프로필 진단 응답 제외) · 가입 승인 대기 = 프로필 진단 응답 중 approved_at 없는 것 (2026-11-23)
-  const [{ count: pendingInquiries }, { count: pendingJoin }, { count: newPartners }] = await Promise.all([
+  const [{ count: pendingInquiries }, { count: pendingJoin }, { count: newPartners }, { count: appliedEvents }] = await Promise.all([
     supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending").or("answers->>form.is.null,answers->>form.neq.match"),
     supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("answers->>form", "match").is("approved_at", null),
     supabase.from("partner_inquiries").select("id", { count: "exact", head: true }).eq("status", "new"),
+    supabase.from("event_applications").select("id", { count: "exact", head: true }).eq("status", "applied"), // 프로그램 참여 신청 중 아직 확정·취소하지 않은 건 (M24)
   ]);
 
   const items = [
     { href: "/admin", label: "대시보드" },
     { href: "/admin/members", label: "회원 DB" },
-    { href: "/admin/programs", label: "프로그램" },
+    { href: "/admin/events", label: "프로그램 참여 신청", badge: appliedEvents ?? 0 }, // M24: 소식 「참여하기」 신청자 DB. 예전 예약·결제형 프로그램 관리(/admin/programs)는 이 화면 하단 링크로만
     { href: "/admin/orders", label: "예약 · 결제" },
     { href: "/admin/inquiries", label: "상담 신청", badge: pendingInquiries ?? 0 },
     { href: "/admin/join", label: "가입 신청", badge: pendingJoin ?? 0 },

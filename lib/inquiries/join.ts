@@ -1,6 +1,7 @@
 import type { InquiryRow } from "@/components/admin/InquiryDetail";
 import { fmtDate } from "@/lib/admin/format";
 import { entryLabel, eventsOf, isPrereg } from "@/lib/inquiries/track";
+import { APPLY_STATUS_KO } from "@/lib/posts/apply";
 import { QUESTION_BY_KEY, PRIORITY_DESC, ageOf, displayMatchAnswer, type MatchAnswers } from "@/lib/match/schema";
 
 /**
@@ -26,7 +27,7 @@ export const JOIN_FILTERS: { value: JoinFilter; label: string }[] = [
 export const parseJoinFilter = (v: string | null | undefined): JoinFilter => (v === "pending" || v === "approved" ? v : "");
 
 /** 어떤 경로로 들어온 가입 신청인지 (목록 배지) */
-export function joinSourceLabel(r: Pick<InquiryRow, "answers">): string {
+export function joinSourceLabel(r: Pick<InquiryRow, "answers" | "events">): string {
   const code = r.answers?.inviteCode;
   const evs = eventsOf(r);
   if (evs.length) {
@@ -39,7 +40,7 @@ export function joinSourceLabel(r: Pick<InquiryRow, "answers">): string {
 }
 
 /** 목록 필터: 승인 상태 + 이름·연락처 검색 */
-export function matchesJoin(r: JoinRowFields & Pick<InquiryRow, "name" | "phone">, state: JoinFilter, q: string): boolean {
+export function matchesJoin(r: JoinRowFields & Pick<InquiryRow, "name" | "phone" | "events">, state: JoinFilter, q: string): boolean {
   if (!isJoinRequest(r)) return false;
   if (state && joinState(r) !== state) return false;
   const needle = q.trim().toLowerCase().replace(/-/g, "");
@@ -96,7 +97,7 @@ export function profileCard(r: InquiryRow & { approved_at?: string | null }): Pr
     {
       title: "접수 정보",
       rows: [
-        ...eventsOf(r).map((e) => ({ label: "참여 신청 행사", value: `${e.title}${e.at ? ` · ${fmtDate(e.at, true)}` : ""}` })),
+        ...eventsOf(r).map((e) => ({ label: "참여 신청 행사", value: `${e.title}${e.status ? ` · ${APPLY_STATUS_KO[e.status]}` : ""}${e.at ? ` · ${fmtDate(e.at, true)}` : ""}` })),
         ...row("알게 된 경로", val(m, "source")),
         ...row("초대코드", a.inviteCode ?? ""),
         ...row("들어온 경로", entryLabel(r)),
