@@ -9,8 +9,8 @@ import { UpButton } from "@/components/site/UpButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getDoc, s } from "@/lib/cms/get";
 import { getPostBySlug } from "@/lib/posts/queries";
-import { fmtDate, plainText } from "@/lib/posts/types";
-import { fmtPostDate } from "@/lib/posts/calendar";
+import { plainText } from "@/lib/posts/types";
+import { fmtEventDate } from "@/lib/posts/calendar";
 import { pageMetadata } from "@/lib/seo/get";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
 import { Badge, ButtonLink, btn } from "@/components/ui/ds";
@@ -39,6 +39,8 @@ export default async function NewsDetailPage({ params }: Params) {
   const applyLabel = s(copy, "applyLabel") || "참여하기";
   const applyHint = s(copy, "applyHint");
   const closedLabel = s(copy, "applyClosedLabel") || "참여 종료";
+  const scheduleLabel = s(copy, "scheduleLabel") || "프로그램 일정";
+  const comingSoon = s(copy, "comingSoonLabel") || "Coming soon";
   const closedBtn = (size: "lg" | "md") => <span aria-disabled="true" data-testid="news-apply-closed" className={btn("assistive", size, "pointer-events-none text-labelDisable border-lineAlt bg-fillAlt")}>{closedLabel}</span>;
 
   return (
@@ -49,11 +51,12 @@ export default async function NewsDetailPage({ params }: Params) {
           <div className="flex items-center gap-[8px] mb-[16px]">
             <Link href="/news" className="t-label-1 text-labelAlt hover:text-label">소식</Link>
             <span className="text-labelAssist">/</span>
-            <Badge tone="primary">{p.category}</Badge>
+            <Badge tone="primary">{scheduleLabel}</Badge>
           </div>
           <h1 className="t-title-2 md:t-title-1 text-label mb-[12px] text-pretty">{p.title}</h1>
-          <div className={`t-label-1 text-labelAlt ${apply ? "mb-[18px]" : "mb-[32px]"}`}>
-            {p.event_date ? <>행사일 {fmtPostDate(p)}<span className="mx-[10px] text-labelAssist">|</span>{fmtDate(p.published_at)} 게시</> : fmtDate(p.published_at)}
+          {/* 2026-11-25: 발행일 없이 프로그램 일정(행사 일자)만. 없으면 Coming soon */}
+          <div className={`t-label-1 text-labelAlt ${apply ? "mb-[18px]" : "mb-[32px]"}`} data-testid="news-schedule">
+            {scheduleLabel} <b className="text-label font-semibold ml-[4px]">{fmtEventDate(p) || comingSoon}</b>
           </div>
           {apply && (
             <div className="mb-[32px] flex items-center gap-[14px] flex-wrap" data-testid="news-apply">

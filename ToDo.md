@@ -184,7 +184,8 @@
 - [x] 어드민 메뉴 「프로그램」 → 「프로그램 참여 신청」(`/admin/events`, 배지 = 아직 확정·취소하지 않은 신청 수): 소식별 현황(행사 일자 · 모집 중/참여 종료/버튼 꺼짐 · 신청/확정/취소 수 · 소식 보기 · 편집) + 고른 소식의 신청자 표(이름 → 회원 프로필 카드, 성별·나이·거주지·직업·가입 상태·상담 상태·경로·참석 상태 버튼·메모·CSV `/api/admin/events/export?post=`). 상태·메모 `PATCH /api/admin/events/:id`(로그 event.status/event.memo), 삭제 DELETE. 예약·결제형 프로그램 관리(/admin/programs)는 메뉴에서 빼고 화면 하단 링크로만 유지(코드 삭제 없음).
 - [x] 가입 신청 목록 배지 「참여 신청 · 글 제목(외 n건)」, 상세·프로필 카드 「참여 신청 행사 · 상태」 줄, 검색에 행사 제목, 들어온 경로 「「제목」 참여하기 버튼」(`lib/events/admin.ts` attachEvents). 문구는 CMS `news.page`(applyLabel·applyHint·applyClosedLabel) · `match.form`(eventBanner · eventGate* · eventDone* · eventDoneAlready).
 - [x] 함께 고침: 소식 편집의 「행사 일자」가 저장 코드(`lib/posts/admin.ts` toRow)에서 빠져 DB 에 기록되지 않던 버그 — 이제 저장된다(기존 글은 한 번 다시 저장해야 월 탭 분류·참여 종료 판정에 반영).
-- [x] 테스트 `tests/newsApply.test.ts`(6) — 총 284 통과. FLOWS 1-7.
+- [x] 소식 카드·상세 표기 (2026-11-25, 사용자 요청): 분류 배지·발행일 대신 「프로그램 일정」 라벨 + 행사 일자(요일 포함)만, 행사 일자가 없으면 「Coming soon」(CMS news.page scheduleLabel·comingSoonLabel, `fmtEventDate`). 발행일은 공개 화면에서 더 이상 보이지 않음(월 탭 분류는 그대로 행사 일자 → 없으면 발행일).
+- [x] 테스트 `tests/newsApply.test.ts`(6) · 일정 표시(1) — 총 285 통과. FLOWS 1-7.
 - [ ] 후속 후보: 참석 확정 문자/알림톡 자동 안내(유료 발송), 행사 정원·마감 인원, 휴대폰 본인확인(인증번호) 후 빠른 신청, 대시보드 「참여 신청」 카드.
 
 ## M23. 소식 본문 사진 — 세로로 긴 상세 페이지 이미지 원본 비율 표시 (사용자 요청, 2026-11-25)

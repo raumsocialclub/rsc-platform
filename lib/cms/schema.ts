@@ -728,8 +728,9 @@ export const DOCS: DocDef[] = [
     fields: [
       t("eyebrow", "제목 위 작은 영문"), ta("emptyText", "글이 없는 달 안내", undefined, "{y} 자리에 연도, {m} 자리에 월이 들어갑니다"), t("backLabel", "상세 글 하단 「목록으로」 문구"), t("ctaLabel", "상세 글 하단 상담 버튼 문구"),
       t("applyLabel", "「참여하기」 버튼 문구", undefined, "행사 소식의 참여 신청 버튼(소식 목록 카드·상세). 누르면 사전등록 설문(/match-check?src=prereg&event=글 주소)으로 가고, 설문을 마치면 어드민 「가입 신청」에 참여 신청으로 들어옵니다. 글마다 버튼을 끄려면 소식 편집의 「참여하기 버튼 표시」"), t("applyHint", "상세의 참여하기 버튼 옆 안내"), t("applyClosedLabel", "행사 일자가 지난 글의 비활성 버튼 문구", undefined, "행사 일자(소식 편집)가 오늘보다 전이면 「참여하기」 대신 눌리지 않는 이 버튼이 보이고, 서버도 신청을 받지 않습니다"),
+      t("scheduleLabel", "카드·상세의 일정 라벨", undefined, "분류 배지 자리에 보이는 문구. 옆에는 소식 편집의 「행사 일자」만 보이고 발행일은 보이지 않습니다"), t("comingSoonLabel", "행사 일자가 없는 글의 일정 문구"),
     ],
-    defaults: { eyebrow: "NEWS", emptyText: "{y}년 {m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.", backLabel: "← 소식 목록", ctaLabel: "RSC 상담 신청하기", applyLabel: "참여하기", applyHint: "3분 프로필 설문을 마치면 참여 신청이 접수됩니다.", applyClosedLabel: "참여 종료" },
+    defaults: { eyebrow: "NEWS", emptyText: "{y}년 {m}월에 올라온 소식이 없습니다. 다른 달을 선택해 보세요.", backLabel: "← 소식 목록", ctaLabel: "RSC 상담 신청하기", applyLabel: "참여하기", applyHint: "3분 프로필 설문을 마치면 참여 신청이 접수됩니다.", applyClosedLabel: "참여 종료", scheduleLabel: "프로그램 일정", comingSoonLabel: "Coming soon" },
   },
 
   /* ---------- 제휴문의 (/partner) ---------- */

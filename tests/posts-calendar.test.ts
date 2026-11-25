@@ -35,3 +35,12 @@ describe("소식 월별 탭", () => {
     expect(fmtPostDate(P("2026-10-15", null))).toBe("2026.10.15 (목)");
   });
 });
+
+describe("프로그램 일정 표시 (2026-11-25)", () => {
+  it("행사 일자만 보여 주고(요일 포함), 없으면 빈 문자열 → 공개 화면은 Coming soon", async () => {
+    const { fmtEventDate } = await import("@/lib/posts/calendar");
+    expect(fmtEventDate({ event_date: "2026-11-27" })).toBe("2026.11.27 (금)");
+    expect(fmtEventDate({ event_date: null })).toBe("");
+    expect(fmtEventDate({ event_date: "" })).toBe("");
+  });
+});

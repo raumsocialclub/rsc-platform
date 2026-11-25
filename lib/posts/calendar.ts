@@ -84,6 +84,11 @@ export function filterMonth<T extends MonthLite>(posts: T[], ym: YM): T[] {
 
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 /** "2026.10.02 (금)" — 행사 일자가 있으면 그 날, 없으면 발행일 */
+/** 프로그램 일정(행사 일자)만 "2026.11.27 (금)" 으로. 행사 일자가 없으면 "" (공개 화면은 Coming soon 으로 표시, 2026-11-25) */
+export function fmtEventDate(p: Pick<MonthLite, "event_date">): string {
+  return p.event_date && /^\d{4}-\d{2}-\d{2}/.test(p.event_date) ? fmtPostDate({ event_date: p.event_date, published_at: null }) : "";
+}
+
 export function fmtPostDate(p: MonthLite): string {
   const d = postDate(p);
   if (!d) return "";

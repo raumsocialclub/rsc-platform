@@ -7,7 +7,7 @@ import { UpButton } from "@/components/site/UpButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { MonthTabs } from "@/components/news/MonthTabs";
 import { YearSelect } from "@/components/news/YearSelect";
-import { filterMonth, fmtPostDate, monthsOf, parseYM, pickDefaultMonth, todayYM, yearOptions } from "@/lib/posts/calendar";
+import { filterMonth, fmtEventDate, monthsOf, parseYM, pickDefaultMonth, todayYM, yearOptions } from "@/lib/posts/calendar";
 import { listPublishedPostMonths, listPublishedPostsByIds } from "@/lib/posts/queries";
 import { plainText } from "@/lib/posts/types";
 import { getPageSeo, pageMetadata } from "@/lib/seo/get";
@@ -41,6 +41,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
   const years = yearOptions([...months, ym], today);
   const applyLabel = s(copy, "applyLabel") || "참여하기";
   const closedLabel = s(copy, "applyClosedLabel") || "참여 종료";
+  const scheduleLabel = s(copy, "scheduleLabel") || "프로그램 일정";
+  const comingSoon = s(copy, "comingSoonLabel") || "Coming soon";
   const todayKst = kstToday();
 
   return (
@@ -75,9 +77,10 @@ export default async function NewsPage({ searchParams }: { searchParams: Search 
                       {p.cover_image && <Image src={p.cover_image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="object-cover object-center" unoptimized={p.cover_image.startsWith("http")} />}
                     </div>
                     <div className="p-[18px] md:p-[20px]">
+                      {/* 2026-11-25: 분류·발행일 대신 「프로그램 일정」 + 행사 일자만. 행사 일자가 없으면 Coming soon */}
                       <div className="flex items-center gap-[8px] mb-[10px]">
-                        <Badge tone="primary">{p.category}</Badge>
-                        <span className="t-caption-1 text-labelAlt">{fmtPostDate(p)}</span>
+                        <Badge tone="primary">{scheduleLabel}</Badge>
+                        <span className="t-caption-1 text-labelAlt" data-testid="news-schedule">{fmtEventDate(p) || comingSoon}</span>
                       </div>
                       <h2 className="t-heading-2 text-label mb-[6px] text-pretty transition-colors group-hover:text-primary">{p.title}</h2>
                       {(p.summary || p.body) && <p className="t-body-2-reading text-labelAlt text-pretty m-0">{p.summary || plainText(p.body, 120)}</p>}
