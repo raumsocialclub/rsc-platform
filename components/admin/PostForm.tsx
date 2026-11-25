@@ -7,34 +7,22 @@ import { useRef, useState } from "react";
 import { BTN_PRIMARY, BTN_SECONDARY, CARD } from "./ui";
 import { fromKstIso } from "@/lib/programs/format";
 import { POST_CATEGORIES, slugify, type Post } from "@/lib/posts/types";
+import { byName, imageLine, MAX_W } from "@/lib/posts/images";
+import { prepareImage } from "@/lib/posts/imageUpload";
 
 type FormState = { title: string; slug: string; slugTouched: boolean; category: string; summary: string; body: string; cover_image: string; published: boolean; published_at: string; event_date: string };
 
 const LABEL = "grid gap-[6px] text-[13px] text-[rgba(55,56,60,.61)]";
 const INPUT = "px-[14px] py-[13px] text-[14px] border border-[rgba(112,115,124,.22)] outline-none text-label bg-white rounded-ds-sm focus:border-primary w-full min-w-0";
 const SECTION = "text-[15px] font-semibold text-label";
-/** 업로드 전 브라우저에서 줄이는 상한. 가로는 1600px(본문 폭 760px 의 2배)면 충분하고, 세로로 긴 상세 페이지 이미지는 세로를 따로 넉넉히 둔다 */
-const MAX_W = 1600;
-const MAX_H = 8000;
 
 const HELP = [
   ["# 큰 제목", "## 중간 제목"],
   ["**굵게**", "*기울임*"],
   ["- 목록", "1. 번호 목록"],
   ["> 인용문", "--- (구분선)"],
-  ["[문구](https://…)", "![설명](사진주소)"],
+  ["[문구](https://…)", "![](사진주소) 사진 · ![설명](사진주소) 캡션 있는 사진"],
 ];
-
-async function shrink(file: File): Promise<Blob> {
-  const bmp = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_W / bmp.width, MAX_H / bmp.height);
-  if (scale === 1 && file.type !== "image/png") return file;
-  const c = document.createElement("canvas");
-  c.width = Math.round(bmp.width * scale);
-  c.height = Math.round(bmp.height * scale);
-  c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
-  return new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("변환 실패"))), "image/jpeg", 0.88));
-}
 
 function initial(p?: Post): FormState {
   if (!p) return { title: "", slug: "", slugTouched: false, category: POST_CATEGORIES[0], summary: "", body: "", cover_image: "", published: false, published_at: "", event_date: "" };
@@ -52,11 +40,12 @@ export function PostForm({ post }: { post?: Post }) {
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const bodyFileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState<"cover" | "body" | null>(null);
+  const [progress, setProgress] = useState("");
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setF((s) => ({ ...s, [k]: v }));
 
-  const upload = async (file: File): Promise<string> => {
+  const uploadBlob = async (blob: Blob, name: string): Promise<string> => {
     const fd = new FormData();
-    fd.append("file", await shrink(file), file.name);
+    fd.append("file", blob, name);
     const res = await fetch("/api/admin/upload?bucket=site", { method: "POST", body: fd });
     const j = (await res.json().catch(() => null)) as { ok?: boolean; url?: string; message?: string } | null;
     if (!j?.ok || !j.url) throw new Error(j?.message ?? "업로드하지 못했습니다.");
@@ -64,17 +53,37 @@ export function PostForm({ post }: { post?: Post }) {
   };
   const onCover = async (file: File) => {
     setUploading("cover"); setErr(null);
-    try { set("cover_image", await upload(file)); } catch (e) { setErr(e instanceof Error ? e.message : "업로드하지 못했습니다."); } finally { setUploading(null); if (coverRef.current) coverRef.current.value = ""; }
+    try { const [blob] = await prepareImage(file, 1); set("cover_image", await uploadBlob(blob, file.name)); } catch (e) { setErr(e instanceof Error ? e.message : "업로드하지 못했습니다."); } finally { setUploading(null); if (coverRef.current) coverRef.current.value = ""; }
   };
-  const onBodyImage = async (file: File) => {
+  /** 여러 장을 한 번에: 파일 이름 순(01, 02 …)으로 올리고, 긴 사진은 조각으로 나눠 올린 뒤 커서 위치에 사진 줄을 이어서 넣는다 */
+  const onBodyImages = async (list: FileList | File[]) => {
+    const files = Array.from(list).sort(byName);
+    if (!files.length) return;
     setUploading("body"); setErr(null);
+    const urls: string[] = [];
     try {
-      const url = await upload(file);
-      const ta = bodyRef.current;
-      const pos = ta ? ta.selectionStart : f.body.length;
-      const snippet = `\n![사진 설명](${url})\n`;
-      set("body", f.body.slice(0, pos) + snippet + f.body.slice(pos));
-    } catch (e) { setErr(e instanceof Error ? e.message : "업로드하지 못했습니다."); } finally { setUploading(null); if (bodyFileRef.current) bodyFileRef.current.value = ""; }
+      for (let i = 0; i < files.length; i++) {
+        setProgress(files.length > 1 ? `${i + 1}/${files.length}장 준비 중…` : "준비 중…");
+        const blobs = await prepareImage(files[i]);
+        for (let j = 0; j < blobs.length; j++) {
+          setProgress(files.length > 1 ? `${i + 1}/${files.length}장 올리는 중…${blobs.length > 1 ? ` (${j + 1}/${blobs.length}조각)` : ""}` : blobs.length > 1 ? `올리는 중… (${j + 1}/${blobs.length}조각)` : "올리는 중…");
+          urls.push(await uploadBlob(blobs[j], files[i].name));
+        }
+      }
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "업로드하지 못했습니다.");
+    } finally {
+      setUploading(null); setProgress("");
+      if (bodyFileRef.current) bodyFileRef.current.value = "";
+    }
+    if (!urls.length) return;
+    const ta = bodyRef.current;
+    const pos = ta ? ta.selectionStart : f.body.length;
+    const before = f.body.slice(0, pos);
+    const after = f.body.slice(pos);
+    // 사진 줄 사이는 빈 줄 없이 붙여야 공개 화면에서 한 장처럼 이어진다. 앞뒤 글과는 빈 줄로 띄운다
+    const snippet = (before && !before.endsWith("\n\n") ? (before.endsWith("\n") ? "\n" : "\n\n") : "") + urls.map(imageLine).join("\n") + (after && !after.startsWith("\n\n") ? (after.startsWith("\n") ? "\n" : "\n\n") : "");
+    set("body", before + snippet + after);
   };
 
   const submit = async (publish?: boolean) => {
@@ -135,12 +144,15 @@ export function PostForm({ post }: { post?: Post }) {
               <div className="flex items-center justify-between gap-[12px] flex-wrap">
                 <span>본문</span>
                 <div className="flex items-center gap-[10px]">
-                  <input ref={bodyFileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const x = e.target.files?.[0]; if (x) void onBodyImage(x); }} />
-                  <button type="button" onClick={() => bodyFileRef.current?.click()} disabled={uploading === "body"} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>{uploading === "body" ? "업로드 중…" : "본문에 사진 넣기"}</button>
+                  <input ref={bodyFileRef} type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { if (e.target.files?.length) void onBodyImages(e.target.files); }} />
+                  <button type="button" onClick={() => bodyFileRef.current?.click()} disabled={uploading === "body"} className={`${BTN_SECONDARY} px-[12px] py-[6px] text-[12px]`}>{uploading === "body" ? progress || "업로드 중…" : "본문에 사진 넣기 (여러 장 가능)"}</button>
                 </div>
               </div>
-              <textarea ref={bodyRef} value={f.body} onChange={(e) => set("body", e.target.value)} rows={22} className={`${INPUT} font-mono text-[14px] leading-[1.7]`} placeholder={"빈 줄로 문단을 나눕니다.\n\n## 소제목\n본문 내용…"} />
-              <div className="text-[12px] text-[rgba(55,56,60,.61)]">본문 사진은 원본 비율 그대로 폭에 맞춰 보입니다. 권장: 가로 1200px(최대 1600px), 세로는 자유(한 장 8000px 이내, 더 길면 여러 장으로 나눠 넣기), JPG·PNG·WEBP 10MB 이하.</div>
+              <textarea ref={bodyRef} value={f.body} onChange={(e) => set("body", e.target.value)} onDragOver={(e) => { if (e.dataTransfer.types.includes("Files")) e.preventDefault(); }} onDrop={(e) => { const fs = Array.from(e.dataTransfer.files).filter((x) => x.type.startsWith("image/")); if (fs.length) { e.preventDefault(); void onBodyImages(fs); } }} rows={22} className={`${INPUT} font-mono text-[14px] leading-[1.7]`} placeholder={"빈 줄로 문단을 나눕니다.\n\n## 소제목\n본문 내용…\n\n사진은 「본문에 사진 넣기」 또는 이 칸에 끌어다 놓기"} />
+              <div className="text-[12px] text-[rgba(55,56,60,.61)] leading-[1.7] grid gap-[2px]">
+                <div><b className="text-label">상세 페이지 사진 넣는 법</b> — 통으로 긴 한 장이든, 잘라 둔 여러 장이든 그대로 올리면 됩니다(여러 장은 파일 이름 순 01, 02…로 들어감). 긴 사진은 자동으로 조각내어 올리고, 공개 화면에서는 붙어 있는 사진 줄을 틈 없이 한 장처럼 이어 보여 줍니다.</div>
+                <div>권장 크기: 가로 <b className="text-label">1200px</b>(최대 {MAX_W}px, 더 크면 자동 축소) · 세로 자유 · JPG·PNG·WEBP. 사진 사이에 글을 넣으려면 사진 줄 사이에 빈 줄을 두고 쓰세요. 대괄호 안에 설명을 적으면 사진 아래 캡션으로 보입니다.</div>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-[6px] text-[12px] text-[rgba(55,56,60,.61)]">
                 {HELP.map(([a, b], i) => <div key={i}><code className="text-label">{a}</code><br /><code className="text-label">{b}</code></div>)}
               </div>

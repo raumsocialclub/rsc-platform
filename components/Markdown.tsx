@@ -38,21 +38,25 @@ function withBreaks(lines: string[], keyBase: string): ReactNode[] {
   return lines.flatMap((l, i) => (i === 0 ? inline(l, `${keyBase}-${i}`) : [<br key={`${keyBase}-br-${i}`} />, ...inline(l, `${keyBase}-${i}`)]));
 }
 
-type Block = { t: "h"; level: 1 | 2 | 3; text: string } | { t: "p"; lines: string[] } | { t: "ul"; items: string[] } | { t: "ol"; items: string[] } | { t: "q"; lines: string[] } | { t: "hr" } | { t: "img"; alt: string; src: string };
+/** img.gap: 바로 앞 사진 줄과 빈 줄로 띄어 썼다 → 공개 화면에서 이어 붙이지 않고 따로 보여 준다 */
+type Block = { t: "h"; level: 1 | 2 | 3; text: string } | { t: "p"; lines: string[] } | { t: "ul"; items: string[] } | { t: "ol"; items: string[] } | { t: "q"; lines: string[] } | { t: "hr" } | { t: "img"; alt: string; src: string; gap: boolean };
 
 export function parseMarkdown(md: string): Block[] {
   const lines = md.replace(/\r\n?/g, "\n").split("\n");
   const blocks: Block[] = [];
   let i = 0;
+  let blank = false; // 직전 줄이 빈 줄이었는지(사진 줄 묶음 판정용)
   while (i < lines.length) {
     const line = lines[i];
     const trimmed = line.trim();
-    if (!trimmed) { i++; continue; }
+    if (!trimmed) { blank = true; i++; continue; }
+    const gap = blank;
+    blank = false;
     const h = /^(#{1,3})\s+(.*)$/.exec(trimmed);
     if (h) { blocks.push({ t: "h", level: h[1].length as 1 | 2 | 3, text: h[2] }); i++; continue; }
     if (/^(-{3,}|\*{3,})$/.test(trimmed)) { blocks.push({ t: "hr" }); i++; continue; }
     const im = /^!\[([^\]]*)\]\(([^)\s]+)\)$/.exec(trimmed);
-    if (im) { blocks.push({ t: "img", alt: im[1], src: im[2] }); i++; continue; }
+    if (im) { blocks.push({ t: "img", alt: im[1], src: im[2], gap }); i++; continue; }
     if (/^[-*]\s+/.test(trimmed)) {
       const items: string[] = [];
       while (i < lines.length && /^[-*]\s+/.test(lines[i].trim())) { items.push(lines[i].trim().replace(/^[-*]\s+/, "")); i++; }
@@ -79,8 +83,21 @@ export function parseMarkdown(md: string): Block[] {
   return blocks;
 }
 
+/** 붙어 있는 사진 줄(빈 줄 없이 연속)은 한 묶음으로 → 공개 화면에서 틈 없이 이어져 긴 상세 페이지 한 장처럼 보인다. 빈 줄로 띄우면 따로 */
+export function groupImages(blocks: Block[]): (Block | { t: "imgs"; items: { alt: string; src: string }[] })[] {
+  const out: (Block | { t: "imgs"; items: { alt: string; src: string }[] })[] = [];
+  for (const b of blocks) {
+    const last = out[out.length - 1];
+    if (b.t === "img" && !b.gap && last?.t === "imgs") { last.items.push({ alt: b.alt, src: b.src }); continue; }
+    out.push(b.t === "img" ? { t: "imgs", items: [{ alt: b.alt, src: b.src }] } : b);
+  }
+  return out;
+}
+
+const SAFE_SRC = /^(https?:\/\/|\/)/;
+
 export function Markdown({ source }: { source: string }) {
-  const blocks = parseMarkdown(source);
+  const blocks = groupImages(parseMarkdown(source));
   return (
     <div>
       {blocks.map((b, i) => {
@@ -97,15 +114,21 @@ export function Markdown({ source }: { source: string }) {
           case "ol": return <ol key={k} className={`${P} list-decimal pl-[22px]`}>{b.items.map((it, j) => <li key={j} className="mb-[6px]">{inline(it, `${k}-${j}`)}</li>)}</ol>;
           case "q": return <blockquote key={k} className="border-l-2 border-brownHover pl-[24px] py-[4px] my-[32px] text-[16px] md:text-[17px] leading-[1.7] text-label text-pretty">{withBreaks(b.lines, k)}</blockquote>;
           case "hr": return <hr key={k} className="border-0 border-t border-[rgba(112,115,124,.16)] my-[40px]" />;
-          case "img": {
-            const safe = /^(https?:\/\/|\/)/.test(b.src);
-            if (!safe) return <Fragment key={k} />;
+          case "img": return <Fragment key={k} />; // groupImages 가 모두 imgs 로 바꾼다
+          case "imgs": {
+            const items = b.items.filter((it) => SAFE_SRC.test(it.src));
+            if (!items.length) return <Fragment key={k} />;
             return (
               <figure key={k} className="my-[32px]">
-                {/* 원본 비율 그대로(세로로 긴 상세 페이지 이미지 포함) — 고정 비율 상자·object-cover 로 잘라내지 않는다 */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={b.src} alt={b.alt} loading="lazy" decoding="async" className="block w-full h-auto bg-[#f4f4f5]" />
-                {b.alt && <figcaption className="text-[13px] text-[rgba(55,56,60,.61)] mt-[10px] text-center">{b.alt}</figcaption>}
+                {/* 원본 비율 그대로(세로로 긴 상세 페이지 이미지 포함) — 고정 비율 상자·object-cover 로 잘라내지 않는다.
+                    여러 조각은 block 으로 세로로 붙여 틈이 없다. 설명(alt)이 있는 조각만 그 아래 캡션 */}
+                {items.map((it, j) => (
+                  <Fragment key={j}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={it.src} alt={it.alt} loading={i === 0 && j === 0 ? "eager" : "lazy"} decoding="async" className="block w-full h-auto bg-[#f4f4f5]" />
+                    {it.alt && <figcaption className="text-[13px] text-[rgba(55,56,60,.61)] mt-[10px] mb-[18px] text-center">{it.alt}</figcaption>}
+                  </Fragment>
+                ))}
               </figure>
             );
           }
