@@ -191,6 +191,7 @@
 
 ## M26. 푸터 「카카오톡 상담」 버튼 (사용자 요청, 2026-11-26)
 - [x] 푸터 3열 「제휴문의 →」 아래 노란(#FEE500) 「카카오톡 상담」 버튼(`components/site/KakaoButton.tsx`, 새 탭) → https://pf.kakao.com/_xezfXj. 링크·문구는 CMS `global.brand.kakaoUrl`·`kakaoLabel`(사이트 관리 → 브랜드 · 연락처 · 푸터 정보), 링크를 비우면 버튼 숨김. 테스트 `tests/kakaoButton.test.ts`(3) — 총 288 통과
+- [x] 피드백 반영: 3열 제목 「문의하기」, 「멤버십 · 프로그램 문의」 설명 + 노란 카카오 버튼 / 「협업 · 제휴 제안」 설명 + 테두리 「제휴문의 →」 버튼(같은 높이 40px, 세로 배치). 문구는 CMS `global.nav` footerInquiryTitle·footerKakaoNote·footerPartnerNote·footerPartnerTitle
 
 ## M25. 푸터 주소 변경 + 푸터 정보 어드민 편집 안내 (사용자 요청, 2026-11-25)
 - [x] 푸터 「서비스 문의」 주소 기본값 → 「서울특별시 강남구 언주로 564, 4층 라움소셜클럽 / (역삼동, 라움아트센터)」(`global.brand.address`). 개인정보처리방침 제12조 보호책임자 주소도 같은 값으로(코드 기본값 + 운영 DB `legal.privacy` 저장본 문자열 치환, 2026-11-25). 사업자 정보의 사업장 주소(`bizAddress`, 「언주로 564 (역삼동)」)는 사업자등록증 기준 그대로

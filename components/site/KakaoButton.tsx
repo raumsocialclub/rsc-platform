@@ -11,7 +11,7 @@ export function KakaoButton({ href, label = "카카오톡 상담", className = "
       target="_blank"
       rel="noreferrer"
       data-testid="kakao-chat"
-      className={`inline-flex items-center gap-[8px] h-[44px] px-[18px] rounded-pill bg-[#FEE500] text-[#191919] text-[15px] font-semibold leading-none transition-[filter,transform] duration-200 hover:brightness-95 active:translate-y-[1px] ${className}`}
+      className={`inline-flex items-center justify-center gap-[8px] h-[40px] px-[20px] rounded-pill bg-[#FEE500] text-[#191919] text-[15px] font-semibold leading-none transition-[filter,transform] duration-200 hover:brightness-95 active:translate-y-[1px] ${className}`}
     >
       <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.86 5.31 4.66 6.73l-.95 3.53c-.08.3.26.54.52.37l4.17-2.77c.52.07 1.05.11 1.6.11 5.52 0 10-3.58 10-7.97S17.52 3 12 3z" />
