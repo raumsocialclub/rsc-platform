@@ -4,6 +4,7 @@ import { Txt } from "@/components/cms/Txt";
 import { getBrand, getNav } from "@/lib/cms/get";
 import { getSettings } from "@/lib/settings/get";
 import { InstagramButton } from "./InstagramButton";
+import { KakaoButton } from "./KakaoButton";
 import { businessInfo } from "@/lib/site/business";
 
 const INK_FILTER = "invert(1) brightness(0.15)";
@@ -13,6 +14,7 @@ const LINK = "t-label-1 text-labelAlt hover:text-label hover:translate-x-[2px] i
  * 푸터 (Wanted DS): 연회색 배경, 브랜드 한 줄 + 메뉴·연락처·제휴문의 열, 맨 아래 약관 링크·사업자 정보.
  * 연락처·제휴 담당 연락처는 CMS(global.brand), 메뉴 이름·열 제목은 CMS(global.nav). 리드 모드면 멤버십·환불규정 링크를, 1:1 매칭 전체 숨김이면 「1:1 매칭」 링크를 숨긴다.
  * 「패밀리 사이트」 열은 2026-11 요청으로 「제휴문의 →」(/partner 로 가는 제목 링크 하나, 연락처는 페이지에서)로 바꿨다. 2열 제목은 「서비스 문의」.
+ * 「제휴문의 →」 아래 노란 「카카오톡 상담」 버튼(2026-11-26): 카카오 채널 링크·문구는 CMS(global.brand kakaoUrl·kakaoLabel), 링크가 비면 숨김.
  */
 export async function SiteFooter() {
   const [b, n, settings] = await Promise.all([getBrand(), getNav(), getSettings()]);
@@ -55,6 +57,7 @@ export async function SiteFooter() {
           </div>
           <div data-testid="footer-partner">
             <Link href="/partner" className="t-label-1 font-semibold text-label hover:text-primary hover:translate-x-[2px] inline-block transition-[color,transform] duration-200">{L("footerPartnerTitle", "제휴문의")} →</Link>
+            <div className="mt-[16px]"><KakaoButton href={b.kakaoUrl} label={b.kakaoLabel || "카카오톡 상담"} /></div>
           </div>
         </div>
         <div className="border-t border-lineNeutral pt-[20px] flex flex-col gap-[12px] md:flex-row md:items-start md:justify-between">
