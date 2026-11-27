@@ -7,75 +7,245 @@
 ---
 
 ## M0. 프로젝트 골격 + 로컬 실행
-- [ ] `npx create-next-app@latest . --ts --tailwind --app --src-dir=false`
-- [ ] 의존성: `@supabase/supabase-js @supabase/ssr @tosspayments/payment-widget-sdk zod`
-- [ ] `Design.md` 토큰을 `tailwind.config.ts`에 등록, SamsungOne `next/font/local` 4종 로드, `app/layout.tsx`에 body 기본(bg cream, text ink, weight 500)
-- [ ] `.env.example` 작성(SETUP.md 목록), `README.md`에 로컬 실행법: `npm i && npm run dev`
-- [ ] `scripts/setup.sh`(mac) / `setup.ps1`(win): node 확인 → npm i → .env 복사 → dev 서버 실행
+- [x] `npx create-next-app@latest . --ts --tailwind --app --src-dir=false`
+- [x] 의존성: `@supabase/supabase-js @supabase/ssr @tosspayments/payment-widget-sdk zod`
+- [x] `Design.md` 토큰을 `tailwind.config.ts`에 등록, SamsungOne `next/font/local` 4종 로드, `app/layout.tsx`에 body 기본(bg cream, text ink, weight 500)
+- [x] `.env.example` 작성(SETUP.md 목록), `README.md`에 로컬 실행법: `npm i && npm run dev`
+- [x] `scripts/setup.sh`(mac) / `setup.ps1`(win): node 확인 → npm i → .env 복사 → dev 서버 실행
 - 완료 조건: `localhost:3000`에 크림 배경 + "RAUM SOCIAL CLUB" 텍스트가 SamsungOne으로 보임
 
 ## M1. 브랜드 페이지 5종 (정적, 현 배포본 대체)
-- [ ] 공통 GNB(데스크톱/모바일 오버레이) + 푸터 + UP 플로팅 버튼
-- [ ] `/` — `design/RAUM Social Club.dc.html` 재현 (deploy/index.html 렌더 참고)
-- [ ] `/pricing` — `design/RSC Pricing.dc.html`
-- [ ] `/benefits` — `design/RSC Benefits.dc.html`
-- [ ] `/fit-check` — `design/RSC Fit Check.dc.html` 설문 UI(아직 저장은 안 함, 다음 모듈)
-- [ ] 이미지 `public/images/`로 이동, `next/image` 사용
-- [ ] 375px·768px·1440px 에서 잘림·겹침 없음
+- [x] 공통 GNB(데스크톱/모바일 오버레이) + 푸터 + UP 플로팅 버튼
+- [x] `/` — `design/RAUM Social Club.dc.html` 재현 (deploy/index.html 렌더 참고)
+- [x] `/pricing` — `design/RSC Pricing.dc.html`
+- [x] `/benefits` — `design/RSC Benefits.dc.html`
+- [x] `/fit-check` — `design/RSC Fit Check.dc.html` 설문 UI(아직 저장은 안 함, 다음 모듈)
+- [x] 이미지 `public/images/`로 이동, `next/image` 사용
+- [x] 375px·768px·1440px 에서 잘림·겹침 없음
 - 완료 조건: 현재 배포 사이트와 동일하게 보임. Vercel 프리뷰 URL 공유.
 
 ## M2. Supabase 연결 + 상담 신청 저장
-- [ ] `SCHEMA.sql` 실행(사용자가 Supabase에서 실행 — 방법 안내)
-- [ ] `lib/supabase/{client,server,admin}.ts`
-- [ ] `POST /api/inquiries` (zod 검증) → `inquiries` insert
-- [ ] `/fit-check` 완료 시 저장 + 결과 화면
+- [x] `SCHEMA.sql` 실행(사용자가 Supabase에서 실행 — 방법 안내)
+- [x] `lib/supabase/{client,server,admin}.ts`
+- [x] `POST /api/inquiries` (zod 검증) → `inquiries` insert
+- [x] `/fit-check` 완료 시 저장 + 결과 화면
 - 완료 조건: 설문 제출 → Supabase Table Editor `inquiries`에 행 생김
 
 ## M3. 인증 + 초대코드 + 가입
-- [ ] Supabase Auth: 이메일/비밀번호, 카카오, 구글 (콜백 `/auth/callback`)
-- [ ] `/join` 초대코드 입력 → `POST /api/invites/verify`
-- [ ] `/join/register?code=` 가입 폼 + 소셜 가입 → 트리거로 `members` 생성 → 코드 used 처리
-- [ ] `/login`, 로그아웃, GNB 로그인 상태 표시(이니셜 아바타)
-- [ ] `middleware.ts` 보호 라우트
+- [x] Supabase Auth: 이메일/비밀번호, 카카오, 구글 (콜백 `/auth/callback`)
+- [x] `/join` 초대코드 입력 → `POST /api/invites/verify`
+- [x] `/join/register?code=` 가입 폼 + 소셜 가입 → 트리거로 `members` 생성 → 코드 used 처리
+- [x] `/login`, 로그아웃, GNB 로그인 상태 표시(이니셜 아바타)
+- [x] `middleware.ts` 보호 라우트
 - 완료 조건: 어드민이 SQL로 넣은 초대코드로 가입 → `/programs` 접근 가능, 코드 없이 `/join/register` 진입 불가
 
 ## M4. 어드민 골격 + 상담 목록 + 초대코드 발급
-- [ ] `/admin` 레이아웃(사이드바, role 검사)
-- [ ] `/admin/inquiries` 목록/상세, 메모, 상태 변경, "초대코드 발급"(코드 생성 + 이메일 발송 — Resend)
-- [ ] `/admin/coupons` 초대코드 목록
+- [x] `/admin` 레이아웃(사이드바, role 검사)
+- [x] `/admin/inquiries` 목록/상세, 메모, 상태 변경, "초대코드 발급"(코드 생성 + 화면 표시·복사. 이메일 발송은 lib/notify.ts 구조만, RESEND_API_KEY 등록 시 자동 발송)
+- [x] `/admin/coupons` 초대코드 목록
 - 완료 조건: 상담 신청 → 어드민에서 코드 발급 → 이메일 수신 → 그 코드로 가입
 
 ## M5. 프로그램 CRUD (어드민) + 회원 목록/상세
-- [ ] `/admin/programs` 탭(전체/단일/시즌) 테이블
-- [ ] `/admin/programs/new`, `/admin/programs/[id]` 폼: 종류·이름·서브·카테고리·장소·소개·설명·이미지 업로드(Storage)·정원·판매가·회원가·일정(단일 1 / 시즌 6)·타임라인·공개
-- [ ] `/programs` 카드 그리드 + 카테고리 필터, 잔여석(`session_availability`)
-- [ ] `/programs/[id]` 상세 + sticky 예약 카드(모바일 하단 고정바)
+- [x] `/admin/programs` 탭(전체/단일/시즌) 테이블
+- [x] `/admin/programs/new`, `/admin/programs/[id]` 폼: 종류·이름·서브·카테고리·장소·소개·설명·이미지 업로드(Storage)·정원·판매가·회원가·일정(단일 1 / 시즌 6)·타임라인·공개
+- [x] `/programs` 카드 그리드 + 카테고리 필터, 잔여석(`session_availability`)
+- [x] `/programs/[id]` 상세 + sticky 예약 카드(모바일 하단 고정바)
 - 완료 조건: 어드민에서 등록·공개한 프로그램이 회원 목록에 보이고 비공개는 안 보임
 
 ## M6. 예약 + 토스 결제 + 내 예약
-- [ ] `POST /api/bookings` → `rpc('reserve_seat')` (pending, 15분)
-- [ ] `/checkout/[bookingId]` 토스 결제위젯 (테스트 키)
-- [ ] `/checkout/success` → `POST /api/payments/confirm` (금액 검증 → 토스 confirm → payments/bookings 갱신)
-- [ ] `/checkout/fail`
-- [ ] `POST /api/payments/webhook`
-- [ ] pg_cron `expire_pending_bookings` 5분
-- [ ] `/my` 다가오는/지난 예약, 취소 → `POST /api/bookings/[id]/cancel` → 토스 cancel
-- [ ] 예약 확정 이메일
+- [x] `POST /api/bookings` → `rpc('reserve_seat')` (pending, 15분)
+- [x] `/checkout/[bookingId]` 토스 결제위젯 (테스트 키)
+- [x] `/checkout/success` → `POST /api/payments/confirm` (금액 검증 → 토스 confirm → payments/bookings 갱신)
+- [x] `/checkout/fail`
+- [x] `POST /api/payments/webhook`
+- [x] pg_cron `expire_pending_bookings` 5분
+- [x] `/my` 다가오는/지난 예약, 취소 → `POST /api/bookings/[id]/cancel` → 토스 cancel
+- [x] 예약 확정 이메일
 - 완료 조건: 테스트 카드로 결제 → 예약 확정 → 내 예약에 표시 → 취소 → 토스 대시보드에서 취소 확인. 두 브라우저로 마지막 1석 동시 결제 시 한 명만 성공.
 
 ## M7. 어드민 예약·결제 + 회원 DB + 대시보드
-- [ ] `/admin/orders` 필터·테이블·상세(영수증, 환불 버튼)
-- [ ] `/admin/members` 검색·필터·상세 드로어(예약/결제 이력, 메모, 상태)
-- [ ] `/admin` 대시보드 KPI(이번 달 매출, 신규 회원, 예약 수, 상담 대기), 최근 예약, 마감 임박
+- [x] `/admin/orders` 필터·테이블·상세(영수증, 환불 버튼)
+- [x] `/admin/members` 검색·필터·상세 드로어(예약/결제 이력, 메모, 상태)
+- [x] `/admin` 대시보드 KPI(이번 달 매출, 신규 회원, 예약 수, 상담 대기), 최근 예약, 마감 임박
 - 완료 조건: 실제 데이터로 KPI 숫자 일치
 
 ## M8. 마무리 & 라이브 전환
-- [ ] 이용약관·개인정보처리방침·환불규정 페이지(`/terms`, `/privacy`, `/refund`) — 문구는 사용자 제공
-- [ ] 에러·로딩·빈 상태 화면 전수 점검(Design.md 규칙)
-- [ ] 접근성(포커스 링, 대비), Lighthouse 모바일 90+
-- [ ] 토스 라이브 키 교체, 웹훅 URL 등록, Supabase Redirect URL 등록
-- [ ] Vercel 도메인 `raumsocialclub2026.vercel.app` 새 프로젝트로 이전
+- [x] 이용약관·개인정보처리방침·환불규정 페이지(`/terms`, `/privacy`, `/refund`) — 자리 문구(`lib/legal/content.ts`), 실제 문구는 사용자 제공 후 교체
+- [x] 에러·로딩·빈 상태 화면 전수 점검(Design.md 규칙) — `app/not-found`, `app/error`, `app/global-error`, 회원·어드민 `loading`
+- [x] 접근성(포커스 링, 대비), Lighthouse 모바일 90+ — 로컬 측정 `/` 96/95/100/100, `/pricing` 94/96, `/login` 98/96, `/terms` 97/91 (대비 경고는 Design.md 고정색 overline)
+- [ ] 토스 라이브 키 교체, 웹훅 URL 등록, Supabase Redirect URL 등록 — 사용자 작업 (SETUP.md 4)
+- [x] ~~Vercel 도메인 `raumsocialclub2026.vercel.app` 새 프로젝트로 이전~~ → 이전하지 않음(다른 Vercel 팀 소유). `rsc-platform.vercel.app` 사용, 이후 실도메인 `www.raumsocialclub.co.kr` 연결 예정(사용자 결정 2026-09-23)
 - [ ] `main` 병합 → 배포
+
+## M9. 어드민 고도화 — 사이트 관리(CMS) · 통계 · 리포트 (사용자 요청)
+- [x] 사이트 콘텐츠 관리: `site_content` + `lib/cms/schema.ts`(문서·필드 정의, 기본값 = 기존 문구) → `/admin/site` 편집기(문구·사진 업로드·색상·연락처·섹션 표시/순서, 저장 즉시 게시, 이력·기본값 복원)
+- [x] 홈·가격·혜택·약관·GNB·푸터가 CMS 데이터로 렌더 (기본값 상태에서 기존 화면과 섹션 위치·높이 동일)
+- [x] 색상 테마: tailwind 토큰 → CSS 변수, 어드민에서 변경 시 전체 반영
+- [x] 접속 통계: `page_views` 비콘(`/api/track`), 일별 PV/UV·페이지·유입·기기·국가 (`stats_page_views`)
+- [x] `/admin/stats`: 기간(7/30/90일·이번 달·지난 달·올해·직접 지정) 매출(일별·프로그램·결제수단)·예약·회원·상담·접속·전환 퍼널·관리자 활동 로그, 항목별/전체 CSV
+- [x] 관리자 활동 로그 `admin_logs` (사이트 저장, 환불, 회원 수정, 프로그램 등록/공개, 초대코드 발급)
+- [ ] 페이지 빌더(섹션 자유 추가·레이아웃 편집)는 범위 밖 — 필요 시 별도 지시
+
+## M10. 어드민 일반 설정 (사용자 요청)
+- [x] `/admin/settings`: 사이트 상태(점검 모드·허용 IP) · 보안(보안 헤더·관리자 허용 IP·로그인 연속 실패 잠금) · 접근 차단(IP·국가) · 페이지 캐시(CDN 시간·비우기) · 알림(이메일 켜기·발신자) · 결제/환불(일수·환불률)
+- [x] `proxy.ts` 가 요청 앞단에서 차단·점검·관리자 IP·보안 헤더·캐시 헤더 적용(설정 30초 캐시), `/api/auth/login` 잠금, 환불 정책·알림 설정 연동
+- [x] Vercel 함수 리전 서울(icn1). 국가 차단·요청 제한·공격 대응은 Vercel Firewall 안내(SETUP.md 4-1, 일반 설정 화면 하단)
+
+## M11. SEO · GEO + 소식 게시판 (사용자 요청)
+- [x] `/admin/seo`: 검색 노출 스위치(기본 꺼짐 → 오픈 때 켬) · 브랜드명 · 기본 설명 · 키워드 · 대표 이미지(OG, 기본 메인 히어로) · 구글/네이버 소유 확인 코드 칸 · AI 크롤러 허용(기본 켜짐) · llms.txt 본문 · 조직 정보(구조화 데이터) · 페이지별 제목/설명/이미지/검색 제외
+- [x] `app/robots.ts` `app/sitemap.ts` `app/llms.txt` 자동 생성, 전 페이지 title/description/OG/canonical/robots 메타(`lib/seo/get.ts`), 어드민·회원·로그인 화면 noindex, Organization·WebSite·FAQPage·NewsArticle·Breadcrumb JSON-LD
+- [x] 메인 08 FAQ 섹션(`home.faq`, 10문항 초안 — 사이트 관리에서 수정) 
+- [x] 소식 게시판: `posts` 테이블(RLS) · `/admin/posts` 목록/새 글/편집(사진 업로드·발행·임시 저장·주소 자동) · 공개 `/news` `/news/[slug]`(마크다운 본문) · GNB·푸터 링크 · 사이트맵·llms.txt 자동 포함
+- [ ] 실도메인 연결 후 구글 서치콘솔·네이버 서치어드바이저 등록 → 소유 확인 코드 입력 → 사이트맵 제출 (SETUP.md 4-2) — 사용자 작업
+
+## M12. 관리자 권한 3단계 + 부관리자 초대 (사용자 요청)
+- [x] 역할 owner(주관리자: nse101@kakao.com) > admin(부관리자) > member. `is_admin()` 은 활동 상태의 admin·owner, `is_owner()` 추가. 정지(paused) 즉시 어드민 차단
+- [x] `/admin/admins`(주관리자 전용): 부관리자 초대(이름·이메일 → 48시간·1회용 링크, 화면 표시+복사, 이메일 키 있으면 발송), 관리자 목록(역할·상태·마지막 로그인), 정지/해제, 권한 해제, 초대 이력·취소, 권한표
+- [x] `/admin-invite/[token]`: 이름·비밀번호 → 계정 생성(트리거가 `app_metadata.admin_invite` 로 초대코드 없이 role=admin 생성) → 바로 로그인. 이미 가입된 이메일이면 권한만 부여
+- [x] 부관리자 제한: 일반 설정·SEO 설정은 읽기 전용(저장 API 403), 회원 목록 CSV(통계 리포트·회원 DB 버튼) 주관리자만, 관리자 관리 메뉴 숨김. 환불은 가능하되 사유 필수 + 활동 로그(처리자·금액·사유)
+- [x] `members.last_login_at`(이메일·소셜 로그인 시 기록), 관리자 로그인 후 기본 목적지 `/admin`, `admin_logs` 에 admin.invite / admin.invite.revoke / admin.role / admin.status / admin.accept
+
+## M13. 오픈 준비 — 모니터링 · 자동 테스트 · 배포 게이트 · 스테이징 · 점검 루틴 (사용자 요청)
+- [x] Sentry(`@sentry/nextjs`): 서버·엣지·브라우저 설정, `instrumentation.ts` onRequestError, error/global-error 캡처, `withSentryConfig`. DSN 없으면 비활성. `lib/alert.ts` opsAlert → 결제 승인 실패·웹훅 실패·환불 실패를 Sentry + 운영 알림 메일(일반 설정 → 알림 → 운영 알림 받는 이메일, 기본 theraumai@gmail.com)
+- [x] 자동 테스트 Vitest 47개: 가입(초대코드 검증·사용·관리자 초대 토큰), 예약(book_session 오류 코드·성공), 결제(금액 검증·만료·중복 승인·토스 실패 알림·웹훅 재조회·취소 동기화), 환불(전액·부분·정책 일수·회원 취소 API·관리자 사유 필수·로그). `npm test`, `npm run check`
+- [x] GitHub Actions `CI`(모든 push/PR: lint·typecheck·test·build) + `Deploy production`(main: 테스트 통과 → Vercel Deploy Hook). `vercel.json` main 자동배포 끔
+- [x] 스테이징: `staging` 브랜치 → Vercel Preview(`rsc-platform-git-staging-…`), Preview 환경변수 `NEXT_PUBLIC_SITE_URL`·`NEXT_PUBLIC_APP_ENV=staging` 분리, 화면 상단 STAGING 띠
+- [x] `MAINTENANCE.md` 월 1회 점검 루틴 + 보고 양식, SETUP 4-4~4-8(Vercel Pro·Supabase Pro 전환 단계, Deploy Hook·GitHub Secret·main 보호, Sentry 가입·DSN, 스테이징)
+- [ ] 사용자: Vercel Pro·Supabase Pro 결제, Sentry 가입 후 DSN 을 Vercel 환경변수에, Deploy Hook → GitHub Secret, main 보호 규칙 (SETUP 4-4~4-6)
+- [ ] 스테이징 DB: Supabase 프로젝트 한도(무료 2개) 때문에 보류 → Pro 전환 또는 옛 프로젝트 정리 후 "스테이징 DB 만들어라"
+
+## M16. 두 갈래 홈 — 소셜클럽 / 1:1 매칭 (사용자 요청, 2026-11)
+- [x] 홈 게이트 히어로(전환 탭 · 스와이프) + 두 방식 비교 카드 + CTA 두 버튼
+- [x] `/social` `/matching` 트랙 페이지 (CMS `social.*` `matching.*`) — 상품 문구는 사업전략(11.03) 기준: 소셜클럽 가입비 구성, ACCESS 5회 · SIGNATURE 10회 만남권, MERRY, 가입 심사 섹션
+- [x] 가격 안내 기본값을 같은 구조로 갱신 (SOCIAL CLUB 카드, 관계 확장 프로그램, YOUR PATH)
+- [x] 가입비·연회비 비공개 (사용자 결정): 공개 페이지·FAQ·llms.txt 에서 금액 제거, 「대면 상담에서 안내」
+- [x] 상담 신청 「관심 있는 방식」 칩 + `?track=` 사전 선택 → `answers.route` → 어드민 「관심 방식」
+- [x] GNB·푸터 메뉴(소셜클럽 · 1:1 매칭), sitemap·llms.txt·페이지 SEO 문서
+- [x] 운영 배포 (2026-11-06, 5e3b506)
+
+## M17. 모든 공개 문구 어드민 편입 + 문구 검색 (사용자 요청, 2026-11-09)
+- [x] 하드코딩 문구 전수 조사 → CMS 문서로 편입: 메뉴 이름(`global.nav`), 비교 카드 버튼·작은 제목(`home.tracks`), 전환 바 한 줄 설명(`home.gate`), 하단 상담 띠 3종(`home.cta` `social.cta` `matching.cta`), 회원 전용 행사 제목·설명(`home.solo`), 멤버십 카드 버튼·확장 옵션 제목·스와이프 안내(`matching.plans`), 이런 분께 버튼(`matching.who`), 상담 신청 양식 전체(`apply.form`), 소식 고정 문구(`news.page`), 혜택 리드 모드 문구(`benefits.hero`)
+- [x] 사이트 관리 탭을 실제 페이지 구조에 맞게 재배치: 소셜클럽 탭에 포지셔닝·TASTE SOCIAL·MOMENTS, 1:1 매칭 탭에 회원 전용 행사. 안 쓰는 옛 히어로·옛 멤버십 문서는 목록에서 숨김(`hidden`, 저장값 보존). 「상담 신청」「소식」 탭 추가
+- [x] 「문구 검색」(사이트에서 본 문장을 붙여 넣으면 탭 › 섹션 › 항목 위치를 찾아 줌, `lib/cms/search.ts` + 테스트) · 「사이트에서 보기」가 해당 섹션 앵커로 이동 · 섹션 목록에 마지막 수정일
+- [x] 저장 시 캐시 갱신 범위를 `/` `/social` `/matching` `/fit-check` `/news` 로 확장
+- [x] 운영 배포 (2026-11-09, 5c3db39 → 소셜클럽 가입 심사 분리 5f963db)
+- [x] 상담 신청 「관심 방식」(소셜클럽 · 1:1 매칭 · 상담 후 결정) + 「들어온 경로」(직전 페이지 · 어느 상담 버튼 · 외부 링크) 기록 → 어드민 목록 열·상세·필터·CSV(interest, entry 열) (`lib/inquiries/track.ts`)
+- [x] 위 항목 운영 배포 (2026-11-09, 9c36f89)
+- [x] 색상 테마가 새 디자인 토큰(--ds-primary 등)에 반영되지 않던 버그 수정 + 하드코딩 파란색 제거, 어드민은 기본 팔레트 고정 — 운영 배포 (2026-11-09, 8a49063)
+- [x] 채널톡 버튼: 일반 설정 → 「채널톡 플러그인 키」가 있으면 공개 페이지(어드민·로그인·설문·결제 제외)에 공식 로더 + `ChannelIO('boot')` 로 싣고, 「맨 위로」 버튼은 그 위로 올림 (`components/site/ChannelTalk.tsx`, `lib/settings/channelTalk.ts`). 운영 DB settings.inquiry 에 플러그인 키 저장 완료
+- [x] 위 항목 운영 배포 (2026-11-09, d875e95)
+- [x] 푸터 「개인정보처리방침」 링크 색을 이용약관·환불규정과 같은 회색으로 통일 — 운영 배포 (2026-11-09, 4e73c18)
+- [x] 사진 생동감 `img-live`: 대문 히어로 배경·모든 섹션 사진·소식·프로그램 사진에 호버 확대 + 빛줄기, 누름(터치) 효과 (`app/globals.css`, `ImageBlock`)
+- [x] 모바일 생동감: 스크롤 시 사진 가라앉기(settle, 스크롤 연동 + is-in 폴백), 대문 배경 켄 번즈, 스와이프 카드 가운데 포커스(`swipe-item`), 카드·사진 누름 효과(iOS :active 활성화), 카드 떠오름 전환 속성 보정
+- [x] 위 항목(사진 생동감 + 모바일 생동감) 운영 배포 (2026-11-10, 6b64886)
+- [x] 대문 사진 호버 복구(켄 번즈를 상자로 이동) + 「동작 줄이기」 기기에서도 호버·누름 반응 유지 — 운영 배포 (2026-11-10, beb541a)
+- [x] 상단 메뉴 재배치 — 순서 「브랜드소개 · 소셜클럽 · 1:1 매칭 · 소식 · FAQ」, 로고와 버튼 사이 가운데 정렬, 간격 24px(lg 48px) · lg 15px 글자, 모바일 메뉴·푸터도 같은 순서. 「소개」 → 「브랜드소개」(CMS global.nav 기본값). 운영 배포 (2026-11-11, 61afea7)
+- [x] 푸터 「패밀리 사이트」 열 → 「제휴문의」 열(제휴 담당 010-9272-7783 · se.na@theraum.co.kr · 제휴 안내 링크) + `/partner` 제휴문의 페이지(협업 분야 3종 · 제휴 담당/일반 문의 카드 · 제안서 안내, CMS partner.page · SEO seo.partner · 사이트맵·llms.txt 등록) — 운영 배포 (2026-11-11, c3dfb25)
+- [x] 푸터 정리: 2열 「문의」 → 「서비스 문의」, 3열 제휴문의는 연락처 없이 「제휴문의 →」 링크 하나(/partner). 운영 배포 (2026-11-11, 876444a)
+- [x] 제휴문의 접수 양식: /partner 연락처 카드 → 실제 양식(유형 4종 · 회사 · 담당자 · 휴대전화 · 이메일 · 내용 · 제휴문의용 개인정보 수집·이용 안내 동의) → `POST /api/partner` → `partner_inquiries`(DB 적용 완료, RLS admin, 1년 보관 크론) → 어드민 `/admin/partners`(목록·상세·상태·메모, 사이드바 배지) + 제휴 담당 이메일 접수 알림. 운영 배포 (2026-11-11, 876444a)
+- [x] 제휴문의 첨부 파일: 양식에서 최대 3개(파일당 10MB · pdf·hwp·hwpx·doc·docx·xls·xlsx·ppt·pptx·jpg·png) → 서명 업로드 URL(`/api/partner/upload-url`)로 비공개 버킷 `partner-files` 에 직접 업로드(DB·버킷·정책 적용 완료) → 어드민 상세에서 내려받기(5분 서명 URL). 보관 1년 크론이 첨부·고아 파일도 정리. 운영 배포 (2026-11-11, 876444a)
+- [x] 제휴문의 양식 안내 보강: 제안 내용 「10자 이상 3,000자까지」 명시 + 글자 수 카운터, 보내기 버튼이 비활성일 때 「보내려면 아직 필요한 것: …」 안내. 운영 배포 (2026-11-11, 876444a)
+- [x] 휴대전화 자동 하이픈 보강(제휴문의 · 상담 신청 공통): 브라우저 자동완성이 React 보다 먼저 채운 값 감지, 칸을 벗어날 때 재서식, 숫자만 있어도 유효(서버로는 정규화해 전송). 운영 배포 (2026-11-11, 876444a)
+- [x] 첨부 업로드 오류 수정: 한글 파일명이 저장소 키로 들어가 거부되던 문제 → 경로는 inbox/<uuid>/file.<확장자>(영문만), 원래 파일명은 files[].name 으로 내려받기에 사용. 업로드 실패 시 원인 문구 표시. 운영 배포 (2026-11-11, 876444a)
+- [x] 상담 신청 5항목화: 이름 · 휴대폰 + 직업(9종) · 학력(10종) · 거주지역 시/도(15종, 충청·전라·경상은 남북 합침, 해외 포함; 시/군/구는 선택) — `lib/inquiries/profile.ts`, `/api/inquiries` 가 목록 밖 값은 거부, `answers.job · education · region · district` 저장 → 어드민 목록 열 · 상세 행 · CSV 뒤 4열 그대로 반영. 동의문·약관·개인정보처리방침 2026-11-12 판(동의 버전 2026-11-12). 운영 DB `site_content` 의 `legal.privacy` 저장본은 2026-11-12 01:07 UTC 에 새 기본값과 같은 내용으로 갱신 완료(옛 저장본은 2026-11-04 기본값과 동일했음). 운영 배포 (2026-11-12, 5c605e3)
+- [x] 마케팅 정보 수신 동의(선택): 상담 신청 개인정보 동의 아래 카드(접기/펼치기, 목적 문구는 소셜클럽·1:1 매칭·상담 후 결정별, 방법 전화·문자·카카오톡, 항목 이름·휴대폰·거주지역·관심 방식·상담 이력, 철회 시까지 + 2년마다 재확인) → `marketing_consents` 표(DB 적용 완료, RLS admin, 철회 기록 1년 크론) + `answers.marketing` → 어드민 「마케팅 수신」(`/admin/marketing`: 동의 중·철회 탭, 철회/취소, 주관리자 CSV, 재확인 예정일 30일 전 표시) + 상담 상세 「마케팅 수신」 행 + 리드 CSV marketing·marketing_at 열. 개인정보처리방침 제2조 2-2호·제4조 2-2호·제9조 추가(동의문 버전 MARKETING_CONSENT_VERSION 2026-11-12). 운영 DB `legal.privacy` 저장본도 2026-11-12 01:48 UTC 에 같은 내용으로 재갱신. 2년 재확인 발송은 수동(어드민 목록의 「확인 필요」 표시 기준). 운영 배포 (2026-11-12, 0b4b5a2)
+- [x] 1:1 매칭 멤버십 가입비 공개(결혼중개업 요건): `/matching` 03 섹션을 등급 이름 · 한글 이름 · 가입비(VAT 포함) · 상담 버튼만 있는 3장 카드로 교체 — RAUM CLASSIC 4,400,000원 · RAUM SIGNATURE 8,800,000원(주력, 다크) · RAUM PRIVÉ 22,000,000원. 「필요한 만큼 추가」·하단 안내 제거. 회원 전용 행사(home.solo)·FAQ·대문 비교 카드·혜택·SEO 설명·llms.txt 의 ACCESS/SIGNATURE/MERRY 문구를 새 이름으로 교체(RAUM SOLO = 연 6회 프리미엄 미팅 파티, 1:1 매칭 가입 회원 1회 참여권). 운영 DB site_content(matching.plans · home.solo · matching.faq · home.faq) 저장본도 같은 내용으로 갱신(2026-11-12 02:1x UTC). 숨겨진 /pricing 문서는 옛 등급·금액 그대로(페이지 삭제 여부 미결). 운영 배포 (2026-11-12, eae9d18)
+- [x] 멤버십 대표 상품 표시를 「주력」 → 「★」 배지(별표만)로, 공개 문구의 나이 범위(만 25~45세)를 모두 삭제해 「싱글」로만 표현(FAQ · 대문 비교 카드 · 혜택 · 이런 분께 · SEO 설명 · llms.txt; 운영 DB home.faq · matching.who · matching.plans 저장본도 갱신). 운영 배포 (2026-11-12, fa4452c)
+- [x] 상단 메뉴에서 FAQ 제거(모바일 메뉴 포함, 푸터 「자주 묻는 질문」은 /social#faq 로), 메인 페이지 FAQ 섹션 제거 — FAQ 문서(home.faq)는 소셜클럽 페이지 전용으로 CMS 「소셜클럽」 탭으로 이동(저장값 유지), 1:1 매칭 FAQ 는 그대로. 운영 배포 (2026-11-12, 7809020)
+- [x] 상담 전 설문(/apply)의 최종학력·직업·시/도 선택지를 상담 신청(/fit-check)과 같은 목록(EDUCATION_OPTIONS 10종 · JOB_OPTIONS 9종 · REGION_OPTIONS 15종)으로 통일: 최종학력 라디오 → 셀렉트, 직업 자유 입력·직업 분류(긴 목록)·기타직업 → 직업 셀렉트 하나, 거주지역·본가·회사소재지는 시/도 + 시/군/구(상세입력 칸 제거). 이전 응답의 옛 값은 DB 에 남지만 어드민·CSV 는 현재 문항 기준으로 표시. 운영 배포 (2026-11-12, d4a75d6)
+- [x] 상담 전 설문 「결혼여부」 → 「현재 혼인 상태」(미혼 · 이혼 · 사별 · 기혼 · 사실혼, 기혼·사실혼 가입 제한 안내) + 「자녀 유무」(없음 · 있음). 개인정보처리방침 제2조 5-3호 항목 문구 갱신(운영 DB 저장본도). 「흡연」(비흡연 · 흡연 · 금연 중) · 「종교」(무교 · 기독교 · 천주교 · 불교 · 기타 직접 입력) 추가 — 종교는 민감정보라 첫 단계의 별도 동의(선택) 체크 시에만 서버가 저장(`sensitiveConsent`, answers.sensitiveConsentAt), 방침 제2조 5-4호·제3조 갱신. 민감정보 동의 안내는 접기/펼치기(기본 접힘). 운영 배포 (2026-11-12, 927c9d9)
+
+## M18. 1:1 매칭 DB 수집 — 프로필 진단 「3분 프로필 진단」 (사용자 요청, 2026-11-16)
+- [x] 플로팅 버튼 + 말풍선(몇 초마다 교체, CMS `match.cta`: 보이기·문구·링크·말풍선 목록) — 공개 페이지에서 스크롤을 조금 내리면 아래 가운데에 나타남, 상담 신청·설문·진단·어드민·결제 화면에서는 숨김, 「맨 위로」 버튼은 그 위로
+- [x] `/match-check` 한 화면 한 질문 퍼널 29문항(레퍼런스 캡처 + 우리 상담 전 설문 조합, 선택지는 상담 신청·상담 전 설문과 통일) — 선택형은 고르면 자동 다음, 입력형은 Enter/다음, 필수 6개 외 「이 질문 건너뛰기」, 생년월일 자동 점 + 만 나이, 중요 요소는 정확히 3개, 사진 1장(비공개 버킷 `match-photos`, 「나중에 올릴게요」), 종교·건강은 민감정보 별도 동의(선택, 접기/펼치기) 체크 시에만 저장, 마지막에 휴대폰 + 개인정보 동의(필수) + 마케팅 수신(선택, 기본 접힘). 작성 중 답은 브라우저에만 임시 저장. 공통 문구 CMS `match.form`
+- [x] `POST /api/match`(IP 10분 5회) → `inquiries`(form=match, track=matching, 직업·학력·거주지 열 공유, answers[] · match 원본 · photo) + `marketing_consents`. 어드민 「진단」 배지 · 상세 「사진 보기」(5분 서명 URL) · 민감정보 동의 시각. DB: 버킷 `match-photos` + 관리자 정책 + `purge_expired_inquiries` 가 사진·고아 업로드도 삭제 — 운영 DB 적용 완료(2026-11-16, 마이그레이션 match_photos_bucket_and_purge)
+- [x] 개인정보처리방침 제2조 5-2~5-4호·제3조·제4조 1호 갱신(프로필 진단 항목·사진·건강 정보 민감정보), 개정 이력 2026-11-16, 동의 버전 PRIVACY_CONSENT_VERSION 2026-11-16. 운영 DB `legal.privacy` 저장본도 2026-11-16 08:40 UTC 에 같은 내용으로 갱신(옛 저장본이 11-12 코드 기본값과 동일함을 md5 로 확인한 뒤 변경 4개 조항만 jsonb_set)
+- [x] SEO 문서 `seo.matchcheck`(사이트맵·메타), 테스트 `tests/match.test.ts`(10) — 총 232 통과
+- [x] 플로팅 버튼 문구를 레퍼런스와 다르게 라움 톤으로 재작성 — 「문구 세트」(버튼 문구 + 말풍선 두 줄) 3종이 약 3초마다 함께 순환(CMS match.cta 세트마다 버튼 문구), 화면 이름·SEO·방침 표기 「3분 프로필 진단」. 모바일 가독성: 말풍선 두 줄 허용, ≤760px 에서 채널톡 위로 올리고 「맨 위로」 숨김 (360·390·430·768·1280px 확인)
+- [x] 운영 배포 (2026-11-16, 98ed887 · dpl_BJy7vd938wyaFcm9sA6XS5EzsKG4) — /match-check 200, 홈 플로팅 버튼 확인
+- [x] 2026-11-18 문항 정비(사용자 수정 요청): 혼인 상태 미혼·돌싱·기혼(기혼 선택 시 안내 빨간색 + 진행 불가) · 거주지 안내 문구 삭제 · 「활동 가능한 지역」 + 뒤에 활동 지역 시/군/구 문항 · 부모님 자산 삭제 · 「싱글 멤버와의 만남에서 중요하게 생각하는 항목 3가지」 14개(설명 포함, 누른 순서 = 1·2·3순위) · 중요 요소 상세 삭제 · 사진 최대 3장(미리보기·삭제, `answers.photos`, 어드민 「사진 n 보기」, 퍼지 함수 photos 포함 — 운영 DB 적용 match_photos_array_purge) · 사진 안내 문구 삭제 · 마지막에 「상담 시 확인 서류 안내」(혼인관계증명서·재직증명서·소득금액증명원) 화면 → 휴대폰·제출. 방침 제2조 5-3호 표기(활동 가능 지역·사진 최대 3장) 갱신 — 운영 배포 (2026-11-18, 8e71616 · dpl_2vBwwwGYVw7DiNnyibKoSKPYWFkP)
+- [x] 플로팅 버튼 문구 교체 (2026-11-18, 소셜클럽 톤): ① 행사·공간 「라움의 공간에서 시작되는 싱글 소셜클럽 / 검증된 멤버 · 매월 행사 · 행사 후 네트워킹 / 이번 달 행사 보기」→ `/social#social` · ② 사람·분위기 「취향이 통하는 싱글들의 사교 모임 / 파티·공연·클래스, 그 뒤엔 자연스러운 네트워킹 시간 / RSC 멤버십 문의하기」 · ③ 자격·입회 「이번 달, 라움에서 어떤 분들을 만날까요? / 사전 검증을 거친 싱글 멤버들과 함께하는 행사 / 프로필 남기고 상담받기」(②③ 은 기본 링크 `/match-check`). CMS `match.cta` 세트에 선택 링크(`href`) 필드 추가(비우면 기본 링크). 운영 DB 에 match.cta 저장본 없음 → 코드 기본값이 그대로 보임. 운영 배포 (2026-11-18, be798de · dpl_7hFjBBG2t99GKDu5egRH9fzh5ggY)
+- [x] 플로팅 버튼 링크 통일 (2026-11-19, 사용자 요청): 「이번 달 행사 보기」가 `/social#social` 로 가던 것을 비워 세 세트 모두 기본 링크 `/match-check` 로 — 정보부터 입력하도록. 운영 배포 (2026-11-19, 1846b82 · dpl_H9v8zCoWka6uya4FU1knadfF7z5V)
+
+## M22. 가입 신청 분리 + 승인 → 가입완료 + 회원 프로필 카드 (사용자 요청, 2026-11-23)
+- [x] 분류: 프로필 진단(/match-check) 응답은 전부 「라움소셜클럽 가입 요청자」 — 플로팅 버튼(소셜클럽 사전등록하기, `/match-check?src=prereg`)·초대코드 입력자·11-20 이전 직접 제출까지(같은 설문, 운영 DB 20건). 상담 신청(/fit-check)·상담 전 설문(/apply)은 「상담 신청」에 그대로. `lib/inquiries/join.ts`(`isJoinRequest`·`joinState`·`matchesJoin`·`profileCard`).
+- [x] 어드민 「가입 신청」(`/admin/join`): 승인 대기/가입완료 탭 + 이름·연락처·초대코드 검색, 열: 신청일·이름·성별·나이·연락처·거주지·직업·학력·사진 수·들어온 경로(사전등록/초대코드/프로필 진단 배지)·상담 상태·가입 상태(승인일). 사이드바 배지 = 승인 대기 수. 「상담 신청」 목록·배지·대시보드 「상담 대기」에서는 프로필 진단 응답을 뺌(종류 선택지의 「사전등록」 삭제). 대시보드 KPI 「가입 승인 대기」 카드(→ /admin/join?state=pending).
+- [x] 회원 프로필 카드(`/admin/join/:id`, `components/admin/JoinProfileCard.tsx`): 왼쪽 사진(비공개 버킷 서명 URL, 클릭하면 원본)·휴대폰·이메일, 오른쪽 기본 정보 / 거주·활동 / 학력·직업·경제 / 생활(종교·건강은 동의한 경우만) / 만남에서 중요한 항목(1~3순위 + 설명) / 접수 정보(알게 된 경로·초대코드·들어온 경로·접수일·동의·유입 광고). 오른쪽에는 기존 상세 패널(상담 메모·상태·초대코드 발급) 그대로. 가입완료 회원도 같은 화면에서 언제든 조회.
+- [x] 승인: 카드 머리의 「가입 승인」(확인창) → `POST /api/admin/inquiries/:id/approve {approve}` → `inquiries.approved_at`·`approved_by`(관리자) 기록, 「가입완료」 배지 + 승인일·승인자 표시, 「승인 취소」로 되돌리기. 관리자 활동 로그 `join.approve`/`join.unapprove`. 상담 상태(status)와는 별개.
+- [x] DB: `inquiries.approved_at timestamptz`, `approved_by uuid → members`, 인덱스 `inquiries_join_idx` — 운영 DB 적용 완료(2026-11-23, 마이그레이션 inquiries_join_approval, 추가 컬럼이라 기존 화면에 영향 없음). `SCHEMA.sql` 동기화.
+- [x] 테스트 `tests/join.test.ts`(9) + 종류 필터 테스트 갱신 — 총 272 통과. tsc·eslint 통과.
+- [x] 운영 배포 (2026-11-23, 2efec82 · dpl_GYXJUm6FAGhL8ngLC959k8kBhGsv) — 공개 화면 변화 없음(플로팅 버튼·메뉴 4개·1:1 매칭 0건 유지), /admin/join 은 비로그인 시 로그인으로 이동 확인
+- [ ] 다음 단계 후보(지시 시): 가입완료 회원만 모은 「회원 프로필」 메뉴·CSV, 카드 인쇄용 보기, 승인 시 가입 안내 문자/알림톡, 승인 회원과 회원 DB(계정) 연결.
+
+## M24. 소식 「참여하기」 → 참여 신청 + 어드민 「프로그램 참여 신청」 (사용자 요청, 2026-11-25)
+- [x] 소식 목록 카드·상세에 「참여하기」 버튼(`posts.apply_open`, 기본 켬, 소식 편집 「참여하기 버튼 표시」로 글마다 끔) → `/match-check?src=prereg&event=<글 주소>` (`lib/posts/apply.ts`). 행사 일자(event_date)가 오늘(KST)보다 전이면 「참여 종료」 비활성 버튼(CMS news.page applyClosedLabel)으로 바뀌고 서버(/api/match · /api/events/apply)도 「참여 신청이 마감된 소식입니다」로 거절. 행사 당일까지는 열림, 행사 일자 없는 글은 끄기 전까지 열림.
+- [x] 이미 설문을 낸 사람(어드민에 있는 사람)은 첫 화면 「이미 프로필을 남기셨나요?」에서 휴대폰 번호만 입력 → `POST /api/events/apply` 가 같은 번호의 최근 프로필 설문 행으로 `event_applications` 한 건(source=quick) 생성(같은 소식이면 「이미 신청됨」). 없으면 3분 프로필 설문으로 이어지고 제출 때 `POST /api/match` 가 한 건(source=survey) 생성. 이 기기에서 제출한 번호는 다음 참여하기 첫 화면에 미리 채움(localStorage).
+- [x] 참여 신청자 DB `event_applications`(소식 × 가입 신청자 1건, status 신청/참석 확정/취소 · source · memo · status_at/by, inquiries 삭제 시 cascade → 보관 180일 동일, 관리자 RLS) — 운영 DB 마이그레이션 `posts_apply_open` · `event_applications` 적용(2026-11-25).
+- [x] 어드민 메뉴 「프로그램」 → 「프로그램 참여 신청」(`/admin/events`, 배지 = 아직 확정·취소하지 않은 신청 수): 소식별 현황(행사 일자 · 모집 중/참여 종료/버튼 꺼짐 · 신청/확정/취소 수 · 소식 보기 · 편집) + 고른 소식의 신청자 표(이름 → 회원 프로필 카드, 성별·나이·거주지·직업·가입 상태·상담 상태·경로·참석 상태 버튼·메모·CSV `/api/admin/events/export?post=`). 상태·메모 `PATCH /api/admin/events/:id`(로그 event.status/event.memo), 삭제 DELETE. 예약·결제형 프로그램 관리(/admin/programs)는 메뉴에서 빼고 화면 하단 링크로만 유지(코드 삭제 없음).
+- [x] 가입 신청 목록 배지 「참여 신청 · 글 제목(외 n건)」, 상세·프로필 카드 「참여 신청 행사 · 상태」 줄, 검색에 행사 제목, 들어온 경로 「「제목」 참여하기 버튼」(`lib/events/admin.ts` attachEvents). 문구는 CMS `news.page`(applyLabel·applyHint·applyClosedLabel) · `match.form`(eventBanner · eventGate* · eventDone* · eventDoneAlready).
+- [x] 함께 고침: 소식 편집의 「행사 일자」가 저장 코드(`lib/posts/admin.ts` toRow)에서 빠져 DB 에 기록되지 않던 버그 — 이제 저장된다(기존 글은 한 번 다시 저장해야 월 탭 분류·참여 종료 판정에 반영).
+- [x] 소식 카드·상세 표기 (2026-11-25, 사용자 요청): 분류 배지·발행일 대신 「프로그램 일정」 라벨 + 행사 일자(요일 포함)만, 행사 일자가 없으면 「Coming soon」(CMS news.page scheduleLabel·comingSoonLabel, `fmtEventDate`). 발행일은 공개 화면에서 더 이상 보이지 않음(월 탭 분류는 그대로 행사 일자 → 없으면 발행일).
+- [x] 테스트 `tests/newsApply.test.ts`(6) · 일정 표시(1) — 총 285 통과. FLOWS 1-7.
+- [x] 운영 배포 (2026-11-25, 4704784 · dpl_5i3nqEWv2ajzqZ6PAXDX83P982da) — /news 카드 「프로그램 일정」+행사 일자/Coming soon·참여하기, 상세 참여하기, /match-check?event= 첫 화면, 홈·어드민 진입 200 확인
+- [ ] 후속 후보: 참석 확정 문자/알림톡 자동 안내(유료 발송), 행사 정원·마감 인원, 휴대폰 본인확인(인증번호) 후 빠른 신청, 대시보드 「참여 신청」 카드.
+
+## M27. 이용약관·개인정보처리방침 전면 개정 — 소셜클럽 멤버십 버전, 1:1 매칭 제외 (사용자 요청, 2026-11-27)
+- [x] 근거: 브랜드북(2026-11-26)·서비스 소개서의 멤버십 구조(회원 자격 1년 · 가입비 1회 · 연 77회 행사 · 지인 초대권 연 2매 · 제휴 혜택 · 가입 심사 5단계 · 서류는 확인만) + 코드·운영 환경에서 확인한 실제 처리. 다른 소셜클럽 약관 2종은 구조만 참고. 상세·결정 항목은 `docs/legal-review-2026-11-27.md`
+- [x] 이용약관(`lib/legal/content.ts` TERMS) 20개 조: 정의(멤버·멤버십·가입비·행사·지인 초대권·제휴 혜택), 통지, 서비스 내용(1:1 소개 미제공·결과 미보장), 상담 신청·사전등록·참여 신청, 가입 자격·심사(신분증·혼인관계증명서·증빙 열람 확인, 사본 미보관), 승인·멤버십 성립, 1년·1회 납부·갱신, 행사 신청·참가, 지인 초대권, 제휴 혜택·주차·대관, 멤버 의무·금지행위, 이용 제한·종료, 청약철회·중도 해지·행사 참가비 환불(7일 전액 / 일할 − 위약금 10% / 3일 전 전액 · 2일 전~전날 50% · 당일 불가), 행사 사진·초상권, 서비스 변경·중단, 책임 제한, 분쟁 해결
+- [x] 개인정보처리방침(PRIVACY) 17개 조: 1:1 매칭 표현 삭제 + 소개·주선 목적 처리 없음 명시, 사전등록 항목을 소셜클럽 가입 상담·심사 기준으로 정리, 신설 — 행사 참여 신청·제휴문의·전화 상담 기록·대면 인터뷰와 자격 확인·멤버 정보·결제 정보·행사 운영·동반 지인·주차 차량번호·제휴 혜택 멤버 확인(제3자 제공 절차)·행사 사진·채널톡 채팅, 수탁업체에 Google LLC(상담 콜 시트, 운영 환경변수 확인)·주식회사 채널코퍼레이션(채널톡, 운영 플러그인 키 확인) 추가, 국외 이전에 Google 추가, 유출 통지·자동화된 결정 없음 조 신설. `PRIVACY_CONSENT_VERSION`·`LEGAL_UPDATED` 2026-11-27. 환불규정(숨김 페이지)도 같은 기준으로 교체
+- [x] CMS 약관 문서 기본 시행일 → `LEGAL_UPDATED`(그동안 /terms 시행일이 10월 1일로 보이던 것 수정). 테스트 `tests/legal.test.ts`(6: 날짜·버전, 1:1 매칭 0건, 핵심 조항, 실제 처리 반영, 조 번호·내부 참조, CMS 기본값) — 총 294 통과. tsc·eslint 통과
+- [x] 사용자 결정(2026-11-27): 부칙·개정 이력 조를 두지 않고 제목 아래 「게시 · 시행일」 한 줄만(`LegalPage`), 수정할 때마다 처음 등록한 것처럼 날짜만 갱신. CMS 필드 이름·설명도 맞춤. 나머지 문구는 그대로 확정
+- [x] 운영 배포 (2026-11-27, a7832be · dpl_4fC1V4jMJvPD1KzCu1sCVnfnpApo, 사용자 「다른건 이상없어. 배포해」) — 운영 DB `legal.privacy` 저장본(11-20)은 `site_content_history` 에 백업 후 삭제해 코드 기본값이 바로 적용되게 함(약관 3종 모두 DB 행 없음 → 앞으로 코드만 고치면 반영). 운영 확인: /terms 제1~20조 · /privacy 제1~17조, 「게시 · 시행일 2026년 11월 27일」, 1:1 매칭·부칙·개정 이력·자리 문구 0건, 채널코퍼레이션·Google LLC 표시, 옛 날짜(11월 20일) 0건, 홈 200
+- [ ] 운영자 확인 남은 것(배포 후에도 숫자만 바꾸면 됨): 환불 기준 · 서류 미보관 원칙 · 멤버 정보 보유 기간 · 상담 콜 시트 정리 주기 · 채널톡 보관 기간 · 상담 전 설문 유지 여부 · 혼인 상태 변동 조항 · 법률 검토(`docs/legal-review-2026-11-27.md` 3절)
+- [ ] 후속 후보: 승인 회원 정보를 180일 자동 삭제에서 제외하는 멤버 관리(현재는 승인 여부와 무관하게 삭제) · 행사 참가비 결제(토스) 도입 시 방침 제2조 16호·제7조 갱신 · 약관 동의 체크(멤버십 가입 시)
+
+## M26. 푸터 「카카오톡 상담」 버튼 (사용자 요청, 2026-11-26)
+- [x] 푸터 3열 「제휴문의 →」 아래 노란(#FEE500) 「카카오톡 상담」 버튼(`components/site/KakaoButton.tsx`, 새 탭) → https://pf.kakao.com/_xezfXj. 링크·문구는 CMS `global.brand.kakaoUrl`·`kakaoLabel`(사이트 관리 → 브랜드 · 연락처 · 푸터 정보), 링크를 비우면 버튼 숨김. 테스트 `tests/kakaoButton.test.ts`(3) — 총 288 통과
+- [x] 피드백 반영: 3열 제목 「문의하기」, 「멤버십 · 프로그램 문의」 설명 + 노란 카카오 버튼 / 「협업 · 제휴 제안」 설명 + 테두리 「제휴문의 →」 버튼(같은 높이 40px, 세로 배치). 문구는 CMS `global.nav` footerInquiryTitle·footerKakaoNote·footerPartnerNote·footerPartnerTitle
+- [x] 운영 배포 (2026-11-26, 229ee52 · dpl_2nS6mezfDL27XmgzsQk8BzwqwFDx) — 운영 메인 푸터에서 「문의하기」 열·카카오톡 상담 버튼(pf.kakao.com/_xezfXj, 새 탭)·제휴문의 버튼 확인
+
+## M25. 푸터 주소 변경 + 푸터 정보 어드민 편집 안내 (사용자 요청, 2026-11-25)
+- [x] 푸터 「서비스 문의」 주소 기본값 → 「서울특별시 강남구 언주로 564, 4층 라움소셜클럽 / (역삼동, 라움아트센터)」(`global.brand.address`). 개인정보처리방침 제12조 보호책임자 주소도 같은 값으로(코드 기본값 + 운영 DB `legal.privacy` 저장본 문자열 치환, 2026-11-25). 사업자 정보의 사업장 주소(`bizAddress`, 「언주로 564 (역삼동)」)는 사업자등록증 기준 그대로
+- [x] 어드민 사이트 관리 → 브랜드·메뉴·테마 → 섹션 이름 「브랜드 · 연락처」→「브랜드 · 연락처 · 푸터 정보」, 설명·항목 이름에 푸터 어느 자리에 보이는지 표기(헤드라인 · 주소 · 전화 · 이메일 · 인스타그램 · 저작권 · 사업자 정보). 저장 로직은 기존 그대로(코드 변경 없이 푸터 전체 편집 가능). 푸터 메뉴 이름·열 제목은 「메뉴 이름」 섹션
+- [x] 운영 배포 (2026-11-25, 5d50cdc · dpl_3yyZssu1SYCHJaY29P8XyyMjfajV) — 운영 메인 푸터·/privacy 에서 새 주소 표시, 옛 주소(비동) 0건 확인
+
+## M23. 소식 본문 사진 — 세로로 긴 상세 페이지 이미지 원본 비율 표시 (사용자 요청, 2026-11-25)
+- [x] 원인: 본문 `![…](주소)` 사진을 3:2 고정 비율 상자 + `object-cover` 로 채워 위아래가 잘렸고, 업로드 시 긴 변 2000px 기준으로 줄여 세로로 긴 이미지는 가로가 크게 줄었음.
+- [x] `components/Markdown.tsx`: 본문 사진을 `<img class="w-full h-auto">` 로 원본 비율 그대로 폭에 맞춰 표시(PC 최대 760px, 모바일 화면 폭-40px). `components/admin/PostForm.tsx`: 업로드 전 축소 기준을 가로 1600px · 세로 8000px 로 분리, 본문 아래 권장 사이즈 안내(가로 1200px 권장·최대 1600px, 세로 자유·한 장 8000px 이내, JPG·PNG·WEBP 10MB 이하). 대표 사진·기존 글은 그대로.
+- [x] 디자이너용 (2026-11-25, 사용자 요청 「통으로 긴 한 장도, 잘라 둔 여러 장도 쉽게」): 「본문에 사진 넣기」 여러 장 선택·본문 칸에 끌어다 놓기(파일 이름 순 01, 02…, 진행 표시) · 가로는 1600px 로만 맞추고 세로로 긴 사진은 4000px 조각으로 자동 분할 업로드(`lib/posts/images.ts` planSlices · `lib/posts/imageUpload.ts` prepareImage, WEBP 0.9) · 공개 화면은 붙어 있는 사진 줄을 틈 없이 한 묶음으로(빈 줄로 띄우면 따로, 설명이 있는 사진만 캡션, 기본 삽입 `![](주소)`) · 대표 사진은 자르지 않고 가로만 맞춤. 테스트 `tests/postImages.test.ts`(6) — 총 278 통과
+- [x] 운영 배포 (2026-11-25, 17be831 · dpl_Gnd3Vq9GvT5QUH7taVb319yFWfoC) — /news/12월-라움소셜모닝 200, 본문 사진 원본 비율 마크업·고정 비율 0건, / · /news 200 확인
+- [ ] 이미 올린 긴 이미지는 예전 기준(긴 변 2000px)으로 줄어 저장됐으므로, 선명하게 보이려면 원본을 다시 「본문에 사진 넣기」로 올려 주소를 교체해야 함.
+
+## M21. 1:1 매칭 전체 숨김 — 카카오 비즈니스 채널 심사 대응 (사용자 요청, 2026-11-23)
+- [x] 배경: 카카오 비즈니스 채널 심사가 「[전환 불가 업종] 허용되지 않은 업종 (만남주선)」으로 반려 — 사이트의 1:1 매칭(사전등록 화면 포함) 내용 때문. 요청: 1:1 매칭 내용을 모두 숨기고 어드민에서 원할 때 다시 노출.
+- [x] 일반 설정 → 사이트 상태 → 「1:1 매칭 전체 숨김」(`settings.site.matchHidden`, 기본 켬, `lib/settings/matchHidden.ts`). 사전등록 모드(`matchPreview`)보다 앞에 있는 더 강한 스위치. 끄면 사전등록 모드 설정대로 돌아간다(코드·CMS 문서·접수된 응답 보존).
+- [x] 숨김 범위: `/matching`·`/match-check` 직접 접속 → 메인(proxy + 페이지 redirect), `POST /api/match`·`/api/match/upload-url` 404(`matchHiddenGuard`), GNB·푸터 「1:1 매칭」 메뉴, 홈 대문 1:1 매칭 탭(전환 탭·카운터·점 표시도 없음)·두 방식 비교 카드 섹션·하단 띠 1:1 매칭 버튼, 소셜클럽 상단 전환 바, 프로필 진단 플로팅 버튼, 상담 신청 `?track=matching`(→ 상담 후 결정)과 마케팅 수신 목적 문구의 1:1 매칭 언급, 홈·소셜·제휴 본문의 1:1 매칭 문장(`scrubDoc`·`stripMatching`, 사전등록 모드와 같은 규칙), 사이트맵·robots·`llms.txt`(1:1 매칭 줄 전부, 사전등록 안내 줄도 없음). 설정 저장 시 관련 화면 캐시 갱신 경로 확대.
+- [x] 남는 표현(의도적으로 두었음, 필요하면 CMS 에서 수정): 홈 브랜드 소개의 「소개팅을 하기 위해 한 번 만나는 곳이 아니라」·「RSC는 소개팅 클럽이 아니라」, 소셜클럽 포지셔닝의 「매칭은 목적이 아니라 … 결과입니다」, 개인정보처리방침 제2조(마케팅 수신 목적·프로필 진단 설명)의 「1:1 매칭」 — 법적 문서라 자동 치환하지 않음.
+- [x] 테스트 `tests/matchHidden.test.ts`(8) — 총 263 통과. tsc·eslint 통과. 로컬 목 백엔드 확인.
+- [x] 상단 메뉴 4개로 변경 (2026-11-23, 사용자 요청): 브랜드소개(/#about) · 멤버십(/social) · 프로그램(/news) · 자주묻는질문(/social#faq). CMS `global.nav` 기본값(navSocial 「멤버십」, navNews 「프로그램」, 새 키 navFaq)으로 바꿔 어드민에서 이름을 계속 수정할 수 있다. 푸터 1열도 같은 키라 「멤버십」「프로그램」으로 함께 바뀜(푸터 FAQ 링크 문구 footerFaq 는 그대로). 페이지 주소는 그대로(/social, /news).
+- [x] 프로필 진단·플로팅 버튼 복구 (2026-11-23, 사용자 수정 요청: "1:1 매칭 사전등록하기 버튼이 아니라 소셜클럽 사전등록하기 버튼"): 전체 숨김 중에도 `/match-check` 와 플로팅 버튼 세 세트(이번 달 행사 보기 · RSC 멤버십 문의하기 · 프로필 남기고 상담받기)는 그대로 열리고, 기본 링크는 `/match-check?src=prereg`(CMS match.cta 기본값). 숨김 중에는 동의 목적·완료 안내·사전등록 이름을 `MATCH_FORM_HIDDEN`(소셜클럽 톤)으로, 검색 제목을 `MATCHCHECK_HIDDEN_SEO` 로 바꾼다. `/api/match` 가드 제거(`matchHiddenGuard.ts` 삭제). 어드민 「들어온 경로」 라벨 「1:1 매칭 사전등록하기」 → 「사전등록하기」, 종류 필터 「사전등록」. 테스트 264.
+- [x] 운영 배포 (2026-11-23, 99c81b4 · dpl_GzxS8iDz6jXNpdPMSZsvTWUajSm1) — 운영 홈 1:1 매칭 흔적 0건, /matching·/match-check → 메인, llms.txt·robots 제외, 상단 메뉴 4개 확인. 카카오 비즈니스 채널 재심사는 이 상태로 신청 가능
+- [x] 운영 배포 (2026-11-23, 84d85a3 · dpl_7SYi1hYgCDiQwZjWErPASYToCZtE) — 운영 홈 플로팅 버튼 표시(세 세트 → /match-check?src=prereg), /match-check 제목 「3분 프로필 진단 · 소셜클럽 사전등록」·본문 1:1 매칭 0건, /matching → 메인, llms.txt 1:1 매칭 없음 확인
+
+## M20. 1:1 매칭 사전등록 모드 + 운영 주체 변경 (사용자 요청, 2026-11-20)
+- [x] 정책 변경: 1:1 매칭 내용은 전부 숨기고 사전등록만 받는다 — 일반 설정 「1:1 매칭 사전등록 모드」(`settings.site.matchPreview`, 기본 켬). 끄면 예전 1:1 매칭 페이지·문구·링크가 그대로 복원(코드·CMS 문서 보존).
+- [x] `/matching` 사전등록 화면(`components/site/MatchPreview.tsx`, CMS `matching.preview`: 배지 · 큰 제목 · 설명 · 「사전등록하기」 · 안내 · 세 줄 소개 · 홈 카드 한 줄 · 검색 제목/설명). 레퍼런스(이모셔널 오렌지 「당신의 이상형이 도착했습니다」) 레이아웃만 참고, 문구는 라움 톤으로 새로 씀.
+- [x] 사전등록하기 → `/match-check?src=prereg`(3분 프로필 설문, 화면 이름 「1:1 매칭 사전등록」·완료 문구는 CMS match.form prereg*) → `POST /api/match` `entrySource` → 어드민 「사전등록」 배지 · 들어온 경로 「1:1 매칭 사전등록하기 버튼」 · 상세 제목 · 종류 필터 · CSV.
+- [x] 숨김 범위: 홈 대문 파란 버튼·비교 카드(특징 표 대신 한 줄 + 사전등록하기)·하단 띠, 소셜클럽 「04 UPGRADE 1:1 매칭으로 전환」·플랜명 문구·FAQ, 홈/소셜/제휴 본문의 1:1 매칭 문장(`scrubDoc`·`stripMatchingText`), 상담 신청 「1:1 매칭」 칩, `llms.txt` 플랜·가입비·회원 행사 줄, `/matching` 메타.
+- [x] 운영 주체 변경 — 사업자등록증 기준 주식회사 트라움에스앤씨(대표자 김진민, 사업자등록번호 220-88-09054, 서울특별시 강남구 언주로 564(역삼동)): 푸터 사업자 정보(global.brand 기본값), 이용약관 제1조·부칙·개정 이력(2026-11-20 시행), 개인정보처리방침 서문·부칙·개정 이력, llms.txt 운영 줄, 구조화 데이터 legalName, 상담 전 설문 동의문. `LEGAL_UPDATED`·`PRIVACY_CONSENT_VERSION` 2026-11-20. 운영 DB `legal.privacy` 저장본도 같은 내용으로 갱신(2026-11-20, md5 c575961c…). 연락처 주소(비동 2층)는 그대로.
+- [x] 테스트 `tests/matchPreview.test.ts`(6) + 경로·API·종류 필터 테스트 추가 — 총 252 통과. 로컬 목 백엔드 확인(홈 사전등록 링크 5곳, /matching 플랜·가입비 0, 상담 신청 칩 2개).
+- [x] 2026-11-20 사용자 피드백: 홈 대문 1:1 매칭 탭 큰 제목 「당신과 어울리는 만남, 라움이 준비합니다.」(운영 DB home.gate + 기본값) · 소셜클럽 멤버십 4번째 카드를 「04 BENEFITS 제휴 혜택」(호텔·리조트·여행, 골프·테니스·피트니스, 미식·와인·파인다이닝, 공연·전시·문화예술, 뷰티·웰니스·헬스케어, 비즈니스 네트워킹 및 투자 커뮤니티, 프라이빗 파티)으로 교체(운영 DB social.membership + 기본값) · 상담 신청 「관심 있는 방식」 선택 칩 제거(값은 ?track= 로만). 사전등록 배지·설정 스위치는 스테이징에만 반영된 상태(운영은 배포 후)
+- [x] 초대코드 입력란 (2026-11-20, 사용자 요청): `/match-check` 「알게 된 경로」 선택지 아래 「초대코드가 있다면 입력해주세요.」 입력칸(`Question.extra`, 대문자·공백 제거·영문숫자하이픈 20자, 이 문항은 자동 넘김 대신 「확인」) → `answers.inviteCode` + 상세 목록 「초대코드」 줄 → 어드민 목록 이름 옆 노란 「초대코드 …」 배지, 상세 이름 옆 배지, CSV `invite_code` 열. 동의문 수집 항목에 「초대코드」 추가(방침 제2조 5-3호 「추천인 코드」로 이미 포함). 테스트 254 통과. 운영 배포 (2026-11-20, 381cc91 · dpl_BFiuKCDEZv4Dwf6zHCDAhkgwcsHf) — /match-check 200 확인
+- [x] 멤버 기준표 (2026-11-20, 사용자 요청): `/social` 「아무나, 들어올 수 없습니다」 카드 아래 `MemberCriteria` — 전문직 · 공공·교육 · 대기업·언론·금융 · 사업가 · 학력 · 셀럽 · 고소득 · 부동산 · 금융자산 9항목, 오른쪽 「기준보기」(인증 기능은 아직 없으므로 「인증하기」 대신)를 누르면 기준·제출 서류가 펼쳐짐(details/summary, 모바일 세로 배치). CMS social.verify 에 기준표 제목·설명·버튼 문구·안내 + 「멤버 기준표」 목록(항목 이름·기준·제출 서류)으로 어드민에서 수정. 1:1 매칭 심사 섹션에는 안 붙음. 테스트 255. 제목 「라움소셜클럽 멤버 가입 기준」(사용자 수정). 운영 배포 (2026-11-20, 479a8fd · dpl_9wsuFoziAzyjmdShTxhk4b3FBL7p) — /social 기준표 확인
+- [x] 운영 배포 (2026-11-20, 9d3d509 · dpl_6DWzatkhP3y8oXPo77adBfBdvM8W) — /matching 사전등록 화면 · 홈 새 제목 · 푸터 트라움에스앤씨 확인
+
+## M19. 회원 설문조사 — 문자 발송용 비밀 링크 「2027 프로그램 수요조사」 (사용자 요청, 2026-11-18)
+- [x] 문항 정의 `lib/survey/definitions.ts`(종류별, 첫 설문 demand2027): 기획 PDF 의 PART 1 기본 정보는 제외, PART 1 관심 프로그램 분야(TASTE TABLE · SOCIAL WELLNESS · ART WALK · ONE QUESTION SALON · AFTER HOURS · SOCIAL TIME · 기타, 1·2순위) + PART 2 모임 방식(네트워킹 방식 최대 2 · 규모 · 1회 참여비 · 중요 요소 최대 3 + 기타). 정제·집계(순위 점수)·CSV `lib/survey/export.ts`
+- [x] `/s/<토큰>` 한 화면 한 질문(`components/survey/SurveyForm.tsx`): 첫 화면 안내 → 순위형 배지 · 단일 자동 다음 · 복수 최대 수/배타(상관없음) · 「기타」 직접 입력 → 마지막 이름·휴대폰 뒤 4자리(선택, 적으면 동의 필수) → 완료. 임시 저장(sessionStorage) · 응답한 기기 표시(localStorage, 다시 응답하기). `/s` 단독·마감·잘못된 주소는 안내만. robots `/s` 제외 · noindex
+- [x] `POST /api/survey`(IP 10분 10회) → `survey_responses`. 어드민 `/admin/surveys`(링크 만들기 · 문자 문구 복사 · 마감/다시 열기 · 응답 수) · `/admin/surveys/:id`(문항별 비율 막대 · 순위 점수 · 기타 입력 · 응답 목록 · 중복 표시 · 주관리자 CSV). 사이드바 「설문조사」. CMS `survey.form`(공통 문구) · `survey.demand2027`(첫 화면·완료·문자 문구)
+- [x] DB: `surveys` · `survey_responses` + 관리자 RLS + `purge_expired_survey_identities`(1년 뒤 이름·뒤 4자리 삭제, 매일 03:52 UTC) — 운영 DB 적용 완료(2026-11-18, 마이그레이션 member_surveys). 개인정보처리방침 제1조·제2조 제5-5호·제3조·제4조 제1-2호·제9조·개정 이력 2026-11-18, 동의 버전 2026-11-18 (운영 DB `legal.privacy` 저장본도 md5 확인 후 갱신)
+- [x] 테스트 `tests/survey.test.ts`(12) — 총 244 통과. 스테이징 확인 후 운영 배포 (2026-11-18, 195ab1c · dpl_4Hg7cE7X7KgzsjniXz96YqwEv4q2) — /s/<토큰> 200 · robots /s/ 제외 확인
+- [ ] 발송 전 확인: 문자 문구의 무료수신거부 번호(080) 실제 번호로, 응답자 혜택 문구 확정, 회원별 고유 링크(응답자 자동 식별)가 필요하면 별도 작업
 
 ## 2차 (별도 지시 후)
 - 멤버십 결제/분납(빌링키), 네이버 로그인, 지인 초대권 사용, 알림톡(솔라피) 전환, 사이트 이미지 CMS, 리마인더 자동 발송

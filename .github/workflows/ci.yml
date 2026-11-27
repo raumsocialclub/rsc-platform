@@ -1,0 +1,35 @@
+# 자동 검사 (M13). 모든 브랜치의 push·PR 에서 린트 → 타입 검사 → 테스트(가입·예약·결제·환불) → 빌드.
+# 하나라도 실패하면 이 워크플로가 빨간불이 되고, main 배포(deploy-production.yml)는 이 검사 통과가 조건이다.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # 빌드에만 쓰는 가짜 값 (실제 서비스에 연결하지 않음)
+      NEXT_PUBLIC_SUPABASE_URL: https://ci.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon
+      NEXT_PUBLIC_SITE_URL: https://ci.example
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --reporter=verbose
+      - run: npm run build
