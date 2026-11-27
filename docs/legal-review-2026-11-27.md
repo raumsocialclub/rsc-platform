@@ -41,3 +41,10 @@
 2. `/privacy` 는 운영 DB `site_content` 의 `legal.privacy` 저장본(11-20 버전, md5 e2059e2e…)이 우선하므로, 배포 직후 저장본을 새 기본값으로 교체(이전본은 `site_content_history` 자동 보관). 방법: 어드민 → 사이트 관리 → 약관 → 개인정보처리방침 → 「기본값 복원」, 또는 SQL 로 `data.sections`·`data.updated` 교체.
 3. 운영 주소에서 `/terms` `/privacy` 200, 「1:1 매칭」 0건, 부칙 2026년 11월 27일, 채널톡·Google 문구 표시 확인.
 4. 스테이징은 운영 DB 를 공유하므로 배포 전에는 `/terms` 만 새 문구, `/privacy` 는 옛 저장본이 보인다.
+
+## 5. 배포 결과 (2026-11-27 05:18 UTC)
+
+- 사용자 결정: 부칙·개정 이력 조 삭제, 제목 아래 「게시 · 시행일」 한 줄만(수정할 때마다 처음 등록한 것처럼 날짜만 갱신). 나머지 문구 확정 → 「배포해」.
+- 운영 배포 a7832be · dpl_4fC1V4jMJvPD1KzCu1sCVnfnpApo (production, icn1). CI 통과.
+- 운영 DB: `site_content` 의 `legal.privacy` 행(11-20 저장본)을 `site_content_history` 에 백업(9번째 이력)한 뒤 삭제 → 약관 3종 모두 DB 행 없음, 코드 기본값(`lib/legal/content.ts`)이 그대로 쓰임. 앞으로 개정은 코드의 본문과 `LEGAL_UPDATED`(+ 수집 항목 변경 시 `PRIVACY_CONSENT_VERSION`)만 바꾸면 된다. 어드민에서 직접 고치면 그때부터 저장본이 우선한다.
+- 운영 확인(외부 fetch): /terms·/privacy·/ 200, 제1~20조 / 제1~17조 제목 연속, 「게시 · 시행일 2026년 11월 27일」, 본문에 1:1 매칭·부칙·개정 이력·자리 문구 0건, 채널코퍼레이션·Google LLC·보호책임자 표시, 옛 날짜 0건.
