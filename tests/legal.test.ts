@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import { LEGAL_UPDATED, PRIVACY, PRIVACY_CONSENT_VERSION, REFUND, TERMS } from "@/lib/legal/content";
 import { DOC_BY_ID } from "@/lib/cms/schema";
 import { mergeDoc } from "@/lib/cms/get";
@@ -8,11 +9,11 @@ const articles = (list: { title: string }[]) => list.map((s) => /^제(\d+)조/.e
 
 /** 2026-11-27 소셜클럽 멤버십 버전 약관·방침 (1:1 매칭 제외) */
 describe("이용약관 · 개인정보처리방침 (소셜클럽 멤버십 버전)", () => {
-  it("시행일·동의 버전이 2026-11-27 로 맞고 부칙에 같은 날짜가 적혀 있다", () => {
+  it("게시·시행일과 동의 버전이 2026-11-27 로 맞고, 부칙·개정 이력 조는 두지 않는다(날짜만 게시)", () => {
     expect(PRIVACY_CONSENT_VERSION).toBe("2026-11-27");
     expect(LEGAL_UPDATED).toBe("2026년 11월 27일");
-    expect(PRIVACY.find((s) => s.title === "부칙")?.body.join(" ")).toContain(`시행일: ${LEGAL_UPDATED}`);
-    expect(TERMS.find((s) => s.title === "부칙")?.body.join(" ")).toContain(`${LEGAL_UPDATED}부터 시행`);
+    for (const doc of [TERMS, PRIVACY, REFUND]) expect(doc.some((s) => /부칙|개정 이력/.test(s.title))).toBe(false);
+    expect(readFileSync("components/legal/LegalPage.tsx", "utf8")).toContain("게시 · 시행일 {updated}");
   });
 
   it("본문 어디에도 1:1 매칭 표현이 없고, 소개·주선을 하지 않음을 밝힌다", () => {

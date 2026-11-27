@@ -19,6 +19,7 @@ const NAV = [
 /**
  * 약관류 공통 레이아웃 (Wanted DS: 제목 + 탭 + 본문 카드). 본문 기본값은 lib/legal/content.ts, 수정본은 CMS(site_content legal.*).
  * 리드 모드면 상단 탭에서 환불규정(숨김 페이지)을 뺀다. 상단 "사업자 정보" 표와 하단 문의 줄은 global.brand 값.
+ * 부칙·개정 이력 조는 두지 않고 제목 아래 「게시 · 시행일」 한 줄만 보인다(2026-11-27 사용자 결정) — 개정할 때는 본문과 이 날짜(CMS updated, 기본값 LEGAL_UPDATED)만 바꾼다.
  */
 export async function LegalPage({ overline, title, updated, sections, current, placeholder = true }: { overline: string; title: string; updated: string; sections: LegalSection[]; current: string; placeholder?: boolean }) {
   const [{ leadMode }, brand] = await Promise.all([getSettings(), getBrand()]);
@@ -33,7 +34,7 @@ export async function LegalPage({ overline, title, updated, sections, current, p
         <Container className="!max-w-[860px]">
           <div className="anim-up t-eyebrow text-primary mb-[8px]">{overline}</div>
           <h1 className="anim-up t-title-2 md:t-title-1 text-label mb-[8px]">{title}</h1>
-          <div className="t-label-1 text-labelAlt mb-[24px]">시행일 {updated}</div>
+          <div className="t-label-1 text-labelAlt mb-[24px]">게시 · 시행일 {updated}</div>
           <nav aria-label="약관 문서" className="flex gap-[24px] border-b border-lineAlt mb-[32px]">
             {nav.map((n) => {
               const on = n.href === current;
@@ -64,7 +65,7 @@ export async function LegalPage({ overline, title, updated, sections, current, p
           )}
           <article data-fold className="grid gap-[32px]">
             {sections.map((s, i) => {
-              const heading = /^(제\s*\d+\s*조|부칙|개정 이력)/.test(s.title) || (i === 0 && /처리방침$/.test(s.title)) ? s.title : `제${i + 1}조 (${s.title})`;
+              const heading = /^(제\s*\d+\s*조)/.test(s.title) || (i === 0 && /처리방침$/.test(s.title)) ? s.title : `제${i + 1}조 (${s.title})`;
               const autoNumber = s.body.length > 1 && !s.body.some((l) => /^\d+\.\s/.test(l));
               return (
                 <section key={i} id={`s${i + 1}`}>
