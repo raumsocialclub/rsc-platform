@@ -7,6 +7,7 @@
  */
 import { SETTINGS_DOCS } from "@/lib/settings/schema";
 import { SEO_DOCS } from "@/lib/seo/schema";
+import { LEGAL_UPDATED } from "@/lib/legal/content";
 
 export type FieldType = "text" | "textarea" | "image" | "link" | "number" | "boolean" | "color" | "select";
 export type Field = {
@@ -938,10 +939,10 @@ export const DOCS: DocDef[] = [
     id: `legal.${k}`,
     page: "legal" as const,
     label: { terms: "이용약관", privacy: "개인정보처리방침", refund: "환불규정" }[k],
-    description: "자리 문구 배너는 '자리 문구' 스위치를 끄면 사라집니다.",
+    description: "본문 기본값은 2026-11-27 소셜클럽 멤버십 버전(lib/legal/content.ts). 여기서 고치면 저장본이 기본값 대신 쓰이고, 개정 시 「개정 이력」 조와 시행일도 함께 갱신하세요. 자리 문구 배너는 '자리 문구' 스위치를 끄면 사라집니다.",
     fields: [t("title", "제목"), t("updated", "시행일"), bool("placeholder", "자리 문구 배너 표시")],
     lists: [{ key: "sections", label: "조항", itemLabel: "조", fields: [t("title", "조 제목"), ta("body", "내용 (줄마다 한 항)")], min: 1, max: 40 }],
-    defaults: { title: { terms: "RAUM SOCIAL CLUB 이용약관", privacy: "개인정보처리방침", refund: "취소 · 환불 규정" }[k], updated: "2026년 10월 1일", placeholder: k === "refund", sections: [] },
+    defaults: { title: { terms: "RAUM SOCIAL CLUB 이용약관", privacy: "개인정보처리방침", refund: "취소 · 환불 규정" }[k], updated: LEGAL_UPDATED, placeholder: k === "refund", sections: [] },
   })),
 ];
 
